@@ -58,6 +58,7 @@ class LocationService {
               if (_currentLocation == null) {
                 print('Location data $locationData');
 //              _addGeoPoint(locationData);
+                updateLocation(locationData);
               } else {
                 if (currentUserId != '') {
                   updateLocation(locationData);

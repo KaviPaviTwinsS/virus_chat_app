@@ -37,6 +37,9 @@ dependencies:
   flare_splash_screen: ^2.0.1+2
   geoflutterfire : ^2.0.2
 
+  flutter_range_slider: "^1.4.0"
+  latlong: ^0.6.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -147,10 +147,10 @@ class LoginSelectionOption extends State<LoginSelection> {
     isFacebookLoggedIn = await facebookSignup.facebookLogin.isLoggedIn;
     print('lodinnnn ${prefs.getString('signInType')}');
     if (prefs.getString('signInType') == 'google') {
-      navigateToUsersPage();
+      navigateToUsersPage("google");
 //      navigateToProfilePageExistingUser(context, 'google', prefs);
     } else if (prefs.getString('signInType') == 'facebook') {
-      navigateToUsersPage();
+      navigateToUsersPage("facebook");
 //      navigateToProfilePageExistingUser(context, 'facebook', prefs);
     }
     this.setState(() {
@@ -472,11 +472,11 @@ class LoginSelectionOption extends State<LoginSelection> {
         MaterialPageRoute(builder: (context) => new LoginSelectionPage()));
   }
 
-  Future navigateToUsersPage() async {
+  Future navigateToUsersPage(String userSignInType) async {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => UsersList(prefs.getString('userId'))));
+            builder: (context) => UsersList(userSignInType,prefs.getString('userId'))));
   }
 
   Future _updatestatus() async {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FacebookSignup.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
+import 'package:virus_chat_app/UsersList.dart';
 import 'dart:convert' as JSON;
 
 import 'const.dart';
@@ -21,6 +22,7 @@ class ProfilePageSetup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Profile Page',
       theme: ThemeData(
         // This is the theme of your application.
@@ -145,9 +147,19 @@ class ProfilePageState extends State<ProfilePage> {
             ),
             margin: EdgeInsets.only(left: 30.0, right: 30.0),
           ),
+          RaisedButton(onPressed: (){
+            navigationPage();
+          },
+          child: Text('GO to Users Page'),)
         ],
       ),
     );
+  }
+  void navigationPage() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => new UsersList(signinType,userId)));
   }
 
   Future fetchAllUsersData() async {
