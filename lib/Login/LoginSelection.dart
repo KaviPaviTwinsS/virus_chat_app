@@ -111,12 +111,14 @@ class LoginSelectionOption extends State<LoginSelection> {
 }*/
 
 class LoginSelectionOption extends State<LoginSelection> {
-  final GoogleSignIn googleSignIn = GoogleSignIn(
+ /* final GoogleSignIn googleSignIn = GoogleSignIn(
     scopes: [
       'email',
     ],
   );
+*/
 
+  GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   SharedPreferences prefs;
 

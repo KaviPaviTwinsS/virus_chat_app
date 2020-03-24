@@ -39,7 +39,10 @@ dependencies:
 
   flutter_range_slider: "^1.4.0"
   latlong: ^0.6.1
-
+  photo_view: ^0.5.0
+  image_picker: ^0.6.1+8
+  firebase_storage: ^3.0.6
+  cached_network_image: 2.0.0-rc.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

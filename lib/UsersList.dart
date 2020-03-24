@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:latlong/latlong.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
+import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/rangeSlider/RangeSliderPage.dart';
 
 
@@ -64,8 +65,8 @@ class UsersListState extends State<UsersListPage> {
 
   @override
   void initState() {
-    super.initState();
     LocationService(currentUser).locationStream;
+    super.initState();
   }
 
   @override
@@ -143,7 +144,8 @@ class ActiveUserListRadius extends StatelessWidget {
   Widget build(BuildContext context) {
     return new StreamBuilder(
       stream: Firestore.instance.collection('users').where(
-          'userDistanceISWITHINRADIUS', isEqualTo: 'YES').snapshots(),
+          'userDistanceISWITHINRADIUS', isEqualTo: 'YES').where(
+          'status', isEqualTo: 'ACTIVE').snapshots(),
       builder:
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         print('locationStream');
@@ -226,7 +228,7 @@ class ActiveUserListRadius extends StatelessWidget {
         'userDistanceISWITHINRADIUS':
         'YES'
       });
-    }else{
+    } else {
       Firestore.instance.collection('users').document(userId).updateData({
         'userDistanceISWITHINRADIUS':
         'NO'
@@ -266,27 +268,39 @@ class LoginUsersList extends StatelessWidget {
                 children: snapshot.data.documents.map((document) {
                   print('Document idddd ${document.documentID}');
                   if (document.documentID != currentUserId) {
-                    return new Center(
-                        child: new Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                margin: EdgeInsets.all(15.0),
-                                width: 100.0,
-                                height: 100.0,
-                                decoration: new BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: new DecorationImage(
-                                        fit: BoxFit.fill,
-                                        image: new NetworkImage(
-                                            document['photoUrl'])
-                                    )
-                                )),
-                            new Text(document['name'],
-                                textScaleFactor: 1.0)
-                          ],
-                        ));
+                    return GestureDetector(
+                        onTap: () {
+                          print('ON TAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Chat(
+                                    currentUserId: currentUserId,
+                                    peerId: document.documentID,
+                                    peerAvatar: document['photoUrl'],
+                                  )));
+                        },
+                        child: new Center(
+                            child: new Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                new Container(
+                                    margin: EdgeInsets.all(15.0),
+                                    width: 100.0,
+                                    height: 100.0,
+                                    decoration: new BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: new DecorationImage(
+                                            fit: BoxFit.fill,
+                                            image: new NetworkImage(
+                                                document['photoUrl'])
+                                        )
+                                    )),
+                                new Text(document['name'],
+                                    textScaleFactor: 1.0)
+                              ],
+                            )));
                   } else {
                     return Center(
                       child: Text(''),
