@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:virus_chat_app/SendInviteScreen.dart';
 import 'package:virus_chat_app/const.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,8 +17,12 @@ class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
   final String currentUserId;
+  final bool isFriend;
+  bool isAlreadyRequestSent;
 
-  Chat({Key key,@required this.currentUserId,@required this.peerId, @required this.peerAvatar}) : super(key: key);
+  Chat({Key key,@required this.currentUserId,@required this.peerId, @required this.peerAvatar, @required this.isFriend,@required this.isAlreadyRequestSent}) : super(key: key){
+    print('ISSSSSSSSSSSSSSSSSSSSSSSSSSSSSS     ${this.isAlreadyRequestSent}');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +38,8 @@ class Chat extends StatelessWidget {
         currentUserId : currentUserId,
         peerId: peerId,
         peerAvatar: peerAvatar,
+        isFriend: isFriend,
+          isAlreadyRequestSent: isAlreadyRequestSent
       ),
     );
   }
@@ -42,19 +49,24 @@ class ChatScreen extends StatefulWidget {
   final String peerId;
   final String peerAvatar;
   final String currentUserId;
+  final bool isFriend;
+  bool isAlreadyRequestSent;
 
-  ChatScreen({Key key,@required this.currentUserId, @required this.peerId, @required this.peerAvatar}) : super(key: key);
+  ChatScreen({Key key,@required this.currentUserId, @required this.peerId, @required this.peerAvatar, @required this.isFriend,@required this.isAlreadyRequestSent}) : super(key: key);
 
   @override
-  State createState() => new ChatScreenState(currentUserId:currentUserId,peerId: peerId, peerAvatar: peerAvatar);
+  State createState() => new ChatScreenState(currentUserId:currentUserId,peerId: peerId, peerAvatar: peerAvatar,isFriend: isFriend,isAlreadyRequestSent:isAlreadyRequestSent);
 }
 
 class ChatScreenState extends State<ChatScreen> {
-  ChatScreenState({Key key, @required this.currentUserId,@required this.peerId, @required this.peerAvatar});
+  ChatScreenState({Key key, @required this.currentUserId,@required this.peerId, @required this.peerAvatar, @required this.isFriend,@required this.isAlreadyRequestSent});
 
   String peerId;
   String peerAvatar;
   String currentUserId;
+  bool isFriend;
+  String friendUrl;
+  bool isAlreadyRequestSent;
   String id;
 
   var listMessage;
@@ -409,29 +421,48 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('groupChatId______________________ $groupChatId');
-    return WillPopScope(
-      child: Stack(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              // List of messages
-              buildListMessage(),
+    print('groupChatId______________________ $isFriend _____ ${isFriend!= null} ___${peerAvatar}');
+    if(isFriend!= null && !isFriend) {
+      return WillPopScope(
+        child: Stack(
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                // List of messages
+                SendInviteToUser(peerId,currentUserId,peerAvatar,isAlreadyRequestSent),
 
-              // Sticker
-              (isShowSticker ? buildSticker() : Container()),
+              ],
+            ),
+            // Loading
+            buildLoading()
+          ],
+        ),
+        onWillPop: onBackPress,
+      );
+    }else {
+      return WillPopScope(
+        child: Stack(
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                // List of messages
+                buildListMessage(),
 
-              // Input content
-              buildInput(),
-            ],
-          ),
+                // Sticker
+                (isShowSticker ? buildSticker() : Container()),
 
-          // Loading
-          buildLoading()
-        ],
-      ),
-      onWillPop: onBackPress,
-    );
+                // Input content
+                buildInput(),
+              ],
+            ),
+
+            // Loading
+            buildLoading()
+          ],
+        ),
+        onWillPop: onBackPress,
+      );
+    }
   }
 
   Widget buildSticker() {

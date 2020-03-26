@@ -66,6 +66,7 @@ class ProfilePageState extends State<ProfilePage> {
   String nickName = '';
   String signinType = '';
   String userId = '';
+  String photoUrl ='';
 
   TextEditingController controllerName;
 
@@ -82,7 +83,7 @@ class ProfilePageState extends State<ProfilePage> {
     super.initState();
     loginSelectionOption = LoginSelectionOption();
     facebookSignup = new FacebookSignup();
-//    fetchAllUsersData();
+    fetchAllUsersData();
     readLocal();
   }
 
@@ -159,7 +160,7 @@ class ProfilePageState extends State<ProfilePage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => new UsersList(signinType,userId)));
+            builder: (context) => new UsersList(signinType,userId,photoUrl)));
   }
 
   Future fetchAllUsersData() async {
@@ -169,7 +170,8 @@ class ProfilePageState extends State<ProfilePage> {
     print('document ${profile['name']}');
     setState(() {
       this.name = profile['name'];
-      controllerName = new TextEditingController(text: name);
+      this.controllerName = new TextEditingController(text: name);
+      this.photoUrl = profile['photoUrl'];
     });
 
   }

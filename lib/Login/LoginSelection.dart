@@ -10,6 +10,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FacebookSignup.dart';
 import 'package:virus_chat_app/LocationService.dart';
+import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
 
@@ -149,11 +150,11 @@ class LoginSelectionOption extends State<LoginSelection> {
     isFacebookLoggedIn = await facebookSignup.facebookLogin.isLoggedIn;
     print('lodinnnn ${prefs.getString('signInType')}');
     if (prefs.getString('signInType') == 'google') {
-      navigateToUsersPage("google");
-//      navigateToProfilePageExistingUser(context, 'google', prefs);
+//      navigateToUsersPage("google");
+      navigateToProfilePageExistingUser(context, 'google', prefs);
     } else if (prefs.getString('signInType') == 'facebook') {
-      navigateToUsersPage("facebook");
-//      navigateToProfilePageExistingUser(context, 'facebook', prefs);
+//      navigateToUsersPage("facebook");
+      navigateToProfilePageExistingUser(context, 'facebook', prefs);
     }
     this.setState(() {
       isLoading = false;
@@ -237,8 +238,11 @@ class LoginSelectionOption extends State<LoginSelection> {
   Future handleGoogleSignOut(SharedPreferences preferences) async {
     prefs = preferences;
     isLoading = true;
+    isLoggedIn = true;
     await FirebaseAuth.instance.signOut();
+    print('SIGN OUT VALLLL ${googleSignIn.isSignedIn() != null}   ____ isLoggg $isLoggedIn');
     if (googleSignIn.isSignedIn() != null && isLoggedIn) {
+      print('SIGN OUT');
       await googleSignIn.disconnect();
       await googleSignIn.signOut();
     }
@@ -250,7 +254,8 @@ class LoginSelectionOption extends State<LoginSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Container(
+      child : Column(
         children: <Widget>[
           new Image.asset(
             'images/splashnew.png',
@@ -261,7 +266,11 @@ class LoginSelectionOption extends State<LoginSelection> {
           OutlineButton.icon(
             icon: Icon(Icons.call),
             onPressed: () {
-              verifyPhone();
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          PhoneNumberSelectionPage()));
             },
             label: Text('Continue with Phone number'),
           ),
@@ -291,126 +300,11 @@ class LoginSelectionOption extends State<LoginSelection> {
           )
         ],
       ),
+      )
     );
   }
 
-  String verificationId;
-  String errorMessage = '';
-  String phoneNo = '+91 7540011847';
-  String smsOTP;
 
-  Future<void> verifyPhone() async {
-    final PhoneCodeSent smsOTPSent = (String verId, [int forceCodeResend]) {
-      this.verificationId = verId;
-      smsOTPDialog(context).then((value) {
-        print('sign in');
-      });
-    };
-    try {
-      await firebaseAuth.verifyPhoneNumber(
-          phoneNumber: this.phoneNo,
-          // PHONE NUMBER TO SEND OTP
-          codeAutoRetrievalTimeout: (String verId) {
-            //Starts the phone number verification process for the given phone number.
-            //Either sends an SMS with a 6 digit code to the phone number specified, or sign's the user in and [verificationCompleted] is called.
-            this.verificationId = verId;
-          },
-          codeSent: smsOTPSent,
-          // WHEN CODE SENT THEN WE OPEN DIALOG TO ENTER OTP.
-          timeout: const Duration(seconds: 20),
-          verificationCompleted: (AuthCredential phoneAuthCredential) {
-            print('phoneAuthCredential${phoneAuthCredential.providerId}');
-          },
-          verificationFailed: (AuthException exceptio) {
-            print('phoneAuthCredential exceptio ${exceptio.message}');
-          });
-    } catch (e) {
-      handleError(e);
-    }
-  }
-
-  Future<bool> smsOTPDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return new AlertDialog(
-            title: Text('Enter SMS Code'),
-            content: Container(
-              height: 85,
-              child: Column(children: [
-                TextField(
-                  onChanged: (value) {
-                    this.smsOTP = value;
-                  },
-                ),
-                (errorMessage != ''
-                    ? Text(
-                        errorMessage,
-                        style: TextStyle(color: Colors.red),
-                      )
-                    : Container())
-              ]),
-            ),
-            contentPadding: EdgeInsets.all(10),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Done'),
-                onPressed: () {
-                  firebaseAuth.currentUser().then((user) {
-                    print('USERRRRRRRRRRR ${user.phoneNumber}');
-                    if (user != null) {
-                      Navigator.of(context).pop();
-//                      Navigator.of(context).pushReplacementNamed('/homepage');
-                    } else {
-                      signIn();
-                    }
-                  });
-                },
-              )
-            ],
-          );
-        });
-  }
-
-  handleError(PlatformException error) {
-    print(error);
-    switch (error.code) {
-      case 'ERROR_INVALID_VERIFICATION_CODE':
-        FocusScope.of(context).requestFocus(new FocusNode());
-        setState(() {
-          errorMessage = 'Invalid Code';
-        });
-        Navigator.of(context).pop();
-        smsOTPDialog(context).then((value) {
-          print('sign in');
-        });
-        break;
-      default:
-        setState(() {
-          errorMessage = error.message;
-        });
-
-        break;
-    }
-  }
-
-  signIn() async {
-    try {
-      final AuthCredential credential = PhoneAuthProvider.getCredential(
-        verificationId: verificationId,
-        smsCode: smsOTP,
-      );
-      final AuthResult user =
-          await firebaseAuth.signInWithCredential(credential);
-      final FirebaseUser currentUser = await firebaseAuth.currentUser();
-      assert(user.user.uid == currentUser.uid);
-//      Navigator.of(context).pop();
-//      Navigator.of(context).pushReplacementNamed('/homepage');
-    } catch (e) {
-      handleError(e);
-    }
-  }
 
   Future _AddNewUser(FirebaseUser firebaseUser, String userEmail, String userId,
       String loginType) async {
@@ -475,10 +369,10 @@ class LoginSelectionOption extends State<LoginSelection> {
   }
 
   Future navigateToUsersPage(String userSignInType) async {
-    Navigator.push(
+   /* Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => UsersList(userSignInType,prefs.getString('userId'))));
+            builder: (context) => UsersList(userSignInType,prefs.getString('userId'))));*/
   }
 
   Future _updatestatus() async {
