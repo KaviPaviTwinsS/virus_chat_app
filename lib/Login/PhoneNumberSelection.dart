@@ -78,7 +78,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                 margin: const EdgeInsets.only(left: 30.0,top: 30.0, right: 30.0),
                 child: Text('+91 '),
               ),
-              Expanded(child: Container(
+                           Expanded(child: Container(
                 margin: const EdgeInsets.only(left: 20.0,top: 20.0, right: 20.0),
                 child: TextField(
                   obscureText: false,

@@ -81,7 +81,16 @@ class UsersListState extends State<UsersListPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Users Listtttttttt"),
+        leading: new IconButton(
+          icon: new Icon(Icons.person_pin, color: Colors.black),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => new ProfilePage(userSignInType,currentUserId: currentUser,)));
+          },
+        ),
+        title: new Text("Active Users List"),
       ),
       body: Container(
         child: Column(

@@ -18,6 +18,7 @@ import 'package:virus_chat_app/UserLocation.dart';
 
 void main() {
   runApp(new MaterialApp(
+    debugShowCheckedModeBanner: false,
     home: new SplashScreenPage(),
     routes: <String, WidgetBuilder>{
       '/HomeScreen': (BuildContext context) => new LoginSelectionPage()

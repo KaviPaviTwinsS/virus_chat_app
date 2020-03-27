@@ -20,6 +20,7 @@ class LoginSelectionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -155,6 +156,8 @@ class LoginSelectionOption extends State<LoginSelection> {
     } else if (prefs.getString('signInType') == 'facebook') {
 //      navigateToUsersPage("facebook");
       navigateToProfilePageExistingUser(context, 'facebook', prefs);
+    }else  if (prefs.getString('signInType') == 'MobileNumber') {
+      navigateToProfilePageExistingUser(context, 'MobileNumber', prefs);
     }
     this.setState(() {
       isLoading = false;
@@ -254,6 +257,7 @@ class LoginSelectionOption extends State<LoginSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       body: Container(
       child : Column(
         children: <Widget>[

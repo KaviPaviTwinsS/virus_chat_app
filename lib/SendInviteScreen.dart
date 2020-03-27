@@ -53,7 +53,6 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                       setState(() {
                         isButtonPressed = !isButtonPressed;
                       });
-
                       var documentReference = Firestore.instance
                           .collection('users')
                           .document(_mCurrentUserId)

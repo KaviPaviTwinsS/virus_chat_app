@@ -2,12 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
+import 'package:virus_chat_app/Login/UserRegistrationPage.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/phone_auth/code.dart';
 import 'package:virus_chat_app/utils/CustomTextSpan.dart';
 
 abstract class otpUpdateListener {
@@ -54,8 +57,7 @@ class OtpApplyPage extends StatefulWidget {
   }
 }
 
-class OtpApplyPageState extends State<OtpApplyPage>
-    implements otpUpdateListener {
+class OtpApplyPageState extends State<OtpApplyPage> implements otpUpdateListener {
   String mPhoneNumber = '';
   TextEditingController userPhoneNumberController = new TextEditingController();
 
@@ -151,7 +153,7 @@ class OtpApplyPageState extends State<OtpApplyPage>
   void loginUser() async {
     FirebaseUser user = await firebaseAuth.currentUser();
 
-    if (user == null) {
+   /* if (user == null) {
       AuthResult result = await firebaseAuth.signInAnonymously();
       user = result.user;
     }
@@ -160,7 +162,7 @@ class OtpApplyPageState extends State<OtpApplyPage>
     print('USER');
     print('    UID: ${user.uid}');
     print('    Token: ${userToken.token}');
-    print('    Expires: ${userToken.expirationTime}');
+    print('    Expires: ${userToken.expirationTime}');*/
     signIn();
   }
 
@@ -169,36 +171,71 @@ class OtpApplyPageState extends State<OtpApplyPage>
       smsOTP = '123456';
     }
     try {
-      print('AUTHTTTTTTTTTTTTTTTTTT ');
+      print('AUTHTTTTTTTTTTTTTTTTTT verificationId $verificationId  _______smsOTP $smsOTP');
 
       final AuthCredential credential = PhoneAuthProvider.getCredential(
         verificationId: verificationId,
         smsCode: smsOTP,
       );
 
-      print('AUTHTTTTTTTTTTTTTTTTTT______ ${credential}');
+        AuthCredential authCredential = PhoneAuthProvider.getCredential(verificationId:verificationId , smsCode: smsOTP);
+
+      print('AUTHTTTTTTTTTTTTTTTTTT______ ${smsOTP}');
 //      if(credential == smsOTP) {
-        Navigator.push(
+       /* Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) =>
                 new ProfilePage(
-                    'mobileNumber', currentUserId: '1234567890')));
+                    'mobileNumber', currentUserId: '1234567890')));*/
 //      Navigator.of(context).pop();
 //      Navigator.of(context).pushReplacementNamed('/homepage');
 //      }
+//      var test = await  firebaseAuth.verifyPhoneNumber(phoneNumber: mPhoneNumber, timeout:, verificationCompleted: null, verificationFailed: verificationId, codeSent: smsOTP, codeAutoRetrievalTimeout: null);
+
+      FirebasePhoneAuth.instantiate(
+          phoneNumber:'+91'+mPhoneNumber);
+
+//      FirebasePhoneAuth.signInWithPhoneNumber(smsCode: _userPhoneNumber);
+
+//      _signInWithPhoneNumber(_userPhoneNumber);
+      if(_userPhoneNumber == smsOTP) {
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => new UserRegistrationPage(userPhoneNumber: '+91'+'\t'+mPhoneNumber,userPhoneNumberWithoutCountryCode:mPhoneNumber)));
+      }else{
+        Fluttertoast.showToast(msg: 'Please enter valid OTP');
+      }
+      /*final PhoneVerificationCompleted verificationCompleted = (AuthCredential credential) {
+        print('verified');
+      };
       final AuthResult user =
       await firebaseAuth.signInWithCredential(credential);
 
       final FirebaseUser currentUser = await firebaseAuth.currentUser();
       assert(user.user.uid == currentUser.uid);
-
-      _AddNewUser(currentUser, '', user.user.uid, 'MobileNumber');
+*/
+//      _AddNewUser(currentUser, '', user.user.uid, 'MobileNumber');
 
     } catch (e) {
       handleError(e);
     }
   }
+/*
+  void _signInWithPhoneNumber(String smsCode) async {
+    await FirebaseAuth.instance
+        .signInWithPhoneNumber(
+        verificationId: verificationId,
+        smsCode: smsCode)
+        .then((FirebaseUser user) async {
+      final FirebaseUser currentUser = await FirebaseAuth.instance.currentUser();
+      assert(user.uid == currentUser.uid);
+      print('signed in with phone number successful: user -> $user');
+    });
+
+  }*/
 
   handleError(PlatformException error) {
     print(error);
@@ -225,40 +262,6 @@ class OtpApplyPageState extends State<OtpApplyPage>
   }
 
 
-  Future _AddNewUser(FirebaseUser firebaseUser, String userEmail, String userId,
-      String loginType) async {
-    var signupUserEmail = '';
-    var loginId = userId;
-    if (firebaseUser.email == null) {
-      signupUserEmail = userEmail;
-    } else {
-      signupUserEmail = firebaseUser.email;
-    }
-    loginType += 'AccountId';
-    UserLocation currentLocation = await LocationService(firebaseUser.uid,)
-        .getLocation();
-    // Update data to server if new user
-    Firestore.instance.collection('users').document(firebaseUser.uid).setData({
-      'name': firebaseUser.displayName,
-      'photoUrl': firebaseUser.photoUrl,
-      'email': signupUserEmail,
-      'nickName': firebaseUser.displayName,
-      'password': 'passwordstatic',
-      'phoneNo': firebaseUser.phoneNumber,
-      'status': 'ACTIVE',
-      'id': firebaseUser.uid,
-      '$loginType': loginId,
-      'createdAt':
-      ((new DateTime.now()
-          .toUtc()
-          .microsecondsSinceEpoch) / 1000).toInt()
-    });
-    Firestore.instance.collection('users').document(firebaseUser.uid)
-        .collection('userLocation').document(firebaseUser.uid)
-        .setData({
-      'userLocation': new GeoPoint(
-          currentLocation.latitude, currentLocation.longitude),
-    });
-  }
+
 
 }
