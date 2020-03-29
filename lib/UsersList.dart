@@ -98,20 +98,6 @@ class UsersListState extends State<UsersListPage> {
             new ActiveUserListRadiusState(currentUser,photoUrl),
             new UsersOnlinePage(currentUser,photoUrl),
             new LoginUsersList(currentUser,photoUrl),
-            Row(
-              children: <Widget>[
-                Container(
-                  child: RaisedButton(onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                ProfilePageSetup(
-                                  userSignInType,
-                                  currentUserId: currentUser,)));
-                  },
-                    child: Text('GO to profile'),),
-                ),
                 Container(
                   child: RaisedButton(onPressed: () {
                     print('_mcurrentUserId $currentUser');
@@ -124,9 +110,7 @@ class UsersListState extends State<UsersListPage> {
                     child: Text('Friend Requests'),),
                 )
               ],
-            )
 
-          ],
         ),
       ),
 //      new LoginUsersList(currentUser),

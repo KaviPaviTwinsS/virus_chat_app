@@ -212,7 +212,7 @@ class LoginSelectionOption extends State<LoginSelection> {
       // Check is already sign up
       final QuerySnapshot result = await Firestore.instance
           .collection('users')
-          .where('userId', isEqualTo: firebaseUser.uid)
+          .where('id', isEqualTo: firebaseUser.uid)
           .getDocuments();
       final List<DocumentSnapshot> documents = result.documents;
       if (documents.length == 0) {
@@ -413,7 +413,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     await prefs.setString('status', documents[0]['status']);
     await prefs.setString('photoUrl', documents[0]['photoUrl']);
     await prefs.setInt('createdAt', documents[0]['createdAt']);
-    await prefs.setInt('phoneNo', documents[0]['phoneNo']);
+    await prefs.setString('phoneNo', documents[0]['phoneNo']);
     await prefs.setString('signInType', signInType);
   }
 

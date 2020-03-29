@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:virus_chat_app/colors.dart';
 import 'package:virus_chat_app/const.dart';
 import 'package:photo_view/photo_view.dart';
 

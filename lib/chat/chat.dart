@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:virus_chat_app/SendInviteScreen.dart';
+import 'package:virus_chat_app/colors.dart';
 import 'package:virus_chat_app/const.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
 import 'package:fluttertoast/fluttertoast.dart';
