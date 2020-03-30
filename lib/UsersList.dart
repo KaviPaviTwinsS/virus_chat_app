@@ -5,6 +5,7 @@ import 'package:virus_chat_app/FriendRequestScreen.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
 import 'package:virus_chat_app/SendInviteScreen.dart';
+import 'package:virus_chat_app/chat/AudioChatsss.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/colors.dart';
 import 'package:virus_chat_app/rangeSlider/RangeSliderPage.dart';
@@ -101,11 +102,16 @@ class UsersListState extends State<UsersListPage> {
                 Container(
                   child: RaisedButton(onPressed: () {
                     print('_mcurrentUserId $currentUser');
-                    Navigator.push(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                FriendRequestScreen(currentUser,photoUrl)));
+                                MyAppChatAudio()));
+                   /* Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                FriendRequestScreen(currentUser,photoUrl)));*/
                   },
                     child: Text('Friend Requests'),),
                 )
