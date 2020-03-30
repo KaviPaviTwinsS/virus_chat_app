@@ -10,6 +10,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FacebookSignup.dart';
 import 'package:virus_chat_app/LocationService.dart';
+import 'package:virus_chat_app/Login/PasswordSetupPage.dart';
 import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
@@ -149,7 +150,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     facebookSignup = new FacebookSignup();
     isLoggedIn = await googleSignIn.isSignedIn();
     isFacebookLoggedIn = await facebookSignup.facebookLogin.isLoggedIn;
-    print('lodinnnn ${prefs.getString('signInType')}');
+    print('lodinnnn ${prefs.getString('userId')}');
     if (prefs.getString('signInType') == 'google') {
 //      navigateToUsersPage("google");
       navigateToProfilePageExistingUser(context, 'google', prefs);
@@ -180,12 +181,12 @@ class LoginSelectionOption extends State<LoginSelection> {
 //    Fluttertoast.showToast(msg: "Faccebook login success ${profileData['picture']['data']['url']} ___ ${profileData['email']}");
     facebookProfileData = profileData;
     if (isFacebookLoggedIn) {
-      if (facebookProfileData != null) {
+   /*   if (facebookProfileData != null) {
         updateLocalData(prefs, facebookProfileData, 'facebook');
         _AddNewUser(facebookProfileData, userEmail, userId, 'facebook');
       }
-      isLoading = false;
-      navigateToProfilePage(context, 'facebook', facebookProfileData);
+      isLoading = false;*/
+      navigateToProfilePage(context, 'facebook', facebookProfileData,userId);
     } else {
 //      Fluttertoast.showToast(msg: "Sign in fail");
       isLoading = false;
@@ -209,27 +210,8 @@ class LoginSelectionOption extends State<LoginSelection> {
         (await firebaseAuth.signInWithCredential(credential)).user;
 
     if (firebaseUser != null) {
-      // Check is already sign up
-      final QuerySnapshot result = await Firestore.instance
-          .collection('users')
-          .where('id', isEqualTo: firebaseUser.uid)
-          .getDocuments();
-      final List<DocumentSnapshot> documents = result.documents;
-      if (documents.length == 0) {
-        // Write data to local
-        currentUser = firebaseUser;
-        updateLocalData(prefs, currentUser, 'google');
-        // Update data to server if new user
-        _AddNewUser(firebaseUser, '', googleUser.id, 'google');
-      } else {
-        // Write data to local
-        updateLocalListData(prefs, documents, 'google');
-      }
-      Fluttertoast.showToast(msg: "Sign in success");
-      this.setState(() {
-        isLoading = false;
-      });
-      navigateToProfilePage(context, 'google', firebaseUser);
+
+      navigateToProfilePage(context, 'google', firebaseUser,googleUser.id);
     } else {
 //      Fluttertoast.showToast(msg: "Sign in fail");
       this.setState(() {
@@ -350,12 +332,18 @@ class LoginSelectionOption extends State<LoginSelection> {
   }
 
   Future navigateToProfilePage(BuildContext context, String signinType,
-      FirebaseUser firebaseUser) async {
+      FirebaseUser firebaseUser, String accountId) async {
+    /*
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
-                ProfilePageSetup(signinType, currentUserId: firebaseUser.uid)));
+                ProfilePageSetup(signinType, currentUserId: firebaseUser.uid)));*/
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                PasswordSetup(signinType,maccountId:accountId,mfirebaseUser: firebaseUser)));
   }
 
   Future navigateToProfilePageExistingUser(

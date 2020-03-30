@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/Login/UserRegistrationPage.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
@@ -27,6 +28,7 @@ class OTPScreen extends StatefulWidget {
 
 class _OTPScreenState extends State<OTPScreen> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  SharedPreferences prefs;
 
   /// Control the input text field.
   TextEditingController _pinEditingController = TextEditingController();
@@ -41,7 +43,12 @@ class _OTPScreenState extends State<OTPScreen> {
   @override
   void initState() {
     super.initState();
+    isSignIn();
     _onVerifyCode();
+  }
+
+  void isSignIn() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
   @override
@@ -244,12 +251,13 @@ class _OTPScreenState extends State<OTPScreen> {
     final List<DocumentSnapshot> documents = result.documents;
     print('documents ${documents.length}');
     if(documents.length !=0){
-      Navigator.push(
+      updateLocalListData(prefs,'MobileNumber',documents,firebaseUser.uid);
+    /*  Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
               new ProfilePage(
-                  'MobileNumber', currentUserId:firebaseUser.uid)));
+                  'MobileNumber', currentUserId:firebaseUser.uid)));*/
     }else {
       Navigator.push(
           context,
@@ -259,5 +267,29 @@ class _OTPScreenState extends State<OTPScreen> {
                   userPhoneNumber: widget.mobileNumber,
                   userPhoneNumberWithoutCountryCode: widget.mobileNumWithoutCountryCode,mFirebaseUser : firebaseUser)));
     }
+  }
+
+
+  Future<Null> updateLocalListData(SharedPreferences prefs,
+      String signInType, List<DocumentSnapshot> documents, String uid) async {
+    print('updateLocalListData');
+    await prefs.setString('userId', documents[0]['id']);
+    await prefs.setString('email', documents[0]['email']);
+    await prefs.setString('name', documents[0]['name']);
+    await prefs.setString('nickname', documents[0]['nickName']);
+    await prefs.setString('status', 'ACTIVE');
+    await prefs.setString('photoUrl', documents[0]['photoUrl']);
+    await prefs.setInt('createdAt', ((new DateTime.now()
+        .toUtc()
+        .microsecondsSinceEpoch) / 1000).toInt());
+    await prefs.setString('phoneNo', documents[0]['phoneNo']);
+    await prefs.setString('signInType', signInType);
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                ProfilePageSetup('MobileNumber',
+                    currentUserId: uid)));
   }
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class SendInviteToUser extends StatefulWidget{
@@ -22,6 +23,9 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   String _mPeerId, _mCurrentUserId;
   String _mPhotoUrl;
   bool _misAlreadyRequestSent;
+  SharedPreferences prefs;
+
+  String _userName,_userPhotoUrl;
 
   SendInviteToUserState(String peerId, String currentUserId,String friendPhotoUrl,bool isAlreadyRequestSent) {
     print('PERRRR IDD $peerId');
@@ -34,14 +38,20 @@ class SendInviteToUserState extends State<SendInviteToUser> {
 
   @override
   void initState() {
+    initial();
+    super.initState();
+  }
+
+  void initial() async{
+    prefs = await SharedPreferences.getInstance();
     if(_misAlreadyRequestSent){
       setState(() {
         isButtonPressed =!isButtonPressed;
       });
     }
-    super.initState();
+    _userName =  await prefs.getString('name');
+    _userPhotoUrl =await prefs.getString('photoUrl');
   }
-
   @override
   Widget build(BuildContext context) {
     return  Flexible(
@@ -66,7 +76,8 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                             'receiveId': _mPeerId,
                             'IsAcceptInvitation': false,
                             'isRequestSent': true,
-                            'friendPhotoUrl': _mPhotoUrl,
+                            'friendPhotoUrl': _userPhotoUrl,
+                            'friendName': _userName,
                             'isAlreadyRequestSent': true,
                             'timestamp': DateTime
                                 .now()
@@ -88,7 +99,8 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                             'receiveId': _mPeerId,
                             'IsAcceptInvitation': false,
                             'isRequestSent': false,
-                            'friendPhotoUrl': _mPhotoUrl,
+                            'friendPhotoUrl': _userPhotoUrl,
+                            'friendName': _userName,
                             'isAlreadyRequestSent': true,
                             'timestamp': DateTime
                                 .now()

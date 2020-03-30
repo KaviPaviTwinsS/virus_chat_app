@@ -132,7 +132,7 @@ class friendlist extends StatelessWidget {
                         valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
               else
                     return new ListView(
-                        scrollDirection: Axis.horizontal,
+                        scrollDirection: Axis.vertical,
                         children: snapshot.data.documents.map((document) {
                           print('Document idddd ${document.documentID}');
                           if (document.documentID != currentUserId) {
@@ -151,65 +151,70 @@ class friendlist extends StatelessWidget {
                                           peerAvatar: document['photoUrl'],
                                         )));*/
                                 },
-                                child: new Center(
-                                    child: new Column(
-                                      crossAxisAlignment: CrossAxisAlignment
+                                child: new Row(
+                                     /* crossAxisAlignment: CrossAxisAlignment
                                           .center,
                                       mainAxisAlignment: MainAxisAlignment
-                                          .center,
+                                          .center,*/
                                       children: <Widget>[
-                                        Material(
-                                          child: CachedNetworkImage(
-                                            placeholder: (context, url) => Container(
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 1.0,
-                                                valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                                              ),
-                                              width: 35.0,
-                                              height: 35.0,
-                                              padding: EdgeInsets.all(10.0),
-                                            ),
-                                            imageUrl: document['friendPhotoUrl'],
-                                            width: 35.0,
-                                            height: 35.0,
-                                            fit: BoxFit.cover,
-                                          ),
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(18.0),
-                                          ),
-                                          clipBehavior: Clip.hardEdge,
-                                        ),
-                                        new Container(
+                                new Container(
+                                margin: EdgeInsets.all(15.0),
+                              child:  Align(
+                                         alignment: Alignment.topLeft,
+                                         child :  Material(
+                                           child: CachedNetworkImage(
+                                             placeholder: (context, url) => Container(
+                                               child: CircularProgressIndicator(
+                                                 strokeWidth: 1.0,
+                                                 valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                                               ),
+                                               width: 55.0,
+                                               height: 55.0,
+                                               padding: EdgeInsets.all(10.0),
+                                             ),
+                                             imageUrl: document['friendPhotoUrl'],
+                                             width: 35.0,
+                                             height: 35.0,
+                                             fit: BoxFit.cover,
+                                           ),
+                                           borderRadius: BorderRadius.all(
+                                             Radius.circular(18.0),
+                                           ),
+                                           clipBehavior: Clip.hardEdge,
+                                         ),
+                                       ),
+                                ),
+                                  new Container(
                                           margin: EdgeInsets.all(15.0),
-                                          width: 100.0,
-                                          height: 100.0,
-                                          child: Text('requestFrom ::::::: ${document['requestFrom']}'),
+                                          child: Text('${document['friendName']}'),
                                         ),
-                                        new Text('receiver ID :::::: ${document['receiveId']}',
-                                            textScaleFactor: 1.0),
-                                        RaisedButton(
-                                          child: Text('Accept Request'),
-                                          onPressed: () {
-                                            print('requestFrom ${document['requestFrom']} ___ ${document['receiveId']}');
-                                            Firestore.instance.collection(
-                                                'users').document(
-                                                document['requestFrom']).collection(
-                                                'FriendsList')
-                                                .document(document['receiveId'])
-                                                .updateData(
-                                                {'IsAcceptInvitation': true});
-                                            Firestore.instance.collection(
-                                                'users').document(
-                                                document['receiveId'])
-                                                .collection('FriendsList')
-                                                .document(
-                                                document['requestFrom'])
-                                                .updateData(
-                                                {'IsAcceptInvitation': true});
-                                          },
-                                        )
+                                      /*  new Text('receiver ID :::::: ${document['receiveId']}',
+                                            textScaleFactor: 1.0),*/
+                                        Container(
+                                          margin: EdgeInsets.all(15.0),
+                                         child:  RaisedButton(
+                                           child: Text('Accept Request'),
+                                           onPressed: () {
+                                             print('requestFrom ${document['requestFrom']} ___ ${document['receiveId']}');
+                                             Firestore.instance.collection(
+                                                 'users').document(
+                                                 document['requestFrom']).collection(
+                                                 'FriendsList')
+                                                 .document(document['receiveId'])
+                                                 .updateData(
+                                                 {'IsAcceptInvitation': true});
+                                             Firestore.instance.collection(
+                                                 'users').document(
+                                                 document['receiveId'])
+                                                 .collection('FriendsList')
+                                                 .document(
+                                                 document['requestFrom'])
+                                                 .updateData(
+                                                 {'IsAcceptInvitation': true});
+                                           },
+                                         ),
+                                       )
                                       ],
-                                    )
                                 ));
                           } else {
                             return Center(

@@ -9,9 +9,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FacebookSignup.dart';
+import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/utils/strings.dart';
 import 'const.dart';
 
 class ProfilePageSetup extends StatelessWidget {
@@ -71,16 +73,15 @@ class ProfilePageState extends State<ProfilePage> {
   String nickName = '';
   String signinType = '';
   String userId = '';
-  String photoUrl ='';
+  String photoUrl = '';
   File avatarImageFile;
   bool isLoading = false;
 
-  String userEmail ='';
+  String userEmail = '';
 
   TextEditingController controllerName;
   TextEditingController controllerNickName;
   TextEditingController controllerEmail;
-
 
 
   LoginSelectionOption loginSelectionOption;
@@ -93,12 +94,10 @@ class ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
+    super.initState();
+    readLocal();
     loginSelectionOption = LoginSelectionOption();
     facebookSignup = new FacebookSignup();
-    fetchAllUsersData();
-    readLocal();
-    super.initState();
-
   }
 
   void readLocal() async {
@@ -108,261 +107,237 @@ class ProfilePageState extends State<ProfilePage> {
     controllerName = new TextEditingController(text: name);
     controllerNickName = new TextEditingController(text: nickName);
     controllerEmail = new TextEditingController(text: userEmail);
+    fetchAllUsersData();
 
     // Force refresh input
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     print('profile build $name');
-    /*return Scaffold(
-      appBar: AppBar(
-       *//* leading: new IconButton(
-          icon: new Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => new LoginSelectionPage()));
-          },
-        ),*//*
-        title: Text('Profile Page setup'),
-      ),*/
-      /*body: Column(
-        children: <Widget>[
-          RaisedButton(
-            child: Text('Logout User'),
+    return Scaffold(
+        resizeToAvoidBottomPadding: false,
+        appBar: AppBar(
+        /*  leading: new IconButton(
+            icon: new Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              if (signinType == 'google')
-                loginSelectionOption.handleGoogleSignOut(prefs);
-              else if (signinType == 'facebook')
-                facebookSignup.facebookLogout(context, prefs);
-              prefs.setString('signInType', '');
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => new LoginSelectionPage()));
             },
-          ),
-//          Text('User Name $name'),
-          Container(
-            child: Theme(
-              data: Theme.of(context).copyWith(primaryColor: primaryColor),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Enter your name',
-                  contentPadding: new EdgeInsets.all(5.0),
-                  hintStyle: TextStyle(color: greyColor),
-                ),
-                controller: controllerName,
-                onChanged: (value) {
-                  name = value;
-                },
-//                focusNode: focusNodeNickname,
-              ),
-            ),
-            margin: EdgeInsets.only(left: 30.0, right: 30.0),
-          ),
-          RaisedButton(onPressed: (){
-            navigationPage();
-          },
-          child: Text('GO to Users Page'),)
-        ],
-      ),*/
-//    );
-
-  return Stack(
-      children: <Widget>[
-        SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              // Avatar
-            /*  Container(
-                child: Center(
-                  child: Stack(
-                    children: <Widget>[
-                      (avatarImageFile == null)
-                          ? (photoUrl != ''
-                          ? Material(
-                        child: CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.0,
-                              valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                            ),
+          ),*/
+          title: Text('Profile Page setup'),
+        ),
+        body: Stack(
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                Container(
+                  child: Center(
+                    child: Stack(
+                      children: <Widget>[
+                        (avatarImageFile == null)
+                            ? (photoUrl != ''
+                            ? Material(
+                          child: CachedNetworkImage(
+                            placeholder: (context, url) =>
+                                Container(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.0,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        themeColor),
+                                  ),
+                                  width: 90.0,
+                                  height: 90.0,
+                                  padding: EdgeInsets.all(20.0),
+                                ),
+                            imageUrl: photoUrl,
                             width: 90.0,
                             height: 90.0,
-                            padding: EdgeInsets.all(20.0),
+                            fit: BoxFit.cover,
                           ),
-                          imageUrl: photoUrl,
-                          width: 90.0,
-                          height: 90.0,
-                          fit: BoxFit.cover,
+                          borderRadius: BorderRadius.all(Radius.circular(45.0)),
+                          clipBehavior: Clip.hardEdge,
+                        )
+                            : Icon(
+                          Icons.account_circle,
+                          size: 90.0,
+                          color: greyColor,
+                        ))
+                            : Material(
+                          child: Image.file(
+                            avatarImageFile,
+                            width: 90.0,
+                            height: 90.0,
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(45.0)),
+                          clipBehavior: Clip.hardEdge,
                         ),
-                        borderRadius: BorderRadius.all(Radius.circular(45.0)),
-                        clipBehavior: Clip.hardEdge,
-                      )
-                          : Icon(
-                        Icons.account_circle,
-                        size: 90.0,
-                        color: greyColor,
-                      ))
-                          : Material(
-                        child: Image.file(
-                          avatarImageFile,
-                          width: 90.0,
-                          height: 90.0,
-                          fit: BoxFit.cover,
+                        IconButton(
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: primaryColor.withOpacity(0.5),
+                          ),
+                          onPressed: getImage,
+                          padding: EdgeInsets.all(30.0),
+                          splashColor: Colors.transparent,
+                          highlightColor: greyColor,
+                          iconSize: 30.0,
                         ),
-                        borderRadius: BorderRadius.all(Radius.circular(45.0)),
-                        clipBehavior: Clip.hardEdge,
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.camera_alt,
-                          color: primaryColor.withOpacity(0.5),
-                        ),
-                        onPressed: getImage,
-                        padding: EdgeInsets.all(30.0),
-                        splashColor: Colors.transparent,
-                        highlightColor: greyColor,
-                        iconSize: 30.0,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  width: double.infinity,
+                  margin: EdgeInsets.all(20.0),
                 ),
-                width: double.infinity,
-                margin: EdgeInsets.all(20.0),
-              ),*/
-
-              // Input
-              Column(
-                children: <Widget>[
-                  // Username
-                  Container(
-                    margin: const EdgeInsets.only(
-                        left: 20.0, top: 20.0, right: 20.0),
+                Container(
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                        primaryColor: primaryColor),
                     child: TextField(
-                      obscureText: false,
+                      decoration: InputDecoration(
+                        hintText: 'Enter your name',
+                        contentPadding: new EdgeInsets.all(5.0),
+                        hintStyle: TextStyle(color: greyColor),
+                      ),
                       controller: controllerName,
-                      onChanged: (userPhoneNumber) {
-                        name = userPhoneNumber;
+                      onChanged: (value) {
+                        name = value;
                       },
-                      decoration: new InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: focused_border_color, width: 2.0),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: enabled_border_color, width: 2.0),
-                        ),
-                        hintText: 'Name',
-                      ),
+//                focusNode: focusNodeNickname,
                     ),
                   ),
-
-                  Container(
-                    margin: const EdgeInsets.only(
-                        left: 20.0, top: 5.0, right: 20.0),
-                    child: TextField(
-                      obscureText: false,
-                      controller: controllerNickName,
-                      onChanged: (userPhoneNumber) {
-                        nickName = userPhoneNumber;
-                      },
-                      decoration: new InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: focused_border_color, width: 2.0),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: enabled_border_color, width: 2.0),
-                        ),
-                        hintText: 'Nick Name',
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(
-                        left: 20.0, top: 5.0, right: 20.0),
-                    child: TextField(
-                      obscureText: false,
-                      controller: controllerEmail,
-                      onChanged: (userPhoneNumber) {
-                        userEmail = userPhoneNumber;
-                      },
-                      decoration: new InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: focused_border_color, width: 2.0),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: enabled_border_color, width: 2.0),
-                        ),
-                        hintText: 'Email',
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                  ),
-
-                ],
-                crossAxisAlignment: CrossAxisAlignment.start,
-              ),
-
-              // Button
-              Container(
-                child: RaisedButton(onPressed: () {
-                  if (name != '' && userEmail != '' &&
-                      photoUrl != '') {
-
-                  } else {
-
-                  }
-                },
-                  child: Text('UPDATE ',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 19),),
+                  margin: EdgeInsets.only(left: 30.0, right: 30.0),
                 ),
-              ),
-              RaisedButton(
-                child: Text('Logout User'),
-                onPressed: () {
-                  if (signinType == 'google')
-                    loginSelectionOption.handleGoogleSignOut(prefs);
-                  else if (signinType == 'facebook')
-                    facebookSignup.facebookLogout(context, prefs);
-                  prefs.setString('signInType', '');
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => new LoginSelectionPage()));
+                Container(
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                        primaryColor: primaryColor),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Enter your NickName',
+                        contentPadding: new EdgeInsets.all(5.0),
+                        hintStyle: TextStyle(color: greyColor),
+                      ),
+                      controller: controllerNickName,
+                      onChanged: (value) {
+                        nickName = value;
+                      },
+//                focusNode: focusNodeNickname,
+                    ),
+                  ),
+                  margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                ),
+                Container(
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                        primaryColor: primaryColor),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Enter your Email',
+                        contentPadding: new EdgeInsets.all(5.0),
+                        hintStyle: TextStyle(color: greyColor),
+                      ),
+                      controller: controllerEmail,
+                      onChanged: (value) {
+                        userEmail = value;
+                      },
+//                focusNode: focusNodeNickname,
+                    ),
+                  ),
+                  margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                ),
+                RaisedButton(onPressed: () {
+                  navigationPage();
                 },
-              ),
-            ],
-          ),
-          padding: EdgeInsets.only(left: 15.0, right: 15.0),
-        ),
-
-        // Loading
-        Positioned(
-          child: isLoading
-              ? Container(
-            child: Center(
-              child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+                  child: Text('GO to Users Page'),),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                      child: RaisedButton(
+                        child: Text('Logout User'),
+                        onPressed: () {
+                          if (signinType == 'google')
+                            loginSelectionOption.handleGoogleSignOut(prefs);
+                          else if (signinType == 'facebook')
+                            facebookSignup.facebookLogout(context, prefs);
+                          else if(signinType == 'MobileNumber')
+                            clearLocalData();
+                          prefs.setString('signInType', '');
+                          _updatestatus();
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (
+                                      context) => new LoginSelectionPage()));
+                        },
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                      child: RaisedButton(
+                        child: Text('Update Profile'),
+                        onPressed: () {
+                          if (prefs.getString('name') != name ||
+                              prefs.getString('nickname') != nickName ||
+                              prefs.getString('photoUrl') != photoUrl ||
+                              prefs.getString('email') != userEmail) {
+                            isLoading = true;
+                            Firestore.instance.collection('users')
+                                .document(userId)
+                                .updateData({
+                              'photoUrl': photoUrl,
+                              'name': name,
+                              'nickName': nickName,
+                              'email': userEmail
+                            });
+                            storeLocalDataInternal(photoUrl,name,nickName,userEmail);
+                            Fluttertoast.showToast(msg: update_success);
+                          } else {
+                            Fluttertoast.showToast(msg: no_data_change);
+                          }
+                        },
+                      ),
+                    )
+                  ],
+                )
+              ],
             ),
-            color: Colors.white.withOpacity(0.8),
-          )
-              : Container(),
-        ),
-      ],
+            // Loading
+            Positioned(
+              child: isLoading
+                  ? Container(
+                child: Center(
+                  child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+                ),
+                color: Colors.white.withOpacity(0.8),
+              )
+                  : Container(),
+            ),
+          ],
+        )
     );
   }
 
+
+  Future _updatestatus() async {
+    LocationService('');
+    Firestore.instance
+        .collection('users')
+        .document(prefs.getString('userId'))
+        .updateData({'status': 'LoggedOut'});
+  }
+
+  Future<Null> setLoader() async {
+    setState(() {
+      this.isLoading = false;
+    });
+  }
 
   Future getImage() async {
     File image = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -414,23 +389,94 @@ class ProfilePageState extends State<ProfilePage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => new UsersList(signinType,userId,photoUrl)));
+            builder: (context) => new UsersList(signinType, userId, photoUrl)));
   }
 
   Future fetchAllUsersData() async {
-    var document = await Firestore.instance.collection('users').document(
-        userId).get();
-    var profile = document.data;
-    print('document ${profile['name']}');
-    setState(() {
-      this.name = profile['name'];
-      this.photoUrl = profile['photoUrl'];
-      this.userEmail = profile['email'];
-      this.nickName = profile['nickName'];
-      this.controllerName = new TextEditingController(text: name);
-      this.controllerNickName = new TextEditingController(text: nickName);
-      this.controllerEmail = new TextEditingController(text: userEmail);
-    });
+    if (prefs.containsKey('userId') && prefs.getString('userId') != null) {
+      if (prefs.getString('userId') == '') {
+        var document = await Firestore.instance.collection('users').document(
+            userId).get();
+        var profile = document.data;
+        print('document ${profile['name']}');
+        setState(() {
+          storeLocalData(profile);
+          this.name = profile['name'];
+          this.photoUrl = profile['photoUrl'];
+          this.userEmail = profile['email'];
+          this.nickName = profile['nickName'];
+          this.controllerName = new TextEditingController(text: name);
+          this.controllerNickName = new TextEditingController(text: nickName);
+          this.controllerEmail = new TextEditingController(text: userEmail);
+        });
+      } else {
+        setState(() {
+          this.name = prefs.getString('name');
+          this.photoUrl = prefs.getString('photoUrl');
+          this.userEmail = prefs.getString('email');
+          this.nickName = prefs.getString('nickname');
+          this.controllerName = new TextEditingController(text: name);
+          this.controllerNickName = new TextEditingController(text: nickName);
+          this.controllerEmail = new TextEditingController(text: userEmail);
+        });
+      }
+    } else {
+      var document = await Firestore.instance.collection('users').document(
+          userId).get();
+      var profile = document.data;
+      print('document ${profile['name']}');
+      setState(() {
+        storeLocalData(profile);
+        this.name = profile['name'];
+        this.photoUrl = profile['photoUrl'];
+        this.userEmail = profile['email'];
+        this.nickName = profile['nickName'];
+        this.controllerName = new TextEditingController(text: name);
+        this.controllerNickName = new TextEditingController(text: nickName);
+        this.controllerEmail = new TextEditingController(text: userEmail);
+      });
+    }
+  }
 
+
+  Future storeLocalData(Map<String, dynamic> profile) async {
+    await prefs.setString('userId', profile['id']);
+    await prefs.setString('email', profile['email']);
+    await prefs.setString('name', profile['name']);
+    await prefs.setString('nickname', profile['nickName']);
+    await prefs.setString('status', 'ACTIVE');
+    await prefs.setString('photoUrl', profile['photoUrl']);
+    await prefs.setInt('createdAt', ((new DateTime.now()
+        .toUtc()
+        .microsecondsSinceEpoch) / 1000).toInt());
+    await prefs.setString('phoneNo', profile['phoneNo']);
+    await prefs.setString('signInType', signinType);
+  }
+
+
+  Future storeLocalDataInternal(String photoUrl,String name,String nickName,String email) async {
+    await prefs.setString('userId', userId);
+    await prefs.setString('email', email);
+    await prefs.setString('name', name);
+    await prefs.setString('nickname', nickName);
+    await prefs.setString('status', 'ACTIVE');
+    await prefs.setString('photoUrl', photoUrl);
+    await prefs.setInt('createdAt', ((new DateTime.now()
+        .toUtc()
+        .microsecondsSinceEpoch) / 1000).toInt());
+    await prefs.setString('signInType', signinType);
+  }
+
+  Future<Null> clearLocalData() async {
+    await prefs.setString('email', '');
+    await prefs.setString('name', '');
+    await prefs.setString('nickname', '');
+    await prefs.setString('password', '');
+    await prefs.setString('status', '');
+    await prefs.setString('photoUrl', '');
+    await prefs.setString('createdAt', '');
+    await prefs.setInt('phoneNo', 0);
+    await prefs.setString('signInType', '');
+    await prefs.setString('userId', '');
   }
 }
