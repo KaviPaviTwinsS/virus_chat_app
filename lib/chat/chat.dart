@@ -479,6 +479,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     }
   }
 
+
+
   bool isLastMessageLeft(int index) {
     if ((index > 0 && listMessage != null &&
         listMessage[index - 1]['idFrom'] == id) || index == 0) {

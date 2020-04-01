@@ -9,3 +9,4 @@ String no_data_change='No changes found';
 String update_success ='Profile Updated successfully';
 String password = 'Password';
 String log_in ='Log in';
+String select_category = 'Need to select anyone category';

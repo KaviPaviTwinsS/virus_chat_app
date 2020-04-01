@@ -9,6 +9,8 @@ import 'package:virus_chat_app/chat/AudioChatsss.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/colors.dart';
 import 'package:virus_chat_app/rangeSlider/RangeSliderPage.dart';
+import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
+import 'package:virus_chat_app/utils/flutter_emoji.dart';
 
 
 class UsersList extends StatelessWidget {
@@ -99,22 +101,51 @@ class UsersListState extends State<UsersListPage> {
             new ActiveUserListRadiusState(currentUser,photoUrl),
             new UsersOnlinePage(currentUser,photoUrl),
             new LoginUsersList(currentUser,photoUrl),
-                Container(
-                  child: RaisedButton(onPressed: () {
-                    print('_mcurrentUserId $currentUser');
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                MyAppChatAudio()));
-                   /* Navigator.push(
+                Row(
+                  children: <Widget>[
+
+                    Container(
+                      child: RaisedButton(onPressed: () {
+                        print('_mcurrentUserId $currentUser');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    MyAppChatAudio()));
+                        /* Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
                                 FriendRequestScreen(currentUser,photoUrl)));*/
-                  },
-                    child: Text('Friend Requests'),),
+                      },
+                        child: Text('Friend Requests'),),
+                    ),
+
+                    Container(
+                      child: RaisedButton(onPressed: () {
+                        print('_mcurrentUserId $currentUser');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    MakeTweetPost(currentUser,photoUrl)));
+                      },
+                        child: Text('Tweet Posts'),),
+                    ),
+                    Container(
+                      child:RaisedButton(onPressed: () {
+                        print('_mcurrentUserId $currentUser');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    MainApp()));
+                      },
+                        child: Text('Home Page'),),
+                    )
+                  ],
                 )
+
               ],
 
         ),
