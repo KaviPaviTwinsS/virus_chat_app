@@ -4,13 +4,12 @@ import 'package:latlong/latlong.dart';
 import 'package:virus_chat_app/FriendRequestScreen.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
-import 'package:virus_chat_app/SendInviteScreen.dart';
+import 'package:virus_chat_app/audiop/MyAudioEx.dart';
 import 'package:virus_chat_app/chat/AudioChatsss.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/colors.dart';
 import 'package:virus_chat_app/rangeSlider/RangeSliderPage.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
-import 'package:virus_chat_app/utils/flutter_emoji.dart';
 
 
 class UsersList extends StatelessWidget {
@@ -84,16 +83,21 @@ class UsersListState extends State<UsersListPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        leading: new IconButton(
-          icon: new Icon(Icons.person_pin, color: Colors.black),
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => new ProfilePage(userSignInType,currentUserId: currentUser,)));
-          },
-        ),
         title: new Text("Active Users List"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.person_pin,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => new ProfilePage(userSignInType,currentUserId: currentUser,)));
+            },
+          )
+        ],
       ),
       body: Container(
         child: Column(
@@ -103,20 +107,19 @@ class UsersListState extends State<UsersListPage> {
             new LoginUsersList(currentUser,photoUrl),
                 Row(
                   children: <Widget>[
-
                     Container(
                       child: RaisedButton(onPressed: () {
                         print('_mcurrentUserId $currentUser');
-                        Navigator.push(
+                       /* Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    MyAppChatAudio()));
-                        /* Navigator.push(
+                                    MyAppChatAudio()));*/
+                         Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                FriendRequestScreen(currentUser,photoUrl)));*/
+                                FriendRequestScreen(currentUser,photoUrl)));
                       },
                         child: Text('Friend Requests'),),
                     ),
@@ -132,17 +135,18 @@ class UsersListState extends State<UsersListPage> {
                       },
                         child: Text('Tweet Posts'),),
                     ),
-                    Container(
-                      child:RaisedButton(onPressed: () {
+
+                  /*  Container(
+                      child: RaisedButton(onPressed: () {
                         print('_mcurrentUserId $currentUser');
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    MainApp()));
+                                    ExampleApp()));
                       },
-                        child: Text('Home Page'),),
-                    )
+                        child: Text('ExampleApp'),),
+                    ),*/
                   ],
                 )
 

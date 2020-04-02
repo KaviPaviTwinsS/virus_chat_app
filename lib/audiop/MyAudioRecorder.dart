@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data' show Uint8List;
@@ -15,8 +14,6 @@ import 'package:flutter_sound/flauto.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 
 
-
-
 enum t_MEDIA {
   FILE,
   BUFFER,
@@ -25,7 +22,7 @@ enum t_MEDIA {
   REMOTE_EXAMPLE_FILE,
 }
 
-class MyAudioRecorder{
+class MyAudioRecorder {
   static FlutterSound flutterSoundModule;
 
   t_CODEC _codec = t_CODEC.CODEC_AAC;
@@ -39,7 +36,7 @@ class MyAudioRecorder{
   String _recorderTxt = '00:00:00';
   String _playerTxt = '00:00:00';
   List<String> _path = [null, null, null, null, null, null, null];
-  String mPath ='';
+  String mPath = '';
 
 
   double sliderCurrentPosition = 0.0;
@@ -58,7 +55,6 @@ class MyAudioRecorder{
   ];
 
 
-
   List<String> assetSample = [
     'assets/samples/sample.aac',
     'assets/samples/sample.aac',
@@ -70,11 +66,10 @@ class MyAudioRecorder{
   ];
 
 
-
   bool _encoderSupported = true; // Optimist
   bool _decoderSupported = true; // Optimist
 
-  MyAudioRecorder(ChatScreenState chatScreenState){
+  MyAudioRecorder(ChatScreenState chatScreenState) {
     _chatScreenState = chatScreenState;
   }
 
@@ -102,20 +97,22 @@ class MyAudioRecorder{
       // );
       Directory tempDir = await getTemporaryDirectory();
 
-       mPath = await flutterSoundModule.startRecorder(
+      mPath = await flutterSoundModule.startRecorder(
         uri: '${tempDir.path}/${paths[_codec.index]}',
         codec: _codec,
       );
       print('startRecorder: $mPath');
 
-      _recorderSubscription = flutterSoundModule.onRecorderStateChanged.listen((e) {
-        DateTime date = new DateTime.fromMillisecondsSinceEpoch(e.currentPosition.toInt(), isUtc: true);
-        String txt = DateFormat('mm:ss:SS', 'en_GB').format(date);
-        _recorderTxt = txt.substring(0, 8);
-      /*  this.setState(() {
+      _recorderSubscription =
+          flutterSoundModule.onRecorderStateChanged.listen((e) {
+            DateTime date = new DateTime.fromMillisecondsSinceEpoch(
+                e.currentPosition.toInt(), isUtc: true);
+            String txt = DateFormat('mm:ss:SS', 'en_GB').format(date);
+            _recorderTxt = txt.substring(0, 8);
+            /*  this.setState(() {
           this._recorderTxt = txt.substring(0, 8);
         });*/
-      });
+          });
       /*_dbPeakSubscription = flutterSoundModule.onRecorderDbPeakChanged.listen((value) {
         print("got update -> $value");
         setState(() {
@@ -175,12 +172,11 @@ class MyAudioRecorder{
       _recorderSubscription.cancel();
       _recorderSubscription = null;
     }
-   /* if (_dbPeakSubscription != null) {
+    /* if (_dbPeakSubscription != null) {
       _dbPeakSubscription.cancel();
       _dbPeakSubscription = null;
     }*/
   }
-
 
 
   Future<void> startPlayer() async {
@@ -196,7 +192,8 @@ class MyAudioRecorder{
       _addListeners();
 
       if (_media == t_MEDIA.ASSET) {
-        dataBuffer = (await rootBundle.load(assetSample[_codec.index])).buffer.asUint8List();
+        dataBuffer = (await rootBundle.load(assetSample[_codec.index])).buffer
+            .asUint8List();
       } else if (_media == t_MEDIA.FILE) {
         // Do we want to play from buffer or from file ?
         if (await fileExists(_path[_codec.index])) audioFilePath = this.mPath;
@@ -215,49 +212,48 @@ class MyAudioRecorder{
 
       // Check whether the user wants to use the audio player features
 //      if (_isAudioPlayer) {
-        String albumArtUrl;
-        String albumArtAsset;
-        if (_media == t_MEDIA.REMOTE_EXAMPLE_FILE)
-          albumArtUrl = albumArtPath;
-        else {
-          if (Platform.isIOS) {
-            albumArtAsset = 'AppIcon';
-          } else if (Platform.isAndroid) {
-            albumArtAsset = 'AppIcon.png';
-          }
-
+      String albumArtUrl;
+      String albumArtAsset;
+      if (_media == t_MEDIA.REMOTE_EXAMPLE_FILE)
+        albumArtUrl = albumArtPath;
+      else {
+        if (Platform.isIOS) {
+          albumArtAsset = 'AppIcon';
+        } else if (Platform.isAndroid) {
+          albumArtAsset = 'AppIcon.png';
         }
+      }
 
-        final track = Track(
-          trackPath: audioFilePath,
-          dataBuffer: dataBuffer,
-          codec: _codec,
-          trackTitle: "This is a record",
-          trackAuthor: "from flutter_sound",
-          albumArtUrl: albumArtUrl,
-          albumArtAsset: albumArtAsset,
-        );
+      final track = Track(
+        trackPath: audioFilePath,
+        dataBuffer: dataBuffer,
+        codec: _codec,
+        trackTitle: "This is a record",
+        trackAuthor: "from flutter_sound",
+        albumArtUrl: albumArtUrl,
+        albumArtAsset: albumArtAsset,
+      );
 
 
-        Flauto flauto = flutterSoundModule;
-        path = await flauto.startPlayerFromTrack(
-          track,
-          /*canSkipForward:true, canSkipBackward:true,*/
-          whenFinished: () {
-            print('I hope you enjoyed listening to this song');
-          },
-          onSkipBackward: () {
-            print('Skip backward');
-            stopPlayer();
-            startPlayer();
-          },
-          onSkipForward: () {
-            print('Skip forward');
-            stopPlayer();
-            startPlayer();
-          },
-        );
-     /* } else {
+      Flauto flauto = flutterSoundModule;
+      path = await flauto.startPlayerFromTrack(
+        track,
+        /*canSkipForward:true, canSkipBackward:true,*/
+        whenFinished: () {
+          print('I hope you enjoyed listening to this song');
+        },
+        onSkipBackward: () {
+          print('Skip backward');
+          stopPlayer();
+          startPlayer();
+        },
+        onSkipForward: () {
+          print('Skip forward');
+          stopPlayer();
+          startPlayer();
+        },
+      );
+      /* } else {
         if (audioFilePath != null) {
           path = await flutterSoundModule.startPlayer(audioFilePath, codec: _codec, whenFinished: () {
             print('Play finished');
@@ -315,11 +311,12 @@ class MyAudioRecorder{
         sliderCurrentPosition = e.currentPosition;
         maxDuration = e.duration;
 
-        DateTime date = new DateTime.fromMillisecondsSinceEpoch(e.currentPosition.toInt(), isUtc: true);
+        DateTime date = new DateTime.fromMillisecondsSinceEpoch(
+            e.currentPosition.toInt(), isUtc: true);
         String txt = DateFormat('mm:ss:SS', 'en_GB').format(date);
 //        this.setState(() {
-          //this._isPlaying = true;
-          _playerTxt = txt.substring(0, 8);
+        //this._isPlaying = true;
+        _playerTxt = txt.substring(0, 8);
         print('_playerTxt $_playerTxt');
 //        });
       }
@@ -331,21 +328,25 @@ class MyAudioRecorder{
     _decoderSupported = await flutterSoundModule.isDecoderSupported(codec);
 
 //    setState(() {
-      _codec = codec;
+    _codec = codec;
 //    });
   }
 
   onStartPlayerPressed() {
-    if (_media == t_MEDIA.FILE || _media == t_MEDIA.BUFFER) // A file must be already recorded to play it
+    if (_media == t_MEDIA.FILE ||
+        _media == t_MEDIA.BUFFER) // A file must be already recorded to play it
         {
       if (_path[_codec.index] == null) return null;
     }
-    if (_media == t_MEDIA.REMOTE_EXAMPLE_FILE && _codec != t_CODEC.CODEC_MP3) // in this example we use just a remote mp3 file
+    if (_media == t_MEDIA.REMOTE_EXAMPLE_FILE && _codec !=
+        t_CODEC.CODEC_MP3) // in this example we use just a remote mp3 file
       return null;
 
     // Disable the button if the selected codec is not supported
     if (!_decoderSupported) return null;
-    return flutterSoundModule.audioState == t_AUDIO_STATE.IS_STOPPED ? startPlayer : null;
+    return flutterSoundModule.audioState == t_AUDIO_STATE.IS_STOPPED
+        ? startPlayer
+        : null;
   }
 
   Future<void> stopPlayer() async {
@@ -361,32 +362,78 @@ class MyAudioRecorder{
       print('error: $err');
     }
 //    this.setState(() {
-      //this._isPlaying = false;
+    //this._isPlaying = false;
 //    });
   }
 
   Widget audioMessage(String content) {
     mPath = content;
+    print('MPATH $mPath');
     return Row(
       children: <Widget>[
         Container(
-          child:IconButton(icon: Icon(Icons.record_voice_over), onPressed: (){
-            print('audioMessage');
-            startPlayer();
-          })
+            child: IconButton(
+                icon: Icon(Icons.record_voice_over), onPressed: () async {
+              print('audioMessage');
+              await flutterPlaySound(mPath);
+//            startPlayer();
+            })
         ),
         Slider(
-        value: sliderCurrentPosition,
-        min: 0.0,
-        max: maxDuration,
-        onChanged: (double value) async {
-          await flutterSoundModule.seekToPlayer(value.toInt());
-        },
-        divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt()),
+            value: sliderCurrentPosition,
+            min: 0.0,
+            max: maxDuration,
+            onChanged: (double value) async {
+              print("Playing Mohan $value");
+              sliderCurrentPosition = value;
+              await flutterSoundModule.seekToPlayer(value.toInt());
+            },
+            divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt()),
       ],
     );
   }
 
+  FlutterSound flutterSound = FlutterSound();
 
+  flutterPlaySound(url) async {
+    await flutterSound.startPlayer(url);
+
+    flutterSound.onPlayerStateChanged.listen((e) {
+      if(flutterSound.isPlaying) {
+        this.sliderCurrentPosition = e.currentPosition;
+        this.maxDuration = e.duration;
+      }else{
+        flutterSound.stopPlayer();
+        sliderCurrentPosition= 0.0;
+        maxDuration = 0.0;
+      }
+      if (sliderCurrentPosition == maxDuration) {
+        flutterSound.stopPlayer();
+        sliderCurrentPosition= 0.0;
+        maxDuration = 0.0;
+      }
+      print(
+          "Playing NUlllllllllllllllllllll $maxDuration ____ $sliderCurrentPosition _____$e");
+      if(e == null){
+//        setState(() {
+//          this.isPlaying = false;
+//        });
+      }
+      else{
+//        setState(() {
+//          this.isPlaying = false;
+//        });
+      }
+    });
+  }
+
+  Future<dynamic> flutterStopPlayer(url) async {
+    await flutterSound.stopPlayer().then(
+            (value) {
+          print('VALUEEEEEEEEEEEEEEEEEEEEEEEE $value');
+//          flutterPlaySound(url);
+        }
+    );
+  }
 
 }

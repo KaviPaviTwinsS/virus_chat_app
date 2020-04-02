@@ -122,7 +122,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
               itemBuilder: (context, index) =>
                   buildItem(index, snapshot.data.documents[index]),
               itemCount: snapshot.data.documents.length,
-              reverse: true,
+//              reverse: true,
               controller: listScrollController,
             );
           }

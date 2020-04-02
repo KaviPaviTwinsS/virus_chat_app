@@ -16,6 +16,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart'
+    show getExternalStorageDirectory, getTemporaryDirectory;
+import 'dart:io' as Io;
+import 'package:http/http.dart' show get;
+
 
 class Chat extends StatelessWidget {
   final String peerId;
@@ -63,11 +68,12 @@ class ChatScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  State createState() => new ChatScreenState(currentUserId: currentUserId,
-      peerId: peerId,
-      peerAvatar: peerAvatar,
-      isFriend: isFriend,
-      isAlreadyRequestSent: isAlreadyRequestSent);
+  State createState() =>
+      new ChatScreenState(currentUserId: currentUserId,
+          peerId: peerId,
+          peerAvatar: peerAvatar,
+          isFriend: isFriend,
+          isAlreadyRequestSent: isAlreadyRequestSent);
 }
 
 abstract class audioListener {
@@ -102,10 +108,17 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   MyAudioRecorder recorder;
   String mAudioPath = '';
 
+
+  double sliderCurrentPosition = 0.0;
+  double maxDuration = 1.0;
+  bool isPlaying = false;
+
+
   @override
   void audioListenerPath(String audioPath) {
     print('audioPath $audioPath');
     mAudioPath = audioPath;
+    uploadAudioFile();
   }
 
   @override
@@ -148,11 +161,13 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
   Future uploadAudioFile() async {
+    print('uploadAudioFile $mAudioPath');
     String imageUrl;
     String fileName = DateTime
         .now()
         .millisecondsSinceEpoch
         .toString();
+    print('downloadUrl Filename $fileName');
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
     StorageUploadTask uploadTask = reference.putFile(File(mAudioPath));
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
@@ -160,7 +175,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       imageUrl = downloadUrl;
       setState(() {
 //        isLoading = false;
-        onSendMessage(imageUrl, 5);
+        storeFile(imageUrl,fileName);
+        onSendMessage(imageUrl, 5, fileName);
       });
     }, onError: (err) {
       setState(() {
@@ -202,7 +218,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       imageUrl = downloadUrl;
       setState(() {
         isLoading = false;
-        onSendMessage(imageUrl, 1);
+        onSendMessage(imageUrl, 1, '');
       });
     }, onError: (err) {
       setState(() {
@@ -212,8 +228,14 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     });
   }
 
-  void onSendMessage(String content, int type) {
+
+  void onSendMessage(String content, int type, String fileName) {
     // type: 0 = text, 1 = image, 2 = sticker
+    String audioTime = '-1';
+    if (type == 5) {
+      if (fileName != '')
+        audioTime = fileName;
+    }
     if (content.trim() != '') {
       textEditingController.clear();
 
@@ -242,6 +264,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 .millisecondsSinceEpoch
                 .toString(),
             'content': content,
+            'audioTime' :audioTime,
             'type': type
           },
         );
@@ -254,9 +277,13 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
   Widget buildItem(int index, DocumentSnapshot document) {
+    if(document['type'] == 5){
+      storeFile(document['content'],document['audioTime'] );
+    }
+    print('CONTENTTTTTTTTTTTTTTTTTTTTTTTTT ${document['content']}');
     if (document['idFrom'] == id) {
       // Right (my message)
-      return Row(
+      return new Row(
         children: <Widget>[
           document['type'] == 0
           // Text
@@ -326,14 +353,29 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           )
           // Sticker
               : document['type'] == 5 ?
-          Container(
-           child: Row(
-             children: <Widget>[
-              Container(
-                  height: 56.0,
-                  child: recorder.audioMessage(document['content'])),
-             ],
-           ),
+          new Material(
+            child: Container(
+              height: 56.0,
+              child: Row(
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.play_circle_filled),
+                    onPressed: () {
+                      isPlaying
+                          ? flutterStopPlayer(document['content'],document['audioTime'])
+                          : flutterPlaySound(document['content'],document['audioTime']);
+                    },
+                  ),
+                  new Slider(
+                    label: index.toString(),
+                    value: sliderCurrentPosition,
+                    min: 0.0,
+                    max: maxDuration,
+                    divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt(),
+                    onChanged: (double value) {},),
+                ],
+              ),
+            ),
           )
               : Container(
             child: new Image.asset(
@@ -480,6 +522,102 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
 
+  FlutterSound flutterSound = FlutterSound();
+
+
+  static const List<String> paths = [
+    'sound.aac', // DEFAULT
+    'sound.aac', // CODEC_AAC
+    'sound.opus', // CODEC_OPUS
+    'sound.caf', // CODEC_CAF_OPUS
+    'sound.mp3', // CODEC_MP3
+    'sound.ogg', // CODEC_VORBIS
+    'sound.wav', // CODEC_PCM
+  ];
+  t_CODEC _codec = t_CODEC.CODEC_AAC;
+
+  String myDataPath = '';
+
+  void storeFile(String imageUrl, String fileName) async {
+    Directory tempDir = await getExternalStorageDirectory();
+    String uri = '${tempDir.path}/${fileName}'+'.aac';
+    print(
+        'urlllllllllllllllllllllllllllllllllllllllllllll_____ $uri _____$imageUrl');
+    if(!await File(uri).exists())
+    getImageFromNetwork(imageUrl, uri);
+    print('myDataPath $myDataPath');
+  }
+
+  Future<Io.File> getImageFromNetwork(String url, String uri) async {
+    var response = await get(url);
+    print('getImageFromNetwork');
+    File file = new File(
+        uri
+    );
+    file.writeAsBytes(response.bodyBytes);
+//
+//    file.writeAsBytesSync(response.bodyBytes);
+//    var cacheManager = await CacheManager.getInstance();
+//    Io.File file = await cacheManager.getFile(url);
+    return file;
+  }
+
+
+  flutterPlaySound(url,String fileName) async {
+    Directory tempDir = await getExternalStorageDirectory();
+    String uri = '${tempDir.path}/${fileName}'+'.aac';
+    bool isFileExist = await File(uri).exists();
+    if(isFileExist){
+      print('EXISTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
+      await flutterSound.startPlayer(uri);
+    }else{
+      print('EXISTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT__________________________');
+      storeFile(url, fileName);
+      await flutterSound.startPlayer(url);
+    }
+    flutterSound.onPlayerStateChanged.listen((e) {
+      if (flutterSound.isPlaying) {
+        setState(() {
+          this.sliderCurrentPosition = e.currentPosition;
+          this.maxDuration = e.duration;
+        });
+      } else {
+        flutterSound.stopPlayer();
+        setState(() {
+          this.sliderCurrentPosition = 0.0;
+          this.maxDuration = 0.0;
+        });
+      }
+      if (sliderCurrentPosition == maxDuration) {
+        flutterSound.stopPlayer();
+        setState(() {
+          this.sliderCurrentPosition = 0.0;
+          this.maxDuration = 0.0;
+        });
+      }
+      print(
+          "Playing NUlllllllllllllllllllll $maxDuration ____ $sliderCurrentPosition _____$e");
+      if (e == null) {
+        setState(() {
+          this.isPlaying = false;
+        });
+      }
+      else {
+        setState(() {
+          this.isPlaying = false;
+        });
+      }
+    });
+  }
+
+  Future<dynamic> flutterStopPlayer(url,String fileName) async {
+    await flutterSound.stopPlayer().then(
+            (value) {
+          print('VALUEEEEEEEEEEEEEEEEEEEEEEEE $value');
+          flutterPlaySound(url,fileName);
+        }
+    );
+  }
 
   bool isLastMessageLeft(int index) {
     if ((index > 0 && listMessage != null &&
@@ -568,7 +706,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           Row(
             children: <Widget>[
               FlatButton(
-                onPressed: () => onSendMessage('mimi1', 2),
+                onPressed: () => onSendMessage('mimi1', 2, ''),
                 child: new Image.asset(
                   'images/mimi1.gif',
                   width: 50.0,
@@ -577,7 +715,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage('mimi2', 2),
+                onPressed: () => onSendMessage('mimi2', 2, ''),
                 child: new Image.asset(
                   'images/mimi2.gif',
                   width: 50.0,
@@ -586,7 +724,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage('mimi3', 2),
+                onPressed: () => onSendMessage('mimi3', 2, ''),
                 child: new Image.asset(
                   'images/mimi3.gif',
                   width: 50.0,
@@ -600,7 +738,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           Row(
             children: <Widget>[
               FlatButton(
-                onPressed: () => onSendMessage('mimi4', 2),
+                onPressed: () => onSendMessage('mimi4', 2, ''),
                 child: new Image.asset(
                   'images/mimi4.gif',
                   width: 50.0,
@@ -609,7 +747,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage('mimi5', 2),
+                onPressed: () => onSendMessage('mimi5', 2, ''),
                 child: new Image.asset(
                   'images/mimi5.gif',
                   width: 50.0,
@@ -618,7 +756,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage('mimi6', 2),
+                onPressed: () => onSendMessage('mimi6', 2, ''),
                 child: new Image.asset(
                   'images/mimi6.gif',
                   width: 50.0,
@@ -632,7 +770,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           Row(
             children: <Widget>[
               FlatButton(
-                onPressed: () => onSendMessage('mimi7', 2),
+                onPressed: () => onSendMessage('mimi7', 2, ''),
                 child: new Image.asset(
                   'images/mimi7.gif',
                   width: 50.0,
@@ -641,7 +779,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage('mimi8', 2),
+                onPressed: () => onSendMessage('mimi8', 2, ''),
                 child: new Image.asset(
                   'images/mimi8.gif',
                   width: 50.0,
@@ -650,7 +788,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage('mimi9', 2),
+                onPressed: () => onSendMessage('mimi9', 2, ''),
                 child: new Image.asset(
                   'images/mimi9.gif',
                   width: 50.0,
@@ -687,8 +825,6 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     );
   }
 
-  FlutterSound flutterSound = new FlutterSound();
-
   Widget buildInput() {
     return Container(
       child: Row(
@@ -702,7 +838,6 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
               onPointerUp: (details) {
                 print('onPointerUp');
                 recorder.stopRecorder();
-                uploadAudioFile();
               },
               child: new Container(
                 margin: new EdgeInsets.symmetric(horizontal: 1.0),
@@ -759,7 +894,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
               margin: new EdgeInsets.symmetric(horizontal: 8.0),
               child: new IconButton(
                 icon: new Icon(Icons.send),
-                onPressed: () => onSendMessage(textEditingController.text, 0),
+                onPressed: () =>
+                    onSendMessage(textEditingController.text, 0, ''),
                 color: primaryColor,
               ),
             ),
