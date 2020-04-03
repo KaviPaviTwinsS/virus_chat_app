@@ -42,6 +42,7 @@ class PasswordSetupState extends State<PasswordSetup>{
   SharedPreferences prefs;
   Geoflutterfire geo = Geoflutterfire();
 
+  String userToken ='';
 
   PasswordSetupState(String signinType, FirebaseUser firebaseUser, String accountId){
     _accountId = accountId;
@@ -59,6 +60,8 @@ class PasswordSetupState extends State<PasswordSetup>{
   void readLocal() async{
     passwordController = TextEditingController(text: userPassword);
     prefs = await SharedPreferences.getInstance();
+    userToken = await prefs.getString('PUSH_TOKEN');
+    print('userToken_____________________________$userToken');
     // Force refresh input
     setState(() {});
   }
@@ -191,6 +194,7 @@ class PasswordSetupState extends State<PasswordSetup>{
       'status': 'ACTIVE',
       'id': firebaseUser.uid,
       '$loginType': loginId,
+      'user_token':userToken,
       'createdAt':
       ((new DateTime.now().toUtc().microsecondsSinceEpoch) / 1000).toInt()
     });

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -136,10 +137,16 @@ class LoginSelectionOption extends State<LoginSelection> {
 
   Geoflutterfire geo = Geoflutterfire();
 
+  String userToken ='';
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
   @override
   void initState() {
     super.initState();
-    isGoogleSignedIn();
+    _firebaseMessaging.getToken().then((token) => {
+      userToken = token ,
+    isGoogleSignedIn()
+    });
   }
 
   void isGoogleSignedIn() async {
@@ -147,10 +154,11 @@ class LoginSelectionOption extends State<LoginSelection> {
       isLoading = true;
     });
     prefs = await SharedPreferences.getInstance();
+    await prefs.setString('PUSH_TOKEN', userToken);
     facebookSignup = new FacebookSignup();
     isLoggedIn = await googleSignIn.isSignedIn();
     isFacebookLoggedIn = await facebookSignup.facebookLogin.isLoggedIn;
-    print('lodinnnn ${prefs.getString('userId')}');
+    print('lodinnnn ${await prefs.getString('PUSH_TOKEN')}');
     if (prefs.getString('signInType') == 'google') {
 //      navigateToUsersPage("google");
       navigateToProfilePageExistingUser(context, 'google', prefs);

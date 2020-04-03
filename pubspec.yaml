@@ -31,7 +31,7 @@ dependencies:
   location: ^2.3.5
   provider: ^3.0.0
   firebase_auth:
-
+  firebase_messaging: ^5.0.4
   flutter_facebook_login: ^1.2.0
   http: ^0.12.0+2
 
@@ -50,6 +50,9 @@ dependencies:
 #  audioplayers: ^0.14.2
 #  audio_recorder2: ^1.0.0
   flutter_cache_manager: ^1.1.3
+  flutter_local_notifications: ^1.4.0
+  device_info: ^0.4.2+1
+
 
 
 dev_dependencies:

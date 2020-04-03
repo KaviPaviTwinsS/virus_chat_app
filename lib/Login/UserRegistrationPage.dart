@@ -82,6 +82,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   File avatarImageFile;
 
   SharedPreferences prefs;
+  String userToken;
 
 
   UserRegistrationScreen(
@@ -97,6 +98,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
 
   void isSignIn() async {
     prefs = await SharedPreferences.getInstance();
+    userToken = await prefs.getString('PUSH_TOKEN');
   }
 
   @override
@@ -513,6 +515,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
       'status': 'ACTIVE',
       'id': firebaseUser.uid,
       '$loginType': firebaseUser.uid,
+      'user_token':userToken,
       'createdAt':
       ((new DateTime.now()
           .toUtc()

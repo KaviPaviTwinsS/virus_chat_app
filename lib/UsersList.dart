@@ -1,6 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info/device_info.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:http/http.dart';
 import 'package:latlong/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FriendRequestScreen.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
@@ -10,6 +18,7 @@ import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/colors.dart';
 import 'package:virus_chat_app/rangeSlider/RangeSliderPage.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
+import 'package:http/http.dart' as http;
 
 
 class UsersList extends StatelessWidget {
@@ -67,6 +76,8 @@ class UsersListState extends State<UsersListPage> {
   String currentUser = '';
   String userSignInType = '';
 
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+
   UsersListState(String currentUserId, String signInType,String mphotoUrl) {
     currentUser = currentUserId;
     userSignInType = signInType;
@@ -76,7 +87,63 @@ class UsersListState extends State<UsersListPage> {
   @override
   void initState() {
     LocationService(currentUser).locationStream;
+//    test();
     super.initState();
+  }
+  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+
+  void test() async{
+    String identifier;
+    final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
+//    try {
+      if (Platform.isAndroid) {
+        var build = await deviceInfoPlugin.androidInfo;
+        identifier = build.id.toString();
+      } else if (Platform.isIOS) {
+        var data = await deviceInfoPlugin.iosInfo;
+        identifier = data.identifierForVendor;//UUID for iOS
+      }
+    print('IDENTIFIER $identifier');
+//    } on PlatformException {
+//      print('Failed to get platform version');
+//    }
+    firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, badge: true, alert: true));
+    firebaseMessaging.onIosSettingsRegistered
+        .listen((IosNotificationSettings settings) {
+      print("Settings registered: $settings");
+    });
+
+    firebaseMessaging.getToken().then((token){
+
+      print('--- Firebase toke here ---');
+//      Firestore.instance.collection(currentUser).document(identifier).setData({ 'token': token});
+      print(token);
+
+    });
+  }
+
+/*
+  void initializeNotify() async{
+    var initializationSettingsAndroid =
+    new AndroidInitializationSettings('app_icon');
+    var initializationSettingsIOS = IOSInitializationSettings(
+        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+    var initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+  }*/
+  Future<void> _showSoundUriNotification() async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        0, 'plain title', 'plain body', platformChannelSpecifics,
+        payload: 'item x');
   }
 
   @override
@@ -160,6 +227,7 @@ class UsersListState extends State<UsersListPage> {
   }
 
 
+
 }
 
 class UsersOnlinePage extends StatelessWidget implements SliderListener {
@@ -223,6 +291,8 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
   bool isLoading = false;
 
 
+  SharedPreferences _preferences;
+
   ActiveUserListRadius(String currentUser,String photoUrl) {
     currentUserId = currentUser;
     mphotoUrl = photoUrl;
@@ -233,6 +303,15 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
     isLoading = true;
     getCurrentUserLocation(currentUserId, sliderData);
   }
+
+  @override
+  void initState() {
+    initialise();
+    super.initState();
+  }
+   void initialise() async {
+     _preferences = await SharedPreferences.getInstance();
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -374,7 +453,8 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
     var query = await Firestore.instance.collection('users')
         .document(currentUserId).collection(
         'FriendsList').getDocuments();
-    print('Friend Listttttt queryyyy${query.documents.length }');
+    print('Friend Listttttt queryyyy${documentSnapshot.data['user_token']}');
+    await _preferences.setString('FRIEND_USER_TOKEN',documentSnapshot.data['user_token'] );
     if (query.documents.length != 0) {
       query.documents.forEach((doc) {
         print('Friend Listttttt ${doc.data}');
@@ -389,6 +469,7 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
 
       });
     } else {
+      isAlreadyRequestSent = false;
       /*Navigator.push(
           context,
           MaterialPageRoute(
@@ -488,9 +569,16 @@ class LoginUsersList extends StatelessWidget {
   String currentUserId = '';
   String mphotoUrl ='';
 
+  SharedPreferences _preferences;
+
   LoginUsersList(String currentUser,String photoUrl) {
     currentUserId = currentUser;
     mphotoUrl = photoUrl;
+    initialise();
+  }
+
+  void initialise() async {
+    _preferences = await SharedPreferences.getInstance();
   }
 
   @override
@@ -578,7 +666,8 @@ class LoginUsersList extends StatelessWidget {
     var query = await Firestore.instance.collection('users')
         .document(currentUserId).collection(
         'FriendsList').getDocuments();
-    print('Friend Listttttt queryyyy${query.documents.length }');
+    print('Friend Listttttt queryyyy${documentSnapshot.data['user_token']}');
+    await _preferences.setString('FRIEND_USER_TOKEN',documentSnapshot.data['user_token'] );
     if (query.documents.length != 0) {
       query.documents.forEach((doc) {
         print('Friend Listttttt ${doc.data}');

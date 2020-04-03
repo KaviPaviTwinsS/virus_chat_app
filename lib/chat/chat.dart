@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:virus_chat_app/SendInviteScreen.dart';
 import 'package:virus_chat_app/audiop/MyAudioRecorder.dart';
@@ -20,6 +23,7 @@ import 'package:path_provider/path_provider.dart'
     show getExternalStorageDirectory, getTemporaryDirectory;
 import 'dart:io' as Io;
 import 'package:http/http.dart' show get;
+import 'package:http/http.dart' as http;
 
 
 class Chat extends StatelessWidget {
@@ -107,6 +111,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
   MyAudioRecorder recorder;
   String mAudioPath = '';
+  String _friendToken = '';
+  String currentUserName ='';
 
 
   double sliderCurrentPosition = 0.0;
@@ -156,7 +162,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
     Firestore.instance.collection('users').document(id).updateData(
         {'chattingWith': peerId});
-
+    _friendToken = await prefs.getString('FRIEND_USER_TOKEN');
+    currentUserName = await prefs.getString('name');
     setState(() {});
   }
 
@@ -271,9 +278,86 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       });
       listScrollController.animateTo(
           0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+      sendAndRetrieveMessage();
     } else {
       Fluttertoast.showToast(msg: 'Nothing to send');
     }
+
+
+  }
+
+  final String serverToken = 'AAAA1iQ7au4:APA91bGvPY8CpYvutHVhzh7RL-xyybt7lxPNU_OxXPCJdxDtyZain9hxgliGV9OQyaXLiKXJyVUhpQm0tygEz4YfisEdGIOLyNo3vgUguNMEpBVEaEwUfONgErCLALyrrLTroFhfq5YD';
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+  String _message = '';
+
+  Future<Map<String, dynamic>> sendAndRetrieveMessage() async {
+    print('_friendToken_____________________________ $_friendToken');
+    await firebaseMessaging.requestNotificationPermissions(
+      const IosNotificationSettings(sound: true, badge: true, alert: true),
+    );
+
+    await http.post(
+      'https://fcm.googleapis.com/fcm/send',
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'key=$serverToken',
+      },
+      body: jsonEncode(
+        <String, dynamic>{
+          'notification': <String, dynamic>{
+            'body': 'Chat from $currentUserName',
+            'title': 'Message'
+          },
+          'priority': 'high',
+          'data': <String, dynamic>{
+            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+            'id': '1',
+            'status': 'done'
+          },
+          'to': _friendToken,
+        },
+      ),
+    );
+
+    final Completer<Map<String, dynamic>> completer =
+    Completer<Map<String, dynamic>>();
+    getMessage();
+    return completer.future;
+  }
+  Future _showNotificationWithDefaultSound(Map<String, dynamic> message) async {
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High);
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    var platformChannelSpecifics = new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      message["notification"]["title"],
+      message["notification"]["body"],
+      platformChannelSpecifics,
+      payload: 'Default_Sound',
+    );
+  }
+
+
+  void getMessage(){
+    firebaseMessaging.configure(
+        onMessage: (Map<String, dynamic> message) async {
+          print('on message $message');
+          _showNotificationWithDefaultSound(message);
+          setState(() => _message = message["notification"]["title"]);
+        }, onResume: (Map<String, dynamic> message) async {
+      print('on resume $message');
+      _showNotificationWithDefaultSound(message);
+      setState(() => _message = message["notification"]["title"]);
+    }, onLaunch: (Map<String, dynamic> message) async {
+      print('on launch $message');
+      setState(() => _message = message["notification"]["title"]);
+    });
   }
 
   Widget buildItem(int index, DocumentSnapshot document) {
