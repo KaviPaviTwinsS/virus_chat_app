@@ -8,6 +8,7 @@ import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/Login/UserRegistrationPage.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
 import 'package:virus_chat_app/utils/CustomTextSpan.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 import './otp_input.dart';
@@ -65,7 +66,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 child: Container(
                   margin: const EdgeInsets.only(left: 5.0, top: 40.0, right: 20.0),
                   child: new IconButton(
-                    icon: new Icon(Icons.arrow_back, color: Colors.black),
+                    icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
                     onPressed: () {
                       Navigator.push(
                           context,
@@ -88,7 +89,7 @@ class _OTPScreenState extends State<OTPScreen> {
             Container(
                 margin: const EdgeInsets.only(left: 20.0, top: 30.0, right: 20.0),
                 child: customTextSpan(
-                    'Check your messages.We have sent you the pin at ',widget.mobileNumber)
+                    otp_page,widget.mobileNumber)
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -107,34 +108,59 @@ class _OTPScreenState extends State<OTPScreen> {
                 },
               ),
             ),
-            Container(
-              padding: EdgeInsets.all(16),
-              child: Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: RaisedButton(
-                    color: Theme.of(context).primaryColor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0.0)),
-                    child: Text(
-                      "VERIFY",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold),
+            Row(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                        left: 20.0, top: 10.0, right: 10.0),
+                    child: Text(resend_otp),
+                  ),
+                ),
+                new GestureDetector(
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                       top: 10.0, right: 10.0),
+                    child: Text(resend_code, style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Colors.blue,)
                     ),
-                    onPressed: () {
-                      if (_pinEditingController.text.length == 6) {
-                        _onFormSubmitted();
-                      } else {
-                        showToast("Invalid OTP", Colors.red);
-                      }
-                    },
-                    padding: EdgeInsets.all(16.0),
+                  ),
+                  onTap: () {
+                    _onVerifyCode();
+                  },
+                ),
+              ],
+            ),
+
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                margin: EdgeInsets.only(top: 30.0,left: 10.0,right: 10.0),
+                padding: EdgeInsets.all(30.0),
+                width: double.infinity,
+                child : SizedBox(
+                  height: 45, // specific value
+                  child: RaisedButton(onPressed: () {
+                    if (_pinEditingController.text.length == 6) {
+                      _onFormSubmitted();
+                    } else {
+                      showToast("Invalid OTP", Colors.red);
+                    }
+                  },
+                    color: facebook_color,
+                    textColor: text_color,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(18.0),
+                    ),
+                    child: Text(btn_otp_verify,
+                      style: TextStyle(fontSize: 17),),
                   ),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -203,8 +229,6 @@ class _OTPScreenState extends State<OTPScreen> {
         _verificationId = verificationId;
       });
     };
-
-    // TODO: Change country code
 
     await _firebaseAuth.verifyPhoneNumber(
         phoneNumber: "${widget.mobileNumber}",

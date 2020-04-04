@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_range_slider/flutter_range_slider.dart' as frs;
 import 'package:virus_chat_app/UsersList.dart';
-import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 
 
 class RangeSliderSample extends StatefulWidget {

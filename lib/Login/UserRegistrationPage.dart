@@ -12,7 +12,8 @@ import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
 import 'package:virus_chat_app/UserLocation.dart';
-import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/utils/colors.dart';
+import 'package:virus_chat_app/utils/strings.dart';
 
 class UserRegistrationPage extends StatelessWidget {
 
@@ -28,10 +29,10 @@ class UserRegistrationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomPadding: true,
         appBar: AppBar(
           leading: new IconButton(
-            icon: new Icon(Icons.arrow_back, color: Colors.black),
+            icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
             onPressed: () {
               Navigator.push(
                   context,
@@ -39,7 +40,7 @@ class UserRegistrationPage extends StatelessWidget {
                       builder: (context) => new LoginSelection()));
             },
           ),
-          title: Text('Profile Page setup'),
+          title: Text(user_registration),
         ),
       body: UserRegistrationState(userPhoneNumber: userPhoneNumber,
           userPhoneNumberWithoutCountryCode: userPhoneNumberWithoutCountryCode,myFirebaseUser:mFirebaseUser),
@@ -103,179 +104,6 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
 
   @override
   Widget build(BuildContext context) {
-     /*SizedBox.shrink(
-      child : Stack(
-                children: <Widget>[
-                  SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          child: Center(
-                            child: Stack(
-                              children: <Widget>[
-                                (avatarImageFile == null)
-                                    ? (photoUrl != ''
-                                    ? Material(
-                                  child: CachedNetworkImage(
-                                    placeholder: (context, url) =>
-                                        Container(
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                            valueColor: AlwaysStoppedAnimation<
-                                                Color>(
-                                                themeColor),
-                                          ),
-                                          width: 90.0,
-                                          height: 90.0,
-                                          padding: EdgeInsets.all(20.0),
-                                        ),
-                                    imageUrl: photoUrl,
-                                    width: 90.0,
-                                    height: 90.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(
-                                          45.0)),
-                                  clipBehavior: Clip.hardEdge,
-                                )
-                                    : Icon(
-                                  Icons.account_circle,
-                                  size: 90.0,
-                                  color: greyColor,
-                                ))
-                                    : Material(
-                                  child: Image.file(
-                                    avatarImageFile,
-                                    width: 90.0,
-                                    height: 90.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(45.0)),
-                                  clipBehavior: Clip.hardEdge,
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.camera_alt,
-                                    color: primaryColor.withOpacity(0.5),
-                                  ),
-                                  onPressed: getImage,
-                                  padding: EdgeInsets.all(30.0),
-                                  splashColor: Colors.transparent,
-                                  highlightColor: greyColor,
-                                  iconSize: 30.0,
-                                ),
-                              ],
-                            ),
-                          ),
-//            width: double.infinity,
-//            margin: EdgeInsets.all(20.0),
-                        ),
-
-                        Container(
-                          margin: const EdgeInsets.only(
-                              left: 20.0, top: 20.0, right: 20.0),
-                          child: TextField(
-                            obscureText: false,
-                            controller: userNameController,
-                            onChanged: (userPhoneNumber) {
-                              _mUserName = userPhoneNumber;
-                            },
-                            decoration: new InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: focused_border_color, width: 2.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: enabled_border_color, width: 2.0),
-                              ),
-                              hintText: 'Name',
-                            ),
-                          ),
-                        ),
-
-                        Container(
-                          margin: const EdgeInsets.only(
-                              left: 20.0, top: 5.0, right: 20.0),
-                          child: TextField(
-                            obscureText: false,
-                            controller: userNockNameController,
-                            onChanged: (userPhoneNumber) {
-                              _mUserNickName = userPhoneNumber;
-                            },
-                            decoration: new InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: focused_border_color, width: 2.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: enabled_border_color, width: 2.0),
-                              ),
-                              hintText: 'Nick Name',
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(
-                              left: 20.0, top: 5.0, right: 20.0),
-                          child: TextField(
-                            obscureText: false,
-                            controller: userEmailController,
-                            onChanged: (userPhoneNumber) {
-                              _mUserEmail = userPhoneNumber;
-                            },
-                            decoration: new InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: focused_border_color, width: 2.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: enabled_border_color, width: 2.0),
-                              ),
-                              hintText: 'Email',
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                          ),
-                        ),
-                        Container(
-                          child: RaisedButton(onPressed: () {
-                            if (_mUserName != '' && _mUserEmail != '' &&
-                                photoUrl != '') {
-                              _AddNewUser();
-                            } else {
-                              Fluttertoast.showToast(
-                                  msg: 'Please fill all details');
-                            }
-                          },
-                            child: Text('REGISTER ',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 19),),
-                          ),
-                        ),
-                        Positioned(
-                          child: isLoading
-                              ? Container(
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      themeColor)),
-                            ),
-                            color: Colors.white.withOpacity(0.8),
-                          )
-                              : Container(),
-                        ),
-                      ],
-                    ),
-                  )
-
-                ]
-            )
-    );*/
-
     return Stack(
       children: <Widget>[
         SingleChildScrollView(
@@ -416,23 +244,35 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                 ],
                 crossAxisAlignment: CrossAxisAlignment.start,
               ),
-
-              // Button
-              Container(
-                child: RaisedButton(onPressed: () {
-                  if (_mUserName != '' && _mUserEmail != '' &&
-                      photoUrl != '') {
-                    _AddNewUser(firebaseUser);
-                  } else {
-                    Fluttertoast.showToast(
-                        msg: 'Please fill all details');
-                  }
-                },
-                  child: Text('REGISTER ',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 19),),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin: EdgeInsets.only(top: 30.0,left: 10.0,right: 10.0),
+                  padding: EdgeInsets.all(30.0),
+                  width: double.infinity,
+                  child : SizedBox(
+                    height: 45, // specific value
+                    child: RaisedButton(onPressed: () {
+                      if (_mUserName != '' && _mUserEmail != '' &&
+                          photoUrl != '') {
+                        print('NAN ADd user');
+                        _AddNewUser(firebaseUser);
+                      } else {
+                        print('NAN registrationValidation');
+                        registrationValidation();
+                      }
+                    },
+                      color: facebook_color,
+                      textColor: text_color,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(18.0),
+                      ),
+                      child: Text(btn_register,
+                        style: TextStyle(fontSize: 17),),
+                    ),
+                  ),
                 ),
-              ),
+              )
             ],
           ),
           padding: EdgeInsets.only(left: 15.0, right: 15.0),
@@ -503,31 +343,40 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   Future _AddNewUser(FirebaseUser firebaseUser) async {
     String loginType = 'Mobile';
     loginType += 'AccountId';
+    updateLocalListData(prefs, 'MobileNumber');
+
+    // Update data to server if new user
+    try {
+      Firestore.instance.collection('users').document(firebaseUser.uid).setData(
+          {
+            'name': _mUserName,
+            'photoUrl': photoUrl,
+            'email': _mUserEmail,
+            'nickName': _mUserNickName,
+            'phoneNo': userPhoneNumber,
+            'status': 'ACTIVE',
+            'id': firebaseUser.uid,
+            '$loginType': firebaseUser.uid,
+            'user_token': userToken,
+            'createdAt':
+            ((new DateTime.now()
+                .toUtc()
+                .microsecondsSinceEpoch) / 1000).toInt()
+          });
+      print('NAN ADd user');
+
+    }catch(e){
+      print('Registration'+e);
+    }
     UserLocation currentLocation = await LocationService(firebaseUser.uid,)
         .getLocation();
-    // Update data to server if new user
-    Firestore.instance.collection('users').document(firebaseUser.uid).setData({
-      'name': _mUserName,
-      'photoUrl': photoUrl,
-      'email': _mUserEmail,
-      'nickName': _mUserNickName,
-      'phoneNo': userPhoneNumber,
-      'status': 'ACTIVE',
-      'id': firebaseUser.uid,
-      '$loginType': firebaseUser.uid,
-      'user_token':userToken,
-      'createdAt':
-      ((new DateTime.now()
-          .toUtc()
-          .microsecondsSinceEpoch) / 1000).toInt()
-    });
     Firestore.instance.collection('users').document(firebaseUser.uid)
         .collection('userLocation').document(firebaseUser.uid)
         .setData({
       'userLocation': new GeoPoint(
           currentLocation.latitude, currentLocation.longitude),
     });
-    updateLocalListData(prefs, 'MobileNumber');
+
   }
 
 
@@ -545,12 +394,34 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('phoneNo', userPhoneNumberWithoutCountryCode);
     await prefs.setString('signInType', signInType);
-
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 ProfilePageSetup('MobileNumber',
                     currentUserId: firebaseUser.uid)));
+  }
+
+
+  void registrationValidation(){
+    bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_mUserEmail);
+
+    if(_mUserName == '') {
+      Fluttertoast.showToast(
+          msg: enter_name);
+    }
+    if(_mUserEmail == ''){
+      Fluttertoast.showToast(
+          msg: enter_email);
+    }else{
+      if(!emailValid){
+        Fluttertoast.showToast(
+            msg: enter_valid_email);
+      }
+    }
+    if(photoUrl ==''){
+      Fluttertoast.showToast(
+          msg: upload_profile);
+    }
   }
 }

@@ -1,20 +1,26 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
-import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
 import 'package:intl/intl.dart';
 import 'package:virus_chat_app/utils/strings.dart';
+import 'package:http/http.dart' as http;
+
 
 class NewTweetPost extends StatefulWidget {
   String __mCurrentId = '';
@@ -154,6 +160,9 @@ class NewTweetPostState extends State<NewTweetPost> {
       margin: EdgeInsets.all(8.0),
       child: new GestureDetector(
         onTap: () {
+          setState(() {
+            isSlected =true;
+          });
           tappedCategoryName = document['categoryName'];
           tappedCategoryImage = document['categoryImage'];
         },
@@ -181,7 +190,7 @@ class NewTweetPostState extends State<NewTweetPost> {
             Center(
               child: Container(
                 margin: EdgeInsets.only(top: 5.0),
-                child: Text(document['categoryName']),
+                child: Text(document['categoryName'],style:TextStyle(color: isSlected ? facebook_color :greyColor2),),
               ),
             )
           ],
@@ -208,108 +217,110 @@ class NewTweetPostState extends State<NewTweetPost> {
       return false;
     }
   }
+  bool isSlected = false;
 
   Widget buildTweetInput() {
     return Expanded(
       child:  Container(
         padding: EdgeInsets.all(10.0),
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Material(
-                  child: CachedNetworkImage(
-                    placeholder: (context, url) =>
-                        Container(
-                          alignment: Alignment.topLeft,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.0,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                themeColor),
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Material(
+                    child: CachedNetworkImage(
+                      placeholder: (context, url) =>
+                          Container(
+                            alignment: Alignment.topLeft,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  themeColor),
+                            ),
+                            width: 50.0,
+                            height: 50.0,
                           ),
-                          width: 50.0,
-                          height: 50.0,
+                      imageUrl: mCurrentPhotoUrl,
+                      width: 50.0,
+                      height: 50.0,
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(45.0)),
+                    clipBehavior: Clip.hardEdge,
+                  ), // Edit text
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: TextField(
+                        style: TextStyle(color: primaryColor, fontSize: 15.0),
+                        controller: textEditingController,
+                        onChanged: (value) {
+                          mTweetMsg = value;
+                        },
+                        decoration: InputDecoration.collapsed(
+                          hintText: 'What\'s happening?',
+                          hintStyle: TextStyle(color: greyColor),
                         ),
-                    imageUrl: mCurrentPhotoUrl,
-                    width: 50.0,
-                    height: 50.0,
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(45.0)),
-                  clipBehavior: Clip.hardEdge,
-                ), // Edit text
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: TextField(
-                      style: TextStyle(color: primaryColor, fontSize: 15.0),
-                      controller: textEditingController,
-                      onChanged: (value) {
-                        mTweetMsg = value;
-                      },
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'What\'s happening?',
-                        hintStyle: TextStyle(color: greyColor),
+                        focusNode: focusNode,
+                        autofocus: true,
                       ),
-                      focusNode: focusNode,
-                      autofocus: true,
                     ),
                   ),
-                ),
 
-              ],
-            ),
-            imageUrl != '' ? Container(
-              child: FlatButton(
-                child: Material(
-                  child: CachedNetworkImage(
-                    placeholder: (context, url) =>
-                        Container(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                themeColor),
+                ],
+              ),
+              imageUrl != '' ? Container(
+                child: FlatButton(
+                  child: Material(
+                    child: CachedNetworkImage(
+                      placeholder: (context, url) =>
+                          Container(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  themeColor),
+                            ),
+                            width: 200.0,
+                            height: 200.0,
+                            decoration: BoxDecoration(
+                              color: greyColor2,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(5.0),
+                              ),
+                            ),
                           ),
-                          width: 200.0,
-                          height: 200.0,
-                          decoration: BoxDecoration(
-                            color: greyColor2,
+                      errorWidget: (context, url, error) =>
+                          Material(
+                            child: Image.asset(
+                              'images/img_not_available.jpeg',
+                              width: 200.0,
+                              height: 200.0,
+                              fit: BoxFit.cover,
+                            ),
                             borderRadius: BorderRadius.all(
                               Radius.circular(5.0),
                             ),
+                            clipBehavior: Clip.hardEdge,
                           ),
-                        ),
-                    errorWidget: (context, url, error) =>
-                        Material(
-                          child: Image.asset(
-                            'images/img_not_available.jpeg',
-                            width: 200.0,
-                            height: 200.0,
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5.0),
-                          ),
-                          clipBehavior: Clip.hardEdge,
-                        ),
-                    imageUrl: imageUrl,
-                    width: 200.0,
-                    height: 200.0,
-                    fit: BoxFit.cover,
+                      imageUrl: imageUrl,
+                      width: 200.0,
+                      height: 200.0,
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    clipBehavior: Clip.hardEdge,
                   ),
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  clipBehavior: Clip.hardEdge,
+                  onPressed: () {
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) =>
+                        FullPhoto(url: imageUrl)));
+                  },
                 ),
-                onPressed: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) =>
-                      FullPhoto(url: imageUrl)));
-                },
-              ),
-            ) : Text(''),
+              ) : Text(''),
 
-          ],
+            ],
+          ),
         ),
-
         width: double.infinity,
         height: 300.0,
         decoration: new BoxDecoration(
@@ -496,6 +507,7 @@ class NewTweetPostState extends State<NewTweetPost> {
         Navigator.push(context, MaterialPageRoute(
             builder: (context) =>
                 MakeTweetPost(currentUserId, mCurrentPhotoUrl)));
+        sendMsg();
       } else {
         Fluttertoast.showToast(msg: 'Nothing to send');
       }
@@ -503,6 +515,95 @@ class NewTweetPostState extends State<NewTweetPost> {
       Fluttertoast.showToast(msg: select_category);
     }
   }
+
+  Future sendMsg() async{
+    String userToken ='';
+    var query = await Firestore.instance.collection('users').getDocuments();
+    query.documents.forEach((doc) {
+      if (currentUserId != doc.data['id']){
+        userToken = doc.data['user_token'];
+        print('user_token new post $userToken');
+        sendAndRetrieveMessage(userToken);
+      }
+    });
+  }
+
+
+
+  final String serverToken = 'AAAA1iQ7au4:APA91bGvPY8CpYvutHVhzh7RL-xyybt7lxPNU_OxXPCJdxDtyZain9hxgliGV9OQyaXLiKXJyVUhpQm0tygEz4YfisEdGIOLyNo3vgUguNMEpBVEaEwUfONgErCLALyrrLTroFhfq5YD';
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+  String _message = '';
+
+  Future<Map<String, dynamic>> sendAndRetrieveMessage(String token) async {
+    await firebaseMessaging.requestNotificationPermissions(
+      const IosNotificationSettings(sound: true, badge: true, alert: true),
+    );
+
+    await http.post(
+      'https://fcm.googleapis.com/fcm/send',
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'key=$serverToken',
+      },
+      body: jsonEncode(
+        <String, dynamic>{
+          'notification': <String, dynamic>{
+            'body': 'New tweat from $currentUserName',
+            'title': 'Tweat'
+          },
+          'priority': 'high',
+          'data': <String, dynamic>{
+            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+            'id': '1',
+            'status': 'done'
+          },
+          'to': token,
+        },
+      ),
+    );
+
+    final Completer<Map<String, dynamic>> completer =
+    Completer<Map<String, dynamic>>();
+    getMessage();
+    return completer.future;
+  }
+  Future _showNotificationWithDefaultSound(Map<String, dynamic> message) async {
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High);
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    var platformChannelSpecifics = new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      message["notification"]["title"],
+      message["notification"]["body"],
+      platformChannelSpecifics,
+      payload: 'Default_Sound',
+    );
+  }
+
+
+  void getMessage(){
+    firebaseMessaging.configure(
+        onMessage: (Map<String, dynamic> message) async {
+          print('on message $message');
+          _showNotificationWithDefaultSound(message);
+          setState(() => _message = message["notification"]["title"]);
+        }, onResume: (Map<String, dynamic> message) async {
+      print('on resume $message');
+      _showNotificationWithDefaultSound(message);
+      setState(() => _message = message["notification"]["title"]);
+    }, onLaunch: (Map<String, dynamic> message) async {
+      print('on launch $message');
+      setState(() => _message = message["notification"]["title"]);
+    });
+  }
+
+
 
 
 }

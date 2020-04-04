@@ -12,9 +12,9 @@ import 'package:virus_chat_app/FacebookSignup.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/UsersList.dart';
-import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
-import 'const.dart';
+import 'utils/const.dart';
 
 class ProfilePageSetup extends StatelessWidget {
   final String currentUserId;
@@ -117,7 +117,7 @@ class ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     print('profile build $name');
     return Scaffold(
-        resizeToAvoidBottomPadding: false,
+        resizeToAvoidBottomPadding: true,
         appBar: AppBar(
         /*  leading: new IconButton(
             icon: new Icon(Icons.arrow_back, color: Colors.black),
@@ -132,181 +132,183 @@ class ProfilePageState extends State<ProfilePage> {
         ),
         body: Stack(
           children: <Widget>[
-            Column(
-              children: <Widget>[
-                Container(
-                  child: Center(
-                    child: Stack(
-                      children: <Widget>[
-                        (avatarImageFile == null)
-                            ? (photoUrl != ''
-                            ? Material(
-                          child: CachedNetworkImage(
-                            placeholder: (context, url) =>
-                                Container(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.0,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        themeColor),
-                                  ),
-                                  width: 90.0,
-                                  height: 90.0,
-                                  padding: EdgeInsets.all(20.0),
-                                ),
-                            imageUrl: photoUrl,
-                            width: 90.0,
-                            height: 90.0,
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(45.0)),
-                          clipBehavior: Clip.hardEdge,
-                        )
-                            : Icon(
-                          Icons.account_circle,
-                          size: 90.0,
-                          color: greyColor,
-                        ))
-                            : Material(
-                          child: Image.file(
-                            avatarImageFile,
-                            width: 90.0,
-                            height: 90.0,
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(45.0)),
-                          clipBehavior: Clip.hardEdge,
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.camera_alt,
-                            color: primaryColor.withOpacity(0.5),
-                          ),
-                          onPressed: getImage,
-                          padding: EdgeInsets.all(30.0),
-                          splashColor: Colors.transparent,
-                          highlightColor: greyColor,
-                          iconSize: 30.0,
-                        ),
-                      ],
-                    ),
-                  ),
-                  width: double.infinity,
-                  margin: EdgeInsets.all(20.0),
-                ),
-                Container(
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                        primaryColor: primaryColor),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Enter your name',
-                        contentPadding: new EdgeInsets.all(5.0),
-                        hintStyle: TextStyle(color: greyColor),
-                      ),
-                      controller: controllerName,
-                      onChanged: (value) {
-                        name = value;
-                      },
+           SingleChildScrollView(
+             child:  Column(
+               children: <Widget>[
+                 Container(
+                   child: Center(
+                     child: Stack(
+                       children: <Widget>[
+                         (avatarImageFile == null)
+                             ? (photoUrl != ''
+                             ? Material(
+                           child: CachedNetworkImage(
+                             placeholder: (context, url) =>
+                                 Container(
+                                   child: CircularProgressIndicator(
+                                     strokeWidth: 2.0,
+                                     valueColor: AlwaysStoppedAnimation<Color>(
+                                         themeColor),
+                                   ),
+                                   width: 90.0,
+                                   height: 90.0,
+                                   padding: EdgeInsets.all(20.0),
+                                 ),
+                             imageUrl: photoUrl,
+                             width: 90.0,
+                             height: 90.0,
+                             fit: BoxFit.cover,
+                           ),
+                           borderRadius: BorderRadius.all(Radius.circular(45.0)),
+                           clipBehavior: Clip.hardEdge,
+                         )
+                             : Icon(
+                           Icons.account_circle,
+                           size: 90.0,
+                           color: greyColor,
+                         ))
+                             : Material(
+                           child: Image.file(
+                             avatarImageFile,
+                             width: 90.0,
+                             height: 90.0,
+                             fit: BoxFit.cover,
+                           ),
+                           borderRadius: BorderRadius.all(Radius.circular(45.0)),
+                           clipBehavior: Clip.hardEdge,
+                         ),
+                         IconButton(
+                           icon: Icon(
+                             Icons.camera_alt,
+                             color: primaryColor.withOpacity(0.5),
+                           ),
+                           onPressed: getImage,
+                           padding: EdgeInsets.all(30.0),
+                           splashColor: Colors.transparent,
+                           highlightColor: greyColor,
+                           iconSize: 30.0,
+                         ),
+                       ],
+                     ),
+                   ),
+                   width: double.infinity,
+                   margin: EdgeInsets.all(20.0),
+                 ),
+                 Container(
+                   child: Theme(
+                     data: Theme.of(context).copyWith(
+                         primaryColor: primaryColor),
+                     child: TextField(
+                       decoration: InputDecoration(
+                         hintText: 'Enter your name',
+                         contentPadding: new EdgeInsets.all(5.0),
+                         hintStyle: TextStyle(color: greyColor),
+                       ),
+                       controller: controllerName,
+                       onChanged: (value) {
+                         name = value;
+                       },
 //                focusNode: focusNodeNickname,
-                    ),
-                  ),
-                  margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                ),
-                Container(
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                        primaryColor: primaryColor),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Enter your NickName',
-                        contentPadding: new EdgeInsets.all(5.0),
-                        hintStyle: TextStyle(color: greyColor),
-                      ),
-                      controller: controllerNickName,
-                      onChanged: (value) {
-                        nickName = value;
-                      },
+                     ),
+                   ),
+                   margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                 ),
+                 Container(
+                   child: Theme(
+                     data: Theme.of(context).copyWith(
+                         primaryColor: primaryColor),
+                     child: TextField(
+                       decoration: InputDecoration(
+                         hintText: 'Enter your NickName',
+                         contentPadding: new EdgeInsets.all(5.0),
+                         hintStyle: TextStyle(color: greyColor),
+                       ),
+                       controller: controllerNickName,
+                       onChanged: (value) {
+                         nickName = value;
+                       },
 //                focusNode: focusNodeNickname,
-                    ),
-                  ),
-                  margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                ),
-                Container(
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                        primaryColor: primaryColor),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Enter your Email',
-                        contentPadding: new EdgeInsets.all(5.0),
-                        hintStyle: TextStyle(color: greyColor),
-                      ),
-                      controller: controllerEmail,
-                      onChanged: (value) {
-                        userEmail = value;
-                      },
+                     ),
+                   ),
+                   margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                 ),
+                 Container(
+                   child: Theme(
+                     data: Theme.of(context).copyWith(
+                         primaryColor: primaryColor),
+                     child: TextField(
+                       decoration: InputDecoration(
+                         hintText: 'Enter your Email',
+                         contentPadding: new EdgeInsets.all(5.0),
+                         hintStyle: TextStyle(color: greyColor),
+                       ),
+                       controller: controllerEmail,
+                       onChanged: (value) {
+                         userEmail = value;
+                       },
 //                focusNode: focusNodeNickname,
-                    ),
-                  ),
-                  margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                ),
-                RaisedButton(onPressed: () {
-                  navigationPage();
-                },
-                  child: Text('GO to Users Page'),),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                      child: RaisedButton(
-                        child: Text('Logout User'),
-                        onPressed: () {
-                          if (signinType == 'google')
-                            loginSelectionOption.handleGoogleSignOut(prefs);
-                          else if (signinType == 'facebook')
-                            facebookSignup.facebookLogout(context, prefs);
-                          else if(signinType == 'MobileNumber')
-                            clearLocalData();
-                          prefs.setString('signInType', '');
-                          _updatestatus();
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (
-                                      context) => new LoginSelectionPage()));
-                        },
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                      child: RaisedButton(
-                        child: Text('Update Profile'),
-                        onPressed: () {
-                          if (prefs.getString('name') != name ||
-                              prefs.getString('nickname') != nickName ||
-                              prefs.getString('photoUrl') != photoUrl ||
-                              prefs.getString('email') != userEmail) {
-                            isLoading = true;
-                            Firestore.instance.collection('users')
-                                .document(userId)
-                                .updateData({
-                              'photoUrl': photoUrl,
-                              'name': name,
-                              'nickName': nickName,
-                              'email': userEmail
-                            });
-                            storeLocalDataInternal(photoUrl,name,nickName,userEmail);
-                            Fluttertoast.showToast(msg: update_success);
-                          } else {
-                            Fluttertoast.showToast(msg: no_data_change);
-                          }
-                        },
-                      ),
-                    )
-                  ],
-                )
-              ],
-            ),
+                     ),
+                   ),
+                   margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                 ),
+                 RaisedButton(onPressed: () {
+                   navigationPage();
+                 },
+                   child: Text('GO to Users Page'),),
+                 Row(
+                   children: <Widget>[
+                     Container(
+                       margin: EdgeInsets.only(left: 30.0, right: 10.0),
+                       child: RaisedButton(
+                         child: Text('Logout User'),
+                         onPressed: () {
+                           if (signinType == 'google')
+                             loginSelectionOption.handleGoogleSignOut(prefs);
+                           else if (signinType == 'facebook')
+                             facebookSignup.facebookLogout(context, prefs);
+                           else if(signinType == 'MobileNumber')
+                             clearLocalData();
+                           prefs.setString('signInType', '');
+                           _updatestatus();
+                           Navigator.push(
+                               context,
+                               MaterialPageRoute(
+                                   builder: (
+                                       context) => new LoginSelectionPage()));
+                         },
+                       ),
+                     ),
+                     Container(
+                       margin: EdgeInsets.only(left: 5.0, right: 10.0),
+                       child: RaisedButton(
+                         child: Text('Update Profile'),
+                         onPressed: () {
+                           if (prefs.getString('name') != name ||
+                               prefs.getString('nickname') != nickName ||
+                               prefs.getString('photoUrl') != photoUrl ||
+                               prefs.getString('email') != userEmail) {
+                             isLoading = true;
+                             Firestore.instance.collection('users')
+                                 .document(userId)
+                                 .updateData({
+                               'photoUrl': photoUrl,
+                               'name': name,
+                               'nickName': nickName,
+                               'email': userEmail
+                             });
+                             storeLocalDataInternal(photoUrl,name,nickName,userEmail);
+                             Fluttertoast.showToast(msg: update_success);
+                           } else {
+                             Fluttertoast.showToast(msg: no_data_change);
+                           }
+                         },
+                       ),
+                     )
+                   ],
+                 )
+               ],
+             ),
+           ),
             // Loading
             Positioned(
               child: isLoading

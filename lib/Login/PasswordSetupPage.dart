@@ -9,7 +9,7 @@ import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
 import 'package:virus_chat_app/UserLocation.dart';
-import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 class PasswordSetup extends StatefulWidget{

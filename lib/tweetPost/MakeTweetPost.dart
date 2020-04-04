@@ -6,7 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
-import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 
 class MakeTweetPost extends StatefulWidget {
@@ -136,121 +136,125 @@ class MakeTweetPostState extends State<MakeTweetPost> {
     return Container(
         padding: EdgeInsets.all(5.0),
         width: double.infinity,
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                document['userPhoto'] != '' ? Container(
-                    child: Material(
-                      child: CachedNetworkImage(
-                        placeholder: (context, url) =>
-                            Container(
-                              margin: EdgeInsets.all(5.0),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.0,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    themeColor),
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  document['userPhoto'] != '' ? Container(
+                      child: Material(
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) =>
+                              Container(
+                                margin: EdgeInsets.all(5.0),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      themeColor),
+                                ),
+                                width: 50.0,
+                                height: 50.0,
                               ),
-                              width: 50.0,
-                              height: 50.0,
-                            ),
-                        imageUrl: document['userPhoto'],
-                        width: 50.0,
-                        height: 50.0,
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(45.0)),
-                      clipBehavior: Clip.hardEdge,
-                    )
-                )
-                    : Text(''),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[document['userName'] != '' ? Container(
-                          margin: EdgeInsets.all(10.0),
-                          child: Center(
+                          imageUrl: document['userPhoto'],
+                          width: 50.0,
+                          height: 50.0,
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(45.0)),
+                        clipBehavior: Clip.hardEdge,
+                      )
+                  )
+                      : Text(''),
+                  SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[document['userName'] != '' ? Container(
+                              margin: EdgeInsets.all(10.0),
+                              child: Center(
+                                child: Text(
+                                    document['userName'],
+                                    style: TextStyle(color: facebook_color)
+                                ),
+                              )
+                          ) : Text(''),
+                            document['createdAt'] != '' ? Container(
+                                child: Center(
+                                  child: Text(
+                                      document['createdAt'],
+                                      style: TextStyle(color: greyColor)
+                                  ),
+                                )
+                            ) : Text(''),
+                          ],
+                        ),
+                        document['content'] != '' ? Container(
+                            margin: EdgeInsets.all(10.0),
                             child: Text(
-                                document['userName'],
-                                style: TextStyle(color: facebook_color)
-                            ),
-                          )
-                      ) : Text(''),
-                        document['createdAt'] != '' ? Container(
-                            child: Center(
-                              child: Text(
-                                  document['createdAt'],
-                                  style: TextStyle(color: greyColor)
+                                document['content'])
+                        )
+                            : Text(''),
+                        document['tweetPostImage'] != '' ? Center(child: Container(
+                          child: FlatButton(
+                            child: Material(
+                              child: CachedNetworkImage(
+                                placeholder: (context, url) =>
+                                    Container(
+                                      child: CircularProgressIndicator(
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                            themeColor),
+                                      ),
+                                      width: 150.0,
+                                      height: 200.0,
+                                      decoration: BoxDecoration(
+                                        color: greyColor2,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        ),
+                                      ),
+                                    ),
+                                errorWidget: (context, url, error) =>
+                                    Material(
+                                      child: Image.asset(
+                                        'images/img_not_available.jpeg',
+                                        width: 150.0,
+                                        height: 200.0,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(5.0),
+                                      ),
+                                      clipBehavior: Clip.hardEdge,
+                                    ),
+                                imageUrl: document['tweetPostImage'],
+                                width: 150.0,
+                                height: 200.0,
+                                fit: BoxFit.cover,
                               ),
-                            )
-                        ) : Text(''),
+                              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                              clipBehavior: Clip.hardEdge,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                  context, MaterialPageRoute(builder: (context) =>
+                                  FullPhoto(url: document['tweetPostImage'])));
+                            },
+                          ),
+                        ),) : Text(''),
                       ],
                     ),
-                    document['content'] != '' ? Container(
-                        margin: EdgeInsets.all(10.0),
-                        child: Text(
-                            document['content'])
-                    )
-                        : Text(''),
-                    document['tweetPostImage'] != '' ? Center(child: Container(
-                      child: FlatButton(
-                        child: Material(
-                          child: CachedNetworkImage(
-                            placeholder: (context, url) =>
-                                Container(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        themeColor),
-                                  ),
-                                  width: 150.0,
-                                  height: 200.0,
-                                  decoration: BoxDecoration(
-                                    color: greyColor2,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5.0),
-                                    ),
-                                  ),
-                                ),
-                            errorWidget: (context, url, error) =>
-                                Material(
-                                  child: Image.asset(
-                                    'images/img_not_available.jpeg',
-                                    width: 150.0,
-                                    height: 200.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
-                                  ),
-                                  clipBehavior: Clip.hardEdge,
-                                ),
-                            imageUrl: document['tweetPostImage'],
-                            width: 150.0,
-                            height: 200.0,
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                          clipBehavior: Clip.hardEdge,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (context) =>
-                              FullPhoto(url: document['tweetPostImage'])));
-                        },
-                      ),
-                    ),) : Text(''),
-                  ],
-                ),
-                Spacer(),
-                Align(
-                  child: getIconWidget(document),
-                )
-              ],
-            ),
-            Divider(color: greyColor,), //                           <-- Divider
-          ],
+                  ),
+                  Spacer(),
+                  Align(
+                    child: getIconWidget(document),
+                  )
+                ],
+              ),
+              Divider(color: greyColor,), //                           <-- Divider
+            ],
+          ),
         )
     );
   }

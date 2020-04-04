@@ -11,7 +11,7 @@ import 'package:virus_chat_app/Login/UserRegistrationPage.dart';
 import 'package:virus_chat_app/Login/otp_input.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
 import 'package:virus_chat_app/UserLocation.dart';
-import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/phone_auth/code.dart';
 import 'package:virus_chat_app/utils/CustomTextSpan.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -147,7 +147,7 @@ class OtpApplyPageState extends State<OtpApplyPage>
         Container(
             margin: const EdgeInsets.only(left: 20.0, top: 30.0, right: 20.0),
             child: customTextSpan(
-                'Check your messages.We have sent you the pin at ',
+                otp_page,
                 mPhoneNumber)
         ),
      /*   Container(
@@ -195,7 +195,7 @@ class OtpApplyPageState extends State<OtpApplyPage>
               alignment: Alignment.topLeft,
               child: Container(
                 margin: const EdgeInsets.only(
-                    left: 20.0, top: 10.0, right: 20.0),
+                    left: 20.0, top: 50.0, right: 20.0),
                 child: Text(resend_otp),
               ),
             ),
@@ -216,6 +216,8 @@ class OtpApplyPageState extends State<OtpApplyPage>
           ],
         ),
         Container(
+          margin: const EdgeInsets.only(
+              left: 10.0, top: 10.0, right: 20.0),
           child: RaisedButton(onPressed: () {
             firebaseAuth.currentUser().then((user) {
               print('USERRRRRRRRRRR $user');

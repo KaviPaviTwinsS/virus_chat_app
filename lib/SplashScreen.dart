@@ -167,8 +167,8 @@ class _SplashScreenState extends State<SplashScreenPage> {
     print( 'token FCMMMMMMM   ___ $userToken');
     await preferences.setString('PUSH_TOKEN', userToken);
     startTime();
-    sendAndRetrieveMessage();
-    getMessage();
+//    sendAndRetrieveMessage();
+//    getMessage();
   }
 
   Future onSelectNotification(String payload) async {

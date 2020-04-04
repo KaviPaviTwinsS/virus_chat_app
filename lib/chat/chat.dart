@@ -12,8 +12,8 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:virus_chat_app/SendInviteScreen.dart';
 import 'package:virus_chat_app/audiop/MyAudioRecorder.dart';
 import 'package:virus_chat_app/chat/AudioChatsss.dart';
-import 'package:virus_chat_app/colors.dart';
-import 'package:virus_chat_app/const.dart';
+import 'package:virus_chat_app/utils/colors.dart';
+import 'package:virus_chat_app/utils/const.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -364,7 +364,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     if(document['type'] == 5){
       storeFile(document['content'],document['audioTime'] );
     }
-    print('CONTENTTTTTTTTTTTTTTTTTTTTTTTTT ${document['content']}');
+    print('CONTENTTTTTTTTTTTTTTTTTTTTTTTTT___ ${ document['type']} ___${document['audioTime']}');
     if (document['idFrom'] == id) {
       // Right (my message)
       return new Row(
@@ -461,7 +461,31 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
               ),
             ),
           )
-              : Container(
+              :
+          new Material(
+            child: Container(
+              height: 56.0,
+              child: Row(
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.play_circle_filled),
+                    onPressed: () {
+                      isPlaying
+                          ? flutterStopPlayer(document['content'],document['audioTime'])
+                          : flutterPlaySound(document['content'],document['audioTime']);
+                    },
+                  ),
+                  new Slider(
+                    label: index.toString(),
+                    value: sliderCurrentPosition,
+                    min: 0.0,
+                    max: maxDuration,
+                    divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt(),
+                    onChanged: (double value) {},),
+                ],
+              ),
+            ),
+          )/*Container(
             child: new Image.asset(
               'images/${document['content']}.gif',
               width: 100.0,
@@ -470,7 +494,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             ),
             margin: EdgeInsets.only(
                 bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
-          ),
+          ),*/
         ],
         mainAxisAlignment: MainAxisAlignment.end,
       );
@@ -568,6 +592,30 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                     padding: EdgeInsets.all(0),
                   ),
                   margin: EdgeInsets.only(left: 10.0),
+                )   : document['type'] == 5 ?
+                new Material(
+                  child: Container(
+                    height: 56.0,
+                    child: Row(
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(Icons.play_circle_filled),
+                          onPressed: () {
+                            isPlaying
+                                ? flutterStopPlayer(document['content'],document['audioTime'])
+                                : flutterPlaySound(document['content'],document['audioTime']);
+                          },
+                        ),
+                        new Slider(
+                          label: index.toString(),
+                          value: sliderCurrentPosition,
+                          min: 0.0,
+                          max: maxDuration,
+                          divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt(),
+                          onChanged: (double value) {},),
+                      ],
+                    ),
+                  ),
                 )
                     : Container(
                   child: new Image.asset(

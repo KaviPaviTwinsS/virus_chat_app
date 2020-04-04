@@ -7,7 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/Login/OtpScreenPage.dart';
 import 'package:virus_chat_app/Login/otpPage.dart';
-import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 class PhoneNumberSelectionPage extends StatelessWidget {
@@ -69,6 +69,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      resizeToAvoidBottomPadding: false,
       body: Column(
         children: <Widget>[
          Align(
@@ -76,7 +77,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
            child:  Container(
              margin: const EdgeInsets.only(left: 5.0, top: 40.0, right: 20.0),
              child: new IconButton(
-               icon: new Icon(Icons.arrow_back, color: Colors.black),
+               icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
                onPressed: () {
                  Navigator.push(
                      context,
@@ -86,20 +87,38 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
              ),
            )
          ),
-      Align(
-        alignment: Alignment.topLeft,
-        child:  Container(
-            margin: const EdgeInsets.only(left: 20.0, top: 20.0, right: 20.0),
-            child: Text('What is your phone number?',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
-            ),
-          ),
-      ),
+     Column(
+       children: <Widget>[
+         Align(
+           alignment: Alignment.topLeft,
+           child:  Container(
+             margin: const EdgeInsets.only(left: 20.0, top: 20.0, right: 20.0),
+             child: Text(phone_no,
+               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
+             ),
+           ),
+         ),
+         Align(
+           alignment: Alignment.topLeft,
+           child:  Container(
+             margin: const EdgeInsets.only(left: 20.0, top: 10.0, right: 20.0),
+             child: Text(phone_no_sub,
+               style: TextStyle(fontSize: 15),
+             ),
+           ),
+         ),
+       ],
+     ),
           Row(
             children: <Widget>[
               Container(
+
+                decoration: new BoxDecoration(
+                  color: greyColor2,
+                ),
+                padding: EdgeInsets.all(5.0),
                 margin: const EdgeInsets.only(
-                    left: 10.0, top: 30.0, right: 5.0),
+                    left: 20.0, top: 20.0, right: 5.0),
                 child: new CountryCodePicker(
                   onChanged: (prints) {
                     print('COUNTRY CODE ${prints.dialCode}');
@@ -122,6 +141,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                   onChanged: (userPhoneNumber) {
                     _userPhoneNumber = userPhoneNumber;
                   },
+                  autofocus: true,
                   decoration: new InputDecoration(
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
@@ -129,7 +149,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                          color: enabled_border_color, width: 2.0),
+                          color: greyColor2, width: 2.0),
                     ),
                     hintText: 'Phone Number',
                   ),
@@ -143,17 +163,27 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              child: RaisedButton(onPressed: () {
-                if(_userPhoneNumber != '') {
-//                  verifyPhone();
-                  Navigator.push(context,
-                      MaterialPageRoute(builder : (context) => new OTPScreen(mobileNumber : _userCountryCode+_userPhoneNumber,mobileNumWithoutCountryCode : _userPhoneNumber)));
-                }else{
-                  Fluttertoast.showToast(msg: enter_phone_number);
-                }
-              },
-                child: Text('CONTINUE',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),),
+              margin: EdgeInsets.only(top: 30.0,left: 10.0,right: 10.0),
+              padding: EdgeInsets.all(30.0),
+              width: double.infinity,
+              child : SizedBox(
+                  height: 45, // specific value
+                  child: RaisedButton(onPressed: () {
+                    if(_userPhoneNumber != '') {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder : (context) => new OTPScreen(mobileNumber : _userCountryCode+_userPhoneNumber,mobileNumWithoutCountryCode : _userPhoneNumber)));
+                    }else{
+                      Fluttertoast.showToast(msg: enter_phone_number);
+                    }
+                  },
+                    color: facebook_color,
+                    textColor: text_color,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(18.0),
+                    ),
+                    child: Text('CONTINUE',
+                      style: TextStyle(fontSize: 17),),
+                  ),
               ),
             ),
           )

@@ -15,7 +15,7 @@ import 'package:virus_chat_app/ProfilePage.dart';
 import 'package:virus_chat_app/audiop/MyAudioEx.dart';
 import 'package:virus_chat_app/chat/AudioChatsss.dart';
 import 'package:virus_chat_app/chat/chat.dart';
-import 'package:virus_chat_app/colors.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/rangeSlider/RangeSliderPage.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
 import 'package:http/http.dart' as http;
@@ -538,7 +538,7 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
         new LatLng(geopoint.latitude, geopoint.longitude));
     print('USER DISTANCE $km');
     print('USER GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
-    if ((km == 0.0 || sliderData >= km) && userId != currentUserId) {
+    if ((km == 0.0 || /*sliderData >= km*/ km<1000.0) && userId != currentUserId) {
       DocumentSnapshot userDocs = await Firestore.instance.collection('users')
           .document(userId).get();
       isLoading = false;
@@ -677,6 +677,9 @@ class LoginUsersList extends StatelessWidget {
         }
 
         if(doc.documentID == friendId ) {
+
+
+
           isAlreadyRequestSent = doc.data['isAlreadyRequestSent'];
         }
 

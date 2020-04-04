@@ -254,89 +254,59 @@ class LoginSelectionOption extends State<LoginSelection> {
           new Image.asset(
             'images/splashnew.png',
             fit: BoxFit.fitWidth,
-            width: 500,
-            height: 500,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height - 170,
           ),
-          OutlineButton.icon(
-            icon: Icon(Icons.call),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          PhoneNumberSelectionPage()));
-            },
-            label: Text('Continue with Phone number'),
-          ),
-          Text('Or connect using social account'),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              RaisedButton.icon(
-                icon: new Image.asset('images/google.png'),
-                onPressed: () {
-                  HandleGoogleSignIn();
+       Align(
+         alignment: Alignment.bottomCenter,
+         child: Container(
+           width: MediaQuery.of(context).size.width,
+           height: 170,
+           child:  Column(
+             children: <Widget>[
+               OutlineButton.icon(
+                 icon: Icon(Icons.call),
+                 onPressed: () {
+                   Navigator.push(
+                       context,
+                       MaterialPageRoute(
+                           builder: (context) =>
+                               PhoneNumberSelectionPage()));
+                 },
+                 label: Text('Continue with Phone number'),
+               ),
+               Text('Or connect using social account'),
+               Row(
+                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                 children: <Widget>[
+                   RaisedButton.icon(
+                     icon: new Image.asset('images/google.png'),
+                     onPressed: () {
+                       HandleGoogleSignIn();
 //                  _settingModalBottomSheet(context);
-                },
-                label: Text('Google'),
-              ),
-              RaisedButton.icon(
-                icon: new Image.asset('images/facebook.png'),
-                onPressed: () {
-                  this.setState(() {
-                    isLoading = true;
-                  });
-                  facebookSignup.initiateFacebookLogin(context, prefs);
-                },
-                label: Text('Facebook'),
-              )
-            ],
-          )
+                     },
+                     label: Text('Google'),
+                   ),
+                   RaisedButton.icon(
+                     icon: new Image.asset('images/facebook.png'),
+                     onPressed: () {
+                       this.setState(() {
+                         isLoading = true;
+                       });
+                       facebookSignup.initiateFacebookLogin(context, prefs);
+                     },
+                     label: Text('Facebook'),
+                   )
+                 ],
+               )
+             ],
+           ),
+         ),
+       )
         ],
       ),
       )
     );
-  }
-
-
-
-  Future _AddNewUser(FirebaseUser firebaseUser, String userEmail, String userId,
-      String loginType) async {
-    var signupUserEmail = '';
-    var loginId = userId;
-    if (firebaseUser.email == null) {
-      signupUserEmail = userEmail;
-    } else {
-      signupUserEmail = firebaseUser.email;
-    }
-    loginType += 'AccountId';
-    UserLocation currentLocation = await LocationService(firebaseUser.uid,).getLocation();
-    /*var currentLocation = UserLocation();
-    var pos = currentLocationListener.whenComplete(() => {
-      currentLocation=
-    });*/
-    GeoFirePoint point = geo.point(
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude);
-
-    // Update data to server if new user
-    Firestore.instance.collection('users').document(firebaseUser.uid).setData({
-      'name': firebaseUser.displayName,
-      'photoUrl': firebaseUser.photoUrl,
-      'email': signupUserEmail,
-      'nickName': firebaseUser.displayName,
-      'password': 'passwordstatic',
-      'phoneNo': firebaseUser.phoneNumber,
-      'status': 'ACTIVE',
-      'id': firebaseUser.uid,
-      '$loginType': loginId,
-      'createdAt':
-          ((new DateTime.now().toUtc().microsecondsSinceEpoch) / 1000).toInt()
-    });
-   Firestore.instance.collection('users').document(firebaseUser.uid).collection('userLocation').document(firebaseUser.uid).setData({
-     'userLocation' : new GeoPoint(currentLocation.latitude, currentLocation.longitude),
-   });
-
   }
 
   Future navigateToProfilePage(BuildContext context, String signinType,
