@@ -8,6 +8,7 @@ import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
+import 'package:virus_chat_app/utils/strings.dart';
 
 class MakeTweetPost extends StatefulWidget {
   String _mCurrentId = '';
@@ -59,13 +60,18 @@ class MakeTweetPostState extends State<MakeTweetPost> {
     return Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
-          leading: new IconButton(
-              icon: Icon(Icons.arrow_back_ios), onPressed: () {
-            Navigator.push(context, MaterialPageRoute(
-                builder: (context) =>
-                    UsersList(signInType, mCurrentId, mPhotoUrl)));
-          }),
-          title: Text('Tweet postssss'),
+          title: Text(community),
+          actions: <Widget>[
+            IconButton(
+              icon: new SvgPicture.asset(
+                'images/community.svg', height: 50.0,
+                width: 50.0,
+                color: text_color,
+              ),
+              onPressed: () {
+              },
+            )
+          ],
         ),
         body: WillPopScope(
           child: Stack(

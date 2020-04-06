@@ -9,6 +9,7 @@ import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
 import 'package:virus_chat_app/UserLocation.dart';
+import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
@@ -32,7 +33,13 @@ class PasswordSetup extends StatefulWidget{
 class PasswordSetupState extends State<PasswordSetup>{
 
   String userPassword ='';
+  String userPhone='';
+  String newPassword ='';
+  String confirmPassword ='';
   TextEditingController passwordController;
+  TextEditingController phoneController;
+  TextEditingController newPasswordController;
+  TextEditingController confirmPasswordController;
 
   String _signinType = '';
   String _accountId = '';
@@ -59,6 +66,9 @@ class PasswordSetupState extends State<PasswordSetup>{
 
   void readLocal() async{
     passwordController = TextEditingController(text: userPassword);
+    phoneController = TextEditingController(text:userPhone );
+    newPasswordController = TextEditingController(text: newPassword);
+    confirmPasswordController = TextEditingController(text: confirmPassword);
     prefs = await SharedPreferences.getInstance();
     userToken = await prefs.getString('PUSH_TOKEN');
     print('userToken_____________________________$userToken');
@@ -77,7 +87,7 @@ class PasswordSetupState extends State<PasswordSetup>{
               child: Container(
                 margin: const EdgeInsets.only(left: 5.0, top: 40.0, right: 20.0),
                 child: new IconButton(
-                  icon: new Icon(Icons.arrow_back, color: Colors.black),
+                  icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
                   onPressed: () {
                     Navigator.push(
                         context,
@@ -98,38 +108,224 @@ class PasswordSetupState extends State<PasswordSetup>{
             ),
           ),
           Container(
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                  primaryColor: primaryColor),
-              child: TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Enter your Password',
-                  contentPadding: new EdgeInsets.all(3.0),
-                  hintStyle: TextStyle(color: greyColor),
+            margin: const EdgeInsets.only(
+                left: 30.0, top: 20.0, right: 20.0),
+            child: TextField(
+              obscureText: true,
+              controller: passwordController,
+              onChanged: (value) {
+                userPassword = value;
+              },
+              autofocus: true,
+              decoration: new InputDecoration(
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: focused_border_color, width: 2.0),
                 ),
-                controller: passwordController,
-                onChanged: (value) {
-                  userPassword = value;
-                },
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: greyColor2, width: 2.0),
+                ),
+                hintText: 'Enter your Password',
               ),
             ),
-            margin: EdgeInsets.only(left: 30.0, right: 30.0),
           ),
-          RaisedButton(
-            child: Text(log_in.toUpperCase()),
-            onPressed: (){
-              if(userPassword != '') {
-                HandleThirdPartySignIn();
-              }else{
-                Fluttertoast.showToast(msg: enter_password);
-              }
-            },
+         /* Align(
+            alignment: Alignment.topRight,
+            child: GestureDetector(
+              onTap: (){
+                forgotPassword();
+              },
+              child:  Container(
+                child: Text('Forgot password'),
+                margin: EdgeInsets.only(left: 30.0, right: 30.0),
+              ),
+            )
+          ),*/
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
+              padding: EdgeInsets.all(30.0),
+              width: double.infinity,
+              child: SizedBox(
+                height: 45, // specific value
+                child: RaisedButton(
+                  child: Text(log_in.toUpperCase()),
+                  color: facebook_color,
+                  textColor: text_color,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(18.0),
+                  ),
+                  onPressed: (){
+                    if(userPassword != '') {
+                      HandleThirdPartySignIn();
+                    }else{
+                      Fluttertoast.showToast(msg: enter_password);
+                    }
+                  },
+                )
+              ),
+            ),
           )
+
         ],
       ),
     );
   }
+
+  void forgotPassword() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            color: Color(0xFF737373),
+            height: 180,
+            child: Container(
+              child: _buildBottomNavigationMenu(),
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(10),
+                  topRight: const Radius.circular(10),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  Column _buildBottomNavigationMenu(){
+    return Column(
+      children: <Widget>[
+        Text('Forgot Password?',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,),),
+        Container(
+          child: Theme(
+            data: Theme.of(context).copyWith(
+                primaryColor: primaryColor),
+            child: TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'Enter your Phone',
+                contentPadding: new EdgeInsets.all(3.0),
+                hintStyle: TextStyle(color: greyColor),
+              ),
+              controller: phoneController,
+              onChanged: (value) {
+                userPhone = value;
+              },
+            ),
+          ),
+          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+        ),
+        RaisedButton(
+          child: Text(send.toUpperCase()),
+          color: facebook_color,
+          textColor: text_color,
+          shape: RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(18.0),
+          ),
+          onPressed: (){
+            sendButton();
+          },
+        )
+
+      ],
+    );
+  }
+
+  void sendButton(){
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            color: Color(0xFF737373),
+            height: 180,
+            child: Container(
+              child: buildPasswordMenu(),
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(10),
+                  topRight: const Radius.circular(10),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+
+  Column buildPasswordMenu(){
+    return Column(
+      children: <Widget>[
+        Text('Reset Password?',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,),),
+        Container(
+          child: Theme(
+            data: Theme.of(context).copyWith(
+                primaryColor: primaryColor),
+            child: TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'Enter New Password',
+                contentPadding: new EdgeInsets.all(3.0),
+                hintStyle: TextStyle(color: greyColor),
+              ),
+              controller: newPasswordController,
+              onChanged: (value) {
+                newPassword = value;
+              },
+            ),
+          ),
+          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+        ),
+        Container(
+          child: Theme(
+            data: Theme.of(context).copyWith(
+                primaryColor: primaryColor),
+            child: TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'Enter Confirm Password',
+                contentPadding: new EdgeInsets.all(3.0),
+                hintStyle: TextStyle(color: greyColor),
+              ),
+              controller: confirmPasswordController,
+              onChanged: (value) {
+                confirmPassword = value;
+              },
+            ),
+          ),
+          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+        ),
+        RaisedButton(
+          child: Text(done.toUpperCase()),
+          color: facebook_color,
+          textColor: text_color,
+          shape: RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(18.0),
+          ),
+          onPressed: (){
+            if(newPassword == '' || confirmPassword == ''){
+              Fluttertoast.showToast(msg: 'Enter new and confirm password');
+            }
+            else if(newPassword == confirmPassword) {
+              updateUserPassword();
+            }else{
+              Fluttertoast.showToast(msg: 'Enter new and confirm password as identical');
+            }
+          },
+        )
+      ],
+    );
+  }
+
+  void updateUserPassword() async {
+    await Firestore.instance.collection('users').document(_firebaseUser.uid).updateData({
+      'password': newPassword
+    });
+  }
+
 
   void HandleThirdPartySignIn() async {
 
@@ -153,11 +349,11 @@ class PasswordSetupState extends State<PasswordSetup>{
         }
       }
 
-   await Navigator.push(
+   /*await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
-                ProfilePageSetup(_signinType, currentUserId: _firebaseUser.uid)));
+                ProfilePageSetup(_signinType, currentUserId: _firebaseUser.uid)));*/
     this.setState(() {
       isLoading = false;
     });
@@ -201,6 +397,14 @@ class PasswordSetupState extends State<PasswordSetup>{
     Firestore.instance.collection('users').document(firebaseUser.uid).collection('userLocation').document(firebaseUser.uid).setData({
       'userLocation' : new GeoPoint(currentLocation.latitude, currentLocation.longitude),
     });
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                UsersList(loginType,
+                    firebaseUser.uid,firebaseUser.photoUrl)));
+
   }
 
 
@@ -223,7 +427,7 @@ class PasswordSetupState extends State<PasswordSetup>{
   Future<Null> updateLocalListData(SharedPreferences prefs,
       List<DocumentSnapshot> documents, String signInType) async {
     print('updateLocalListData');
-    await prefs.setString('userId', documents[0]['uid']);
+    await prefs.setString('userId', documents[0]['id']);
     await prefs.setString('email', documents[0]['email']);
     await prefs.setString('name', documents[0]['displayName']);
     await prefs.setString('nickname', documents[0]['displayName']);
@@ -233,6 +437,12 @@ class PasswordSetupState extends State<PasswordSetup>{
     await prefs.setInt('createdAt', documents[0]['createdAt']);
     await prefs.setString('phoneNo', documents[0]['phoneNo']);
     await prefs.setString('signInType', signInType);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                UsersList('MobileNumber',
+                    documents[0]['id'],documents[0]['photoUrl'])));
   }
 
 }

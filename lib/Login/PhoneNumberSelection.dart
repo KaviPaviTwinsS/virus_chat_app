@@ -69,189 +69,152 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      resizeToAvoidBottomPadding: false,
-      body: Column(
-        children: <Widget>[
-         Align(
-           alignment: Alignment.topLeft,
-           child:  Container(
-             margin: const EdgeInsets.only(left: 5.0, top: 40.0, right: 20.0),
-             child: new IconButton(
-               icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
-               onPressed: () {
-                 Navigator.push(
-                     context,
-                     MaterialPageRoute(
-                         builder: (context) => new LoginSelectionPage()));
-               },
-             ),
-           )
-         ),
-     Column(
-       children: <Widget>[
-         Align(
-           alignment: Alignment.topLeft,
-           child:  Container(
-             margin: const EdgeInsets.only(left: 20.0, top: 20.0, right: 20.0),
-             child: Text(phone_no,
-               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
-             ),
-           ),
-         ),
-         Align(
-           alignment: Alignment.topLeft,
-           child:  Container(
-             margin: const EdgeInsets.only(left: 20.0, top: 10.0, right: 20.0),
-             child: Text(phone_no_sub,
-               style: TextStyle(fontSize: 15),
-             ),
-           ),
-         ),
-       ],
-     ),
-          Row(
-            children: <Widget>[
-              Container(
-
-                decoration: new BoxDecoration(
-                  color: greyColor2,
+        resizeToAvoidBottomPadding: false,
+        body: WillPopScope(
+            onWillPop: (){
+              onBackPress();
+            },
+            child: Column(
+              children: <Widget>[
+                Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                          left: 5.0, top: 40.0, right: 20.0),
+                      child: new IconButton(
+                        icon: new Icon(
+                            Icons.arrow_back_ios, color: Colors.black),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (
+                                      context) => new LoginSelectionPage()));
+                        },
+                      ),
+                    )
                 ),
-                padding: EdgeInsets.all(5.0),
-                margin: const EdgeInsets.only(
-                    left: 20.0, top: 20.0, right: 5.0),
-                child: new CountryCodePicker(
-                  onChanged: (prints) {
-                    print('COUNTRY CODE ${prints.dialCode}');
-                    _userCountryCode = prints.dialCode;
-                  },
-                  // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-                  initialSelection: 'IN',
-                  favorite: ['+91', 'IN'],
-                  // optional. Shows only country name and flag
-                  showCountryOnly: true,
+                Column(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        margin: const EdgeInsets.only(
+                            left: 20.0, top: 20.0, right: 20.0),
+                        child: Text(phone_no,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 19),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        margin: const EdgeInsets.only(
+                            left: 20.0, top: 10.0, right: 20.0),
+                        child: Text(phone_no_sub,
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
+                Row(
+                  children: <Widget>[
+                    Container(
 
-              Expanded(child: Container(
-                margin: const EdgeInsets.only(
-                    left: 10.0, top: 20.0, right: 20.0),
-                child: TextField(
-                  obscureText: false,
-                  controller: userPhoneNumberController,
-                  onChanged: (userPhoneNumber) {
-                    _userPhoneNumber = userPhoneNumber;
-                  },
-                  autofocus: true,
-                  decoration: new InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: focused_border_color, width: 2.0),
+                      decoration: new BoxDecoration(
+                        color: greyColor2,
+                      ),
+                      padding: EdgeInsets.all(5.0),
+                      margin: const EdgeInsets.only(
+                          left: 20.0, top: 20.0, right: 5.0),
+                      child: new CountryCodePicker(
+                        onChanged: (prints) {
+                          print('COUNTRY CODE ${prints.dialCode}');
+                          _userCountryCode = prints.dialCode;
+                        },
+                        // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
+                        initialSelection: 'IN',
+                        favorite: ['+91', 'IN'],
+                        // optional. Shows only country name and flag
+                        showCountryOnly: true,
+                      ),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: greyColor2, width: 2.0),
+
+                    Expanded(child: Container(
+                      margin: const EdgeInsets.only(
+                          left: 10.0, top: 20.0, right: 20.0),
+                      child: TextField(
+                        obscureText: false,
+                        controller: userPhoneNumberController,
+                        onChanged: (userPhoneNumber) {
+                          _userPhoneNumber = userPhoneNumber;
+                        },
+                        autofocus: true,
+                        decoration: new InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: focused_border_color, width: 2.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: greyColor2, width: 2.0),
+                          ),
+                          hintText: 'Phone Number',
+                        ),
+                        keyboardType: TextInputType.phone,
+                      ),
                     ),
-                    hintText: 'Phone Number',
+                    ),
+
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
+                    padding: EdgeInsets.all(30.0),
+                    width: double.infinity,
+                    child: SizedBox(
+                      height: 45, // specific value
+                      child: RaisedButton(
+                        onPressed: () {
+                          if (_userPhoneNumber != '') {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) =>
+                                new OTPScreen(
+                                    mobileNumber: _userCountryCode +
+                                        _userPhoneNumber,
+                                    mobileNumWithoutCountryCode: _userPhoneNumber)));
+                          } else {
+                            Fluttertoast.showToast(msg: enter_phone_number);
+                          }
+                        },
+                        color: facebook_color,
+                        textColor: text_color,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(18.0),
+                        ),
+                        child: Text('CONTINUE',
+                          style: TextStyle(fontSize: 17),),
+                      ),
+                    ),
                   ),
-                  keyboardType: TextInputType.phone,
-                ),
-              ),
-              ),
-
-            ],
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              margin: EdgeInsets.only(top: 30.0,left: 10.0,right: 10.0),
-              padding: EdgeInsets.all(30.0),
-              width: double.infinity,
-              child : SizedBox(
-                  height: 45, // specific value
-                  child: RaisedButton(onPressed: () {
-                    if(_userPhoneNumber != '') {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder : (context) => new OTPScreen(mobileNumber : _userCountryCode+_userPhoneNumber,mobileNumWithoutCountryCode : _userPhoneNumber)));
-                    }else{
-                      Fluttertoast.showToast(msg: enter_phone_number);
-                    }
-                  },
-                    color: facebook_color,
-                    textColor: text_color,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(18.0),
-                    ),
-                    child: Text('CONTINUE',
-                      style: TextStyle(fontSize: 17),),
-                  ),
-              ),
-            ),
-          )
-        ],
-      ),
-
+                )
+              ],
+            ),)
     );
   }
 
-  OtpApplyPageState listener = new OtpApplyPageState('','');
 
-
-  Future<void> verifyPhone() async {
-  /*  String phoneNo = _userCountryCode + _userPhoneNumber;
-    print('forceCodeResend ${phoneNo}');
-
-    final PhoneCodeSent smsOTPSent = (String verId, [int forceCodeResend]) {
-      this.verificationId = verId;
-      listener.otpUpdate(verificationId, smsOTP);
-    };
-
-    try {
-      await firebaseAuth.verifyPhoneNumber(
-          phoneNumber: phoneNo,
-          // PHONE NUMBER TO SEND OTP
-          codeAutoRetrievalTimeout: (String verId) {
-            //Starts the phone number verification process for the given phone number.
-            //Either sends an SMS with a 6 digit code to the phone number specified, or sign's the user in and [verificationCompleted] is called.
-            this.verificationId = verId;
-          },
-          codeSent: smsOTPSent,
-          // WHEN CODE SENT THEN WE OPEN DIALOG TO ENTER OTP.
-          timeout: const Duration(seconds: 20),
-          verificationCompleted: (AuthCredential phoneAuthCredential) {
-            print('phoneAuthCredential${phoneAuthCredential}');
-          },
-          verificationFailed: (AuthException exceptio) {
-            print('phoneAuthCredential exceptio ${exceptio.message}');
-          });
-    } catch (e) {
-      handleError(e);
-    }*/
-   /* Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => new OtpScreenPage(_userCountryCode,_userPhoneNumber)));*/
-
+  Future<bool> onBackPress() async {
+    print('onBackPress');
+    Navigator.pop(context);
+//    Navigator.push(
+//        context,
+//        MaterialPageRoute(
+//            builder: (context) => new LoginSelectionPage()));
+//    return Future.value(true);
   }
-/*
-  handleError(PlatformException error) {
-    print('NANHDU        error');
-    switch (error.code) {
-      case 'ERROR_INVALID_VERIFICATION_CODE':
-        FocusScope.of(context).requestFocus(new FocusNode());
-        setState(() {
-          errorMessage = 'Invalid Code';
-        });
-        Navigator.of(context).pop();
-        *//* smsOTPDialog(context).then((value) {
-          print('sign in');
-        });*//*
-        break;
-      default:
-        setState(() {
-          errorMessage = error.message;
-        });
-
-        break;
-    }
-  }*/
 }

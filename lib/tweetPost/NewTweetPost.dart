@@ -146,7 +146,7 @@ class NewTweetPostState extends State<NewTweetPost> {
           },
         ),
         width: double.infinity,
-        height: 80.0,
+        height: 100.0,
         decoration: new BoxDecoration(
             border: new Border(
                 top: new BorderSide(color: Colors.white, width: 0.5)),
@@ -181,8 +181,8 @@ class NewTweetPostState extends State<NewTweetPost> {
                         ),
                       ),
                   imageUrl: document['categoryImage'],
-                  width: 30.0,
-                  height: 30.0,
+                  width: 50.0,
+                  height: 50.0,
                   fit: BoxFit.cover,
                 ),
               ),

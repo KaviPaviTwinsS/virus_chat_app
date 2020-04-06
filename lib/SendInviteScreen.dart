@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:virus_chat_app/UsersList.dart';
+import 'package:virus_chat_app/chat/chat.dart';
 
 
 class SendInviteToUser extends StatefulWidget{
@@ -29,11 +32,13 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   String _mPeerId, _mCurrentUserId;
   String _mPhotoUrl;
   bool _misAlreadyRequestSent;
+  bool isFriend;
   SharedPreferences prefs;
 
   String _userName,_userPhotoUrl;
   String _friendToken = '';
   String currentUserName ='';
+  String userSignInType = '';
 
 
   SendInviteToUserState(String peerId, String currentUserId,String friendPhotoUrl,bool isAlreadyRequestSent) {
@@ -62,6 +67,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
     _userPhotoUrl =await prefs.getString('photoUrl');
     _friendToken = await prefs.getString('FRIEND_USER_TOKEN');
     currentUserName = await prefs.getString('name');
+    userSignInType = await prefs.getString('signInType');
     var initializationSettingsAndroid =
     new AndroidInitializationSettings('app_icon');
     var initializationSettingsIOS = new IOSInitializationSettings();
@@ -72,66 +78,108 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   }
   @override
   Widget build(BuildContext context) {
-    return  Flexible(
-              child : Center(
+    return Scaffold(
+    /*  appBar: AppBar(
+        leading: new IconButton(
+            icon: Icon(Icons.arrow_back_ios), onPressed: () {
+          Navigator.push(context, MaterialPageRoute(
+              builder: (context) =>
+                  Chat(currentUserId:_mCurrentUserId ,peerId: _mPeerId,peerAvatar: _mPhotoUrl,isFriend: false,isAlreadyRequestSent: _misAlreadyRequestSent,)));
+        }),
+      ),*/
+      body:Column(
+            children: <Widget>[
+              Row(
+                 children: <Widget>[
+                   new IconButton(
+                       icon: Icon(Icons.arrow_back_ios), onPressed: () {
+                     Navigator.push(context, MaterialPageRoute(
+                         builder: (context) =>
+                             UsersList(userSignInType,_mCurrentUserId,_mPhotoUrl)));
+                   }),
+                   Container(
+                     child: CachedNetworkImage(
+                       placeholder: (context, url) =>
+                           Container(
+                             alignment: Alignment.topLeft,
+                             child: CircularProgressIndicator(
+                               strokeWidth: 2.0,
+                             ),
+                           ),
+                       imageUrl: _mPhotoUrl,
+                       width: 50.0,
+                       height: 50.0,
+                       fit: BoxFit.cover,
+                     ),
+                   ),
+                   Container(
+                     margin: EdgeInsets.only(left: 10.0),
+                     child: Text(currentUserName)
+                   ),
+
+                 ],
+              ),
+              Center(
                 child: RaisedButton(
-                  child: Text( isButtonPressed ? 'Invitation sent Successfully Waiting for accept' : ' Sent Invitation' ,),
-                  onPressed: () {
-                    if (!_misAlreadyRequestSent) {
-                      var documentReference = Firestore.instance
-                          .collection('users')
-                          .document(_mCurrentUserId)
-                          .collection('FriendsList')
-                          .document(_mPeerId);
-                      Firestore.instance.runTransaction((transaction) async {
-                        await transaction.set(
-                          documentReference,
-                          {
-                            'requestFrom': _mCurrentUserId,
-                            'receiveId': _mPeerId,
-                            'IsAcceptInvitation': false,
-                            'isRequestSent': true,
-                            'friendPhotoUrl': _userPhotoUrl,
-                            'friendName': _userName,
-                            'isAlreadyRequestSent': true,
-                            'timestamp': DateTime
-                                .now()
-                                .millisecondsSinceEpoch
-                                .toString(),
-                          },
-                        );
-                      });
-                      var documentReference1 = Firestore.instance
-                          .collection('users')
-                          .document(_mPeerId)
-                          .collection('FriendsList')
-                          .document(_mCurrentUserId);
-                      Firestore.instance.runTransaction((transaction) async {
-                        await transaction.set(
-                          documentReference1,
-                          {
-                            'requestFrom': _mCurrentUserId,
-                            'receiveId': _mPeerId,
-                            'IsAcceptInvitation': false,
-                            'isRequestSent': false,
-                            'friendPhotoUrl': _userPhotoUrl,
-                            'friendName': _userName,
-                            'isAlreadyRequestSent': true,
-                            'timestamp': DateTime
-                                .now()
-                                .millisecondsSinceEpoch
-                                .toString(),
-                          },
-                        );
-                      });
-                      sendAndRetrieveMessage();
-                      setState(() {
-                        isButtonPressed = !isButtonPressed;
-                      });
+                    child: Text( isButtonPressed ? 'Invitation sent Successfully Waiting for accept' : ' Sent Invitation' ,),
+                    onPressed: () {
+                      if (!_misAlreadyRequestSent) {
+                        var documentReference = Firestore.instance
+                            .collection('users')
+                            .document(_mCurrentUserId)
+                            .collection('FriendsList')
+                            .document(_mPeerId);
+                        Firestore.instance.runTransaction((transaction) async {
+                          await transaction.set(
+                            documentReference,
+                            {
+                              'requestFrom': _mCurrentUserId,
+                              'receiveId': _mPeerId,
+                              'IsAcceptInvitation': false,
+                              'isRequestSent': true,
+                              'friendPhotoUrl': _userPhotoUrl,
+                              'friendName': _userName,
+                              'isAlreadyRequestSent': true,
+                              'timestamp': DateTime
+                                  .now()
+                                  .millisecondsSinceEpoch
+                                  .toString(),
+                            },
+                          );
+                        });
+                        var documentReference1 = Firestore.instance
+                            .collection('users')
+                            .document(_mPeerId)
+                            .collection('FriendsList')
+                            .document(_mCurrentUserId);
+                        Firestore.instance.runTransaction((transaction) async {
+                          await transaction.set(
+                            documentReference1,
+                            {
+                              'requestFrom': _mCurrentUserId,
+                              'receiveId': _mPeerId,
+                              'IsAcceptInvitation': false,
+                              'isRequestSent': false,
+                              'friendPhotoUrl': _userPhotoUrl,
+                              'friendName': _userName,
+                              'isAlreadyRequestSent': true,
+                              'timestamp': DateTime
+                                  .now()
+                                  .millisecondsSinceEpoch
+                                  .toString(),
+                            },
+                          );
+                        });
+                        sendAndRetrieveMessage();
+                        setState(() {
+                          isButtonPressed = !isButtonPressed;
+                        });
+                      }
                     }
-                  }
                 ),
-              )
+              ),
+            ],
+          )
     );
   }
   final String serverToken = 'AAAA1iQ7au4:APA91bGvPY8CpYvutHVhzh7RL-xyybt7lxPNU_OxXPCJdxDtyZain9hxgliGV9OQyaXLiKXJyVUhpQm0tygEz4YfisEdGIOLyNo3vgUguNMEpBVEaEwUfONgErCLALyrrLTroFhfq5YD';

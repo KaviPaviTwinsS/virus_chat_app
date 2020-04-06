@@ -794,8 +794,9 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             Column(
               children: <Widget>[
                 // List of messages
-                SendInviteToUser(
-                    peerId, currentUserId, peerAvatar, isAlreadyRequestSent),
+//
+//                SendInviteToUser(
+//                    peerId, currentUserId, peerAvatar, isAlreadyRequestSent),
 
               ],
             ),

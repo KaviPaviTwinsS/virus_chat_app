@@ -100,6 +100,12 @@ flutter:
       - images/tag_alert.svg
       - images/tag_social.svg
       - images/tag_help.svg
+      - images/post.svg
+      - images/home.svg
+      - images/home_highlight.svg
+      - images/community.svg
+      - images/home_chat.svg
+      - images/accept.svg
 
   #   - images/a_dot_ham.jpeg
 

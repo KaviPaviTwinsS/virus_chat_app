@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:http/http.dart' as http;
+import 'package:virus_chat_app/UsersList.dart';
 
 class SplashScreenPage extends StatefulWidget {
   @override
@@ -164,7 +165,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
 
   void initialise() async{
     preferences = await SharedPreferences.getInstance();
-    print( 'token FCMMMMMMM   ___ $userToken');
+    print( 'token FCMMMMMMM   ___ ${await preferences.getString('userId')}');
     await preferences.setString('PUSH_TOKEN', userToken);
     startTime();
 //    sendAndRetrieveMessage();
@@ -183,10 +184,40 @@ class _SplashScreenState extends State<SplashScreenPage> {
     );
   }
   void navigationPage() {
+    isGoogleSignedIn();
+  }
+
+  void isGoogleSignedIn() async {
+    if(await preferences.getString('userId') == null || await preferences.getString('userId') == ''){
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => new LoginSelectionPage()));
+    }else {
+      if (await preferences.getString('signInType') == 'google') {
+//      navigateToUsersPage("google");
+        navigateToProfilePageExistingUser(context, 'google', preferences);
+      } else if (await preferences.getString('signInType') == 'facebook') {
+//      navigateToUsersPage("facebook");
+        navigateToProfilePageExistingUser(context, 'facebook', preferences);
+      } else if (await preferences.getString('signInType') == 'MobileNumber') {
+        navigateToProfilePageExistingUser(context, 'MobileNumber', preferences);
+      }
+    }
+  }
+
+  Future navigateToProfilePageExistingUser(
+      BuildContext context, String signinType, SharedPreferences prefs) async {
+    /* Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ProfilePageSetup(signinType,
+                currentUserId: prefs.getString('userId'))));
+*/
     Navigator.push(
         context,
         MaterialPageRoute(
-        builder: (context) => new LoginSelectionPage()));
+            builder: (context) => UsersList(signinType,prefs.getString('userId'),prefs.getString('photoUrl'))));
   }
 
   @override

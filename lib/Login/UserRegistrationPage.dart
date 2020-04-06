@@ -10,8 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
-import 'package:virus_chat_app/ProfilePage.dart';
 import 'package:virus_chat_app/UserLocation.dart';
+import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
@@ -240,7 +240,6 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                       keyboardType: TextInputType.emailAddress,
                     ),
                   ),
-
                 ],
                 crossAxisAlignment: CrossAxisAlignment.start,
               ),
@@ -253,9 +252,9 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                   child : SizedBox(
                     height: 45, // specific value
                     child: RaisedButton(onPressed: () {
+                      print('USER RIGISTRSST _mUserEmail$_mUserEmail ___mUserName$_mUserName __photoUrl$photoUrl');
                       if (_mUserName != '' && _mUserEmail != '' &&
                           photoUrl != '') {
-                        print('NAN ADd user');
                         _AddNewUser(firebaseUser);
                       } else {
                         print('NAN registrationValidation');
@@ -394,12 +393,18 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('phoneNo', userPhoneNumberWithoutCountryCode);
     await prefs.setString('signInType', signInType);
-    Navigator.push(
+  /*  Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 ProfilePageSetup('MobileNumber',
-                    currentUserId: firebaseUser.uid)));
+                    currentUserId: firebaseUser.uid)));*/
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                UsersList(signInType,
+                    firebaseUser.uid,photoUrl)));
   }
 
 

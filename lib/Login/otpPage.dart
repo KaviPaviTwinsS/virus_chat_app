@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/Login/UserRegistrationPage.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
+import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/CustomTextSpan.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -16,11 +16,13 @@ import './otp_input.dart';
 class OTPScreen extends StatefulWidget {
   final String mobileNumber;
   String mobileNumWithoutCountryCode;
+
   OTPScreen({
     Key key,
     @required this.mobileNumber,
     @required this.mobileNumWithoutCountryCode
-  })  : assert(mobileNumber != null),
+  })
+      : assert(mobileNumber != null),
         super(key: key);
 
   @override
@@ -64,7 +66,8 @@ class _OTPScreenState extends State<OTPScreen> {
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-                  margin: const EdgeInsets.only(left: 5.0, top: 40.0, right: 20.0),
+                  margin: const EdgeInsets.only(
+                      left: 5.0, top: 40.0, right: 20.0),
                   child: new IconButton(
                     icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
                     onPressed: () {
@@ -80,16 +83,18 @@ class _OTPScreenState extends State<OTPScreen> {
             Align(
               alignment: Alignment.topLeft,
               child: Container(
-                margin: const EdgeInsets.only(left: 20.0, top: 30.0, right: 20.0),
+                margin: const EdgeInsets.only(
+                    left: 20.0, top: 30.0, right: 20.0),
                 child: Text(verify_phone,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
                 ),
               ),
             ),
             Container(
-                margin: const EdgeInsets.only(left: 20.0, top: 30.0, right: 20.0),
+                margin: const EdgeInsets.only(
+                    left: 20.0, top: 30.0, right: 20.0),
                 child: customTextSpan(
-                    otp_page,widget.mobileNumber)
+                    otp_page, widget.mobileNumber)
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -121,7 +126,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 new GestureDetector(
                   child: Container(
                     margin: const EdgeInsets.only(
-                       top: 10.0, right: 10.0),
+                        top: 10.0, right: 10.0),
                     child: Text(resend_code, style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
@@ -138,18 +143,19 @@ class _OTPScreenState extends State<OTPScreen> {
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                margin: EdgeInsets.only(top: 30.0,left: 10.0,right: 10.0),
+                margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
                 padding: EdgeInsets.all(30.0),
                 width: double.infinity,
-                child : SizedBox(
+                child: SizedBox(
                   height: 45, // specific value
-                  child: RaisedButton(onPressed: () {
-                    if (_pinEditingController.text.length == 6) {
-                      _onFormSubmitted();
-                    } else {
-                      showToast("Invalid OTP", Colors.red);
-                    }
-                  },
+                  child: RaisedButton(
+                    onPressed: () {
+                      if (_pinEditingController.text.length == 6) {
+                        _onFormSubmitted();
+                      } else {
+                        showToast("Invalid OTP", Colors.red);
+                      }
+                    },
                     color: facebook_color,
                     textColor: text_color,
                     shape: RoundedRectangleBorder(
@@ -192,7 +198,7 @@ class _OTPScreenState extends State<OTPScreen> {
           // Handle loogged in state
           print(value.user.phoneNumber);
           navigationToUser(value.user);
-         /* Navigator.pushAndRemoveUntil(
+          /* Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
                 builder: (context) => HomePage(
@@ -250,7 +256,7 @@ class _OTPScreenState extends State<OTPScreen> {
         // Handle loogged in state
         print(value.user.phoneNumber);
         navigationToUser(value.user);
-     /*   Navigator.pushAndRemoveUntil(
+        /*   Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (context) => HomePage(
@@ -267,29 +273,32 @@ class _OTPScreenState extends State<OTPScreen> {
   }
 
 
-  void navigationToUser(FirebaseUser firebaseUser) async{
+
+  void navigationToUser(FirebaseUser firebaseUser) async {
     final QuerySnapshot result = await Firestore.instance
         .collection('users')
-        .where('id', isEqualTo:firebaseUser.uid)
+        .where('id', isEqualTo: firebaseUser.uid)
         .getDocuments();
     final List<DocumentSnapshot> documents = result.documents;
-    print('documents ${documents.length}');
-    if(documents.length !=0){
-      updateLocalListData(prefs,'MobileNumber',documents,firebaseUser.uid);
-    /*  Navigator.push(
+    print('OTPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP ${documents.length} ___ ');
+    if (documents.length != 0) {
+      updateLocalListData(prefs, 'MobileNumber', documents, firebaseUser.uid);
+      /*  Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
               new ProfilePage(
                   'MobileNumber', currentUserId:firebaseUser.uid)));*/
-    }else {
+    } else {
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
               new UserRegistrationPage(
                   userPhoneNumber: widget.mobileNumber,
-                  userPhoneNumberWithoutCountryCode: widget.mobileNumWithoutCountryCode,mFirebaseUser : firebaseUser)));
+                  userPhoneNumberWithoutCountryCode: widget
+                      .mobileNumWithoutCountryCode,
+                  mFirebaseUser: firebaseUser)));
     }
   }
 
@@ -308,12 +317,17 @@ class _OTPScreenState extends State<OTPScreen> {
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('phoneNo', documents[0]['phoneNo']);
     await prefs.setString('signInType', signInType);
-
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
+                UsersList('MobileNumber',
+                    uid, documents[0]['photoUrl'])));
+    /* Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
                 ProfilePageSetup('MobileNumber',
-                    currentUserId: uid)));
+                    currentUserId: uid)));*/
   }
 }

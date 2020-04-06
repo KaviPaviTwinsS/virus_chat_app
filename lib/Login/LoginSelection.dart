@@ -47,72 +47,6 @@ class LoginSelection extends StatefulWidget {
     return LoginSelectionOption();
   }
 }
-/*
-class LoginSelectionOption extends State<LoginSelection> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: Column(children: <Widget>[
-      new Image.asset(
-        'images/splashnew.png',
-        fit: BoxFit.fitWidth,
-        width: 500,
-        height: 500,
-      ),
-      OutlineButton.icon(
-        icon: Icon(Icons.call),
-        onPressed: () {},
-        label: Text('Continue with Phone number'),
-      ),
-      Text('Or connect using social account'),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          RaisedButton.icon(
-            icon: new Image.asset('images/google.png'),
-            onPressed: () {
-              _settingModalBottomSheet(context);
-            },
-            label: Text('Google'),
-          ),
-          RaisedButton.icon(
-            icon: new Image.asset('images/facebook.png'),
-            onPressed: () {},
-            label: Text('Facebook'),
-          )
-        ],
-      )
-    ]));
-  }
-
-
-
-  void _settingModalBottomSheet(context){
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc){
-          return Container(
-            child: new Wrap(
-              children: <Widget>[
-                new ListTile(
-                    leading: new Icon(Icons.music_note),
-                    title: new Text('Music'),
-                    onTap: () => {}
-                ),
-                new ListTile(
-                  leading: new Icon(Icons.videocam),
-                  title: new Text('Video'),
-                  onTap: () => {},
-                ),
-              ],
-            ),
-          );
-        }
-    );
-  }
-
-
-}*/
 
 class LoginSelectionOption extends State<LoginSelection> {
  /* final GoogleSignIn googleSignIn = GoogleSignIn(
@@ -218,7 +152,6 @@ class LoginSelectionOption extends State<LoginSelection> {
         (await firebaseAuth.signInWithCredential(credential)).user;
 
     if (firebaseUser != null) {
-
       navigateToProfilePage(context, 'google', firebaseUser,googleUser.id);
     } else {
 //      Fluttertoast.showToast(msg: "Sign in fail");
@@ -270,8 +203,10 @@ class LoginSelectionOption extends State<LoginSelection> {
                    Navigator.push(
                        context,
                        MaterialPageRoute(
-                           builder: (context) =>
-                               PhoneNumberSelectionPage()));
+                           builder: (context){
+                             return PhoneNumberSelectionPage();
+                           }
+                               ));
                  },
                  label: Text('Continue with Phone number'),
                ),
@@ -326,11 +261,16 @@ class LoginSelectionOption extends State<LoginSelection> {
 
   Future navigateToProfilePageExistingUser(
       BuildContext context, String signinType, SharedPreferences prefs) async {
-    Navigator.push(
+   /* Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => ProfilePageSetup(signinType,
                 currentUserId: prefs.getString('userId'))));
+*/
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => UsersList(signinType,prefs.getString('userId'),prefs.getString('photoUrl'))));
   }
 
   Future navigationLoginPage() async {

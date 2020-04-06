@@ -14,7 +14,7 @@ import 'package:virus_chat_app/SplashScreen.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 
 //void main() => runApp(SplashScreenPage());
-
+//https://github.com/spnaga68/trackx
 
 void main() {
   runApp(new MaterialApp(

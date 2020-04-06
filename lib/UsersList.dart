@@ -6,15 +6,19 @@ import 'package:device_info/device_info.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'package:latlong/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FriendRequestScreen.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
+import 'package:virus_chat_app/SendInviteScreen.dart';
 import 'package:virus_chat_app/audiop/MyAudioEx.dart';
 import 'package:virus_chat_app/chat/AudioChatsss.dart';
 import 'package:virus_chat_app/chat/chat.dart';
+import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/rangeSlider/RangeSliderPage.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
@@ -92,6 +96,8 @@ class UsersListState extends State<UsersListPage> {
   }
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
 
+  int _curIndex =0 ;
+  bool homeClicked = true;
   void test() async{
     String identifier;
     final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
@@ -166,44 +172,115 @@ class UsersListState extends State<UsersListPage> {
           )
         ],
       ),
-      body: Container(
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _curIndex , // this will be set when a new tab is tapped
+        onTap: (index) {
+          setState(() {
+            print('CURENT IDEX____ $index');
+            _curIndex = index;
+            switch (_curIndex) {
+              case 0:
+//                  contents = "Home";
+                setState(() {
+                  print('CICKEDDDDDDDDDDDDDDDDDDDDD');
+                  homeClicked = true;
+                });
+                break;
+              case 1:
+//                  contents = "Articles";
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            NewTweetPost(currentUser,photoUrl)));
+                break;
+              case 2:
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            MakeTweetPost(currentUser,photoUrl)));
+//                  contents = "User";
+                break;
+
+            }
+          });
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: new IconButton(
+              icon: new SvgPicture.asset(
+                homeClicked ?  'images/home_highlight.svg' :  'images/home.svg' , height: 15.0,
+                width: 15.0,
+              ), onPressed: () {
+
+            },
+            ),
+            title: new Text(''),
+          ),
+          BottomNavigationBarItem(
+            icon: new IconButton(
+              icon: new SvgPicture.asset(
+                'images/post.svg', height: 15.0,
+                width: 15.0,
+              ), onPressed: () {
+
+            },
+            ),
+            title: new Text(''),
+          ),
+          BottomNavigationBarItem(
+              icon:  new IconButton(
+                icon: new SvgPicture.asset(
+                  'images/community.svg', height: 15.0,
+                  width: 15.0,
+                ),
+                onPressed: (){
+
+                },
+              ),
+              title: Text('')
+          ),
+        ],
+      ),
+      body: WillPopScope(child: Container(
         child: Column(
           children: <Widget>[
             new ActiveUserListRadiusState(currentUser,photoUrl),
             new UsersOnlinePage(currentUser,photoUrl),
             new LoginUsersList(currentUser,photoUrl),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      child: RaisedButton(onPressed: () {
-                        print('_mcurrentUserId $currentUser');
-                       /* Navigator.push(
+            Row(
+              children: <Widget>[
+                Container(
+                  child: RaisedButton(onPressed: () {
+                    print('_mcurrentUserId $currentUser');
+                    /* Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
                                     MyAppChatAudio()));*/
-                         Navigator.push(
+                    Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
                                 FriendRequestScreen(currentUser,photoUrl)));
-                      },
-                        child: Text('Friend Requests'),),
-                    ),
+                  },
+                    child: Text('Friend Requests'),),
+                ),
 
-                    Container(
-                      child: RaisedButton(onPressed: () {
-                        print('_mcurrentUserId $currentUser');
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    MakeTweetPost(currentUser,photoUrl)));
-                      },
-                        child: Text('Tweet Posts'),),
-                    ),
+                Container(
+                  child: RaisedButton(onPressed: () {
+                    print('_mcurrentUserId $currentUser');
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                MakeTweetPost(currentUser,photoUrl)));
+                  },
+                    child: Text('Tweet Posts'),),
+                ),
 
-                  /*  Container(
+                /*  Container(
                       child: RaisedButton(onPressed: () {
                         print('_mcurrentUserId $currentUser');
                         Navigator.push(
@@ -214,19 +291,23 @@ class UsersListState extends State<UsersListPage> {
                       },
                         child: Text('ExampleApp'),),
                     ),*/
-                  ],
-                )
-
               ],
+            )
+
+          ],
 
         ),
-      ),
+      ), onWillPop: null)
 //      new LoginUsersList(currentUser),
 //      UsersOnlinePage(),
     );
   }
 
 
+
+  Future onBackPress() async {
+    Fluttertoast.showToast(msg: 'Please exit the App');
+  }
 
 }
 
@@ -496,6 +577,10 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
                   )));
     } else {
       Navigator.push(
+          context, MaterialPageRoute(builder: (context) =>
+          SendInviteToUser(
+              friendId, currentUserId, mphotoUrl, isAlreadyRequestSent)));
+   /*   Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
@@ -505,7 +590,7 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
                       peerAvatar: mphotoUrl,
                       isFriend: false,
                       isAlreadyRequestSent: isAlreadyRequestSent
-                  )));
+                  )));*/
     }
   }
 
@@ -517,10 +602,12 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
         .document(userId).collection(
         'userLocation').document(userId)
         .get();
-    DocumentSnapshot map = doc;
-    GeoPoint geopoint = map['userLocation'];
-    getDocumentNearBy(geopoint.latitude, geopoint.longitude, sliderData);
-    print('USERCURRENT  GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
+    if(doc.data.length != 0) {
+      DocumentSnapshot map = doc;
+      GeoPoint geopoint = map['userLocation'];
+      getDocumentNearBy(geopoint.latitude, geopoint.longitude, sliderData);
+      print('USERCURRENT  GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
+    }
   }
 
 
@@ -710,7 +797,7 @@ class LoginUsersList extends StatelessWidget {
                       isAlreadyRequestSent: isAlreadyRequestSent
                   )));
     } else {
-      Navigator.push(
+      /*Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
@@ -720,7 +807,11 @@ class LoginUsersList extends StatelessWidget {
                       peerAvatar: mphotoUrl,
                       isFriend: false,
                       isAlreadyRequestSent: isAlreadyRequestSent
-                  )));
+                  )));*/
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) =>
+          SendInviteToUser(
+              friendId, currentUserId, mphotoUrl, isAlreadyRequestSent)));
     }
   }
 }
