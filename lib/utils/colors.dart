@@ -14,3 +14,4 @@ final focused_border_color = Color(0xFF1E88E5);
 final enabled_border_color = Color(0xFFBDBDBD);
 final rounded_border_color =Color(0xFF1E88E5);
 final button_fill_color =Color(0xFF1E88E5);
+final white_color =Color(0xFFFFFFFF);

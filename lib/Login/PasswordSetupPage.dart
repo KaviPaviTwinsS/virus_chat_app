@@ -79,7 +79,6 @@ class PasswordSetupState extends State<PasswordSetup>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: true,
       body: Column(
         children: <Widget>[
           Align(
@@ -101,15 +100,15 @@ class PasswordSetupState extends State<PasswordSetup>{
           Align(
             alignment: Alignment.topLeft,
             child: Container(
-              margin: const EdgeInsets.only(left: 30.0, top: 30.0, right: 20.0),
+              margin: const EdgeInsets.only(left: 20.0, top: 30.0, right: 20.0),
               child: Text(password,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
               ),
             ),
           ),
           Container(
             margin: const EdgeInsets.only(
-                left: 30.0, top: 20.0, right: 20.0),
+                left: 20.0, top: 20.0, right: 20.0),
             child: TextField(
               obscureText: true,
               controller: passwordController,
@@ -429,8 +428,8 @@ class PasswordSetupState extends State<PasswordSetup>{
     print('updateLocalListData');
     await prefs.setString('userId', documents[0]['id']);
     await prefs.setString('email', documents[0]['email']);
-    await prefs.setString('name', documents[0]['displayName']);
-    await prefs.setString('nickname', documents[0]['displayName']);
+    await prefs.setString('name', documents[0]['name']);
+    await prefs.setString('nickname', documents[0]['nickName']);
     await prefs.setString('password', documents[0]['password']);
     await prefs.setString('status', documents[0]['status']);
     await prefs.setString('photoUrl', documents[0]['photoUrl']);

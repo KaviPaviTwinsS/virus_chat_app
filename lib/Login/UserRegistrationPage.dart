@@ -74,16 +74,16 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   TextEditingController userNockNameController = new TextEditingController();
   TextEditingController userEmailController = new TextEditingController();
 
-  String _mUserName, _mUserNickName, _mUserEmail;
+  String _mUserName =' ', _mUserNickName ='', _mUserEmail ='';
 
-  String userPhoneNumberWithoutCountryCode;
+  String userPhoneNumberWithoutCountryCode ='';
   String photoUrl = '';
 
   bool isLoading = false;
   File avatarImageFile;
 
   SharedPreferences prefs;
-  String userToken;
+  String userToken='';
 
 
   UserRegistrationScreen(
@@ -409,24 +409,25 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
 
 
   void registrationValidation(){
-    bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_mUserEmail);
+    bool emailValid = false;
 
-    if(_mUserName == '') {
+    print('_mUserEmail $_mUserEmail');
+    if(photoUrl =='' || photoUrl == null){
+      Fluttertoast.showToast(
+          msg: upload_profile);
+    } else if(_mUserName == '' || _mUserName == null) {
       Fluttertoast.showToast(
           msg: enter_name);
-    }
-    if(_mUserEmail == ''){
+    }else if(_mUserEmail == '' || _mUserEmail == null){
       Fluttertoast.showToast(
           msg: enter_email);
     }else{
+      emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_mUserEmail);
       if(!emailValid){
         Fluttertoast.showToast(
             msg: enter_valid_email);
       }
     }
-    if(photoUrl ==''){
-      Fluttertoast.showToast(
-          msg: upload_profile);
-    }
+
   }
 }

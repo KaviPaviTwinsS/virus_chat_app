@@ -130,15 +130,12 @@ class ProfilePageState extends State<ProfilePage> {
     return Scaffold(
         resizeToAvoidBottomPadding: true,
         appBar: AppBar(
-          /*  leading: new IconButton(
-            icon: new Icon(Icons.arrow_back, color: Colors.black),
+            leading: new IconButton(
+            icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => new LoginSelectionPage()));
+              navigationPage();
             },
-          ),*/
+          ),
           title: Text('Profile Page setup'),
         ),
 
@@ -273,18 +270,6 @@ class ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                   ),
-                  Container(
-                    child: RaisedButton(
-                      child: Text('Update Photo'),
-                      onPressed: () {
-
-                      },
-                    ),
-                  ),
-                  /* RaisedButton(onPressed: () {
-                   navigationPage();
-                 },
-                   child: Text('GO to Users Page'),),*/
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
@@ -375,7 +360,37 @@ class ProfilePageState extends State<ProfilePage> {
     Widget okButton = FlatButton(
       child: Text("Update Password"),
       onPressed: () {
+        if (newPassword == '' || newPassword == null) {
+          Fluttertoast.showToast(msg: 'Please enter NewPassword');
+        }else  if (confirmPassword == ''  || confirmPassword == null) {
+          Fluttertoast.showToast(
+              msg: 'Please enter ConfirmPassword');
+        } else if (confirmPassword == newPassword) {
+          if (confirmPassword == userPassword) {
+            Fluttertoast.showToast(
+                msg: 'Entered Password are same as existing password');
+          } else {
+            Firestore.instance.collection('users')
+                .document(userId)
+                .updateData({
+              'password': confirmPassword,
+            });
+            _updatePassword(confirmPassword);
+            Fluttertoast.showToast(
+                msg: 'Password updated successfully');
+            Navigator.of(context, rootNavigator: true).pop('dialog');
+          }
+        } else {
+          Fluttertoast.showToast(
+              msg: 'Please enter NewPassword and ConfirmPassword identical');
+        }
+      },
+    );
 
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true).pop('dialog');
       },
     );
 
@@ -383,14 +398,14 @@ class ProfilePageState extends State<ProfilePage> {
     AlertDialog alert = AlertDialog(
       title: Text("Reset Password"),
       content: Container(
-          width: 100.0,
+          width: 200.0,
           height: 230.0,
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
                 Container(
                   margin: const EdgeInsets.only(
-                      left: 10.0, top: 10.0, right: 10.0),
+                      top: 10.0,),
                   child: TextField(
                     obscureText: true,
                     controller: controllerNewPassword,
@@ -414,7 +429,7 @@ class ProfilePageState extends State<ProfilePage> {
                 ),
                 Container(
                   margin: const EdgeInsets.only(
-                      left: 10.0, top: 20.0, right: 10.0),
+                      top: 20.0),
                   child: TextField(
                     obscureText: true,
                     controller: controllerConfirmPassword,
@@ -436,51 +451,69 @@ class ProfilePageState extends State<ProfilePage> {
                     keyboardType: TextInputType.phone,
                   ),
                 ),
-
-                Container(
-                  margin: const EdgeInsets.only(
-                      left: 10.0, top: 10.0, right: 10.0),
-                  child: RaisedButton(
-                    child: Text('Update Password'),
-                    onPressed: () {
-                      if (confirmPassword == '') {
-                        Fluttertoast.showToast(
-                            msg: 'Please enter ConfirmPassword');
-                      }
-                      if (newPassword == '') {
-                        Fluttertoast.showToast(msg: 'Please enter NewPassword');
-                      }
-                      if (confirmPassword == newPassword) {
-                        if (confirmPassword == userPassword) {
-                          Fluttertoast.showToast(
-                              msg: 'Entered Password are same as existing password');
-                        } else {
-                          Firestore.instance.collection('users')
-                              .document(userId)
-                              .updateData({
-                            'password': confirmPassword,
-                          });
-                          _updatePassword(confirmPassword);
-                        }
-                      } else {
-                        Fluttertoast.showToast(
-                            msg: 'Please enter NewPassword and ConfirmPassword identical');
-                      }
-                    },
-                  ),
-                )
+           /*     Row(
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.only(
+                         top: 10.0),
+                      child: OutlineButton(
+                        color: white_color,
+                        child: Text('Update Password'),
+                        onPressed: () {
+                          if (newPassword == '' || newPassword == null) {
+                            Fluttertoast.showToast(msg: 'Please enter NewPassword');
+                          }else  if (confirmPassword == ''  || confirmPassword == null) {
+                            Fluttertoast.showToast(
+                                msg: 'Please enter ConfirmPassword');
+                          } else if (confirmPassword == newPassword) {
+                            if (confirmPassword == userPassword) {
+                              Fluttertoast.showToast(
+                                  msg: 'Entered Password are same as existing password');
+                            } else {
+                              Firestore.instance.collection('users')
+                                  .document(userId)
+                                  .updateData({
+                                'password': confirmPassword,
+                              });
+                              _updatePassword(confirmPassword);
+                              Fluttertoast.showToast(
+                                  msg: 'Password updated successfully');
+                            }
+                          } else {
+                            Fluttertoast.showToast(
+                                msg: 'Please enter NewPassword and ConfirmPassword identical');
+                          }
+                        },
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                          left: 5.0, top: 10.0),
+                      child: OutlineButton(
+                        color: white_color,
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.pop(context, true);
+//                          Navigator.pop(context);
+                        },
+                      ),
+                    )
+                  ],
+                )*/
               ],
             ),
           )
       ),
       actions: [
-//        okButton,
+        okButton,
+        cancelButton,
       ],
     );
 
     // show the dialog
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return alert;
       },

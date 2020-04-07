@@ -23,6 +23,7 @@ String upload_profile ='Upload profile photo';
 String community = 'My Community';
 String send ='SEND';
 String done = 'DONE';
+String explore = 'Explore new ways to chat with people';
 
 
 

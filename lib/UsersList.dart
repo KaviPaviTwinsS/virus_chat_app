@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -28,9 +29,9 @@ import 'package:http/http.dart' as http;
 class UsersList extends StatelessWidget {
   String currentUser = '';
   String userSignInType = '';
-  String mphotoUrl= '';
+  String mphotoUrl = '';
 
-  UsersList(String signinType, String userId,String photoUrl) {
+  UsersList(String signinType, String userId, String photoUrl) {
     currentUser = userId;
     userSignInType = signinType;
     mphotoUrl = photoUrl;
@@ -53,7 +54,7 @@ class UsersList extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: UsersListPage(currentUser, userSignInType,mphotoUrl),
+      home: UsersListPage(currentUser, userSignInType, mphotoUrl),
     );
   }
 }
@@ -61,9 +62,9 @@ class UsersList extends StatelessWidget {
 class UsersListPage extends StatefulWidget {
   String currentUserId = '';
   String signInType = '';
-  String mphotoUrl='';
+  String mphotoUrl = '';
 
-  UsersListPage(String currentUser, String userSignInType,String photoUrl) {
+  UsersListPage(String currentUser, String userSignInType, String photoUrl) {
     currentUserId = currentUser;
     signInType = userSignInType;
     mphotoUrl = photoUrl;
@@ -71,44 +72,57 @@ class UsersListPage extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return UsersListState(currentUserId, signInType,mphotoUrl);
+    return UsersListState(currentUserId, signInType, mphotoUrl);
   }
 }
 
 class UsersListState extends State<UsersListPage> {
-  String photoUrl = '';
+  String currentUserPhotoUrl = '';
+  String currentUserName = '';
   String currentUser = '';
   String userSignInType = '';
+  SharedPreferences prefs;
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
 
-  UsersListState(String currentUserId, String signInType,String mphotoUrl) {
+  UsersListState(String currentUserId, String signInType, String mphotoUrl) {
     currentUser = currentUserId;
     userSignInType = signInType;
-    photoUrl = mphotoUrl;
+    currentUserPhotoUrl = mphotoUrl;
   }
 
   @override
   void initState() {
-    LocationService(currentUser).locationStream;
 //    test();
     super.initState();
+    initialise();
+    setState(() {});
   }
+
+  Future initialise() async {
+    prefs = await SharedPreferences.getInstance();
+    currentUserName = prefs.getString('name');
+    print('USERLIST name_____ $currentUserName');
+    LocationService(currentUser).locationStream;
+  }
+
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
 
-  int _curIndex =0 ;
+  int _curIndex = 0;
+
   bool homeClicked = true;
-  void test() async{
+
+  void test() async {
     String identifier;
     final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
 //    try {
-      if (Platform.isAndroid) {
-        var build = await deviceInfoPlugin.androidInfo;
-        identifier = build.id.toString();
-      } else if (Platform.isIOS) {
-        var data = await deviceInfoPlugin.iosInfo;
-        identifier = data.identifierForVendor;//UUID for iOS
-      }
+    if (Platform.isAndroid) {
+      var build = await deviceInfoPlugin.androidInfo;
+      identifier = build.id.toString();
+    } else if (Platform.isIOS) {
+      var data = await deviceInfoPlugin.iosInfo;
+      identifier = data.identifierForVendor; //UUID for iOS
+    }
     print('IDENTIFIER $identifier');
 //    } on PlatformException {
 //      print('Failed to get platform version');
@@ -120,12 +134,10 @@ class UsersListState extends State<UsersListPage> {
       print("Settings registered: $settings");
     });
 
-    firebaseMessaging.getToken().then((token){
-
+    firebaseMessaging.getToken().then((token) {
       print('--- Firebase toke here ---');
 //      Firestore.instance.collection(currentUser).document(identifier).setData({ 'token': token});
       print(token);
-
     });
   }
 
@@ -155,155 +167,229 @@ class UsersListState extends State<UsersListPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Active Users List"),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.person_pin,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => new ProfilePage(userSignInType,currentUserId: currentUser,)));
-            },
-          )
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _curIndex , // this will be set when a new tab is tapped
-        onTap: (index) {
-          setState(() {
-            print('CURENT IDEX____ $index');
-            _curIndex = index;
-            switch (_curIndex) {
-              case 0:
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _curIndex, // this will be set when a new tab is tapped
+          onTap: (index) {
+            setState(() {
+              print('CURENT IDEX____ $index');
+              _curIndex = index;
+              switch (_curIndex) {
+                case 0:
 //                  contents = "Home";
-                setState(() {
-                  print('CICKEDDDDDDDDDDDDDDDDDDDDD');
-                  homeClicked = true;
-                });
-                break;
-              case 1:
+                  setState(() {
+                    print('CICKEDDDDDDDDDDDDDDDDDDDDD');
+                    homeClicked = true;
+                  });
+                  break;
+                case 1:
 //                  contents = "Articles";
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            NewTweetPost(currentUser,photoUrl)));
-                break;
-              case 2:
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            MakeTweetPost(currentUser,photoUrl)));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              NewTweetPost(currentUser, currentUserPhotoUrl)));
+                  break;
+                case 2:
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              MakeTweetPost(currentUser, currentUserPhotoUrl)));
 //                  contents = "User";
-                break;
-
-            }
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: new IconButton(
-              icon: new SvgPicture.asset(
-                homeClicked ?  'images/home_highlight.svg' :  'images/home.svg' , height: 15.0,
-                width: 15.0,
-              ), onPressed: () {
-
-            },
-            ),
-            title: new Text(''),
-          ),
-          BottomNavigationBarItem(
-            icon: new IconButton(
-              icon: new SvgPicture.asset(
-                'images/post.svg', height: 15.0,
-                width: 15.0,
-              ), onPressed: () {
-
-            },
-            ),
-            title: new Text(''),
-          ),
-          BottomNavigationBarItem(
-              icon:  new IconButton(
+                  break;
+              }
+            });
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: new IconButton(
                 icon: new SvgPicture.asset(
-                  'images/community.svg', height: 15.0,
+                  homeClicked ? 'images/home_highlight.svg' : 'images/home.svg',
+                  height: 15.0,
                   width: 15.0,
-                ),
-                onPressed: (){
+                ), onPressed: () {
 
-                },
+              },
               ),
-              title: Text('')
-          ),
-        ],
-      ),
-      body: WillPopScope(child: Container(
-        child: Column(
-          children: <Widget>[
-            new ActiveUserListRadiusState(currentUser,photoUrl),
-            new UsersOnlinePage(currentUser,photoUrl),
-            new LoginUsersList(currentUser,photoUrl),
-            Row(
-              children: <Widget>[
-                Container(
-                  child: RaisedButton(onPressed: () {
-                    print('_mcurrentUserId $currentUser');
-                    /* Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    MyAppChatAudio()));*/
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                FriendRequestScreen(currentUser,photoUrl)));
+              title: new Text(''),
+            ),
+            BottomNavigationBarItem(
+              icon: new IconButton(
+                icon: new SvgPicture.asset(
+                  'images/post.svg', height: 15.0,
+                  width: 15.0,
+                ), onPressed: () {
+
+              },
+              ),
+              title: new Text(''),
+            ),
+            BottomNavigationBarItem(
+                icon: new IconButton(
+                  icon: new SvgPicture.asset(
+                    'images/community.svg', height: 15.0,
+                    width: 15.0,
+                  ),
+                  onPressed: () {
+
                   },
-                    child: Text('Friend Requests'),),
                 ),
-
-                Container(
-                  child: RaisedButton(onPressed: () {
-                    print('_mcurrentUserId $currentUser');
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                MakeTweetPost(currentUser,photoUrl)));
-                  },
-                    child: Text('Tweet Posts'),),
-                ),
-
-                /*  Container(
-                      child: RaisedButton(onPressed: () {
-                        print('_mcurrentUserId $currentUser');
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ExampleApp()));
-                      },
-                        child: Text('ExampleApp'),),
-                    ),*/
-              ],
-            )
-
+                title: Text('')
+            ),
           ],
-
         ),
-      ), onWillPop: null)
-//      new LoginUsersList(currentUser),
-//      UsersOnlinePage(),
+        body: WillPopScope(
+            child: Stack(
+              children: <Widget>[
+                SingleChildScrollView(
+                    child: Container(
+                        color: facebook_color,
+                        height: MediaQuery
+                            .of(context)
+                            .size
+                            .height - 350,
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                new Container(
+                                  margin: EdgeInsets.only(
+                                      left: 15.0, top: 30.0, right: 10.0),
+                                  child: Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Material(
+                                      child: CachedNetworkImage(
+                                        placeholder: (context, url) =>
+                                            Container(
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 1.0,
+                                                valueColor: AlwaysStoppedAnimation<
+                                                    Color>(themeColor),
+                                              ),
+                                              width: 55.0,
+                                              height: 55.0,
+                                              padding: EdgeInsets.all(10.0),
+                                            ),
+                                        imageUrl: currentUserPhotoUrl,
+                                        width: 35.0,
+                                        height: 35.0,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(18.0),
+                                      ),
+                                      clipBehavior: Clip.hardEdge,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      top: 40.0, right: 10.0),
+                                  child: Text(
+                                    currentUserName, style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: text_color),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      top: 20.0, right: 15.0, left: 10.0),
+                                  child: Align(
+                                    alignment: Alignment.topRight,
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.person_pin,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                new ProfilePage(
+                                                  userSignInType,
+                                                  currentUserId: currentUser,)));
+                                      },
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Container(
+                                  margin: EdgeInsets.only(top: 30.0),
+                                  child: Align(
+                                    alignment: Alignment.topCenter,
+                                    child: new SvgPicture.asset(
+                                      'images/home_chat.svg',
+                                      width: 90.0,
+                                      height: 90.0,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      bottom: 50.0, top: 5.0),
+                                  child: Align(
+                                      alignment: Alignment.topCenter,
+                                      child: Text(
+                                        'Chat with people', style: TextStyle(
+                                          color: text_color),)
+                                  ),
+                                )
+                              ],
+                            ),
+
+                          ],
+                        )
+                    )
+                ),
+
+
+                Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Container(
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width,
+                        height: 300,
+                        decoration: BoxDecoration(
+                            color: text_color,
+                            borderRadius: new BorderRadius.only(
+                              topLeft: const Radius.circular(30.0),
+                              topRight: const Radius.circular(30.0),
+                            )
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            Align(
+                              alignment: Alignment.bottomLeft,
+                              child: Container(
+                                  margin: EdgeInsets.only(left: 20.0,
+                                      top: 30.0),
+                                  child: Text('People', style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 19.0),)
+                              ),
+                            ),
+                            Expanded(
+                              child : new LoginUsersList(
+                                    currentUser, currentUserPhotoUrl),
+                            )
+                          ],
+                        )
+                    )
+                ),
+              ],
+            ), onWillPop: null)
     );
   }
-
-
 
   Future onBackPress() async {
     Fluttertoast.showToast(msg: 'Please exit the App');
@@ -313,11 +399,11 @@ class UsersListState extends State<UsersListPage> {
 
 class UsersOnlinePage extends StatelessWidget implements SliderListener {
   String currentUserId = '';
-  String mphotoUrl ='';
+  String mphotoUrl = '';
 
-  UsersOnlinePage(String currentUser,String photoUrl) {
+  UsersOnlinePage(String currentUser, String photoUrl) {
     currentUserId = currentUser;
-        mphotoUrl = photoUrl;
+    mphotoUrl = photoUrl;
   }
 
 
@@ -332,7 +418,8 @@ class UsersOnlinePage extends StatelessWidget implements SliderListener {
   void SliderChangeListener(double sliderData) {
     print('SliderChangeListener $sliderData');
 //    myAppState.userListUpdate(sliderData);
-    ActiveUserListRadiusState(currentUserId,mphotoUrl).userListUpdate(sliderData);
+    ActiveUserListRadiusState(currentUserId, mphotoUrl).userListUpdate(
+        sliderData);
   }
 
 
@@ -345,27 +432,27 @@ abstract class SliderListener {
 class ActiveUserListRadiusState extends StatefulWidget {
 
   String _mcurrentUserId = ' ';
-  String photoUrl ='';
+  String photoUrl = '';
 
-  ActiveUserListRadiusState(String currentUserId,String mphotoUrl) {
+  ActiveUserListRadiusState(String currentUserId, String mphotoUrl) {
     _mcurrentUserId = currentUserId;
     photoUrl = mphotoUrl;
   }
 
   @override
   State<StatefulWidget> createState() {
-    return ActiveUserListRadius(_mcurrentUserId,photoUrl);
+    return ActiveUserListRadius(_mcurrentUserId, photoUrl);
   }
 
   userListUpdate(double sliderData) {
-    ActiveUserListRadius(_mcurrentUserId,photoUrl).userListUpdate(sliderData);
+    ActiveUserListRadius(_mcurrentUserId, photoUrl).userListUpdate(sliderData);
   }
 }
 
 
 class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
   String currentUserId = '';
-  String mphotoUrl ='';
+  String mphotoUrl = '';
 
   GeoPoint mUserGeoPoint;
 
@@ -374,7 +461,7 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
 
   SharedPreferences _preferences;
 
-  ActiveUserListRadius(String currentUser,String photoUrl) {
+  ActiveUserListRadius(String currentUser, String photoUrl) {
     currentUserId = currentUser;
     mphotoUrl = photoUrl;
   }
@@ -390,9 +477,10 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
     initialise();
     super.initState();
   }
-   void initialise() async {
-     _preferences = await SharedPreferences.getInstance();
-   }
+
+  void initialise() async {
+    _preferences = await SharedPreferences.getInstance();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -535,19 +623,19 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
         .document(currentUserId).collection(
         'FriendsList').getDocuments();
     print('Friend Listttttt queryyyy${documentSnapshot.data['user_token']}');
-    await _preferences.setString('FRIEND_USER_TOKEN',documentSnapshot.data['user_token'] );
+    await _preferences.setString(
+        'FRIEND_USER_TOKEN', documentSnapshot.data['user_token']);
     if (query.documents.length != 0) {
       query.documents.forEach((doc) {
         print('Friend Listttttt ${doc.data}');
         if (doc.documentID == friendId &&
             doc.data['IsAcceptInvitation'] == true) {
-            isFriend = true;
+          isFriend = true;
         }
 
-        if(doc.documentID == friendId ) {
+        if (doc.documentID == friendId) {
           isAlreadyRequestSent = doc.data['isAlreadyRequestSent'];
         }
-
       });
     } else {
       isAlreadyRequestSent = false;
@@ -580,7 +668,7 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
           context, MaterialPageRoute(builder: (context) =>
           SendInviteToUser(
               friendId, currentUserId, mphotoUrl, isAlreadyRequestSent)));
-   /*   Navigator.push(
+      /*   Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
@@ -602,7 +690,7 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
         .document(userId).collection(
         'userLocation').document(userId)
         .get();
-    if(doc.data.length != 0) {
+    if (doc.data.length != 0) {
       DocumentSnapshot map = doc;
       GeoPoint geopoint = map['userLocation'];
       getDocumentNearBy(geopoint.latitude, geopoint.longitude, sliderData);
@@ -625,7 +713,8 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
         new LatLng(geopoint.latitude, geopoint.longitude));
     print('USER DISTANCE $km');
     print('USER GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
-    if ((km == 0.0 || /*sliderData >= km*/ km<1000.0) && userId != currentUserId) {
+    if ((km == 0.0 || /*sliderData >= km*/ km < 1000.0) &&
+        userId != currentUserId) {
       DocumentSnapshot userDocs = await Firestore.instance.collection('users')
           .document(userId).get();
       isLoading = false;
@@ -654,11 +743,11 @@ class ActiveUserListRadius extends State<ActiveUserListRadiusState> {
 
 class LoginUsersList extends StatelessWidget {
   String currentUserId = '';
-  String mphotoUrl ='';
+  String mphotoUrl = '';
 
   SharedPreferences _preferences;
 
-  LoginUsersList(String currentUser,String photoUrl) {
+  LoginUsersList(String currentUser, String photoUrl) {
     currentUserId = currentUser;
     mphotoUrl = photoUrl;
     initialise();
@@ -676,17 +765,17 @@ class LoginUsersList extends StatelessWidget {
       builder:
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) return new Text('Loading...');
-        return Expanded(
-            child: new ListView(
-                scrollDirection: Axis.horizontal,
-                children: snapshot.data.documents.map((document) {
-                  print('Document idddd ${document.documentID}');
-                  if (document.documentID != currentUserId) {
-                    return GestureDetector(
-                        onTap: () {
-                          print('ON TAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP currentUserId $currentUserId');
-                          getFriendList(context, currentUserId, document);
-                          /*Navigator.push(
+        return new ListView(
+            scrollDirection: Axis.horizontal,
+            children: snapshot.data.documents.map((document) {
+              print('Document idddd ${document.documentID}');
+              if (document.documentID != currentUserId) {
+                return GestureDetector(
+                    onTap: () {
+                      print(
+                          'ON TAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP currentUserId $currentUserId');
+                      getFriendList(context, currentUserId, document);
+                      /*Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
@@ -697,38 +786,36 @@ class LoginUsersList extends StatelessWidget {
                                         isFriend: null,
                                           isAlreadyRequestSent  :null
                                       )));*/
-                        },
-                        child: new Center(
-                            child: new Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Container(
-                                    margin: EdgeInsets.all(15.0),
-                                    width: 100.0,
-                                    height: 100.0,
-                                    decoration: new BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: new DecorationImage(
-                                            fit: BoxFit.fill,
-                                            image: new NetworkImage(
-                                                document['photoUrl'])
-                                        )
-                                    )),
-                                new Text(document['name'],
-                                    textScaleFactor: 1.0)
-                              ],
-                            )));
-                  } else {
-                    return Center(
-                      child: Text(''),
-                    );
-                  }
-                  /*  return new ListTile(
+                    },
+                    child:new Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new Container(
+                              margin: EdgeInsets.only(left: 20.0),
+                                width: 80.0,
+                                height: 80.0,
+                                decoration: new BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: new DecorationImage(
+                                        fit: BoxFit.fill,
+                                        image: new NetworkImage(
+                                            document['photoUrl'])
+                                    )
+                                )),
+                            new Text(document['name'],
+                                textScaleFactor: 1.0)
+                          ],
+                        ));
+              } else {
+                return Center(
+                  child: Text(''),
+                );
+              }
+              /*  return new ListTile(
                 title: new Text(document['name']),
                 subtitle: new Text(document['status']));*/
-                }).toList()
-            )
+            }).toList()
         );
       },
     );
@@ -754,7 +841,8 @@ class LoginUsersList extends StatelessWidget {
         .document(currentUserId).collection(
         'FriendsList').getDocuments();
     print('Friend Listttttt queryyyy${documentSnapshot.data['user_token']}');
-    await _preferences.setString('FRIEND_USER_TOKEN',documentSnapshot.data['user_token'] );
+    await _preferences.setString(
+        'FRIEND_USER_TOKEN', documentSnapshot.data['user_token']);
     if (query.documents.length != 0) {
       query.documents.forEach((doc) {
         print('Friend Listttttt ${doc.data}');
@@ -763,13 +851,9 @@ class LoginUsersList extends StatelessWidget {
           isFriend = true;
         }
 
-        if(doc.documentID == friendId ) {
-
-
-
+        if (doc.documentID == friendId) {
           isAlreadyRequestSent = doc.data['isAlreadyRequestSent'];
         }
-
       });
     } else {
       /*Navigator.push(
@@ -783,7 +867,6 @@ class LoginUsersList extends StatelessWidget {
                   )));*/
     }
     print('Friend Listttttt isFriend${documentSnapshot['photoUrl']}');
-
     if (isFriend) {
       Navigator.push(
           context,
@@ -792,7 +875,7 @@ class LoginUsersList extends StatelessWidget {
                   Chat(
                       currentUserId: currentUserId,
                       peerId: friendId,
-                      peerAvatar: mphotoUrl,
+                      peerAvatar: documentSnapshot['photoUrl'],
                       isFriend: true,
                       isAlreadyRequestSent: isAlreadyRequestSent
                   )));
@@ -811,7 +894,7 @@ class LoginUsersList extends StatelessWidget {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) =>
           SendInviteToUser(
-              friendId, currentUserId, mphotoUrl, isAlreadyRequestSent)));
+              friendId, currentUserId, documentSnapshot['photoUrl'], isAlreadyRequestSent)));
     }
   }
 }

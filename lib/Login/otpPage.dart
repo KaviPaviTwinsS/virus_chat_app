@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,7 +39,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
   /// Decorate the outside of the Pin.
   PinDecoration _pinDecoration =
-  UnderlineDecoration(enteredColor: Colors.grey, hintText: '333333');
+  BoxLooseDecoration(strokeColor: Colors.grey, hintText: '333333');
 
   bool isCodeSent = false;
   String _verificationId;
@@ -114,15 +115,13 @@ class _OTPScreenState extends State<OTPScreen> {
               ),
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Container(
+              Container(
                     margin: const EdgeInsets.only(
                         left: 20.0, top: 10.0, right: 10.0),
                     child: Text(resend_otp),
                   ),
-                ),
                 new GestureDetector(
                   child: Container(
                     margin: const EdgeInsets.only(
@@ -140,9 +139,7 @@ class _OTPScreenState extends State<OTPScreen> {
               ],
             ),
 
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
+          Container(
                 margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
                 padding: EdgeInsets.all(30.0),
                 width: double.infinity,
@@ -165,13 +162,13 @@ class _OTPScreenState extends State<OTPScreen> {
                       style: TextStyle(fontSize: 17),),
                   ),
                 ),
-              ),
             )
           ],
         ),
       ),
     );
   }
+
 
   void showToast(message, Color color) {
     print(message);
@@ -271,7 +268,6 @@ class _OTPScreenState extends State<OTPScreen> {
       showToast("Something went wrong", Colors.red);
     });
   }
-
 
 
   void navigationToUser(FirebaseUser firebaseUser) async {

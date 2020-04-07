@@ -31,6 +31,7 @@ class SendInviteToUser extends StatefulWidget{
 class SendInviteToUserState extends State<SendInviteToUser> {
   String _mPeerId, _mCurrentUserId;
   String _mPhotoUrl;
+  String _mcurrentPhotoUrl;
   bool _misAlreadyRequestSent;
   bool isFriend;
   SharedPreferences prefs;
@@ -95,27 +96,30 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                        icon: Icon(Icons.arrow_back_ios), onPressed: () {
                      Navigator.push(context, MaterialPageRoute(
                          builder: (context) =>
-                             UsersList(userSignInType,_mCurrentUserId,_mPhotoUrl)));
+                             UsersList(userSignInType,_mCurrentUserId,_userPhotoUrl)));
                    }),
-                   Container(
-                     child: CachedNetworkImage(
-                       placeholder: (context, url) =>
-                           Container(
-                             alignment: Alignment.topLeft,
-                             child: CircularProgressIndicator(
-                               strokeWidth: 2.0,
-                             ),
-                           ),
-                       imageUrl: _mPhotoUrl,
-                       width: 50.0,
-                       height: 50.0,
-                       fit: BoxFit.cover,
-                     ),
-                   ),
-                   Container(
-                     margin: EdgeInsets.only(left: 10.0),
-                     child: Text(currentUserName)
-                   ),
+
+                   Column(
+                     crossAxisAlignment: CrossAxisAlignment.center,
+                     children: <Widget>[
+                       new Container(
+                           margin: EdgeInsets.only(top: 35.0,left: 20.0),
+                           width: 50.0,
+                           height: 50.0,
+                           decoration: new BoxDecoration(
+                               shape: BoxShape.circle,
+                               image: new DecorationImage(
+                                   fit: BoxFit.fill,
+                                   image: new NetworkImage(
+                                       _mPhotoUrl)
+                               )
+                           )),
+                       Container(
+                           margin: EdgeInsets.only(left: 10.0,top:10.0),
+                           child: Text(currentUserName)
+                       ),
+                     ],
+                   )
 
                  ],
               ),

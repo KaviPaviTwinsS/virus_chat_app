@@ -57,6 +57,7 @@ dependencies:
 
 
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -106,6 +107,10 @@ flutter:
       - images/community.svg
       - images/home_chat.svg
       - images/accept.svg
+      - images/image.svg
+      - images/phone.svg
+      - images/gmail.svg
+      - images/fb.svg
 
   #   - images/a_dot_ham.jpeg
 

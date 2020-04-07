@@ -214,6 +214,8 @@ class _SplashScreenState extends State<SplashScreenPage> {
             builder: (context) => ProfilePageSetup(signinType,
                 currentUserId: prefs.getString('userId'))));
 */
+    print('USERLIST name ${await prefs.getString('name')}');
+
     Navigator.push(
         context,
         MaterialPageRoute(

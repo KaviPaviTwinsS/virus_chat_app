@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -15,6 +16,8 @@ import 'package:virus_chat_app/Login/PasswordSetupPage.dart';
 import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
+import 'package:virus_chat_app/utils/colors.dart';
+import 'package:virus_chat_app/utils/strings.dart';
 
 import '../ProfilePage.dart';
 
@@ -49,7 +52,7 @@ class LoginSelection extends StatefulWidget {
 }
 
 class LoginSelectionOption extends State<LoginSelection> {
- /* final GoogleSignIn googleSignIn = GoogleSignIn(
+  /* final GoogleSignIn googleSignIn = GoogleSignIn(
     scopes: [
       'email',
     ],
@@ -71,15 +74,16 @@ class LoginSelectionOption extends State<LoginSelection> {
 
   Geoflutterfire geo = Geoflutterfire();
 
-  String userToken ='';
+  String userToken = '';
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   @override
   void initState() {
     super.initState();
-    _firebaseMessaging.getToken().then((token) => {
-      userToken = token ,
-    isGoogleSignedIn()
+    _firebaseMessaging.getToken().then((token) =>
+    {
+      userToken = token,
+      isGoogleSignedIn()
     });
   }
 
@@ -99,7 +103,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     } else if (prefs.getString('signInType') == 'facebook') {
 //      navigateToUsersPage("facebook");
       navigateToProfilePageExistingUser(context, 'facebook', prefs);
-    }else  if (prefs.getString('signInType') == 'MobileNumber') {
+    } else if (prefs.getString('signInType') == 'MobileNumber') {
       navigateToProfilePageExistingUser(context, 'MobileNumber', prefs);
     }
     this.setState(() {
@@ -111,8 +115,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     isLoading = false;
   }
 
-  void isFacebookLoggedInUpdate(
-      BuildContext context,
+  void isFacebookLoggedInUpdate(BuildContext context,
       SharedPreferences preferences,
       bool isLoggedIn,
       String userEmail,
@@ -123,12 +126,12 @@ class LoginSelectionOption extends State<LoginSelection> {
 //    Fluttertoast.showToast(msg: "Faccebook login success ${profileData['picture']['data']['url']} ___ ${profileData['email']}");
     facebookProfileData = profileData;
     if (isFacebookLoggedIn) {
-   /*   if (facebookProfileData != null) {
+      /*   if (facebookProfileData != null) {
         updateLocalData(prefs, facebookProfileData, 'facebook');
         _AddNewUser(facebookProfileData, userEmail, userId, 'facebook');
       }
       isLoading = false;*/
-      navigateToProfilePage(context, 'facebook', facebookProfileData,userId);
+      navigateToProfilePage(context, 'facebook', facebookProfileData, userId);
     } else {
 //      Fluttertoast.showToast(msg: "Sign in fail");
       isLoading = false;
@@ -152,7 +155,7 @@ class LoginSelectionOption extends State<LoginSelection> {
         (await firebaseAuth.signInWithCredential(credential)).user;
 
     if (firebaseUser != null) {
-      navigateToProfilePage(context, 'google', firebaseUser,googleUser.id);
+      navigateToProfilePage(context, 'google', firebaseUser, googleUser.id);
     } else {
 //      Fluttertoast.showToast(msg: "Sign in fail");
       this.setState(() {
@@ -166,7 +169,8 @@ class LoginSelectionOption extends State<LoginSelection> {
     isLoading = true;
     isLoggedIn = true;
     await FirebaseAuth.instance.signOut();
-    print('SIGN OUT VALLLL ${googleSignIn.isSignedIn() != null}   ____ isLoggg $isLoggedIn');
+    print('SIGN OUT VALLLL ${googleSignIn.isSignedIn() !=
+        null}   ____ isLoggg $isLoggedIn');
     if (googleSignIn.isSignedIn() != null && isLoggedIn) {
       print('SIGN OUT');
       await googleSignIn.disconnect();
@@ -180,69 +184,142 @@ class LoginSelectionOption extends State<LoginSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      body: Container(
-      child : Column(
-        children: <Widget>[
-          new Image.asset(
-            'images/splashnew.png',
+        resizeToAvoidBottomPadding: false,
+        body: Container(
+          child: Column(
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(top: 40.0, left: 20.0, right: 20.0),
+                child: Text(explore, style: TextStyle(
+                    fontWeight: FontWeight.bold, fontSize: 29.0)),
+              ),
+              new SvgPicture.asset(
+                'images/image.svg',
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height - 290,
+              ),
+              /*  new Image.asset(
+            'images/image.svg',
             fit: BoxFit.fitWidth,
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height - 170,
-          ),
-       Align(
-         alignment: Alignment.bottomCenter,
-         child: Container(
-           width: MediaQuery.of(context).size.width,
-           height: 170,
-           child:  Column(
-             children: <Widget>[
-               OutlineButton.icon(
-                 icon: Icon(Icons.call),
-                 onPressed: () {
-                   Navigator.push(
-                       context,
-                       MaterialPageRoute(
-                           builder: (context){
-                             return PhoneNumberSelectionPage();
-                           }
-                               ));
-                 },
-                 label: Text('Continue with Phone number'),
-               ),
-               Text('Or connect using social account'),
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                 children: <Widget>[
-                   RaisedButton.icon(
-                     icon: new Image.asset('images/google.png'),
-                     onPressed: () {
-                       HandleGoogleSignIn();
+          ),*/
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                  height: 170,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width,
+                        margin: EdgeInsets.only(left: 20.0, right: 20.0),
+                        child: OutlineButton.icon(
+                          icon: new SvgPicture.asset(
+                            'images/phone.svg',
+                            width: 20.0,
+                            height: 20.0,
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) {
+                                      return PhoneNumberSelectionPage();
+                                    }
+                                ));
+                          },
+                          label: Text('Continue with Phone number'),
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width,
+                        margin: EdgeInsets.only(left: 20.0, right: 20.0,bottom: 10.0,top: 10.0),
+                        child: Text('Or connect using social account'),
+                      ),
+                      Container(
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .width,
+                          margin: EdgeInsets.only(left: 20.0, right: 20.0),
+                          child:
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Container(
+                                width: ((MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width) / 2) - 30,
+                                height: 40.0,
+                                child: RaisedButton.icon(
+                                  icon: new SvgPicture.asset(
+                                    'images/gmail.svg',
+                                    width: 20.0,
+                                    height: 20.0,
+                                  ),
+                                  onPressed: () {
+                                    HandleGoogleSignIn();
 //                  _settingModalBottomSheet(context);
-                     },
-                     label: Text('Google'),
-                   ),
-                   RaisedButton.icon(
-                     icon: new Image.asset('images/facebook.png'),
-                     onPressed: () {
-                       this.setState(() {
-                         isLoading = true;
-                       });
-                       facebookSignup.initiateFacebookLogin(context, prefs);
-                     },
-                     label: Text('Facebook'),
-                   )
-                 ],
-               )
-             ],
-           ),
-         ),
-       )
-        ],
-      ),
-      )
+                                  },
+                                  label: Text('Google'),
+                                  color: white_color,
+                                ),
+                              ),
+                              Container(
+                                  height: 40.0,
+                                  width: ((MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width) / 2) - 30,
+                                  child: RaisedButton.icon(
+                                    icon: new SvgPicture.asset(
+                                      'images/fb.svg',
+                                      width: 20.0,
+                                      height: 20.0,
+                                    ),
+                                    onPressed: () {
+                                      this.setState(() {
+                                        isLoading = true;
+                                      });
+                                      facebookSignup.initiateFacebookLogin(
+                                          context, prefs);
+                                    },
+                                    label: Text('Facebook'),
+                                    color: white_color,
+                                  )
+                              )
+                            ],
+                          )
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        )
     );
   }
+
 
   Future navigateToProfilePage(BuildContext context, String signinType,
       FirebaseUser firebaseUser, String accountId) async {
@@ -256,12 +333,13 @@ class LoginSelectionOption extends State<LoginSelection> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-                PasswordSetup(signinType,maccountId:accountId,mfirebaseUser: firebaseUser)));
+                PasswordSetup(signinType, maccountId: accountId,
+                    mfirebaseUser: firebaseUser)));
   }
 
-  Future navigateToProfilePageExistingUser(
-      BuildContext context, String signinType, SharedPreferences prefs) async {
-   /* Navigator.push(
+  Future navigateToProfilePageExistingUser(BuildContext context,
+      String signinType, SharedPreferences prefs) async {
+    /* Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => ProfilePageSetup(signinType,
@@ -270,7 +348,9 @@ class LoginSelectionOption extends State<LoginSelection> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => UsersList(signinType,prefs.getString('userId'),prefs.getString('photoUrl'))));
+            builder: (context) =>
+                UsersList(signinType, prefs.getString('userId'),
+                    prefs.getString('photoUrl'))));
   }
 
   Future navigationLoginPage() async {
@@ -279,7 +359,7 @@ class LoginSelectionOption extends State<LoginSelection> {
   }
 
   Future navigateToUsersPage(String userSignInType) async {
-   /* Navigator.push(
+    /* Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => UsersList(userSignInType,prefs.getString('userId'))));*/
@@ -305,7 +385,9 @@ class LoginSelectionOption extends State<LoginSelection> {
     await prefs.setString('photoUrl', currentUser.photoUrl);
     await prefs.setString('signInType', signInType);
     await prefs.setInt('createdAt',
-        ((new DateTime.now().toUtc().microsecondsSinceEpoch) / 1000).toInt());
+        ((new DateTime.now()
+            .toUtc()
+            .microsecondsSinceEpoch) / 1000).toInt());
   }
 
   Future<Null> updateLocalListData(SharedPreferences prefs,
