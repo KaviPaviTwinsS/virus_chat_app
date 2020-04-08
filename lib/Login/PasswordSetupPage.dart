@@ -369,14 +369,13 @@ class PasswordSetupState extends State<PasswordSetup>{
       signupUserEmail = firebaseUser.email;
     }
     loginType += 'AccountId';
-    UserLocation currentLocation = await LocationService(firebaseUser.uid,).getLocation();
     /*var currentLocation = UserLocation();
     var pos = currentLocationListener.whenComplete(() => {
       currentLocation=
     });*/
-    GeoFirePoint point = geo.point(
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude);
+//    GeoFirePoint point = geo.point(
+//        latitude: currentLocation.latitude,
+//        longitude: currentLocation.longitude);
 
     // Update data to server if new user
     Firestore.instance.collection('users').document(firebaseUser.uid).setData({
@@ -393,6 +392,7 @@ class PasswordSetupState extends State<PasswordSetup>{
       'createdAt':
       ((new DateTime.now().toUtc().microsecondsSinceEpoch) / 1000).toInt()
     });
+    UserLocation currentLocation = await LocationService(firebaseUser.uid,).getLocation();
     Firestore.instance.collection('users').document(firebaseUser.uid).collection('userLocation').document(firebaseUser.uid).setData({
       'userLocation' : new GeoPoint(currentLocation.latitude, currentLocation.longitude),
     });

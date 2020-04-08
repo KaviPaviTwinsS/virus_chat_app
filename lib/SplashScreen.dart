@@ -5,8 +5,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:http/http.dart' as http;
+import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
 
 class SplashScreenPage extends StatefulWidget {
@@ -21,6 +23,8 @@ class _SplashScreenState extends State<SplashScreenPage> {
 
   SharedPreferences preferences;
   String userToken ='';
+  var user ='';
+  var userUrl ='';
 
   _register() {
     _firebaseMessaging.getToken().then((token) => {print( 'token FCMMMMMMM   ___ $token'),
@@ -30,8 +34,10 @@ class _SplashScreenState extends State<SplashScreenPage> {
 //      print( 'token FCMMMMMMM REFRESSSSHHH  ___ $token');
 //    });
   }
-  startTime() async {
+  Future startTime() async {
     var _duration = new Duration(seconds: 2);
+    String test =  preferences.getString('signInType');
+    print('SPLAS TIME $test');
     return new Timer(_duration, navigationPage);
   }
 
@@ -165,8 +171,11 @@ class _SplashScreenState extends State<SplashScreenPage> {
 
   void initialise() async{
     preferences = await SharedPreferences.getInstance();
-    print( 'token FCMMMMMMM   ___ ${await preferences.getString('userId')}');
+    print( 'token FCMMMMMMM   ___ ${await preferences.getString('signInType')}');
     await preferences.setString('PUSH_TOKEN', userToken);
+    user = await preferences.getString('userId');
+    userUrl = await preferences.getString('photoUrl');
+
     startTime();
 //    sendAndRetrieveMessage();
 //    getMessage();
@@ -188,19 +197,22 @@ class _SplashScreenState extends State<SplashScreenPage> {
   }
 
   void isGoogleSignedIn() async {
-    if(await preferences.getString('userId') == null || await preferences.getString('userId') == ''){
+    if(user == null || user == ''){
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => new LoginSelectionPage()));
     }else {
-      if (await preferences.getString('signInType') == 'google') {
+      String signType = await preferences.getString('signInType');
+      if (signType == 'google') {
 //      navigateToUsersPage("google");
         navigateToProfilePageExistingUser(context, 'google', preferences);
-      } else if (await preferences.getString('signInType') == 'facebook') {
+      } else if (signType == 'facebook') {
 //      navigateToUsersPage("facebook");
         navigateToProfilePageExistingUser(context, 'facebook', preferences);
-      } else if (await preferences.getString('signInType') == 'MobileNumber') {
+      } else if (signType == 'MobileNumber') {
+        navigateToProfilePageExistingUser(context, 'MobileNumber', preferences);
+      }else {
         navigateToProfilePageExistingUser(context, 'MobileNumber', preferences);
       }
     }
@@ -214,13 +226,15 @@ class _SplashScreenState extends State<SplashScreenPage> {
             builder: (context) => ProfilePageSetup(signinType,
                 currentUserId: prefs.getString('userId'))));
 */
-    print('USERLIST name ${await prefs.getString('name')}');
+    print('SPLASHHHHHHHHHHHHHHHHHH _____$user _____$userUrl');
+    UserLocation currentLocation = await LocationService(user,).getLocation();
 
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => UsersList(signinType,prefs.getString('userId'),prefs.getString('photoUrl'))));
-  }
+            builder: (context) => UsersList(signinType,user,userUrl)));
+
+     }
 
   @override
   Widget build(BuildContext context) {

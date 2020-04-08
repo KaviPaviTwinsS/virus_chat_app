@@ -54,7 +54,7 @@ class LocationService {
               latitude: locationData.latitude,
               longitude: locationData.longitude,
             );*/
-              print('currentUserId $currentUserId');
+//              print('currentUserId $_currentLocation');
               if (_currentLocation == null) {
                 print('Location data $locationData');
 //              _addGeoPoint(locationData);
@@ -93,15 +93,23 @@ class LocationService {
 
   void updateLocation(LocationData locationData) async {
     print('NAN updateLocation $currentUserId  ___ ${locationData}');
-    GeoFirePoint point = geo.point(
-        latitude: locationData.latitude, longitude: locationData.longitude);
+//    GeoFirePoint point = geo.point(
+//        latitude: locationData.latitude, longitude: locationData.longitude);
    /* databaseReference.collection('users').document(currentUserId).updateData({
       'userLocation':
           new GeoPoint(locationData.latitude, locationData.longitude)
     });*/
-    databaseReference.collection('users').document(currentUserId).collection('userLocation').document(currentUserId).updateData({
-      'userLocation':
-      new GeoPoint(locationData.latitude, locationData.longitude)
-    });
+   if(databaseReference.collection('users').document(currentUserId).collection('userLocation').document(currentUserId) == null){
+     databaseReference.collection('users').document(currentUserId).collection('userLocation').document(currentUserId).setData({
+       'userLocation':
+       new GeoPoint(locationData.latitude, locationData.longitude)
+     });
+   }else {
+     databaseReference.collection('users').document(currentUserId).collection(
+         'userLocation').document(currentUserId).updateData({
+       'userLocation':
+       new GeoPoint(locationData.latitude, locationData.longitude)
+     });
+   }
   }
 }

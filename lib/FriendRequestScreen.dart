@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
+import 'package:virus_chat_app/utils/strings.dart';
 
 class FriendRequestScreen extends StatelessWidget {
 
@@ -75,7 +76,7 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
     return Scaffold(
         appBar: AppBar(
           leading: new IconButton(
-            icon: new Icon(Icons.arrow_back, color: Colors.black),
+            icon: new Icon(Icons.arrow_back_ios, color: white_color),
             onPressed: () {
               Navigator.push(
                   context,
@@ -152,10 +153,10 @@ class friendlist extends StatelessWidget {
                                         )));*/
                                 },
                                 child: new Row(
-                                     /* crossAxisAlignment: CrossAxisAlignment
+                                      crossAxisAlignment: CrossAxisAlignment
                                           .center,
                                       mainAxisAlignment: MainAxisAlignment
-                                          .center,*/
+                                          .spaceEvenly,
                                       children: <Widget>[
                                 new Container(
                                 margin: EdgeInsets.all(15.0),
@@ -186,7 +187,7 @@ class friendlist extends StatelessWidget {
                                 ),
                                   new Container(
                                           margin: EdgeInsets.all(15.0),
-                                          child: Text('${document['friendName']}'),
+                                          child: Text(capitalize(document['friendName'])),
                                         ),
                                       /*  new Text('receiver ID :::::: ${document['receiveId']}',
                                             textScaleFactor: 1.0),*/

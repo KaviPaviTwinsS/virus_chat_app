@@ -61,7 +61,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           title: Text(community),
-          actions: <Widget>[
+         /* actions: <Widget>[
             IconButton(
               icon: new SvgPicture.asset(
                 'images/community.svg', height: 50.0,
@@ -69,9 +69,10 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                 color: text_color,
               ),
               onPressed: () {
+
               },
             )
-          ],
+          ],*/
         ),
         body: WillPopScope(
           child: Stack(
@@ -181,7 +182,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                               margin: EdgeInsets.all(10.0),
                               child: Center(
                                 child: Text(
-                                    document['userName'],
+                                    capitalize(document['userName']),
                                     style: TextStyle(color: facebook_color)
                                 ),
                               )

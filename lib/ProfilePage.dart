@@ -144,85 +144,117 @@ class ProfilePageState extends State<ProfilePage> {
             SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  Container(
-                    child: Center(
-                      child: Stack(
-                        children: <Widget>[
-                          (avatarImageFile == null)
-                              ? (photoUrl != ''
-                              ? Material(
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) =>
-                                  Container(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          themeColor),
-                                    ),
-                                    width: 90.0,
-                                    height: 90.0,
-                                    padding: EdgeInsets.all(20.0),
-                                  ),
-                              imageUrl: photoUrl,
-                              width: 90.0,
-                              height: 90.0,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.all(
-                                Radius.circular(45.0)),
-                            clipBehavior: Clip.hardEdge,
-                          )
-                              : Icon(
-                            Icons.account_circle,
-                            size: 90.0,
-                            color: greyColor,
-                          ))
-                              : Material(
-                            child: Image.file(
-                              avatarImageFile,
-                              width: 90.0,
-                              height: 90.0,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(
-                                45.0)),
-                            clipBehavior: Clip.hardEdge,
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        child: Center(
+                          child: Stack(
+                            children: <Widget>[
+                              (avatarImageFile == null)
+                                  ? (photoUrl != ''
+                                  ? Material(
+                                child: CachedNetworkImage(
+                                  placeholder: (context, url) =>
+                                      Container(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.0,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                              themeColor),
+                                        ),
+                                        width: 90.0,
+                                        height: 90.0,
+                                        padding: EdgeInsets.all(20.0),
+                                      ),
+                                  imageUrl: photoUrl,
+                                  width: 90.0,
+                                  height: 90.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(45.0)),
+                                clipBehavior: Clip.hardEdge,
+                              )
+                                  : Icon(
+                                Icons.account_circle,
+                                size: 90.0,
+                                color: greyColor,
+                              ))
+                                  : Material(
+                                child: Image.file(
+                                  avatarImageFile,
+                                  width: 90.0,
+                                  height: 90.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.all(Radius.circular(
+                                    45.0)),
+                                clipBehavior: Clip.hardEdge,
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.camera_alt,
+                                  color: primaryColor.withOpacity(0.5),
+                                ),
+                                onPressed: getImage,
+                                padding: EdgeInsets.all(30.0),
+                                splashColor: Colors.transparent,
+                                highlightColor: greyColor,
+                                iconSize: 30.0,
+                              )
+                            ],
                           ),
-                          if((photoUrl == ''))IconButton(
-                            icon: Icon(
-                              Icons.camera_alt,
-                              color: primaryColor.withOpacity(0.5),
-                            ),
-                            onPressed: getImage,
-                            padding: EdgeInsets.all(30.0),
-                            splashColor: Colors.transparent,
-                            highlightColor: greyColor,
-                            iconSize: 30.0,
-                          )
-                        ],
-                      ),
-                    ),
-                    width: double.infinity,
-                    margin: EdgeInsets.all(20.0),
-                  ),
-                  Container(
-                    child: Theme(
-                      data: Theme.of(context).copyWith(
-                          primaryColor: primaryColor),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your name',
-                          contentPadding: new EdgeInsets.all(5.0),
-                          hintStyle: TextStyle(color: greyColor),
                         ),
-                        controller: controllerName,
-                        onChanged: (value) {
-                          name = value;
-                        },
-//                focusNode: focusNodeNickname,
+                        width: double.infinity,
+                        margin: EdgeInsets.all(20.0),
                       ),
-                    ),
-                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                      Container(
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                              primaryColor: primaryColor),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Enter your name',
+                              contentPadding: new EdgeInsets.all(5.0),
+                              hintStyle: TextStyle(color: greyColor),
+                            ),
+                            controller: controllerName,
+                            onChanged: (value) {
+                              name = value;
+                            },
+//                focusNode: focusNodeNickname,
+                          ),
+                        ),
+                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                      ),
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: Container(
+                          width: 100,
+                          height: 100,
+                          child: IconButton(
+                            icon: new SvgPicture.asset(
+                              'images/post_icon.svg', height: 500.0,
+                              width: 500.0,
+                            ),
+                            onPressed: () {
+                              if (signinType == 'google')
+                                loginSelectionOption.handleGoogleSignOut(prefs);
+                              else if (signinType == 'facebook')
+                                facebookSignup.facebookLogout(context, prefs);
+                              else if (signinType == 'MobileNumber')
+                                clearLocalData();
+                              prefs.setString('signInType', '');
+                              _updatestatus();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (
+                                          context) => new LoginSelectionPage()));
+                            },
+                          ),
+                        ),
+                      )
+                    ],
                   ),
                   Container(
                     child: Theme(
@@ -277,19 +309,7 @@ class ProfilePageState extends State<ProfilePage> {
                         child: RaisedButton(
                           child: Text('Logout User'),
                           onPressed: () {
-                            if (signinType == 'google')
-                              loginSelectionOption.handleGoogleSignOut(prefs);
-                            else if (signinType == 'facebook')
-                              facebookSignup.facebookLogout(context, prefs);
-                            else if (signinType == 'MobileNumber')
-                              clearLocalData();
-                            prefs.setString('signInType', '');
-                            _updatestatus();
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (
-                                        context) => new LoginSelectionPage()));
+
                           },
                         ),
                       ),
@@ -560,6 +580,7 @@ class ProfilePageState extends State<ProfilePage> {
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           photoUrl = downloadUrl;
+          print('DOWNLOAD URL PROFILE $photoUrl');
           Fluttertoast.showToast(msg: "Upload success");
           setState(() {
             isLoading = false;

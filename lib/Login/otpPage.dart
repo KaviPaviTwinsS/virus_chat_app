@@ -278,7 +278,7 @@ class _OTPScreenState extends State<OTPScreen> {
     final List<DocumentSnapshot> documents = result.documents;
     print('OTPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP ${documents.length} ___ ');
     if (documents.length != 0) {
-      updateLocalListData(prefs, 'MobileNumber', documents, firebaseUser.uid);
+      await updateLocalListData(prefs, 'MobileNumber', documents, firebaseUser.uid);
       /*  Navigator.push(
           context,
           MaterialPageRoute(
@@ -301,7 +301,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
   Future<Null> updateLocalListData(SharedPreferences prefs,
       String signInType, List<DocumentSnapshot> documents, String uid) async {
-    print('updateLocalListData');
+
     await prefs.setString('userId', documents[0]['id']);
     await prefs.setString('email', documents[0]['email']);
     await prefs.setString('name', documents[0]['name']);
@@ -319,6 +319,8 @@ class _OTPScreenState extends State<OTPScreen> {
             builder: (context) =>
                 UsersList('MobileNumber',
                     uid, documents[0]['photoUrl'])));
+    print('updateLocalListData NANDHU');
+
     /* Navigator.push(
         context,
         MaterialPageRoute(

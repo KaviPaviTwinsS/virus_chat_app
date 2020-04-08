@@ -342,7 +342,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   Future _AddNewUser(FirebaseUser firebaseUser) async {
     String loginType = 'Mobile';
     loginType += 'AccountId';
-    updateLocalListData(prefs, 'MobileNumber');
+    await updateLocalListData(prefs, 'MobileNumber');
+    UserLocation currentLocation = await LocationService(firebaseUser.uid,).getLocation();
 
     // Update data to server if new user
     try {
@@ -367,8 +368,6 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     }catch(e){
       print('Registration'+e);
     }
-    UserLocation currentLocation = await LocationService(firebaseUser.uid,)
-        .getLocation();
     Firestore.instance.collection('users').document(firebaseUser.uid)
         .collection('userLocation').document(firebaseUser.uid)
         .setData({
@@ -381,6 +380,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
 
   Future<Null> updateLocalListData(SharedPreferences prefs,
       String signInType) async {
+
     print('updateLocalListData');
     await prefs.setString('userId', firebaseUser.uid);
     await prefs.setString('email', _mUserEmail);
@@ -393,18 +393,19 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('phoneNo', userPhoneNumberWithoutCountryCode);
     await prefs.setString('signInType', signInType);
-  /*  Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                ProfilePageSetup('MobileNumber',
-                    currentUserId: firebaseUser.uid)));*/
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 UsersList(signInType,
                     firebaseUser.uid,photoUrl)));
+  /*  Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                ProfilePageSetup('MobileNumber',
+                    currentUserId: firebaseUser.uid)));*/
+
   }
 
 

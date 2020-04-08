@@ -220,6 +220,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                   height: 170,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Container(
                         width: MediaQuery
@@ -227,7 +228,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                             .size
                             .width,
                         margin: EdgeInsets.only(left: 20.0, right: 20.0),
-                        child: OutlineButton.icon(
+                        child : RaisedButton.icon(
                           icon: new SvgPicture.asset(
                             'images/phone.svg',
                             width: 20.0,
@@ -242,9 +243,10 @@ class LoginSelectionOption extends State<LoginSelection> {
                                     }
                                 ));
                           },
-                          label: Text('Continue with Phone number'),
+                          label: Text('Continue with phone number'),
+                          color: white_color,
                         ),
-                      ),
+                ),
                       Container(
                         width: MediaQuery
                             .of(context)

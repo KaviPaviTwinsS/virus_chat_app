@@ -14,7 +14,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
+import 'package:virus_chat_app/tweetPost/CategorySelection.dart';
+import 'package:virus_chat_app/userListCopy.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
 import 'package:intl/intl.dart';
@@ -52,12 +55,16 @@ class NewTweetPostState extends State<NewTweetPost> {
   String mTweetMsg = '';
   SharedPreferences preferences;
   String currentUserId = ' ';
+  String signInType = ' ';
   var listMessage;
   String peerAvatar;
   String currentUserName = '';
 
   String tappedCategoryName = '';
   String tappedCategoryImage = '';
+
+  bool isSelectedCategory = false;
+  List<CategorySelection> mCategorySelect = new List<CategorySelection>();
 
   NewTweetPostState(String _mCurrentId, String _mCurrentPhotoUrl) {
     currentUserId = _mCurrentId;
@@ -77,7 +84,8 @@ class NewTweetPostState extends State<NewTweetPost> {
 
   void initialise() async {
     preferences = await SharedPreferences.getInstance();
-//    currentUserId = preferences.getString('userId');
+    signInType = await preferences.getString('signInType');
+    print('NEW TWEET signInType $signInType');
     peerAvatar = await preferences.getString('photoUrl');
     currentUserName = await preferences.getString('name');
   }
@@ -95,74 +103,99 @@ class NewTweetPostState extends State<NewTweetPost> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: true,
-      appBar: AppBar(
-        leading: new IconButton(
-            icon: Icon(Icons.arrow_back_ios), onPressed: () {
-          Navigator.push(context, MaterialPageRoute(
-              builder: (context) =>
-                  MakeTweetPost(currentUserId, mCurrentPhotoUrl)));
-        }),
-        title: Text('Post Message'),
-      ),
-      body:Stack(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              buildListTweetCategory(),
-              // List of messages
-              buildTweetInput(),
-              // Input content
-              buildInput(),
-            ],
-          ),
-        ],
-      )
+        resizeToAvoidBottomPadding: true,
+        appBar: AppBar(
+          leading: new IconButton(
+              icon: Icon(Icons.arrow_back_ios), onPressed: () {
+            Navigator.push(context, MaterialPageRoute(
+                builder: (context) =>
+                    UsersList(signInType,currentUserId, mCurrentPhotoUrl)));
+          }),
+          title: Text('Post Message'),
+        ),
+        body: Stack(
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                buildListTweetCategory(),
+                // List of messages
+                buildTweetInput(),
+                // Input content
+                buildInput(),
+              ],
+            ),
+          ],
+        )
     );
   }
 
   Widget buildListTweetCategory() {
     return Container(
-        child: StreamBuilder(
-          stream: Firestore.instance
-              .collection('tweetPostCategory')
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                  child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
-            } else {
-              listMessage = snapshot.data.documents;
-              return ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) =>
-                    buildCategoryItem(index, snapshot.data.documents[index]),
-                itemCount: snapshot.data.documents.length,
+      child: StreamBuilder(
+        stream: Firestore.instance
+            .collection('tweetPostCategory')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+                child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+          } else {
+            listMessage = snapshot.data.documents;
+
+            return ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) =>
+                  buildCategoryItem(index, snapshot.data.documents[index]),
+              itemCount: snapshot.data.documents.length,
 //              reverse: true,
-                controller: listScrollController,
-              );
-            }
-          },
-        ),
-        width: double.infinity,
-        height: 100.0,
-        decoration: new BoxDecoration(
-            border: new Border(
-                top: new BorderSide(color: Colors.white, width: 0.5)),
-            color: Colors.white),
+              controller: listScrollController,
+            );
+          }
+        },
+      ),
+      width: double.infinity,
+      height: 100.0,
+      decoration: new BoxDecoration(
+          border: new Border(
+              top: new BorderSide(color: Colors.white, width: 0.5)),
+          color: Colors.white),
     );
   }
 
+
   Widget buildCategoryItem(int index, DocumentSnapshot document) {
-    return SingleChildScrollView(child : Container(
+    bool isSelection = document['isSelected'];
+    print('NANDHu DOcumenId ${isSelection}');
+    mCategorySelect.add(CategorySelection(isCategorySelected: isSelection));
+    return SingleChildScrollView(child: Container(
       padding: EdgeInsets.all(10.0),
       margin: EdgeInsets.all(8.0),
       child: new GestureDetector(
         onTap: () {
-          setState(() {
-            isSlected =true;
-          });
+          print(
+              'NANDHu mCategorySelect index____$index ____ ${mCategorySelect[index]
+                  .isCategorySelected}');
+          if (mCategorySelect[index].isCategorySelected) {
+            setState(() {
+              for (int i = 0; i < mCategorySelect.length; i++) {
+                if (index == i)
+                  mCategorySelect[i].isCategorySelected = true;
+                else
+                  mCategorySelect[i].isCategorySelected = false;
+              }
+            });
+          }
+          else {
+            setState(() {
+              for (int i = 0; i < mCategorySelect.length; i++) {
+                if (index == i)
+                  mCategorySelect[i].isCategorySelected = true;
+                else
+                  mCategorySelect[i].isCategorySelected = false;
+              }
+            });
+          }
           tappedCategoryName = document['categoryName'];
           tappedCategoryImage = document['categoryImage'];
         },
@@ -172,7 +205,7 @@ class NewTweetPostState extends State<NewTweetPost> {
           children: <Widget>[
             Center(
               child: Container(
-                child: CachedNetworkImage(
+                /* child: CachedNetworkImage(
                   placeholder: (context, url) =>
                       Container(
                         alignment: Alignment.topLeft,
@@ -181,16 +214,26 @@ class NewTweetPostState extends State<NewTweetPost> {
                         ),
                       ),
                   imageUrl: document['categoryImage'],
-                  width: 50.0,
-                  height: 50.0,
+                  width: 30.0,
+                  height: 30.0,
                   fit: BoxFit.cover,
-                ),
+                ),*/
+                  child: IconButton(
+                    icon: new SvgPicture.asset(
+                      document['categoryImage'],
+                      width: 30.0,
+                      height: 30.0,
+                    ),
+                  )
               ),
             ),
             Center(
               child: Container(
                 margin: EdgeInsets.only(top: 5.0),
-                child: Text(document['categoryName'],style:TextStyle(color: isSlected ? facebook_color :greyColor2),),
+                child: Text(document['categoryName'], style: TextStyle(
+                    color: mCategorySelect[index].isCategorySelected
+                        ? facebook_color
+                        : greyColor2),),
               ),
             )
           ],
@@ -217,11 +260,12 @@ class NewTweetPostState extends State<NewTweetPost> {
       return false;
     }
   }
+
   bool isSlected = false;
 
   Widget buildTweetInput() {
     return Expanded(
-      child:  Container(
+      child: Container(
         padding: EdgeInsets.all(10.0),
         child: SingleChildScrollView(
           child: Column(
@@ -334,10 +378,10 @@ class NewTweetPostState extends State<NewTweetPost> {
 
   Widget buildInput() {
     return Container(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            // Button send image
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          /*  // Button send image
             Center(
               child: Material(
                 child: Container(
@@ -368,23 +412,23 @@ class NewTweetPostState extends State<NewTweetPost> {
                 ),
                 color: Colors.white,
               ),
-            ),
-            Center(
-              child: Material(
-                child: new Container(
-                  child: new IconButton(
-                    icon: new SvgPicture.asset(
-                      'images/pic.svg', height: 30.0,
-                      width: 30.0,
-                    ),
-                    onPressed: getImage,
-                    color: primaryColor,
+            ),*/
+          Center(
+            child: Material(
+              child: new Container(
+                child: new IconButton(
+                  icon: new SvgPicture.asset(
+                    'images/pic.svg', height: 30.0,
+                    width: 30.0,
                   ),
+                  onPressed: getImage,
+                  color: primaryColor,
                 ),
-                color: Colors.white,
               ),
+              color: Colors.white,
             ),
-            /* Material(
+          ),
+          /* Material(
                 child: new Container(
                   child: new IconButton(
                     icon: new SvgPicture.asset(
@@ -397,31 +441,31 @@ class NewTweetPostState extends State<NewTweetPost> {
                 ),
                 color: Colors.white,
               ),*/
-            Spacer(),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Container(
-                width: 100,
-                height: 100,
-                child: IconButton(
-                    icon: new SvgPicture.asset(
-                      'images/Send.svg', height: 500.0,
-                      width: 500.0,
-                    ),
-                    onPressed: () {
-                      onSendMessage(textEditingController.text, imageUrl);
-                    }
-                ),
+          Spacer(),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Container(
+              width: 100,
+              height: 100,
+              child: IconButton(
+                  icon: new SvgPicture.asset(
+                    'images/Send.svg', height: 500.0,
+                    width: 500.0,
+                  ),
+                  onPressed: () {
+                    onSendMessage(textEditingController.text, imageUrl);
+                  }
               ),
             ),
-          ],
-        ),
-        width: double.infinity,
-        height: 80.0,
-        decoration: new BoxDecoration(
-            border: new Border(
-                top: new BorderSide(color: greyColor2, width: 0.5)),
-            color: Colors.white),
+          ),
+        ],
+      ),
+      width: double.infinity,
+      height: 80.0,
+      decoration: new BoxDecoration(
+          border: new Border(
+              top: new BorderSide(color: greyColor2, width: 0.5)),
+          color: Colors.white),
     );
   }
 
@@ -516,18 +560,17 @@ class NewTweetPostState extends State<NewTweetPost> {
     }
   }
 
-  Future sendMsg() async{
-    String userToken ='';
+  Future sendMsg() async {
+    String userToken = '';
     var query = await Firestore.instance.collection('users').getDocuments();
     query.documents.forEach((doc) {
-      if (currentUserId != doc.data['id']){
+      if (currentUserId != doc.data['id']) {
         userToken = doc.data['user_token'];
         print('user_token new post $userToken');
         sendAndRetrieveMessage(userToken);
       }
     });
   }
-
 
 
   final String serverToken = 'AAAA1iQ7au4:APA91bGvPY8CpYvutHVhzh7RL-xyybt7lxPNU_OxXPCJdxDtyZain9hxgliGV9OQyaXLiKXJyVUhpQm0tygEz4YfisEdGIOLyNo3vgUguNMEpBVEaEwUfONgErCLALyrrLTroFhfq5YD';
@@ -570,6 +613,7 @@ class NewTweetPostState extends State<NewTweetPost> {
     getMessage();
     return completer.future;
   }
+
   Future _showNotificationWithDefaultSound(Map<String, dynamic> message) async {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
@@ -587,7 +631,7 @@ class NewTweetPostState extends State<NewTweetPost> {
   }
 
 
-  void getMessage(){
+  void getMessage() {
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
           print('on message $message');
@@ -602,8 +646,6 @@ class NewTweetPostState extends State<NewTweetPost> {
       setState(() => _message = message["notification"]["title"]);
     });
   }
-
-
 
 
 }

@@ -34,9 +34,7 @@ class _RangeSliderSampleState extends State<RangeSliderSample> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-          padding: const EdgeInsets.only(top: 50.0, left: 10.0, right: 10.0),
-          child: Column(
+    return Column(
               children: <Widget>[
                 frs.RangeSlider(
                   min: 0.0,
@@ -66,9 +64,8 @@ class _RangeSliderSampleState extends State<RangeSliderSample> {
                 Container(
                   child: Text('My selected geofence Meter $_upperValue metre'),
                 ),
-
               ]
-      ),);
+      );
   }
 
 
