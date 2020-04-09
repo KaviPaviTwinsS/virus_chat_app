@@ -62,7 +62,7 @@ class _RangeSliderSampleState extends State<RangeSliderSample> {
                   },
                 ),
                 Container(
-                  child: Text('My selected geofence Meter $_upperValue metre'),
+                  child: Text('My selected geofence $_upperValue metre',style: TextStyle(color: text_color),),
                 ),
               ]
       );

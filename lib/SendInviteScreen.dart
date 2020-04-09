@@ -18,15 +18,19 @@ class SendInviteToUser extends StatefulWidget{
   String _mPeerId, _mCurrentUserId;
   String _mPhotoUrl;
   bool _misAlreadyRequestSent;
-  SendInviteToUser(String peerId, String currentUserId,String friendPhotoUrl,bool isAlreadyRequestSent) {
+  bool _misRequestSent;
+  String _mName = '';
+  SendInviteToUser(String peerId, String currentUserId,String friendPhotoUrl,bool isAlreadyRequestSent,bool isRequestSent,String name) {
     _mPeerId = peerId;
     _mCurrentUserId = currentUserId;
     _mPhotoUrl = friendPhotoUrl;
     _misAlreadyRequestSent= isAlreadyRequestSent;
+    _misRequestSent = isRequestSent;
+    _mName = name;
   }
   @override
   State<StatefulWidget> createState() {
-    return SendInviteToUserState(_mPeerId,_mCurrentUserId,_mPhotoUrl,_misAlreadyRequestSent);
+    return SendInviteToUserState(_mPeerId,_mCurrentUserId,_mPhotoUrl,_misAlreadyRequestSent,_misRequestSent,_mName);
   }
 
 }
@@ -35,6 +39,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   String _mPhotoUrl;
   String _mcurrentPhotoUrl;
   bool _misAlreadyRequestSent;
+  bool _misRequestSent;
   bool isFriend;
   SharedPreferences prefs;
 
@@ -43,15 +48,19 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   String currentUserName ='';
   String userSignInType = '';
 
+  String _mUserName = '';
 
-  SendInviteToUserState(String peerId, String currentUserId,String friendPhotoUrl,bool isAlreadyRequestSent) {
+  SendInviteToUserState(String peerId, String currentUserId,String friendPhotoUrl,bool isAlreadyRequestSent,bool isRequestSent,String mName) {
     print('PERRRR IDD $peerId');
     _mPeerId = peerId;
     _mCurrentUserId = currentUserId;
     _mPhotoUrl = friendPhotoUrl;
     _misAlreadyRequestSent= isAlreadyRequestSent;
+    _misRequestSent = isRequestSent;
+    _mUserName = mName;
   }
   bool isButtonPressed = false;
+  bool isRequestSent = true;
 
   @override
   void initState() {
@@ -103,7 +112,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                            .of(context)
                            .size
                            .width ,
-                       height: 80,
+                       height: 100,
                        child: Column(
                          children: <Widget>[
                            Row(
@@ -149,7 +158,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                  margin: EdgeInsets.only(
                                      top: 40.0, right: 10.0),
                                  child: Text(
-                                   currentUserName, style: TextStyle(
+                                   _mUserName, style: TextStyle(
                                      fontWeight: FontWeight.bold,
                                      color: text_color),
                                  ),
@@ -208,7 +217,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           new SvgPicture.asset(
-                              'images/accept.svg',
+                              'images/invite_sent.svg',
                               width: 80.0,
                               height: 80.0,
                             ),
@@ -269,7 +278,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                   });
                                 }
                               }
-                          ) : Text('Invite sent',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20.0),),
+                          ) :!isRequestSent ? Text('Invitation Received',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20.0),): Text('Already invitation sent',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20.0),),
                           Container(
                             padding: EdgeInsets.all(20.0),
                             child: Text('You\'ll be able to chat with VALENTINE once your invitation has been accepted.'),

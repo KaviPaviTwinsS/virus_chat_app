@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
@@ -240,7 +241,10 @@ class _SplashScreenState extends State<SplashScreenPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       body: new Center(
-        child: new Image.asset('images/splashnew.png',fit: BoxFit.cover,),
+        child :  new SvgPicture.asset(
+          'images/splash.svg',
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }

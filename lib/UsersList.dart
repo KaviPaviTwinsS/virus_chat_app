@@ -228,8 +228,8 @@ class UsersListState extends State<UsersListPage>
             BottomNavigationBarItem(
               icon: new IconButton(
                 icon: new SvgPicture.asset(
-                  'images/post.svg', height: 15.0,
-                  width: 15.0,
+                  'images/post.svg', height: 30.0,
+                  width: 30.0,
                 ), onPressed: () {
 
               },
@@ -239,8 +239,8 @@ class UsersListState extends State<UsersListPage>
             BottomNavigationBarItem(
                 icon: new IconButton(
                   icon: new SvgPicture.asset(
-                    'images/community.svg', height: 15.0,
-                    width: 15.0,
+                    'images/community.svg', height: 30.0,
+                    width: 30.0,
                   ),
                   onPressed: () {
 
@@ -259,7 +259,7 @@ class UsersListState extends State<UsersListPage>
                       height: MediaQuery
                           .of(context)
                           .size
-                          .height - 350,
+                          .height - 360,
                       child: Column(
                         children: <Widget>[
                           Row(
@@ -332,7 +332,9 @@ class UsersListState extends State<UsersListPage>
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  FriendRequestScreen(currentUser,currentUserPhotoUrl)));
+                                                  FriendRequestScreen(
+                                                      currentUser,
+                                                      currentUserPhotoUrl)));
                                     },
                                   ),
                                 ),
@@ -342,7 +344,7 @@ class UsersListState extends State<UsersListPage>
                           Column(
                             children: <Widget>[
                               Container(
-                                margin: EdgeInsets.only(top: 30.0),
+                                margin: EdgeInsets.only(top: 5.0),
                                 child: Align(
                                   alignment: Alignment.topCenter,
                                   child: new SvgPicture.asset(
@@ -364,7 +366,7 @@ class UsersListState extends State<UsersListPage>
                               ),
                               Container(
                                 margin: EdgeInsets.only(
-                                    top: 10.0, left: 10.0, right: 10.0),
+                                    top: 5.0, left: 10.0, right: 10.0),
                                 child: UsersOnlinePage(
                                     currentUser, currentUserPhotoUrl, this),
                               )
@@ -411,7 +413,7 @@ class UsersListState extends State<UsersListPage>
                             .of(context)
                             .size
                             .width,
-                        height: 340,
+                        height: 320,
                         decoration: BoxDecoration(
                             color: text_color,
                             borderRadius: new BorderRadius.only(
@@ -586,7 +588,9 @@ class ActiveUserListRadius extends StatelessWidget {
 //              if(isLoading == true)   return Center(
 //                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(themeColor)));;
           if (!snapshot.hasData)
-            return new Text('Loading...');
+            return new Container(
+                margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                child: new Text('Loading...'));
           else
             return Expanded(
                 child: new ListView(
@@ -713,6 +717,8 @@ class ActiveUserListRadius extends StatelessWidget {
                 )));*/
     bool isFriend = false;
     bool isAlreadyRequestSent = false;
+    bool isRequestSent = false;
+
     String friendId = documentSnapshot.documentID;
     var query = await Firestore.instance.collection('users')
         .document(currentUserId).collection(
@@ -730,6 +736,7 @@ class ActiveUserListRadius extends StatelessWidget {
 
         if (doc.documentID == friendId) {
           isAlreadyRequestSent = doc.data['isAlreadyRequestSent'];
+          isRequestSent = doc.data['isRequestSent'];
         }
       });
     } else {
@@ -752,17 +759,18 @@ class ActiveUserListRadius extends StatelessWidget {
           MaterialPageRoute(
               builder: (context) =>
                   Chat(
-                      currentUserId: currentUserId,
-                      peerId: friendId,
-                      peerAvatar: mphotoUrl,
-                      isFriend: true,
-                      isAlreadyRequestSent: isAlreadyRequestSent
+                    currentUserId: currentUserId,
+                    peerId: friendId,
+                    peerAvatar: mphotoUrl,
+                    isFriend: true,
+                    isAlreadyRequestSent: isAlreadyRequestSent,
                   )));
     } else {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) =>
           SendInviteToUser(
-              friendId, currentUserId, mphotoUrl, isAlreadyRequestSent)));
+              friendId, currentUserId, mphotoUrl, isAlreadyRequestSent,
+              isRequestSent, documentSnapshot['name'])));
       /*   Navigator.push(
           context,
           MaterialPageRoute(
@@ -855,11 +863,13 @@ class LoginUsersList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new StreamBuilder(
-      stream: Firestore.instance.collection('users').where(
-          'status', isEqualTo: 'ACTIVE').snapshots(),
+      stream: Firestore.instance.collection('users') /*.where(
+          'status', isEqualTo: 'ACTIVE')*/.snapshots(),
       builder:
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) return new Text('Loading...');
+        if (!snapshot.hasData) return new Container(
+            margin: EdgeInsets.only(left: 20.0, top: 20.0),
+            child: new Text('Loading...'));
         return Expanded(
             child: new ListView(
                 scrollDirection: Axis.horizontal,
@@ -885,18 +895,23 @@ class LoginUsersList extends StatelessWidget {
                         },
                         child: new Column(
                           children: <Widget>[
-                            new Container(
-                                margin: EdgeInsets.only(left: 20.0, top: 20.0),
-                                width: 80.0,
-                                height: 80.0,
-                                decoration: new BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: new DecorationImage(
-                                        fit: BoxFit.fill,
-                                        image: new NetworkImage(
-                                            document['photoUrl'])
-                                    )
-                                )),
+                            Stack(
+                                children: <Widget>[
+                                  new Container(
+                                      margin: EdgeInsets.only(
+                                          left: 20.0, top: 20.0),
+                                      width: 80.0,
+                                      height: 80.0,
+                                      decoration: new BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: new DecorationImage(
+                                              fit: BoxFit.fill,
+                                              image: new NetworkImage(
+                                                  document['photoUrl'])
+                                          )
+                                      )),
+                                ]
+                            ),
                             new Container(
                               margin: EdgeInsets.only(left: 20.0, top: 10.0),
                               child: Text(capitalize(document['name']),
@@ -919,7 +934,6 @@ class LoginUsersList extends StatelessWidget {
     );
   }
 
-
   Future getFriendList(BuildContext context, String currentUserId,
       DocumentSnapshot documentSnapshot) async {
 /*
@@ -935,6 +949,7 @@ class LoginUsersList extends StatelessWidget {
     bool isFriend = false;
     bool isAlreadyRequestSent = false;
     String friendId = documentSnapshot.documentID;
+    bool isRequestSent = false;
     var query = await Firestore.instance.collection('users')
         .document(currentUserId).collection(
         'FriendsList').getDocuments();
@@ -951,6 +966,7 @@ class LoginUsersList extends StatelessWidget {
 
         if (doc.documentID == friendId) {
           isAlreadyRequestSent = doc.data['isAlreadyRequestSent'];
+          isRequestSent = doc.data['isRequestSent'];
         }
       });
     } else {
@@ -993,7 +1009,7 @@ class LoginUsersList extends StatelessWidget {
           context, MaterialPageRoute(builder: (context) =>
           SendInviteToUser(
               friendId, currentUserId, documentSnapshot['photoUrl'],
-              isAlreadyRequestSent)));
+              isAlreadyRequestSent, isRequestSent, documentSnapshot['name'])));
     }
   }
 }

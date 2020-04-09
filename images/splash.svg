@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="375" height="812" viewBox="0 0 375 812">
+  <defs>
+    <filter id="MeSpace" x="-0.5" y="301.5" width="376" height="227" filterUnits="userSpaceOnUse">
+      <feOffset dy="5" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="27.5" result="blur"/>
+      <feFlood flood-opacity="0.302"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <clipPath id="clip-_1">
+      <rect width="375" height="812"/>
+    </clipPath>
+  </defs>
+  <g id="_1" data-name="1" clip-path="url(#clip-_1)">
+    <rect width="375" height="812" fill="#f7f7f7"/>
+    <rect id="Rectangle_9" data-name="Rectangle 9" width="375" height="812" fill="#4285f4"/>
+    <g id="form" transform="translate(-61.867 156.333)">
+      <path id="Shape" d="M26.209,498.993A20.2,20.2,0,0,1,7.046,472.409L52.968,334.638A237.11,237.11,0,0,1,162.714,24.11,235.143,235.143,0,0,1,268.218-1c.2,0,.4,0,.6,0h12.714c.373,0,.747.01,1.112.031A236.715,236.715,0,0,1,505.959,222.351c.02.38.031.754.031,1.111v12.749A237.348,237.348,0,0,1,268.772,473.459h-.6a235.358,235.358,0,0,1-97.816-21.427L32.593,497.956A20.168,20.168,0,0,1,26.209,498.993Zm236.058-458.6A196.7,196.7,0,0,0,86.746,325.15a20.2,20.2,0,0,1,1.133,15.494L52.141,447.862l107.215-35.74a20.2,20.2,0,0,1,15.493,1.133,194.735,194.735,0,0,0,87.371,20.811h.494A197.055,197.055,0,0,0,459.6,237.283V225.034A196.306,196.306,0,0,0,274.962,40.394H262.267Z" transform="translate(0.867 0.667)" fill="rgba(255,255,255,0.15)"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, 0, 0)" filter="url(#MeSpace)">
+      <text id="MeSpace-2" data-name="MeSpace" transform="translate(293 427)" fill="#fff" font-size="50" font-family="GoogleSans-Regular, Google Sans"><tspan x="-210.9" y="0">MeSpace</tspan></text>
+    </g>
+  </g>
+</svg>

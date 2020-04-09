@@ -130,8 +130,8 @@ class ProfilePageState extends State<ProfilePage> {
     return Scaffold(
         resizeToAvoidBottomPadding: true,
         appBar: AppBar(
-            leading: new IconButton(
-            icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
+          leading: new IconButton(
+            icon: new Icon(Icons.arrow_back_ios, color: white_color),
             onPressed: () {
               navigationPage();
             },
@@ -144,123 +144,102 @@ class ProfilePageState extends State<ProfilePage> {
             SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        child: Center(
-                          child: Stack(
-                            children: <Widget>[
-                              (avatarImageFile == null)
-                                  ? (photoUrl != ''
-                                  ? Material(
-                                child: CachedNetworkImage(
-                                  placeholder: (context, url) =>
-                                      Container(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.0,
-                                          valueColor: AlwaysStoppedAnimation<Color>(
-                                              themeColor),
-                                        ),
-                                        width: 90.0,
-                                        height: 90.0,
-                                        padding: EdgeInsets.all(20.0),
-                                      ),
-                                  imageUrl: photoUrl,
-                                  width: 90.0,
-                                  height: 90.0,
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                    Radius.circular(45.0)),
-                                clipBehavior: Clip.hardEdge,
-                              )
-                                  : Icon(
-                                Icons.account_circle,
-                                size: 90.0,
-                                color: greyColor,
-                              ))
-                                  : Material(
-                                child: Image.file(
-                                  avatarImageFile,
-                                  width: 90.0,
-                                  height: 90.0,
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.all(Radius.circular(
-                                    45.0)),
-                                clipBehavior: Clip.hardEdge,
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.camera_alt,
-                                  color: primaryColor.withOpacity(0.5),
-                                ),
-                                onPressed: getImage,
-                                padding: EdgeInsets.all(30.0),
-                                splashColor: Colors.transparent,
-                                highlightColor: greyColor,
-                                iconSize: 30.0,
-                              )
-                            ],
-                          ),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      margin: EdgeInsets.only(right: 20.0),
+                      child: IconButton(
+                        icon: new SvgPicture.asset(
+                          'images/post_icon.svg', height: 200.0,
+                          width: 200.0,
                         ),
-                        width: double.infinity,
-                        margin: EdgeInsets.all(20.0),
+                        onPressed: () {
+                          showLogoutAlertDialog(context);
+                        },
                       ),
-                      Container(
-                        child: Theme(
-                          data: Theme.of(context).copyWith(
-                              primaryColor: primaryColor),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Enter your name',
-                              contentPadding: new EdgeInsets.all(5.0),
-                              hintStyle: TextStyle(color: greyColor),
-                            ),
-                            controller: controllerName,
-                            onChanged: (value) {
-                              name = value;
-                            },
-//                focusNode: focusNodeNickname,
-                          ),
-                        ),
-                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                      ),
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: Container(
-                          width: 100,
-                          height: 100,
-                          child: IconButton(
-                            icon: new SvgPicture.asset(
-                              'images/post_icon.svg', height: 500.0,
-                              width: 500.0,
-                            ),
-                            onPressed: () {
-                              if (signinType == 'google')
-                                loginSelectionOption.handleGoogleSignOut(prefs);
-                              else if (signinType == 'facebook')
-                                facebookSignup.facebookLogout(context, prefs);
-                              else if (signinType == 'MobileNumber')
-                                clearLocalData();
-                              prefs.setString('signInType', '');
-                              _updatestatus();
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (
-                                          context) => new LoginSelectionPage()));
-                            },
-                          ),
-                        ),
-                      )
-                    ],
+                    ),
                   ),
                   Container(
-                    child: Theme(
-                      data: Theme.of(context).copyWith(
-                          primaryColor: primaryColor),
-                      child: TextField(
+                    child: Center(
+                      child: Stack(
+                        children: <Widget>[
+                          (avatarImageFile == null)
+                              ? (photoUrl != ''
+                              ? Material(
+                            child: CachedNetworkImage(
+                              placeholder: (context, url) =>
+                                  Container(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.0,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          themeColor),
+                                    ),
+                                    width: 90.0,
+                                    height: 90.0,
+                                    padding: EdgeInsets.all(20.0),
+                                  ),
+                              imageUrl: photoUrl,
+                              width: 90.0,
+                              height: 90.0,
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(45.0)),
+                            clipBehavior: Clip.hardEdge,
+                          )
+                              : Icon(
+                            Icons.account_circle,
+                            size: 90.0,
+                            color: greyColor,
+                          ))
+                              : Material(
+                            child: Image.file(
+                              avatarImageFile,
+                              width: 90.0,
+                              height: 90.0,
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.all(Radius.circular(
+                                45.0)),
+                            clipBehavior: Clip.hardEdge,
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.camera_alt,
+                              color: primaryColor.withOpacity(0.5),
+                            ),
+                            onPressed: getImage,
+                            padding: EdgeInsets.all(30.0),
+                            splashColor: Colors.transparent,
+                            highlightColor: greyColor,
+                            iconSize: 30.0,
+                          )
+                        ],
+                      ),
+                    ),
+                    width: double.infinity,
+                    margin: EdgeInsets.all(20.0),
+                  ),
+
+
+                  Container(
+                    child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Enter your name',
+                          contentPadding: new EdgeInsets.all(5.0),
+                          hintStyle: TextStyle(color: greyColor),
+                        ),
+                        controller: controllerName,
+                        onChanged: (value) {
+                          name = value;
+                        },
+                    ),
+                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                  ),
+                  Container(
+                    child: TextField(
                         decoration: InputDecoration(
                           hintText: 'Enter your NickName',
                           contentPadding: new EdgeInsets.all(5.0),
@@ -270,16 +249,11 @@ class ProfilePageState extends State<ProfilePage> {
                         onChanged: (value) {
                           nickName = value;
                         },
-//                focusNode: focusNodeNickname,
-                      ),
                     ),
                     margin: EdgeInsets.only(left: 30.0, right: 30.0),
                   ),
                   Container(
-                    child: Theme(
-                      data: Theme.of(context).copyWith(
-                          primaryColor: primaryColor),
-                      child: TextField(
+                    child: TextField(
                         decoration: InputDecoration(
                           hintText: 'Enter your Email',
                           contentPadding: new EdgeInsets.all(5.0),
@@ -289,31 +263,24 @@ class ProfilePageState extends State<ProfilePage> {
                         onChanged: (value) {
                           userEmail = value;
                         },
-//                focusNode: focusNodeNickname,
-                      ),
                     ),
                     margin: EdgeInsets.only(left: 30.0, right: 30.0),
                   ),
-                  Container(
-                    child: RaisedButton(
-                      child: Text('Update Password'),
-                      onPressed: () {
-                        showAlertDialog(context);
-                      },
-                    ),
-                  ),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       Container(
+                        margin: EdgeInsets.only(top: 15.0,),
                         child: RaisedButton(
-                          child: Text('Logout User'),
+                          child: Text('Change Password'),
                           onPressed: () {
-
+                            showAlertDialog(context);
                           },
                         ),
                       ),
                       Container(
+                        margin: EdgeInsets.only(top: 15.0,),
                         child: RaisedButton(
                           child: Text('Update Profile'),
                           onPressed: () {
@@ -361,9 +328,10 @@ class ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void uploadProfile() async{
+  void uploadProfile() async {
     StorageReference reference = FirebaseStorage.instance.ref().child('HELP');
-    StorageUploadTask uploadTask = reference.putFile(File('This PC\Galaxy S6\Phone\Pictures'));
+    StorageUploadTask uploadTask = reference.putFile(
+        File('This PC\Galaxy S6\Phone\Pictures'));
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
     storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
       print('DOWNLOAD URLLLLLLLLLLLLL $downloadUrl');
@@ -375,14 +343,78 @@ class ProfilePageState extends State<ProfilePage> {
     });
   }
 
+
+  showLogoutAlertDialog(BuildContext context) {
+    // set up the AlertDialog
+    AlertDialog logoutAlert = AlertDialog(
+      content: Container(
+          width: 200.0,
+          height: 90.0,
+          child: SingleChildScrollView(
+              child: Column(
+                  children: <Widget>[
+                    Text('Are you sure want to logout?'),
+              Container(
+                  margin: const EdgeInsets.only(
+                      top: 20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      RaisedButton(
+                        child: Text("Yes"),
+                        color: white_color,
+                        onPressed: () {
+                          if (signinType == 'google')
+                            loginSelectionOption.handleGoogleSignOut(prefs);
+                          else if (signinType == 'facebook')
+                            facebookSignup.facebookLogout(context, prefs);
+                          else if (signinType == 'MobileNumber')
+                            clearLocalData();
+                          prefs.setString('signInType', '');
+                          _updatestatus();
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (
+                                      context) => new LoginSelectionPage()));
+                          Navigator.of(context, rootNavigator: true).pop('dialog');
+                        },
+                      ),
+                      RaisedButton(
+                        color: white_color,
+                        child: Text("No"),
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).pop(
+                              'dialog');
+                        },
+                      )
+                    ],
+                  ),
+              )
+                  ]
+              )
+          )
+      ));
+      // show the dialog
+      showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return logoutAlert;
+      },
+    );
+  }
+
+
   showAlertDialog(BuildContext context) {
     // set up the button
-    Widget okButton = FlatButton(
-      child: Text("Update Password"),
+    Widget okButton = RaisedButton(
+      child: Text("Update"),
+      color: white_color,
       onPressed: () {
         if (newPassword == '' || newPassword == null) {
           Fluttertoast.showToast(msg: 'Please enter NewPassword');
-        }else  if (confirmPassword == ''  || confirmPassword == null) {
+        } else if (confirmPassword == '' || confirmPassword == null) {
           Fluttertoast.showToast(
               msg: 'Please enter ConfirmPassword');
         } else if (confirmPassword == newPassword) {
@@ -407,7 +439,8 @@ class ProfilePageState extends State<ProfilePage> {
       },
     );
 
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = RaisedButton(
+      color: white_color,
       child: Text("Cancel"),
       onPressed: () {
         Navigator.of(context, rootNavigator: true).pop('dialog');
@@ -416,34 +449,28 @@ class ProfilePageState extends State<ProfilePage> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Reset Password"),
+      title: Text("Change Password"),
       content: Container(
           width: 200.0,
-          height: 230.0,
+          height: 220.0,
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
                 Container(
                   margin: const EdgeInsets.only(
-                      top: 10.0,),
+                    top: 10.0,),
                   child: TextField(
                     obscureText: true,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: 'New Password',
+                      contentPadding: new EdgeInsets.all(5.0),
+                      hintStyle: TextStyle(color: greyColor),
+                    ),
                     controller: controllerNewPassword,
                     onChanged: (value) {
                       newPassword = value;
                     },
-                    autofocus: true,
-                    decoration: new InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: focused_border_color, width: 2.0),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: greyColor2, width: 2.0),
-                      ),
-                      hintText: 'New Password',
-                    ),
                     keyboardType: TextInputType.phone,
                   ),
                 ),
@@ -456,33 +483,28 @@ class ProfilePageState extends State<ProfilePage> {
                     onChanged: (value) {
                       confirmPassword = value;
                     },
-                    autofocus: true,
                     decoration: new InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: focused_border_color, width: 2.0),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: greyColor2, width: 2.0),
-                      ),
+                      contentPadding: new EdgeInsets.all(5.0),
                       hintText: 'Confirm Password',
                     ),
                     keyboardType: TextInputType.phone,
                   ),
                 ),
-           /*     Row(
-                  children: <Widget>[
-                    Container(
-                      margin: const EdgeInsets.only(
-                         top: 10.0),
-                      child: OutlineButton(
+                Container(
+                  margin: const EdgeInsets.only(
+                      top: 20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      RaisedButton(
+                        child: Text("Update"),
                         color: white_color,
-                        child: Text('Update Password'),
                         onPressed: () {
                           if (newPassword == '' || newPassword == null) {
-                            Fluttertoast.showToast(msg: 'Please enter NewPassword');
-                          }else  if (confirmPassword == ''  || confirmPassword == null) {
+                            Fluttertoast.showToast(
+                                msg: 'Please enter NewPassword');
+                          } else if (confirmPassword == '' ||
+                              confirmPassword == null) {
                             Fluttertoast.showToast(
                                 msg: 'Please enter ConfirmPassword');
                           } else if (confirmPassword == newPassword) {
@@ -498,6 +520,8 @@ class ProfilePageState extends State<ProfilePage> {
                               _updatePassword(confirmPassword);
                               Fluttertoast.showToast(
                                   msg: 'Password updated successfully');
+                              Navigator.of(context, rootNavigator: true).pop(
+                                  'dialog');
                             }
                           } else {
                             Fluttertoast.showToast(
@@ -505,28 +529,24 @@ class ProfilePageState extends State<ProfilePage> {
                           }
                         },
                       ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(
-                          left: 5.0, top: 10.0),
-                      child: OutlineButton(
+                      RaisedButton(
                         color: white_color,
-                        child: Text('Cancel'),
+                        child: Text("Cancel"),
                         onPressed: () {
-                          Navigator.pop(context, true);
-//                          Navigator.pop(context);
+                          Navigator.of(context, rootNavigator: true).pop(
+                              'dialog');
                         },
-                      ),
-                    )
-                  ],
-                )*/
+                      )
+                    ],
+                  ),
+                )
               ],
             ),
           )
       ),
       actions: [
-        okButton,
-        cancelButton,
+//        okButton,
+//        cancelButton,
       ],
     );
 
@@ -539,6 +559,7 @@ class ProfilePageState extends State<ProfilePage> {
       },
     );
   }
+
 
   Future _updatePassword(String password) async {
     await prefs.setString('password', password);

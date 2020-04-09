@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -128,10 +129,13 @@ class friendlist extends StatelessWidget {
 //              if(isLoading == true)   return Center(
 //                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(themeColor)));;
               if (!snapshot.hasData)
-                return Center(
+               /* return Center(
                     child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
-              else
+                        valueColor: AlwaysStoppedAnimation<Color>(themeColor)));*/
+                return Center(
+                  child: Text('No Pending Requests'),
+                );
+                else
                     return new ListView(
                         scrollDirection: Axis.vertical,
                         children: snapshot.data.documents.map((document) {
@@ -212,6 +216,7 @@ class friendlist extends StatelessWidget {
                                                  document['requestFrom'])
                                                  .updateData(
                                                  {'IsAcceptInvitation': true});
+                                             Fluttertoast.showToast(msg: 'Invitation accepted');
                                            },
                                          ),
                                        )

@@ -111,6 +111,8 @@ flutter:
       - images/phone.svg
       - images/gmail.svg
       - images/fb.svg
+      - images/splash.svg
+      - images/invite_sent.svg
 
   #   - images/a_dot_ham.jpeg
 
