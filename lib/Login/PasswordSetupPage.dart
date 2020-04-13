@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
@@ -76,6 +78,19 @@ class PasswordSetupState extends State<PasswordSetup>{
     setState(() {});
   }
 
+  GoogleSignIn googleSignIn = GoogleSignIn();
+  var facebookLogin = FacebookLogin();
+
+  Future updateLogin() async{
+    await FirebaseAuth.instance.signOut();
+    if (googleSignIn.isSignedIn() != null) {
+      await googleSignIn.disconnect();
+      await googleSignIn.signOut();
+    }
+    if(facebookLogin.isLoggedIn != null ) {
+      await facebookLogin.logOut();
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,11 +103,13 @@ class PasswordSetupState extends State<PasswordSetup>{
                 child: new IconButton(
                   icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
                   onPressed: () {
+
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (
                                 context) => new LoginSelectionPage()));
+                    updateLogin();
                   },
                 ),
               )

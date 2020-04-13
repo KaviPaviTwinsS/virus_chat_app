@@ -24,7 +24,7 @@ String community = 'My Community';
 String send ='SEND';
 String done = 'DONE';
 String explore = 'Explore new ways to chat with people';
-
+String profile_header = 'Profile setup';
 
 
 String capitalize(String s) => s[0].toUpperCase() + s.substring(1);

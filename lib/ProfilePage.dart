@@ -129,7 +129,7 @@ class ProfilePageState extends State<ProfilePage> {
     print('profile build $name');
     return Scaffold(
         resizeToAvoidBottomPadding: true,
-        appBar: AppBar(
+        /*  appBar: AppBar(
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back_ios, color: white_color),
             onPressed: () {
@@ -137,179 +137,324 @@ class ProfilePageState extends State<ProfilePage> {
             },
           ),
           title: Text('Profile Page setup'),
-        ),
-
+        ),*/
         body: Stack(
           children: <Widget>[
-            SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      margin: EdgeInsets.only(right: 20.0),
-                      child: IconButton(
-                        icon: new SvgPicture.asset(
-                          'images/post_icon.svg', height: 200.0,
-                          width: 200.0,
-                        ),
-                        onPressed: () {
-                          showLogoutAlertDialog(context);
-                        },
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: Center(
-                      child: Stack(
+           Column(
+                  children: <Widget>[
+                    Container(
+                      color: facebook_color,
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      height: MediaQuery
+                          .of(context)
+                          .size
+                          .height - 520,
+                      child:
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment
+                            .center,
                         children: <Widget>[
-                          (avatarImageFile == null)
-                              ? (photoUrl != ''
-                              ? Material(
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) =>
-                                  Container(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          themeColor),
-                                    ),
-                                    width: 90.0,
-                                    height: 90.0,
-                                    padding: EdgeInsets.all(20.0),
-                                  ),
-                              imageUrl: photoUrl,
-                              width: 90.0,
-                              height: 90.0,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.all(
-                                Radius.circular(45.0)),
-                            clipBehavior: Clip.hardEdge,
-                          )
-                              : Icon(
-                            Icons.account_circle,
-                            size: 90.0,
-                            color: greyColor,
-                          ))
-                              : Material(
-                            child: Image.file(
-                              avatarImageFile,
-                              width: 90.0,
-                              height: 90.0,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(
-                                45.0)),
-                            clipBehavior: Clip.hardEdge,
+                          Container(
+                            margin: EdgeInsets.only(top: 30.0, bottom: 20.0),
+                            child: new IconButton(
+                                icon: Icon(Icons.arrow_back_ios,
+                                  color: white_color,),
+                                onPressed: () {
+                                  navigationPage();
+                                }),
                           ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.camera_alt,
-                              color: primaryColor.withOpacity(0.5),
+                          new Container(
+                              margin: EdgeInsets.only(
+                                  top: 30.0, right: 10.0, bottom: 20.0),
+                              child: Text(profile_header, style: TextStyle(
+                                  color: text_color,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold),)
+                          ),
+                          Spacer(),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Container(
+                              margin: EdgeInsets.only(
+                                  top: 40.0, bottom: 10.0, right: 10.0),
+                              child: IconButton(
+                                icon: new SvgPicture.asset(
+                                  'images/logout.svg', height: 20.0,
+                                  width: 20.0,
+                                ),
+                                onPressed: () {
+                                  showLogoutAlertDialog(context);
+                                },
+                              ),
                             ),
-                            onPressed: getImage,
-                            padding: EdgeInsets.all(30.0),
-                            splashColor: Colors.transparent,
-                            highlightColor: greyColor,
-                            iconSize: 30.0,
                           )
                         ],
                       ),
                     ),
-                    width: double.infinity,
-                    margin: EdgeInsets.all(20.0),
-                  ),
-
-
-                  Container(
-                    child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your name',
-                          contentPadding: new EdgeInsets.all(5.0),
-                          hintStyle: TextStyle(color: greyColor),
-                        ),
-                        controller: controllerName,
-                        onChanged: (value) {
-                          name = value;
-                        },
+                  ]
+            ),
+            Align(
+                alignment: Alignment.bottomLeft,
+                child: Container(
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    height: 550,
+                    decoration: BoxDecoration(
+                        color: text_color,
+                        borderRadius: new BorderRadius.only(
+                          topLeft: const Radius.circular(30.0),
+                          topRight: const Radius.circular(30.0),
+                        )
                     ),
-                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                  ),
-                  Container(
-                    child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your NickName',
-                          contentPadding: new EdgeInsets.all(5.0),
-                          hintStyle: TextStyle(color: greyColor),
-                        ),
-                        controller: controllerNickName,
-                        onChanged: (value) {
-                          nickName = value;
-                        },
-                    ),
-                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                  ),
-                  Container(
-                    child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your Email',
-                          contentPadding: new EdgeInsets.all(5.0),
-                          hintStyle: TextStyle(color: greyColor),
-                        ),
-                        controller: controllerEmail,
-                        onChanged: (value) {
-                          userEmail = value;
-                        },
-                    ),
-                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                  ),
+                    child: Container(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                child: Center(
+                                  child: Stack(
+                                    children: <Widget>[
+                                      (avatarImageFile == null)
+                                          ? (photoUrl != ''
+                                          ? GestureDetector(
+                                        onTap: getImage,
+                                        child: Material(
+                                          child: CachedNetworkImage(
+                                            placeholder: (context, url) =>
+                                                Container(
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2.0,
+                                                    valueColor: AlwaysStoppedAnimation<
+                                                        Color>(
+                                                        themeColor),
+                                                  ),
+                                                  width: 90.0,
+                                                  height: 90.0,
+                                                  padding: EdgeInsets.all(20.0),
+                                                ),
+                                            imageUrl: photoUrl,
+                                            width: 90.0,
+                                            height: 90.0,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(45.0)),
+                                          clipBehavior: Clip.hardEdge,
+                                        ),
+                                      )
+                                          : IconButton(
+                                        icon: Icon(
+                                          Icons.account_circle,
+                                          size: 90.0,
+                                          color: greyColor,
+                                        ),
+                                        onPressed: () {
+                                          getImage();
+                                        },))
+                                          : Material(
+                                        child: Image.file(
+                                          avatarImageFile,
+                                          width: 90.0,
+                                          height: 90.0,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(
+                                                45.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                      ),
+                                      photoUrl == '' ? IconButton(
+                                        icon: Icon(
+                                          Icons.camera_alt,
+                                          color: primaryColor.withOpacity(0.5),
+                                        ),
+                                        onPressed: getImage,
+                                        padding: EdgeInsets.all(30.0),
+                                        splashColor: Colors.transparent,
+                                        highlightColor: greyColor,
+                                        iconSize: 30.0,
+                                      ) : Text('')
+                                    ],
+                                  ),
+                                ),
+                                width: double.infinity,
+                                margin: EdgeInsets.all(20.0),
+                              ),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(top: 15.0,),
-                        child: RaisedButton(
-                          child: Text('Change Password'),
-                          onPressed: () {
-                            showAlertDialog(context);
-                          },
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 15.0,),
-                        child: RaisedButton(
-                          child: Text('Update Profile'),
-                          onPressed: () {
-                            if (prefs.getString('name') != name ||
-                                prefs.getString('nickname') != nickName ||
-                                prefs.getString('photoUrl') != photoUrl ||
-                                prefs.getString('email') != userEmail) {
-                              isLoading = true;
-                              Firestore.instance.collection('users')
-                                  .document(userId)
-                                  .updateData({
-                                'photoUrl': photoUrl,
-                                'name': name,
-                                'nickName': nickName,
-                                'email': userEmail
-                              });
-                              storeLocalDataInternal(
-                                  photoUrl, name, nickName, userEmail);
-                              Fluttertoast.showToast(msg: update_success);
-                            } else {
-                              Fluttertoast.showToast(msg: no_data_change);
-                            }
-                          },
-                        ),
-                      )
-                    ],
-                  )
-                ],
-              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    margin: EdgeInsets.only(
+                                        left: 30.0, right: 30.0, top: 20.0),
+                                    child: Text('First name'.toUpperCase()),
+                                  ),
+                                  Container(
+                                    child: TextField(
+                                      decoration: new InputDecoration(
+                                        contentPadding: new EdgeInsets.all(
+                                            15.0),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: focused_border_color,
+                                              width: 1.0),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: greyColor, width: 1.0),
+                                        ),
+                                        hintText: 'Enter your name',
+                                      ),
+                                      controller: controllerName,
+                                      onChanged: (value) {
+                                        name = value;
+                                      },
+                                    ),
+                                    margin: EdgeInsets.only(
+                                        left: 30.0, right: 30.0, top: 5.0),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                          left: 30.0, right: 30.0, top: 20.0),
+                                      child: Text('Last name'.toUpperCase()),
+                                    ),
+                                    Container(
+                                      child: TextField(
+                                        decoration: new InputDecoration(
+                                          contentPadding: new EdgeInsets.all(
+                                              15.0),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: focused_border_color,
+                                                width: 1.0),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: greyColor, width: 1.0),
+                                          ),
+                                          hintText: 'Enter your LastName',
+                                        ),
+                                        controller: controllerNickName,
+                                        onChanged: (value) {
+                                          nickName = value;
+                                        },
+                                      ),
+                                      margin: EdgeInsets.only(
+                                          left: 30.0, right: 30.0, top: 5.0),
+                                    ),
+                                  ]
+                              ),
+                              Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                          left: 30.0, right: 30.0, top: 20.0),
+                                      child: Text('Email'.toUpperCase()),
+                                    ),
+                                    Container(
+
+                                      child: TextField(
+                                        decoration: new InputDecoration(
+                                          contentPadding: new EdgeInsets.all(
+                                              15.0),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: focused_border_color,
+                                                width: 1.0),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: greyColor, width: 1.0),
+                                          ),
+                                          hintText: 'Enter your Email',
+                                        ),
+                                        controller: controllerEmail,
+                                        onChanged: (value) {
+                                          userEmail = value;
+                                        },
+                                      ),
+                                      margin: EdgeInsets.only(
+                                          left: 30.0, right: 30.0, top: 5.0),
+                                    ),
+                                  ]
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment
+                                    .spaceEvenly,
+                                children: <Widget>[
+                                  Container(
+                                    margin: EdgeInsets.only(top: 15.0,),
+                                    child: RaisedButton(
+                                      color: white_color,
+                                      textColor: facebook_color,
+                                      hoverColor: facebook_color,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: new BorderRadius.circular(
+                                            18.0),
+                                      ),
+                                      child: Text('Update Password'),
+                                      onPressed: () {
+                                        updatePassword();
+//                                        showAlertDialog(context);
+                                      },
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(top: 15.0,),
+                                    child: RaisedButton(
+                                      color: facebook_color,
+                                      textColor: text_color,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: new BorderRadius.circular(
+                                            18.0),
+                                      ),
+                                      child: Text('Update Profile'),
+                                      onPressed: () {
+                                        if (prefs.getString('name') != name ||
+                                            prefs.getString('nickname') !=
+                                                nickName ||
+                                            prefs.getString('photoUrl') !=
+                                                photoUrl ||
+                                            prefs.getString('email') !=
+                                                userEmail) {
+                                          isLoading = true;
+                                          Firestore.instance.collection('users')
+                                              .document(userId)
+                                              .updateData({
+                                            'photoUrl': photoUrl,
+                                            'name': name,
+                                            'nickName': nickName,
+                                            'email': userEmail
+                                          });
+                                          storeLocalDataInternal(
+                                              photoUrl, name, nickName,
+                                              userEmail);
+                                          Fluttertoast.showToast(
+                                              msg: update_success);
+                                        } else {
+                                          Fluttertoast.showToast(
+                                              msg: no_data_change);
+                                        }
+                                      },
+                                    ),
+                                  )
+                                ],
+                              )
+                            ]
+                        )
+                    )
+                )
             ),
             // Loading
             Positioned(
@@ -327,6 +472,7 @@ class ProfilePageState extends State<ProfilePage> {
         )
     );
   }
+
 
   void uploadProfile() async {
     StorageReference reference = FirebaseStorage.instance.ref().child('HELP');
@@ -347,62 +493,233 @@ class ProfilePageState extends State<ProfilePage> {
   showLogoutAlertDialog(BuildContext context) {
     // set up the AlertDialog
     AlertDialog logoutAlert = AlertDialog(
-      content: Container(
-          width: 200.0,
-          height: 90.0,
-          child: SingleChildScrollView(
-              child: Column(
-                  children: <Widget>[
-                    Text('Are you sure want to logout?'),
-              Container(
-                  margin: const EdgeInsets.only(
-                      top: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+        content: Container(
+            width: 200.0,
+            height: 90.0,
+            child: SingleChildScrollView(
+                child: Column(
                     children: <Widget>[
-                      RaisedButton(
-                        child: Text("Yes"),
-                        color: white_color,
-                        onPressed: () {
-                          if (signinType == 'google')
-                            loginSelectionOption.handleGoogleSignOut(prefs);
-                          else if (signinType == 'facebook')
-                            facebookSignup.facebookLogout(context, prefs);
-                          else if (signinType == 'MobileNumber')
-                            clearLocalData();
-                          prefs.setString('signInType', '');
-                          _updatestatus();
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (
-                                      context) => new LoginSelectionPage()));
-                          Navigator.of(context, rootNavigator: true).pop('dialog');
-                        },
-                      ),
-                      RaisedButton(
-                        color: white_color,
-                        child: Text("No"),
-                        onPressed: () {
-                          Navigator.of(context, rootNavigator: true).pop(
-                              'dialog');
-                        },
+                      Text('Are you sure want to logout?'),
+                      Container(
+                        margin: const EdgeInsets.only(
+                            top: 20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            RaisedButton(
+                              child: Text("Yes"),
+                              color: white_color,
+                              onPressed: () {
+                                if (signinType == 'google')
+                                  loginSelectionOption.handleGoogleSignOut(
+                                      prefs);
+                                else if (signinType == 'facebook')
+                                  facebookSignup.facebookLogout(context, prefs);
+                                else if (signinType == 'MobileNumber')
+                                  clearLocalData();
+                                prefs.setString('signInType', '');
+                                _updatestatus();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (
+                                            context) => new LoginSelectionPage()));
+                                Navigator.of(context, rootNavigator: true).pop(
+                                    'dialog');
+                              },
+                            ),
+                            RaisedButton(
+                              color: white_color,
+                              child: Text("No"),
+                              onPressed: () {
+                                Navigator.of(context, rootNavigator: true).pop(
+                                    'dialog');
+                              },
+                            )
+                          ],
+                        ),
                       )
-                    ],
-                  ),
-              )
-                  ]
-              )
-          )
-      ));
-      // show the dialog
-      showDialog(
+                    ]
+                )
+            )
+        ));
+    // show the dialog
+    showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return logoutAlert;
       },
     );
+  }
+
+
+
+  void updatePassword() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            color: Color(0xFF737373),
+            height: 300,
+            child: Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.only(
+                        left: 20.0, right: 30.0, top: 20.0),
+                    child: Text('Update Password?', style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 20.0),),
+                  ),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(
+                              left: 20.0, right: 30.0, top: 20.0),
+                          child: Text('New password'.toUpperCase()),
+                        ),
+                        Container(
+                          child: TextField(
+                            decoration: new InputDecoration(
+                              contentPadding: new EdgeInsets.all(
+                                  15.0),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: focused_border_color,
+                                    width: 1.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: greyColor, width: 1.0),
+                              ),
+                              hintText: 'Enter new password',
+                              hintStyle: TextStyle(color:primaryColor )
+                            ),
+                            controller: controllerNewPassword,
+                            obscureText: true,
+                            onChanged: (value) {
+                              newPassword = value;
+                            },
+                          ),
+                          margin: EdgeInsets.only(
+                              left: 20.0, right: 30.0, top: 5.0),
+                        ),
+                      ]
+                  ),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(
+                              left: 20.0, right: 30.0, top: 20.0),
+                          child: Text('Confirm password'.toUpperCase()),
+                        ),
+                        Container(
+                          child: TextField(
+                            decoration: new InputDecoration(
+                              contentPadding: new EdgeInsets.all(
+                                  15.0),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: focused_border_color,
+                                    width: 1.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: greyColor, width: 1.0),
+                              ),
+                              hintText: 'Enter confirm password',
+                                hintStyle: TextStyle(color:primaryColor )
+                            ),
+                            controller: controllerConfirmPassword,
+                            obscureText: true,
+                            onChanged: (value) {
+                              confirmPassword = value;
+                            },
+                          ),
+                          margin: EdgeInsets.only(
+                              left: 20.0, right: 30.0, top: 5.0),
+                        ),
+                      ]
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceEvenly,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(top: 15.0,),
+                        child: RaisedButton(
+                          color: white_color,
+                          textColor: facebook_color,
+                          hoverColor: facebook_color,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(
+                                18.0),
+                          ),
+                          child: Text('Cancel'),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 15.0,),
+                        child: RaisedButton(
+                          color: facebook_color,
+                          textColor: text_color,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(
+                                18.0),
+                          ),
+                          child: Text('Save'),
+                          onPressed: () {
+                            if (newPassword == '' || newPassword == null) {
+                              Fluttertoast.showToast(msg: 'Please enter NewPassword');
+                            } else if (confirmPassword == '' || confirmPassword == null) {
+                              Fluttertoast.showToast(
+                                  msg: 'Please enter ConfirmPassword');
+                            } else if (confirmPassword == newPassword) {
+                              if (confirmPassword == userPassword) {
+                                Fluttertoast.showToast(
+                                    msg: 'Entered Password are same as existing password');
+                              } else {
+                                Firestore.instance.collection('users')
+                                    .document(userId)
+                                    .updateData({
+                                  'password': confirmPassword,
+                                });
+                                _updatePassword(confirmPassword);
+                                Fluttertoast.showToast(
+                                    msg: 'Password updated successfully');
+                                Navigator.of(context, rootNavigator: true).pop('dialog');
+                              }
+                            } else {
+                              Fluttertoast.showToast(
+                                  msg: 'Please enter NewPassword and ConfirmPassword identical');
+                            }
+                            Navigator.pop(context);
+                          },
+                        ),
+                      )
+                    ],
+                  )
+                ]
+              ),
+              decoration: BoxDecoration(
+                color: Theme
+                    .of(context)
+                    .canvasColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(10),
+                  topRight: const Radius.circular(10),
+                ),
+              ),
+            ),
+          );
+        });
   }
 
 

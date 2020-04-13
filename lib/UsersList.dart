@@ -328,6 +328,7 @@ class UsersListState extends State<UsersListPage>
                                       color: Colors.white,
                                     ),
                                     onPressed: () {
+                                      print('USER LIST getFriendList');
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(

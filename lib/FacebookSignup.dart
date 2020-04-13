@@ -15,8 +15,7 @@ class FacebookSignup {
   var profileData;
 
   void initiateFacebookLogin(BuildContext context,SharedPreferences prefs) async {
-    var facebookLoginResult = await facebookLogin
-        .logInWithReadPermissions(['email', 'public_profile']);
+    var facebookLoginResult = await facebookLogin.logIn(['email', 'public_profile']);
     switch (facebookLoginResult.status) {
       case FacebookLoginStatus.error:
         _loginPageState.isFacebookLoggedInUpdate(context,prefs,false,'','');

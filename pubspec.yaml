@@ -32,7 +32,7 @@ dependencies:
   provider: ^3.0.0
   firebase_auth:
   firebase_messaging: ^5.0.4
-  flutter_facebook_login: ^1.2.0
+  flutter_facebook_login: ^3.0.0
   http: ^0.12.0+2
 
   flare_splash_screen: ^2.0.1+2
@@ -113,6 +113,7 @@ flutter:
       - images/fb.svg
       - images/splash.svg
       - images/invite_sent.svg
+      - images/logout.svg
 
   #   - images/a_dot_ham.jpeg
 
