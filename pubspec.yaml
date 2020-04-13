@@ -114,6 +114,11 @@ flutter:
       - images/splash.svg
       - images/invite_sent.svg
       - images/logout.svg
+      - images/online_idle.svg
+      - images/online_active.svg
+      - images/online_inactive.svg
+      - images/friend_request.svg
+      - images/recent_chat.svg
 
   #   - images/a_dot_ham.jpeg
 

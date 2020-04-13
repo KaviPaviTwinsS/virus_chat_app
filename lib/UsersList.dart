@@ -18,6 +18,7 @@ import 'package:virus_chat_app/ProfilePage.dart';
 import 'package:virus_chat_app/SendInviteScreen.dart';
 import 'package:virus_chat_app/audiop/MyAudioEx.dart';
 import 'package:virus_chat_app/chat/AudioChatsss.dart';
+import 'package:virus_chat_app/chat/RecentChatsScreen.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 import 'package:virus_chat_app/utils/colors.dart';
@@ -268,7 +269,7 @@ class UsersListState extends State<UsersListPage>
                             children: <Widget>[
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
@@ -290,8 +291,8 @@ class UsersListState extends State<UsersListPage>
                                                 valueColor: AlwaysStoppedAnimation<
                                                     Color>(themeColor),
                                               ),
-                                              width: 55.0,
-                                              height: 55.0,
+                                              width: 35.0,
+                                              height: 35.0,
                                               padding: EdgeInsets.all(10.0),
                                             ),
                                         imageUrl: currentUserPhotoUrl,
@@ -317,19 +318,42 @@ class UsersListState extends State<UsersListPage>
                                     color: text_color),
                                 ),
                               ),
+                              Spacer(),
                               Container(
                                 margin: EdgeInsets.only(
-                                    top: 20.0, right: 15.0, left: 10.0),
+                                    top: 20.0, left: 10.0),
+                                child: Align(
+                                  alignment: Alignment.topRight,
+                                  child : IconButton(
+                                    icon: new SvgPicture.asset(
+                                      'images/recent_chat.svg', height: 20.0,
+                                      width: 20.0,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  RecentChatsScreen(
+                                                      currentUser,
+                                                      currentUserPhotoUrl)));
+                                    },
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    top: 20.0, right: 15.0),
                                 child: Align(
                                   alignment: Alignment.topRight,
                                   child: IconButton(
-                                    icon: Icon(
-                                      Icons.person_pin,
-                                      color: Colors.white,
+                                    icon: new SvgPicture.asset(
+                                      'images/friend_request.svg', height: 20.0,
+                                      width: 20.0,
                                     ),
                                     onPressed: () {
                                       print('USER LIST getFriendList');
-                                      Navigator.push(
+                                      Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
@@ -574,7 +598,7 @@ class ActiveUserListRadius extends StatelessWidget {
     _preferences = await SharedPreferences.getInstance();
     print('ActiveUserListRadius initialise $msliderData');
     isLoading = true;
-    getCurrentUserLocation(currentUserId, msliderData);
+//    getCurrentUserLocation(currentUserId, msliderData);
   }
 
   @override
@@ -755,7 +779,7 @@ class ActiveUserListRadius extends StatelessWidget {
     print('Friend Listttttt isFriend${documentSnapshot['photoUrl']}');
 
     if (isFriend) {
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) =>
@@ -770,7 +794,7 @@ class ActiveUserListRadius extends StatelessWidget {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) =>
           SendInviteToUser(
-              friendId, currentUserId, mphotoUrl, isAlreadyRequestSent,
+              friendId, currentUserId, documentSnapshot['photoUrl'], isAlreadyRequestSent,
               isRequestSent, documentSnapshot['name'])));
       /*   Navigator.push(
           context,
@@ -911,6 +935,36 @@ class LoginUsersList extends StatelessWidget {
                                                   document['photoUrl'])
                                           )
                                       )),
+                                  document['status'] == 'ACTIVE' ? Container(
+                                      child: new SvgPicture.asset(
+                                        'images/online_active.svg', height: 10.0,
+                                        width: 10.0,
+//                                          color: primaryColor,
+                                      ),
+                                      margin: EdgeInsets.only(left: 80.0,
+                                          bottom: 30.0,
+                                          top: 20.0,
+                                          right: 5.0)) : document['status'] == 'LoggedOut' ? Container(
+                                    child: new SvgPicture.asset(
+                                      'images/online_inactive.svg', height: 10.0,
+                                      width: 10.0,
+//                                        color: primaryColor,
+                                    ),
+                                    margin: EdgeInsets.only(left: 80.0,
+                                        bottom: 30.0,
+                                        top: 20.0,
+                                        right: 5.0),
+                                  ) :  Container(
+                                    child: new SvgPicture.asset(
+                                      'images/online_idle.svg', height: 10.0,
+                                      width: 10.0,
+//                                        color: primaryColor,
+                                    ),
+                                    margin: EdgeInsets.only(left: 80.0,
+                                        bottom: 30.0,
+                                        top: 20.0,
+                                        right: 5.0),
+                                  )
                                 ]
                             ),
                             new Container(
@@ -983,7 +1037,7 @@ class LoginUsersList extends StatelessWidget {
     }
     print('Friend Listttttt isFriend${documentSnapshot['photoUrl']}');
     if (isFriend) {
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) =>

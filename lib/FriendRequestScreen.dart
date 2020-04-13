@@ -89,7 +89,7 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
           ),
           title: Text('Friend Requests'),
         ),
-        body: new StreamBuilder(
+        body: /*new StreamBuilder(
             stream: Firestore.instance.collection('users').document(
                 _mcurrentUserId).collection('FriendsList').where(
                 'IsAcceptInvitation', isEqualTo: false).where(
@@ -98,9 +98,9 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (!snapshot.hasData) {
                 print('Document FRIEND REQUEST HAS DATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-                /* return Center(
+                */ /* return Center(
                     child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(themeColor)));*/
+                        valueColor: AlwaysStoppedAnimation<Color>(themeColor)));*/ /*
                 return Center(
                   child: Text('No Pending Requests'),
                 );
@@ -115,7 +115,7 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                             onTap: () {
                               print(
                                   'ON TAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
-                              /*Navigator.push(
+                              */ /*Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
@@ -123,7 +123,7 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                                           currentUserId: currentUserId,
                                           peerId: document.documentID,
                                           peerAvatar: document['photoUrl'],
-                                        )));*/
+                                        )));*/ /*
                             },
                             child: new Row(
                               crossAxisAlignment: CrossAxisAlignment
@@ -165,8 +165,8 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                                   child: Text(
                                       capitalize(document['friendName'])),
                                 ),
-                                /*  new Text('receiver ID :::::: ${document['receiveId']}',
-                                            textScaleFactor: 1.0),*/
+                                */ /*  new Text('receiver ID :::::: ${document['receiveId']}',
+                                            textScaleFactor: 1.0),*/ /*
                                 Container(
                                   margin: EdgeInsets.all(15.0),
                                   child: RaisedButton(
@@ -204,7 +204,8 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                     }).toList()
                 );
             }
-        )
+        )*/
+        friendlist(_mcurrentUserId)
     );
   }
 /*
@@ -233,39 +234,26 @@ class friendlist extends StatelessWidget {
     return new StreamBuilder(
         stream: Firestore.instance.collection('users').document(
             currentUserId).collection('FriendsList').where(
-            'IsAcceptInvitation', isEqualTo: false).where(
-            'isRequestSent', isEqualTo: false).snapshots(),
+            'isRequestSent', isEqualTo: false).where(
+            'IsAcceptInvitation', isEqualTo: false).snapshots(),
         builder:
             (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-//              if(isLoading == true)   return Center(
-//                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(themeColor)));;
-          if (!snapshot.hasData)
+          if (snapshot.data == null || !snapshot.hasData) {
             /* return Center(
                     child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(themeColor)));*/
             return Center(
               child: Text('No Pending Requests'),
             );
-          else
-            return new ListView(
+          } else {
+            return (snapshot.data.documents.length == 0) ? Center(
+              child: Text('No Pending Requests'),
+            ) : new ListView(
                 scrollDirection: Axis.vertical,
                 children: snapshot.data.documents.map((document) {
-                  print('Document FRIEND REQUEST ${document.documentID}');
                   if (document.documentID != currentUserId) {
                     return GestureDetector(
                         onTap: () {
-                          print(
-                              'ON TAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
-//                            getFriendList(context, currentUserId, document);
-                          /*Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        Chat(
-                                          currentUserId: currentUserId,
-                                          peerId: document.documentID,
-                                          peerAvatar: document['photoUrl'],
-                                        )));*/
                         },
                         child: new Row(
                           crossAxisAlignment: CrossAxisAlignment
@@ -286,8 +274,8 @@ class friendlist extends StatelessWidget {
                                             valueColor: AlwaysStoppedAnimation<
                                                 Color>(themeColor),
                                           ),
-                                          width: 55.0,
-                                          height: 55.0,
+                                          width: 35.0,
+                                          height: 35.0,
                                           padding: EdgeInsets.all(10.0),
                                         ),
                                     imageUrl: document['friendPhotoUrl'],
@@ -304,7 +292,8 @@ class friendlist extends StatelessWidget {
                             ),
                             new Container(
                               margin: EdgeInsets.all(15.0),
-                              child: Text(capitalize(document['friendName'])),
+                              child: Text(
+                                  capitalize(document['friendName'])),
                             ),
                             /*  new Text('receiver ID :::::: ${document['receiveId']}',
                                             textScaleFactor: 1.0),*/
@@ -339,11 +328,12 @@ class friendlist extends StatelessWidget {
                         ));
                   } else {
                     return Center(
-                      child: Text('No Users'),
+                      child: Text('No Pending Requests'),
                     );
                   }
                 }).toList()
             );
+          }
         }
     );
   }

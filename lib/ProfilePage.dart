@@ -1012,6 +1012,7 @@ class ProfilePageState extends State<ProfilePage> {
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('phoneNo', profile['phoneNo']);
     await prefs.setString('signInType', signinType);
+    await prefs.setStringList('CHAT_USERS', profile['chattingWith']);
   }
 
 

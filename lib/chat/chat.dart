@@ -47,6 +47,12 @@ class Chat extends StatelessWidget {
           'CHAT',
           style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
         ),
+        leading: new IconButton(
+          icon: new Icon(Icons.arrow_back_ios, color: white_color),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         centerTitle: true,
       ),
       body: new ChatScreen(
@@ -112,8 +118,9 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   MyAudioRecorder recorder;
   String mAudioPath = '';
   String _friendToken = '';
-  String currentUserName ='';
+  String currentUserName = '';
 
+  List<String> mUsersList ;
 
   double sliderCurrentPosition = 0.0;
   double maxDuration = 1.0;
@@ -160,10 +167,12 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       groupChatId = '$peerId-$id';
     }
 
-    Firestore.instance.collection('users').document(id).updateData(
-        {'chattingWith': peerId});
+    /* Firestore.instance.collection('users').document(id).updateData(
+        {'chattingWith': peerId});*/
     _friendToken = await prefs.getString('FRIEND_USER_TOKEN');
     currentUserName = await prefs.getString('name');
+    mUsersList = await prefs.getStringList('CHAT_USERS');
+
     setState(() {});
   }
 
@@ -182,7 +191,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       imageUrl = downloadUrl;
       setState(() {
 //        isLoading = false;
-        storeFile(imageUrl,fileName);
+        storeFile(imageUrl, fileName);
         onSendMessage(imageUrl, 5, fileName);
       });
     }, onError: (err) {
@@ -260,6 +269,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           .collection('messages')
           .document(groupChatId);
 */
+
       Firestore.instance.runTransaction((transaction) async {
         await transaction.set(
           documentReference,
@@ -271,20 +281,39 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 .millisecondsSinceEpoch
                 .toString(),
             'content': content,
-            'audioTime' :audioTime,
+            'audioTime': audioTime,
             'type': type
           },
         );
       });
+
       listScrollController.animateTo(
           0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
       sendAndRetrieveMessage();
+      validate();
     } else {
       Fluttertoast.showToast(msg: 'Nothing to send');
     }
-
-
   }
+
+  void validate() {
+    bool isExistUser = false;
+    if(mUsersList != null && mUsersList.length != 0) {
+      for (int j = 0; j < mUsersList.length; j++) {
+        print('CHAT USER PEERRRRRRRRRRRRRRRRRRRRRRRRRRRRR ${mUsersList[j]}');
+        if (mUsersList[j] == peerId) {
+          isExistUser = true;
+        }
+      }
+    }
+    if (!isExistUser) {
+      Firestore.instance.collection('users').document(currentUserId).updateData(
+          {
+            'chattingWith': peerId
+          });
+    }
+  }
+
 
   final String serverToken = 'AAAA1iQ7au4:APA91bGvPY8CpYvutHVhzh7RL-xyybt7lxPNU_OxXPCJdxDtyZain9hxgliGV9OQyaXLiKXJyVUhpQm0tygEz4YfisEdGIOLyNo3vgUguNMEpBVEaEwUfONgErCLALyrrLTroFhfq5YD';
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
@@ -327,6 +356,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     getMessage();
     return completer.future;
   }
+
   Future _showNotificationWithDefaultSound(Map<String, dynamic> message) async {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
@@ -344,7 +374,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
 
-  void getMessage(){
+  void getMessage() {
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
           print('on message $message');
@@ -361,10 +391,11 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
   Widget buildItem(int index, DocumentSnapshot document) {
-    if(document['type'] == 5){
-      storeFile(document['content'],document['audioTime'] );
+    if (document['type'] == 5) {
+      storeFile(document['content'], document['audioTime']);
     }
-    print('CONTENTTTTTTTTTTTTTTTTTTTTTTTTT___ ${ document['type']} ___${document['audioTime']}');
+    print(
+        'CONTENTTTTTTTTTTTTTTTTTTTTTTTTT___ ${ document['type']} ___${document['audioTime']}');
     if (document['idFrom'] == id) {
       // Right (my message)
       return new Row(
@@ -446,8 +477,10 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                     icon: Icon(Icons.play_circle_filled),
                     onPressed: () {
                       isPlaying
-                          ? flutterStopPlayer(document['content'],document['audioTime'])
-                          : flutterPlaySound(document['content'],document['audioTime']);
+                          ? flutterStopPlayer(
+                          document['content'], document['audioTime'])
+                          : flutterPlaySound(
+                          document['content'], document['audioTime']);
                     },
                   ),
                   new Slider(
@@ -471,8 +504,10 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                     icon: Icon(Icons.play_circle_filled),
                     onPressed: () {
                       isPlaying
-                          ? flutterStopPlayer(document['content'],document['audioTime'])
-                          : flutterPlaySound(document['content'],document['audioTime']);
+                          ? flutterStopPlayer(
+                          document['content'], document['audioTime'])
+                          : flutterPlaySound(
+                          document['content'], document['audioTime']);
                     },
                   ),
                   new Slider(
@@ -485,7 +520,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 ],
               ),
             ),
-          )/*Container(
+          ) /*Container(
             child: new Image.asset(
               'images/${document['content']}.gif',
               width: 100.0,
@@ -592,7 +627,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                     padding: EdgeInsets.all(0),
                   ),
                   margin: EdgeInsets.only(left: 10.0),
-                )   : document['type'] == 5 ?
+                ) : document['type'] == 5 ?
                 new Material(
                   child: Container(
                     height: 56.0,
@@ -602,8 +637,10 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                           icon: Icon(Icons.play_circle_filled),
                           onPressed: () {
                             isPlaying
-                                ? flutterStopPlayer(document['content'],document['audioTime'])
-                                : flutterPlaySound(document['content'],document['audioTime']);
+                                ? flutterStopPlayer(
+                                document['content'], document['audioTime'])
+                                : flutterPlaySound(
+                                document['content'], document['audioTime']);
                           },
                         ),
                         new Slider(
@@ -611,7 +648,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                           value: sliderCurrentPosition,
                           min: 0.0,
                           max: maxDuration,
-                          divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt(),
+                          divisions: maxDuration == 0.0 ? 1 : maxDuration
+                              .toInt(),
                           onChanged: (double value) {},),
                       ],
                     ),
@@ -672,11 +710,11 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
   void storeFile(String imageUrl, String fileName) async {
     Directory tempDir = await getExternalStorageDirectory();
-    String uri = '${tempDir.path}/${fileName}'+'.aac';
+    String uri = '${tempDir.path}/${fileName}' + '.aac';
     print(
         'urlllllllllllllllllllllllllllllllllllllllllllll_____ $uri _____$imageUrl');
-    if(!await File(uri).exists())
-    getImageFromNetwork(imageUrl, uri);
+    if (!await File(uri).exists())
+      getImageFromNetwork(imageUrl, uri);
     print('myDataPath $myDataPath');
   }
 
@@ -695,15 +733,16 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
 
-  flutterPlaySound(url,String fileName) async {
+  flutterPlaySound(url, String fileName) async {
     Directory tempDir = await getExternalStorageDirectory();
-    String uri = '${tempDir.path}/${fileName}'+'.aac';
+    String uri = '${tempDir.path}/${fileName}' + '.aac';
     bool isFileExist = await File(uri).exists();
-    if(isFileExist){
+    if (isFileExist) {
       print('EXISTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
       await flutterSound.startPlayer(uri);
-    }else{
-      print('EXISTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT__________________________');
+    } else {
+      print(
+          'EXISTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT__________________________');
       storeFile(url, fileName);
       await flutterSound.startPlayer(url);
     }
@@ -742,11 +781,11 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     });
   }
 
-  Future<dynamic> flutterStopPlayer(url,String fileName) async {
+  Future<dynamic> flutterStopPlayer(url, String fileName) async {
     await flutterSound.stopPlayer().then(
             (value) {
           print('VALUEEEEEEEEEEEEEEEEEEEEEEEE $value');
-          flutterPlaySound(url,fileName);
+          flutterPlaySound(url, fileName);
         }
     );
   }
@@ -770,7 +809,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
   Future<bool> onBackPress() {
-    if (isShowSticker) {
+    /* if (isShowSticker) {
       setState(() {
         isShowSticker = false;
       });
@@ -778,9 +817,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       Firestore.instance.collection('users').document(id).updateData(
           {'chattingWith': null});
       Navigator.pop(context);
-    }
-
-    return Future.value(false);
+    }*/
+    Navigator.pop(context);
   }
 
   @override

@@ -101,14 +101,6 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /*  appBar: AppBar(
-        leading: new IconButton(
-            icon: Icon(Icons.arrow_back_ios), onPressed: () {
-          Navigator.push(context, MaterialPageRoute(
-              builder: (context) =>
-                  Chat(currentUserId:_mCurrentUserId ,peerId: _mPeerId,peerAvatar: _mPhotoUrl,isFriend: false,isAlreadyRequestSent: _misAlreadyRequestSent,)));
-        }),
-      ),*/
         body: Stack(
             children: <Widget>[
               SingleChildScrollView(
@@ -158,8 +150,8 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                                     valueColor: AlwaysStoppedAnimation<
                                                         Color>(themeColor),
                                                   ),
-                                                  width: 55.0,
-                                                  height: 55.0,
+                                                  width: 35.0,
+                                                  height: 35.0,
                                                   padding: EdgeInsets.all(10.0),
                                                 ),
                                             imageUrl: _mPhotoUrl,
@@ -217,7 +209,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                   )
               ),
               Align(
-                  alignment: Alignment.bottomLeft,
+                  alignment: Alignment.bottomCenter,
                   child: Container(
                       width: MediaQuery
                           .of(context)
@@ -306,11 +298,14 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                 : Text('Already invitation sent',
                               style: TextStyle(fontWeight: FontWeight.bold,
                                   fontSize: 20.0),),
-                            Container(
-                              padding: EdgeInsets.all(20.0),
-                              child: Text(
-                                  'You\'ll be able to chat with VALENTINE once your invitation has been accepted.'),
-                            )
+                           Align(
+                             alignment: Alignment.center,
+                             child:  Container(
+                               padding: EdgeInsets.all(20.0),
+                               child: Text(
+                                   'You\'ll be able to chat with VALENTINE once your invitation has been accepted.'),
+                             ),
+                           )
                           ],
                         ),
                       )

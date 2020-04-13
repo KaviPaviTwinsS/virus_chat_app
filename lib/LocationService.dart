@@ -41,11 +41,12 @@ class LocationService {
     }
       // Request permission to use location
       location.requestPermission().then((granted) {
-        print('Location data granted $_currentLocation  ___ $currentUserId');
         if (granted != null) {
+          print('LocationService  ___granted__ $currentUser');
           // If granted listen to the onLocationChanged stream and emit over our controller
           locationSubcription = location.onLocationChanged().listen((locationData) {
             if (locationData != null && !locationController.isClosed) {
+              print('LocationService  locationData ______ $currentUser');
               locationController.add(UserLocation(
                 latitude: locationData.latitude,
                 longitude: locationData.longitude,
@@ -56,7 +57,6 @@ class LocationService {
             );*/
 //              print('currentUserId $_currentLocation');
               if (_currentLocation == null) {
-                print('Location data $locationData');
 //              _addGeoPoint(locationData);
                 updateLocation(locationData);
               } else {
@@ -64,8 +64,20 @@ class LocationService {
                   updateLocation(locationData);
                 }
               }
+            }else{
+              print('LocationService  locationDataNULL ______ $currentUser');
+              /*    Firestore.instance
+                  .collection('users')
+                  .document(currentUserId)
+                  .updateData({'status': 'INACTIVE'});*/
             }
           });
+        }else{
+          print('LocationService  ___NOTgranted__ $currentUser');
+          /* Firestore.instance
+              .collection('users')
+              .document(currentUserId)
+              .updateData({'status': 'INACTIVE'});*/
         }
       });
   }
@@ -108,7 +120,10 @@ class LocationService {
      databaseReference.collection('users').document(currentUserId).collection(
          'userLocation').document(currentUserId).updateData({
        'userLocation':
-       new GeoPoint(locationData.latitude, locationData.longitude)
+       new GeoPoint(locationData.latitude, locationData.longitude),
+       'UpdateTime':  ((new DateTime.now()
+           .toUtc()
+           .microsecondsSinceEpoch) / 1000).toInt(),
      });
    }
   }
