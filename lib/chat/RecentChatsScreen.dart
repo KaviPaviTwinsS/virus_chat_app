@@ -56,7 +56,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
     var query = await Firestore.instance.collection('users')
         .document(_muserId).collection(
         'userLocation').document(_muserId).get();
-    print('Recent Chats ${query['UpdateTime']}');
+    print('Recent Chats ___ ${_muserId} ___ ${query['UpdateTime']}');
 
     if(_muserId != '') {
       if (currentTime > query['UpdateTime']) {
@@ -194,7 +194,8 @@ class UsersRecentChats extends StatelessWidget {
                                               peerId: document.documentID,
                                               peerAvatar: document['photoUrl'],
                                               isFriend: true,
-                                              isAlreadyRequestSent: true
+                                              isAlreadyRequestSent: true,
+                                            peerName : document['name']
                                           )));
                             },
                             child: new Row(

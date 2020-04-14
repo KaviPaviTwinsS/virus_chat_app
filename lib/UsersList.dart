@@ -480,12 +480,15 @@ class UsersListState extends State<UsersListPage>
                     )
                 ),
               ],
-            ), onWillPop: null)
+            ),    onWillPop: (){
+          onBackPress();
+        },)
     );
   }
 
 
   Future onBackPress() async {
+    print('USRELIST ONBACKPRESS');
     Fluttertoast.showToast(msg: 'Please exit the App');
   }
 
@@ -779,7 +782,7 @@ class ActiveUserListRadius extends StatelessWidget {
     print('Friend Listttttt isFriend${documentSnapshot['photoUrl']}');
 
     if (isFriend) {
-      Navigator.pushReplacement(
+      Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
@@ -789,6 +792,7 @@ class ActiveUserListRadius extends StatelessWidget {
                     peerAvatar: mphotoUrl,
                     isFriend: true,
                     isAlreadyRequestSent: isAlreadyRequestSent,
+                    peerName: documentSnapshot['name'],
                   )));
     } else {
       Navigator.push(
@@ -1037,7 +1041,7 @@ class LoginUsersList extends StatelessWidget {
     }
     print('Friend Listttttt isFriend${documentSnapshot['photoUrl']}');
     if (isFriend) {
-      Navigator.pushReplacement(
+      Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
@@ -1046,7 +1050,8 @@ class LoginUsersList extends StatelessWidget {
                       peerId: friendId,
                       peerAvatar: documentSnapshot['photoUrl'],
                       isFriend: true,
-                      isAlreadyRequestSent: isAlreadyRequestSent
+                      isAlreadyRequestSent: isAlreadyRequestSent,
+                    peerName: documentSnapshot['name'],
                   )));
     } else {
       /*Navigator.push(

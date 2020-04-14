@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:io' as Io;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,22 +9,20 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_sound/flauto.dart';
 import 'package:flutter_sound/flutter_sound.dart';
-import 'package:virus_chat_app/SendInviteScreen.dart';
-import 'package:virus_chat_app/audiop/MyAudioRecorder.dart';
-import 'package:virus_chat_app/chat/AudioChatsss.dart';
-import 'package:virus_chat_app/utils/colors.dart';
-import 'package:virus_chat_app/utils/const.dart';
-import 'package:virus_chat_app/chat/fullPhoto.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart'
-    show getExternalStorageDirectory, getTemporaryDirectory;
-import 'dart:io' as Io;
 import 'package:http/http.dart' show get;
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart'
+    show getExternalStorageDirectory, getTemporaryDirectory;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:virus_chat_app/audiop/MyAudioRecorder.dart';
+import 'package:virus_chat_app/chat/fullPhoto.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 
 
 class Chat extends StatelessWidget {
@@ -32,9 +31,10 @@ class Chat extends StatelessWidget {
   final String currentUserId;
   final bool isFriend;
   bool isAlreadyRequestSent;
+  String peerName;
 
   Chat(
-      {Key key, @required this.currentUserId, @required this.peerId, @required this.peerAvatar, @required this.isFriend, @required this.isAlreadyRequestSent})
+      {Key key, @required this.currentUserId, @required this.peerId, @required this.peerAvatar, @required this.isFriend, @required this.isAlreadyRequestSent, @required this.peerName})
       : super(key: key) {
     print('ISSSSSSSSSSSSSSSSSSSSSSSSSSSSSS     ${this.isAlreadyRequestSent}');
   }
@@ -60,7 +60,8 @@ class Chat extends StatelessWidget {
           peerId: peerId,
           peerAvatar: peerAvatar,
           isFriend: isFriend,
-          isAlreadyRequestSent: isAlreadyRequestSent
+          isAlreadyRequestSent: isAlreadyRequestSent,
+          peerName: peerName
       ),
     );
   }
@@ -72,9 +73,10 @@ class ChatScreen extends StatefulWidget {
   final String currentUserId;
   final bool isFriend;
   bool isAlreadyRequestSent;
+  String peerName;
 
-  ChatScreen(
-      {Key key, @required this.currentUserId, @required this.peerId, @required this.peerAvatar, @required this.isFriend, @required this.isAlreadyRequestSent})
+  ChatScreen({Key key, @required this.currentUserId, @required this.peerId,
+    @required this.peerAvatar, @required this.isFriend, @required this.isAlreadyRequestSent, @required this.peerName})
       : super(key: key);
 
   @override
@@ -83,7 +85,8 @@ class ChatScreen extends StatefulWidget {
           peerId: peerId,
           peerAvatar: peerAvatar,
           isFriend: isFriend,
-          isAlreadyRequestSent: isAlreadyRequestSent);
+          isAlreadyRequestSent: isAlreadyRequestSent,
+          peerName: peerName);
 }
 
 abstract class audioListener {
@@ -92,7 +95,8 @@ abstract class audioListener {
 
 class ChatScreenState extends State<ChatScreen> implements audioListener {
   ChatScreenState(
-      {Key key, @required this.currentUserId, @required this.peerId, @required this.peerAvatar, @required this.isFriend, @required this.isAlreadyRequestSent});
+      {Key key, @required this.currentUserId, @required this.peerId, @required this.peerAvatar,
+        @required this.isFriend, @required this.isAlreadyRequestSent, @required this.peerName});
 
   String peerId;
   String peerAvatar;
@@ -101,6 +105,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   String friendUrl;
   bool isAlreadyRequestSent;
   String id;
+  String peerName;
 
   var listMessage;
   String groupChatId;
@@ -120,7 +125,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   String _friendToken = '';
   String currentUserName = '';
 
-  List<String> mUsersList ;
+  List<String> mUsersList = List<String>();
+  List<String> mUsersListName = List<String>();
 
   double sliderCurrentPosition = 0.0;
   double maxDuration = 1.0;
@@ -172,7 +178,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     _friendToken = await prefs.getString('FRIEND_USER_TOKEN');
     currentUserName = await prefs.getString('name');
     mUsersList = await prefs.getStringList('CHAT_USERS');
-
+    mUsersListName = await prefs.getStringList('CHAT_USERS_NAME');
     setState(() {});
   }
 
@@ -185,6 +191,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
         .toString();
     print('downloadUrl Filename $fileName');
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
+    File file =File(mAudioPath);
+    assert(file.existsSync());
     StorageUploadTask uploadTask = reference.putFile(File(mAudioPath));
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
     storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
@@ -270,6 +278,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           .document(groupChatId);
 */
 
+
       Firestore.instance.runTransaction((transaction) async {
         await transaction.set(
           documentReference,
@@ -289,29 +298,43 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
       listScrollController.animateTo(
           0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
-      sendAndRetrieveMessage();
       validate();
     } else {
       Fluttertoast.showToast(msg: 'Nothing to send');
     }
   }
 
-  void validate() {
+  void validate() async {
+    print('VALIDATE');
     bool isExistUser = false;
-    if(mUsersList != null && mUsersList.length != 0) {
+    if (mUsersList != null && mUsersList.length != 0) {
       for (int j = 0; j < mUsersList.length; j++) {
         print('CHAT USER PEERRRRRRRRRRRRRRRRRRRRRRRRRRRRR ${mUsersList[j]}');
         if (mUsersList[j] == peerId) {
           isExistUser = true;
+        } else {
+          mUsersList.add(peerId);
+          mUsersListName.add(peerName);
         }
       }
+    } else {
+      mUsersList = new List();
+      mUsersListName = new List();
+      mUsersList.add(peerId);
+      mUsersListName.add(peerName);
     }
     if (!isExistUser) {
+      print('CHAT USER isExistUser ${mUsersList.length}');
       Firestore.instance.collection('users').document(currentUserId).updateData(
           {
-            'chattingWith': peerId
+            'chattingWith': FieldValue.arrayUnion(mUsersList),
+            'chattingWithName': FieldValue.arrayUnion(mUsersListName)
           });
+    } else {
+      print('CHAT USER NOTTTTTTT isExistUser');
     }
+
+    await sendAndRetrieveMessage();
   }
 
 
@@ -323,7 +346,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   String _message = '';
 
   Future<Map<String, dynamic>> sendAndRetrieveMessage() async {
-    print('_friendToken_____________________________ $_friendToken');
+    print('_friendToken_____________________________chat $_friendToken');
     await firebaseMessaging.requestNotificationPermissions(
       const IosNotificationSettings(sound: true, badge: true, alert: true),
     );
@@ -996,6 +1019,9 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     );
   }
 
+
+  bool audioClicked = false;
+
   Widget buildInput() {
     return Container(
       child: Row(
@@ -1004,19 +1030,92 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             child: Listener(
               onPointerDown: (details) {
                 print('onPointerDown');
-                recorder.startRecorder();
+//                audioClicked = true;
               },
               onPointerUp: (details) {
                 print('onPointerUp');
-                recorder.stopRecorder();
               },
-              child: new Container(
-                margin: new EdgeInsets.symmetric(horizontal: 1.0),
-                child: new IconButton(
-                  icon: new Icon(Icons.record_voice_over),
-                  color: primaryColor,
+              child: GestureDetector(
+                onTap: (){
+                  print('CHAT SOUTTTTTTTTTTTTTTTTTTTTT');
+                  if(audioClicked) {
+                    setState(() {
+                      audioClicked = false;
+                    });
+                  }
+                  else {
+                    setState(() {
+                      audioClicked = true;
+                    });
+                  }
+                  },
+                child: Stack(
+                  children: <Widget>[
+                Center(child: new Container(
+                      margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                      child: audioClicked ? new IconButton(
+                        icon: new SvgPicture.asset(
+                          'images/voice_highlight.svg', height: 20.0,
+                          width: 20.0,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            audioClicked = false;
+                          });
+                          print('CHAT STOPRECORDER');
+                          recorder.stopRecorder();
+                        },
+                      ) : new IconButton(
+                        icon: new SvgPicture.asset(
+                          'images/voice.svg', height: 20.0,
+                          width: 20.0,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            audioClicked = true;
+                          });
+                          print('CHAT STARTRECORDER');
+                          recorder.startRecorder();
+                        },
+                      ),
+                    ),
                 ),
-              ),
+                    audioClicked ? Container(
+                        margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                        child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(themeColor)))
+                        : Center(child: new Container(
+                      margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                      child: audioClicked ? new IconButton(
+                        icon: new SvgPicture.asset(
+                          'images/voice_highlight.svg', height: 20.0,
+                          width: 20.0,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            audioClicked = false;
+                          });
+                          print('CHAT STOPRECORDER _____________');
+                          recorder.stopRecorder();
+                        },
+                      ) : new IconButton(
+                        icon: new SvgPicture.asset(
+                          'images/voice.svg', height: 20.0,
+                          width: 20.0,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            audioClicked = true;
+                          });
+                          print('CHAT STARTRECORDER___________________');
+                          recorder.startRecorder();
+                        },
+                      ),
+                    ),
+                    )
+                  ],
+                ),
+              )
             ),
             color: Colors.white,
           ),

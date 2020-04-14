@@ -74,6 +74,10 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
             onWillPop: (){
               onBackPress();
             },
+            child: new GestureDetector(
+            onTap: () {
+            FocusScope.of(context).requestFocus(new FocusNode());
+            },
             child: Column(
               children: <Widget>[
                 Align(
@@ -204,6 +208,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                 )
               ],
             ),)
+        )
     );
   }
 

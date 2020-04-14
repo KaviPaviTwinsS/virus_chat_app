@@ -203,7 +203,7 @@ class ProfilePageState extends State<ProfilePage> {
                         .of(context)
                         .size
                         .width,
-                    height: 550,
+                    height: 545,
                     decoration: BoxDecoration(
                         color: text_color,
                         borderRadius: new BorderRadius.only(
@@ -1012,6 +1012,7 @@ class ProfilePageState extends State<ProfilePage> {
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('phoneNo', profile['phoneNo']);
     await prefs.setString('signInType', signinType);
+    print('CHATTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT ${profile['chattingWith']}');
     await prefs.setStringList('CHAT_USERS', profile['chattingWith']);
   }
 

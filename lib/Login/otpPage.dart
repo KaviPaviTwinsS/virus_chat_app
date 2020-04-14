@@ -39,7 +39,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
   /// Decorate the outside of the Pin.
   PinDecoration _pinDecoration =
-  BoxLooseDecoration(strokeColor: Colors.grey, hintText: '333333');
+  BoxLooseDecoration(strokeColor: Colors.grey, hintText: '______');
 
   bool isCodeSent = false;
   String _verificationId;
