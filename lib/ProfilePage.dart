@@ -148,17 +148,14 @@ class ProfilePageState extends State<ProfilePage> {
                           .of(context)
                           .size
                           .width,
-                      height: MediaQuery
-                          .of(context)
-                          .size
-                          .height - 520,
+                      height:150,
                       child:
                       Row(
                         crossAxisAlignment: CrossAxisAlignment
                             .center,
                         children: <Widget>[
                           Container(
-                            margin: EdgeInsets.only(top: 30.0, bottom: 20.0),
+                            margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
                             child: new IconButton(
                                 icon: Icon(Icons.arrow_back_ios,
                                   color: white_color,),
@@ -168,7 +165,7 @@ class ProfilePageState extends State<ProfilePage> {
                           ),
                           new Container(
                               margin: EdgeInsets.only(
-                                  top: 30.0, right: 10.0, bottom: 20.0),
+                                  top: 20.0, right: 10.0, bottom: 40.0),
                               child: Text(profile_header, style: TextStyle(
                                   color: text_color,
                                   fontSize: 20.0,
@@ -179,7 +176,7 @@ class ProfilePageState extends State<ProfilePage> {
                             alignment: Alignment.topRight,
                             child: Container(
                               margin: EdgeInsets.only(
-                                  top: 40.0, bottom: 10.0, right: 10.0),
+                                  top: 40, bottom: 20.0, right: 10.0),
                               child: IconButton(
                                 icon: new SvgPicture.asset(
                                   'images/logout.svg', height: 20.0,
@@ -203,7 +200,10 @@ class ProfilePageState extends State<ProfilePage> {
                         .of(context)
                         .size
                         .width,
-                    height: 545,
+                    height:  MediaQuery
+                        .of(context)
+                        .size
+                        .height - 100,
                     decoration: BoxDecoration(
                         color: text_color,
                         borderRadius: new BorderRadius.only(

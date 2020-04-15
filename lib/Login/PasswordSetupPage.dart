@@ -52,6 +52,7 @@ class PasswordSetupState extends State<PasswordSetup>{
   Geoflutterfire geo = Geoflutterfire();
 
   String userToken ='';
+  bool passwordVisible = true;
 
   PasswordSetupState(String signinType, FirebaseUser firebaseUser, String accountId){
     _accountId = accountId;
@@ -127,13 +128,28 @@ class PasswordSetupState extends State<PasswordSetup>{
             margin: const EdgeInsets.only(
                 left: 20.0, top: 20.0, right: 20.0),
             child: TextField(
-              obscureText: true,
+              obscureText: passwordVisible,
               controller: passwordController,
               onChanged: (value) {
                 userPassword = value;
               },
               autofocus: true,
               decoration: new InputDecoration(
+                suffixIcon:  IconButton(
+                  icon: Icon(
+                    // Based on passwordVisible state choose the icon
+                    passwordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: Theme.of(context).primaryColorDark,
+                  ),
+                  onPressed: () {
+                    // Update the state i.e. toogle the state of passwordVisible variable
+                    setState(() {
+                      passwordVisible = !passwordVisible;
+                    });
+                  },
+                ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(
                       color: focused_border_color, width: 2.0),

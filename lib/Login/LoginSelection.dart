@@ -17,6 +17,7 @@ import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
+import 'package:virus_chat_app/utils/const.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 import '../ProfilePage.dart';
@@ -80,11 +81,16 @@ class LoginSelectionOption extends State<LoginSelection> {
   @override
   void initState() {
     super.initState();
+    initialise();
     _firebaseMessaging.getToken().then((token) =>
     {
       userToken = token,
       isGoogleSignedIn()
     });
+  }
+  void initialise() async{
+    prefs = await SharedPreferences.getInstance();
+    await prefs.setString(WALK_THROUGH, 'YES');
   }
 
   void isGoogleSignedIn() async {
@@ -92,6 +98,7 @@ class LoginSelectionOption extends State<LoginSelection> {
       isLoading = true;
     });
     prefs = await SharedPreferences.getInstance();
+    await prefs.setString(WALK_THROUGH, 'YES');
     await prefs.setString('PUSH_TOKEN', userToken);
     facebookSignup = new FacebookSignup();
     isLoggedIn = await googleSignIn.isSignedIn();

@@ -10,7 +10,7 @@ import 'package:virus_chat_app/FacebookSignup.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/ProfilePage.dart';
-import 'package:virus_chat_app/SplashScreen.dart';
+import 'package:virus_chat_app/splash/SplashScreen.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 
 //void main() => runApp(SplashScreenPage());

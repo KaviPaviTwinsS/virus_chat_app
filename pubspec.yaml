@@ -120,6 +120,15 @@ flutter:
       - images/online_inactive.svg
       - images/friend_request.svg
       - images/recent_chat.svg
+      - images/walkthrough_step1.svg
+      - images/walkthrough_step2.svg
+      - images/walkthrough_step3.svg
+      - images/splash_new.svg
+      - images/friend_accept.svg
+      - images/friend_decline.svg
+      - images/walkthrough_step1_new.png
+      - images/walkthrough_step2_new.png
+      - images/walkthrough_step3_new.png
 
   #   - images/a_dot_ham.jpeg
 

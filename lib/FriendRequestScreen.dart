@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
+import 'package:intl/intl.dart';
 
 class FriendRequestScreen extends StatelessWidget {
 
@@ -62,6 +65,9 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
   String _mcurrentUserId;
   String photoUrl;
 
+  SharedPreferences prefs;
+  String userSignInType = '';
+
   FriendRequestScreenPage(String currentUserId, String mphotoUrl) {
     _mcurrentUserId = currentUserId;
     photoUrl = mphotoUrl;
@@ -69,143 +75,91 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
 
   @override
   void initState() {
+    initialise();
     super.initState();
+  }
+
+
+  void initialise() async {
+    prefs = await SharedPreferences.getInstance();
+    userSignInType = await prefs.getString('signInType');
+    print('Friend Request userSignInType____ $userSignInType');
   }
 
   @override
   Widget build(BuildContext context) {
-    print('FRIEND REQUEST_______________________________________');
     return Scaffold(
-        appBar: AppBar(
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back_ios, color: white_color),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                      new UsersList('google', _mcurrentUserId, photoUrl)));
-            },
-          ),
-          title: Text('Friend Requests'),
-        ),
-        body: /*new StreamBuilder(
-            stream: Firestore.instance.collection('users').document(
-                _mcurrentUserId).collection('FriendsList').where(
-                'IsAcceptInvitation', isEqualTo: false).where(
-                'isRequestSent', isEqualTo: false).snapshots(),
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (!snapshot.hasData) {
-                print('Document FRIEND REQUEST HAS DATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-                */ /* return Center(
-                    child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(themeColor)));*/ /*
-                return Center(
-                  child: Text('No Pending Requests'),
-                );
-              }
-              else
-                return new ListView(
-                    scrollDirection: Axis.vertical,
-                    children: snapshot.data.documents.map((document) {
-                      print('Document FRIEND REQUEST ${document.documentID}');
-                      if (document.documentID != _mcurrentUserId) {
-                        return GestureDetector(
-                            onTap: () {
-                              print(
-                                  'ON TAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
-                              */ /*Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        Chat(
-                                          currentUserId: currentUserId,
-                                          peerId: document.documentID,
-                                          peerAvatar: document['photoUrl'],
-                                        )));*/ /*
-                            },
-                            child: new Row(
-                              crossAxisAlignment: CrossAxisAlignment
-                                  .center,
-                              mainAxisAlignment: MainAxisAlignment
-                                  .spaceEvenly,
-                              children: <Widget>[
-                                new Container(
-                                  margin: EdgeInsets.all(15.0),
-                                  child: Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Material(
-                                      child: CachedNetworkImage(
-                                        placeholder: (context, url) =>
-                                            Container(
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 1.0,
-                                                valueColor: AlwaysStoppedAnimation<
-                                                    Color>(themeColor),
-                                              ),
-                                              width: 55.0,
-                                              height: 55.0,
-                                              padding: EdgeInsets.all(10.0),
-                                            ),
-                                        imageUrl: document['friendPhotoUrl'],
-                                        width: 35.0,
-                                        height: 35.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(18.0),
-                                      ),
-                                      clipBehavior: Clip.hardEdge,
-                                    ),
-                                  ),
-                                ),
-                                new Container(
-                                  margin: EdgeInsets.all(15.0),
-                                  child: Text(
-                                      capitalize(document['friendName'])),
-                                ),
-                                */ /*  new Text('receiver ID :::::: ${document['receiveId']}',
-                                            textScaleFactor: 1.0),*/ /*
-                                Container(
-                                  margin: EdgeInsets.all(15.0),
-                                  child: RaisedButton(
-                                    child: Text('Accept Request'),
-                                    onPressed: () {
-                                      print(
-                                          'requestFrom ${document['requestFrom']} ___ ${document['receiveId']}');
-                                      Firestore.instance.collection(
-                                          'users').document(
-                                          document['requestFrom']).collection(
-                                          'FriendsList')
-                                          .document(document['receiveId'])
-                                          .updateData(
-                                          {'IsAcceptInvitation': true});
-                                      Firestore.instance.collection(
-                                          'users').document(
-                                          document['receiveId'])
-                                          .collection('FriendsList')
-                                          .document(
-                                          document['requestFrom'])
-                                          .updateData(
-                                          {'IsAcceptInvitation': true});
-                                      Fluttertoast.showToast(
-                                          msg: 'Invitation accepted');
-                                    },
-                                  ),
-                                )
-                              ],
-                            ));
-                      } else {
-                        return Center(
-                          child: Text('No Users'),
-                        );
-                      }
-                    }).toList()
-                );
-            }
-        )*/
-        friendlist(_mcurrentUserId)
+        body: Stack(
+          children: <Widget>[
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    color: facebook_color,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    height: 150,
+                    child:
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(top: 10.0, bottom: 35.0),
+                          child: new IconButton(
+                              icon: Icon(Icons.arrow_back,
+                                color: white_color,),
+                              onPressed: () {
+//                                Navigator.pop(context);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                        new UsersList(
+                                            userSignInType, _mcurrentUserId,
+                                            photoUrl)));
+                              }),
+                        ),
+                        new Container(
+                            margin: EdgeInsets.only(
+                                top: 10.0, right: 10.0, bottom: 35.0),
+                            child: Text(friend_request, style: TextStyle(
+                                color: text_color,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold),)
+                        ),
+                      ],
+                    ),
+                  ),
+                ]
+            ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Container(
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height - 100,
+                  decoration: BoxDecoration(
+                      color: text_color,
+                      borderRadius: new BorderRadius.only(
+                        topLeft: const Radius.circular(30.0),
+                        topRight: const Radius.circular(30.0),
+                      )
+                  ),
+                  child: Container(
+                      child: friendlist(_mcurrentUserId)
+                  )
+              ),
+            )
+          ],
+        )
     );
   }
 /*
@@ -243,26 +197,59 @@ class friendlist extends StatelessWidget {
                     child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(themeColor)));*/
             return Center(
-              child: Text('No Pending Requests'),
+              child: Text(pending_request),
             );
           } else {
             return (snapshot.data.documents.length == 0) ? Center(
-              child: Text('No Pending Requests'),
+              child: Text(pending_request),
             ) : new ListView(
                 scrollDirection: Axis.vertical,
                 children: snapshot.data.documents.map((document) {
                   if (document.documentID != currentUserId) {
+                    var date = new DateTime.fromMillisecondsSinceEpoch(
+                        int.parse(document['timestamp']));
+                    var currDate =  ((new DateTime.now()
+                        .toUtc()
+                        .microsecondsSinceEpoch) / 1000).toInt();
+                    var currTime =new DateTime.fromMillisecondsSinceEpoch(
+                        currDate);
+                    var differenceDays =currTime.difference(date).inDays;
+                    var differenceHours =currTime.difference(date).inHours;
+                    var differenceMins=currTime.difference(date).inMinutes;
+                    var differenceSecs=currTime.difference(date).inSeconds;
+                    String mDifference = '';
+                    if( differenceDays == 0){
+                      if(differenceHours == 0){
+                        if(differenceMins == 0){
+                          if(differenceSecs == 0){
+                          }else{
+                            mDifference = differenceSecs.toString() +'\t secs';
+                          }
+                        }else{
+                          mDifference = differenceMins.toString() +'\t mins';
+                        }
+                      }else{
+                        mDifference = differenceHours.toString() +'\t hours';
+                      }
+                    }else{
+                      if(differenceDays == 1){
+                        mDifference = differenceDays.toString() +'\t day';
+                      }else if(differenceDays == 30){
+                        differenceDays = 1;
+                      }else{
+                        mDifference = differenceDays.toString() +'\t days';
+                      }
+                    }
                     return GestureDetector(
-                        onTap: () {
-                        },
+                        onTap: () {},
                         child: new Row(
                           crossAxisAlignment: CrossAxisAlignment
                               .center,
                           mainAxisAlignment: MainAxisAlignment
-                              .spaceEvenly,
+                              .spaceBetween,
                           children: <Widget>[
                             new Container(
-                              margin: EdgeInsets.all(15.0),
+                              margin: EdgeInsets.only(top : 20.0,left: 10.0),
                               child: Align(
                                 alignment: Alignment.topLeft,
                                 child: Material(
@@ -270,65 +257,104 @@ class friendlist extends StatelessWidget {
                                     placeholder: (context, url) =>
                                         Container(
                                           child: CircularProgressIndicator(
-                                            strokeWidth: 1.0,
+                                            strokeWidth: 2.0,
                                             valueColor: AlwaysStoppedAnimation<
-                                                Color>(themeColor),
+                                                Color>(
+                                                themeColor),
                                           ),
-                                          width: 35.0,
-                                          height: 35.0,
-                                          padding: EdgeInsets.all(10.0),
+                                          width: 70.0,
+                                          height: 70.0,
+                                          padding: EdgeInsets.all(20.0),
                                         ),
                                     imageUrl: document['friendPhotoUrl'],
-                                    width: 35.0,
-                                    height: 35.0,
+                                    width: 70.0,
+                                    height: 70.0,
                                     fit: BoxFit.cover,
                                   ),
                                   borderRadius: BorderRadius.all(
-                                    Radius.circular(18.0),
-                                  ),
+                                      Radius.circular(45.0)),
                                   clipBehavior: Clip.hardEdge,
                                 ),
                               ),
                             ),
-                            new Container(
-                              margin: EdgeInsets.all(15.0),
-                              child: Text(
-                                  capitalize(document['friendName'])),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                new Container(
+                                  margin: EdgeInsets.only(left : 13.0,top : 20.0),
+                                  child: Text(
+                                    capitalize(document['friendName']),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold),),
+                                ),
+                                new Container(
+                                  margin: EdgeInsets.only(left : 10.0,top: 5.0),
+                                  child:Text('Requested '+mDifference+'\t ago'),
+                                )
+                              ],
                             ),
-                            /*  new Text('receiver ID :::::: ${document['receiveId']}',
-                                            textScaleFactor: 1.0),*/
+                            Spacer(),
                             Container(
-                              margin: EdgeInsets.all(15.0),
-                              child: RaisedButton(
-                                child: Text('Accept Request'),
-                                onPressed: () {
-                                  print(
-                                      'requestFrom ${document['requestFrom']} ___ ${document['receiveId']}');
-                                  Firestore.instance.collection(
-                                      'users').document(
-                                      document['requestFrom']).collection(
-                                      'FriendsList')
-                                      .document(document['receiveId'])
-                                      .updateData(
-                                      {'IsAcceptInvitation': true});
-                                  Firestore.instance.collection(
-                                      'users').document(
-                                      document['receiveId'])
-                                      .collection('FriendsList')
-                                      .document(
-                                      document['requestFrom'])
-                                      .updateData(
-                                      {'IsAcceptInvitation': true});
-                                  Fluttertoast.showToast(
-                                      msg: 'Invitation accepted');
-                                },
+                              height: 40.0,
+                              width: 40.0,
+                              margin: EdgeInsets.only(top : 20.0,right: 10.0),
+                              child: FloatingActionButton(
+                                backgroundColor: white_color,
+                                  child: new SvgPicture.asset(
+                                      'images/friend_decline.svg'
+                                  ),
+                                  onPressed: () {
+                                    Firestore.instance.collection(
+                                        'users').document(
+                                        document['requestFrom']).collection(
+                                        'FriendsList')
+                                        .document(document['receiveId'])
+                                        .delete();
+                                    Firestore.instance.collection(
+                                        'users').document(
+                                        document['receiveId'])
+                                        .collection('FriendsList')
+                                        .document(document['requestFrom'])
+                                        .delete();
+                                    Fluttertoast.showToast(
+                                        msg: request_Reject);
+                                  },
                               ),
+                            ),
+                            Container(
+                                height: 40.0,
+                                width: 40.0,
+                                margin: EdgeInsets.only(top : 20.0,right: 10.0),
+                                child: FloatingActionButton(
+                                  backgroundColor: white_color,
+                                  child: SvgPicture.asset(
+                                      'images/friend_accept.svg',),
+                                    onPressed: () {
+                                      Firestore.instance.collection(
+                                          'users').document(
+                                          document['requestFrom']).collection(
+                                          'FriendsList')
+                                          .document(document['receiveId'])
+                                          .updateData(
+                                          {'IsAcceptInvitation': true});
+                                      Firestore.instance.collection(
+                                          'users').document(
+                                          document['receiveId'])
+                                          .collection('FriendsList')
+                                          .document(
+                                          document['requestFrom'])
+                                          .updateData(
+                                          {'IsAcceptInvitation': true});
+                                      Fluttertoast.showToast(
+                                          msg: request_Accept);
+                                    },
+                                )
                             )
                           ],
                         ));
                   } else {
                     return Center(
-                      child: Text('No Pending Requests'),
+                      child: Text(pending_request),
                     );
                   }
                 }).toList()

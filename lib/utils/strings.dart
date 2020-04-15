@@ -24,8 +24,14 @@ String community = 'My Community';
 String send ='SEND';
 String done = 'DONE';
 String explore = 'Explore new ways to chat with people';
+String request_Accept = 'Invitation accepted';
+String request_Reject ='Invitation rejected';
+String pending_request ='No Pending Requests';
+String skip = 'Skip';
+//Header texts
 String profile_header = 'Profile setup';
 String recent_chats = 'Recent Chats';
+String friend_request = 'Friend Requests';
 
 
 String capitalize(String s) => s[0].toUpperCase() + s.substring(1);

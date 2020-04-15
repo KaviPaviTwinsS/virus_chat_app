@@ -1,0 +1,25 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" height="54" viewBox="0 0 54 54"
+    width="54" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter filterUnits="userSpaceOnUse" height="54" id="Oval" width="54" x="0" y="0">
+            <feOffset dy="1" input="SourceAlpha" />
+            <feGaussianBlur result="blur" stdDeviation="3" />
+            <feFlood flood-opacity="0.161" />
+            <feComposite in2="blur" operator="in" />
+            <feComposite in="SourceGraphic" />
+        </filter>
+    </defs>
+    <g id="fr_deline" transform="translate(-234 -4)">
+        <g filter="url(#Oval)" transform="matrix(1, 0, 0, 1, 234, 4)">
+            <circle cx="18" cy="18" data-name="Oval" fill="#fff" id="Oval-2" r="18"
+                transform="translate(9 8)" />
+        </g>
+        <g id="close" transform="translate(253 21.984)">
+            <g data-name="Group 311" id="Group_311" transform="translate(0 0.016)">
+                <path d="M9.763,8.016l5.983-5.983a.877.877,0,0,0,0-1.238L15.221.271a.877.877,0,0,0-1.238,0L8,6.254,2.018.271a.877.877,0,0,0-1.237,0L.256.8a.876.876,0,0,0,0,1.238L6.239,8.016.256,14a.878.878,0,0,0,0,1.238l.524.524a.877.877,0,0,0,1.237,0L8,9.778l5.983,5.983a.868.868,0,0,0,.619.255h0a.868.868,0,0,0,.619-.255l.524-.524a.878.878,0,0,0,0-1.238Z" data-name="Path 660"
+                    fill="#ea4335"
+                    id="Path_660" transform="translate(0 -0.016)" />
+            </g>
+        </g>
+    </g>
+</svg>

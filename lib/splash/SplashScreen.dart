@@ -11,6 +11,8 @@ import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:http/http.dart' as http;
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
+import 'package:virus_chat_app/splash/WalkThroughOne.dart';
+import 'package:virus_chat_app/utils/const.dart';
 
 class SplashScreenPage extends StatefulWidget {
   @override
@@ -26,6 +28,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
   String userToken ='';
   var user ='';
   var userUrl ='';
+  String walkThrough = '';
 
   _register() {
     _firebaseMessaging.getToken().then((token) => {print( 'token FCMMMMMMM   ___ $token'),
@@ -176,7 +179,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
     await preferences.setString('PUSH_TOKEN', userToken);
     user = await preferences.getString('userId');
     userUrl = await preferences.getString('photoUrl');
-
+    walkThrough = await preferences.getString(WALK_THROUGH);
     startTime();
 //    sendAndRetrieveMessage();
 //    getMessage();
@@ -198,11 +201,19 @@ class _SplashScreenState extends State<SplashScreenPage> {
   }
 
   void isGoogleSignedIn() async {
+    print('NANDHU SPLASH $walkThrough ___user $user');
     if(user == null || user == ''){
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => new LoginSelectionPage()));
+      if(walkThrough != '' && walkThrough != null) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => new LoginSelectionPage()));
+      }else {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => new WalkThroughOne()));
+      }
     }else {
       String signType = await preferences.getString('signInType');
       if (signType == 'google') {
@@ -242,7 +253,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
     return new Scaffold(
       body: new Center(
         child :  new SvgPicture.asset(
-          'images/splash.svg',
+          'images/splash_new.svg',
           fit: BoxFit.cover,
         ),
       ),

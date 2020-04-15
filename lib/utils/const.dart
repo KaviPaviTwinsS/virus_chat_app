@@ -8,3 +8,5 @@ final greyColor2 = Color(0xffE8E8E8);
 */
 
 
+String WALK_THROUGH = 'walk_throuch';
+
