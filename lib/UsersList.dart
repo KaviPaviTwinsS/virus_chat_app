@@ -107,6 +107,12 @@ class UsersListState extends State<UsersListPage>
   Future initialise() async {
     prefs = await SharedPreferences.getInstance();
     currentUserName = await prefs.getString('name');
+    if(userSignInType == ''){
+      userSignInType = await prefs.getString('signInType');
+    }
+    if(currentUserPhotoUrl == ''){
+      currentUserPhotoUrl = await prefs.getString('photoUrl');
+    }
     print('USERLIST name_____ $currentUserName');
     LocationService(currentUser).locationStream;
     /*for(int i=5;i<250;i+5){
@@ -182,220 +188,229 @@ class UsersListState extends State<UsersListPage>
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _curIndex, // this will be set when a new tab is tapped
-          onTap: (index) {
-            setState(() {
-              print('CURENT IDEX____ $index');
-              _curIndex = index;
-              switch (_curIndex) {
-                case 0:
-//                  contents = "Home";
-                  setState(() {
-                    print('CICKEDDDDDDDDDDDDDDDDDDDDD');
-                    homeClicked = true;
-                  });
-                  break;
-                case 1:
-//                  contents = "Articles";
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              NewTweetPost(currentUser, currentUserPhotoUrl)));
-                  break;
-                case 2:
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              MakeTweetPost(currentUser, currentUserPhotoUrl)));
-//                  contents = "User";
-                  break;
-              }
-            });
-          },
-          items: [
-            BottomNavigationBarItem(
-              icon: new IconButton(
-                icon: new SvgPicture.asset(
-                  homeClicked ? 'images/home_highlight.svg' : 'images/home.svg',
-                  height: 15.0,
-                  width: 15.0,
-                ), onPressed: () {},
-              ),
-              title: new Text(''),
-            ),
-            BottomNavigationBarItem(
-              icon: new IconButton(
-                icon: new SvgPicture.asset(
-                  'images/post.svg', height: 30.0,
-                  width: 30.0,
-                ), onPressed: () {
-
-              },
-              ),
-              title: new Text(''),
-            ),
-            BottomNavigationBarItem(
-                icon: new IconButton(
-                  icon: new SvgPicture.asset(
-                    'images/community.svg', height: 30.0,
-                    width: 30.0,
+        bottomNavigationBar: SizedBox(
+          height: 70,
+          child: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            currentIndex: _curIndex,
+            // this will be set when a new tab is tapped
+            onTap: (index) {
+              setState(() {
+                print('CURENT IDEX____ $index');
+                _curIndex = index;
+                switch (_curIndex) {
+                  case 0:
+                    setState(() {
+                      homeClicked = true;
+                    });
+                    break;
+                  case 1:
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                NewTweetPost(
+                                    currentUser, currentUserPhotoUrl)));
+                    break;
+                  case 2:
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                MakeTweetPost(
+                                    currentUser, currentUserPhotoUrl)));
+                    break;
+                }
+              });
+            },
+            items: [
+              BottomNavigationBarItem(
+                icon: homeClicked ? Container(
+                  margin: EdgeInsets.only(top: 15.0),
+                  child: new SvgPicture.asset(
+                    'images/home_highlight.svg',
+                    height: 20.0,
+                    width: 20.0,
                   ),
-                  onPressed: () {
-
-                  },
+                ) : Container(
+                  margin: EdgeInsets.only(top: 15.0),
+                  child: new SvgPicture.asset(
+                    'images/home.svg',
+                    height: 20.0,
+                    width: 20.0,
+                  ),
                 ),
-                title: Text('')
-            ),
-          ],
+                title: new Text(''),
+              ),
+              BottomNavigationBarItem(
+                icon: Container(
+                  margin: EdgeInsets.only(top: 15.0),
+                  child: new SvgPicture.asset(
+                    'images/post.svg', height: 20.0,
+                    width: 20.0,
+                  ),
+                ),
+                title: new Text(''),
+              ),
+              BottomNavigationBarItem(
+                  icon: Container(
+                    margin: EdgeInsets.only(top: 15.0),
+                    child: new SvgPicture.asset(
+                      'images/community.svg', height: 20.0,
+                      width: 20.0,
+                    ),
+                  ),
+                  title: Text('')
+              ),
+
+            ],
+          ),
         ),
         body: WillPopScope(
-            child: Stack(
-              children: <Widget>[
-                SingleChildScrollView(
-                  child: Container(
-                      color: facebook_color,
-                      height: MediaQuery
-                          .of(context)
-                          .size
-                          .height - 360,
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                          new ProfilePage(
-                                            userSignInType,
-                                            currentUserId: currentUser,)));
-                                },
-                                child: new Container(
-                                  margin: EdgeInsets.only(
-                                      left: 15.0, top: 30.0, right: 10.0),
-                                  child: Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Material(
-                                      child: CachedNetworkImage(
-                                        placeholder: (context, url) =>
-                                            Container(
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 1.0,
-                                                valueColor: AlwaysStoppedAnimation<
-                                                    Color>(themeColor),
-                                              ),
-                                              width: 35.0,
-                                              height: 35.0,
-                                              padding: EdgeInsets.all(10.0),
+          child: Stack(
+            children: <Widget>[
+              SingleChildScrollView(
+                child: Container(
+                    color: facebook_color,
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height - 360,
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                        new ProfilePage(
+                                          userSignInType,
+                                          currentUserId: currentUser,)));
+                              },
+                              child: new Container(
+                                margin: EdgeInsets.only(
+                                    left: 15.0, top: 30.0, right: 10.0),
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Material(
+                                    child: CachedNetworkImage(
+                                      placeholder: (context, url) =>
+                                          Container(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 1.0,
+                                              valueColor: AlwaysStoppedAnimation<
+                                                  Color>(themeColor),
                                             ),
-                                        imageUrl: currentUserPhotoUrl,
-                                        width: 35.0,
-                                        height: 35.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(18.0),
-                                      ),
-                                      clipBehavior: Clip.hardEdge,
+                                            width: 35.0,
+                                            height: 35.0,
+                                            padding: EdgeInsets.all(10.0),
+                                          ),
+                                      imageUrl: currentUserPhotoUrl,
+                                      width: 35.0,
+                                      height: 35.0,
+                                      fit: BoxFit.cover,
                                     ),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(18.0),
+                                    ),
+                                    clipBehavior: Clip.hardEdge,
                                   ),
                                 ),
                               ),
+                            ),
 
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: 40.0, right: 10.0),
-                                child: Text(
-                                  currentUserName, style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: text_color),
+                            Container(
+                              margin: EdgeInsets.only(
+                                  top: 40.0, right: 10.0),
+                              child: Text(
+                                currentUserName, style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: text_color),
+                              ),
+                            ),
+                            Spacer(),
+                            Container(
+                              margin: EdgeInsets.only(
+                                  top: 20.0, left: 10.0),
+                              child: Align(
+                                alignment: Alignment.topRight,
+                                child: IconButton(
+                                  icon: new SvgPicture.asset(
+                                    'images/recent_chat.svg', height: 20.0,
+                                    width: 20.0,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                RecentChatsScreen(
+                                                    currentUser,
+                                                    currentUserPhotoUrl)));
+                                  },
                                 ),
                               ),
-                              Spacer(),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: 20.0, left: 10.0),
-                                child: Align(
-                                  alignment: Alignment.topRight,
-                                  child : IconButton(
-                                    icon: new SvgPicture.asset(
-                                      'images/recent_chat.svg', height: 20.0,
-                                      width: 20.0,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  RecentChatsScreen(
-                                                      currentUser,
-                                                      currentUserPhotoUrl)));
-                                    },
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(
+                                  top: 20.0, right: 15.0),
+                              child: Align(
+                                alignment: Alignment.topRight,
+                                child: IconButton(
+                                  icon: new SvgPicture.asset(
+                                    'images/friend_request.svg', height: 20.0,
+                                    width: 20.0,
                                   ),
+                                  onPressed: () {
+                                    print('USER LIST getFriendList');
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                FriendRequestScreen(
+                                                    currentUser,
+                                                    currentUserPhotoUrl)));
+                                  },
                                 ),
                               ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: 20.0, right: 15.0),
-                                child: Align(
-                                  alignment: Alignment.topRight,
-                                  child: IconButton(
-                                    icon: new SvgPicture.asset(
-                                      'images/friend_request.svg', height: 20.0,
-                                      width: 20.0,
-                                    ),
-                                    onPressed: () {
-                                      print('USER LIST getFriendList');
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  FriendRequestScreen(
-                                                      currentUser,
-                                                      currentUserPhotoUrl)));
-                                    },
-                                  ),
+                            )
+                          ],
+                        ),
+                        Column(
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(top: 5.0),
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: new SvgPicture.asset(
+                                  'images/home_chat.svg',
+                                  width: 90.0,
+                                  height: 90.0,
                                 ),
-                              )
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Container(
-                                margin: EdgeInsets.only(top: 5.0),
-                                child: Align(
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(
+                                  top: 10.0),
+                              child: Align(
                                   alignment: Alignment.topCenter,
-                                  child: new SvgPicture.asset(
-                                    'images/home_chat.svg',
-                                    width: 90.0,
-                                    height: 90.0,
-                                  ),
-                                ),
+                                  child: Text(
+                                    'Chat with people', style: TextStyle(
+                                      color: text_color),)
                               ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: 10.0),
-                                child: Align(
-                                    alignment: Alignment.topCenter,
-                                    child: Text(
-                                      'Chat with people', style: TextStyle(
-                                        color: text_color),)
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: 5.0, left: 10.0, right: 10.0),
-                                child: UsersOnlinePage(
-                                    currentUser, currentUserPhotoUrl, this),
-                              )
-                              /*Container(
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(
+                                  top: 5.0, left: 10.0, right: 10.0),
+                              child: UsersOnlinePage(
+                                  currentUser, currentUserPhotoUrl, this),
+                            )
+                            /*Container(
                               margin: EdgeInsets.only(right: 50.0),
                               child:Align(
                               alignment: Alignment.bottomRight,
@@ -423,64 +438,64 @@ class UsersListState extends State<UsersListPage>
                               ),
                             )
                             )*/
-                            ],
+                          ],
+                        ),
+
+                      ],
+                    )
+                ),
+              ),
+
+              Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      height: 320,
+                      decoration: BoxDecoration(
+                          color: text_color,
+                          borderRadius: new BorderRadius.only(
+                            topLeft: const Radius.circular(30.0),
+                            topRight: const Radius.circular(30.0),
+                          )
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Container(
+                                margin: EdgeInsets.only(left: 20.0,
+                                    top: 10.0),
+                                child: Text('People', style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 19.0),)
+                            ),
                           ),
+                          new LoginUsersList(
+                              currentUser, currentUserPhotoUrl),
+                          Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Container(
+                                margin: EdgeInsets.only(left: 20.0,
+                                    top: 10.0),
+                                child: Text('Active', style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 19.0),)
+                            ),
+                          ),
+                          new ActiveUserListRadius(
+                              currentUser, currentUserPhotoUrl, _msliderData)
 
                         ],
                       )
-                  ),
-                ),
-
-                Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Container(
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width,
-                        height: 320,
-                        decoration: BoxDecoration(
-                            color: text_color,
-                            borderRadius: new BorderRadius.only(
-                              topLeft: const Radius.circular(30.0),
-                              topRight: const Radius.circular(30.0),
-                            )
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Container(
-                                  margin: EdgeInsets.only(left: 20.0,
-                                      top: 10.0),
-                                  child: Text('People', style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 19.0),)
-                              ),
-                            ),
-                            new LoginUsersList(
-                                currentUser, currentUserPhotoUrl),
-                            Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Container(
-                                  margin: EdgeInsets.only(left: 20.0,
-                                      top: 10.0),
-                                  child: Text('Active', style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 19.0),)
-                              ),
-                            ),
-                            new ActiveUserListRadius(
-                                currentUser, currentUserPhotoUrl, _msliderData)
-
-                          ],
-                        )
-                    )
-                ),
-              ],
-            ),    onWillPop: (){
+                  )
+              ),
+            ],
+          ), onWillPop: () {
           onBackPress();
         },)
     );
@@ -798,7 +813,8 @@ class ActiveUserListRadius extends StatelessWidget {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) =>
           SendInviteToUser(
-              friendId, currentUserId, documentSnapshot['photoUrl'], isAlreadyRequestSent,
+              friendId, currentUserId, documentSnapshot['photoUrl'],
+              isAlreadyRequestSent,
               isRequestSent, documentSnapshot['name'])));
       /*   Navigator.push(
           context,
@@ -941,16 +957,19 @@ class LoginUsersList extends StatelessWidget {
                                       )),
                                   document['status'] == 'ACTIVE' ? Container(
                                       child: new SvgPicture.asset(
-                                        'images/online_active.svg', height: 10.0,
+                                        'images/online_active.svg',
+                                        height: 10.0,
                                         width: 10.0,
 //                                          color: primaryColor,
                                       ),
                                       margin: EdgeInsets.only(left: 80.0,
                                           bottom: 30.0,
                                           top: 20.0,
-                                          right: 5.0)) : document['status'] == 'LoggedOut' ? Container(
+                                          right: 5.0)) : document['status'] ==
+                                      'LoggedOut' ? Container(
                                     child: new SvgPicture.asset(
-                                      'images/online_inactive.svg', height: 10.0,
+                                      'images/online_inactive.svg',
+                                      height: 10.0,
                                       width: 10.0,
 //                                        color: primaryColor,
                                     ),
@@ -958,7 +977,7 @@ class LoginUsersList extends StatelessWidget {
                                         bottom: 30.0,
                                         top: 20.0,
                                         right: 5.0),
-                                  ) :  Container(
+                                  ) : Container(
                                     child: new SvgPicture.asset(
                                       'images/online_idle.svg', height: 10.0,
                                       width: 10.0,
@@ -1046,11 +1065,11 @@ class LoginUsersList extends StatelessWidget {
           MaterialPageRoute(
               builder: (context) =>
                   Chat(
-                      currentUserId: currentUserId,
-                      peerId: friendId,
-                      peerAvatar: documentSnapshot['photoUrl'],
-                      isFriend: true,
-                      isAlreadyRequestSent: isAlreadyRequestSent,
+                    currentUserId: currentUserId,
+                    peerId: friendId,
+                    peerAvatar: documentSnapshot['photoUrl'],
+                    isFriend: true,
+                    isAlreadyRequestSent: isAlreadyRequestSent,
                     peerName: documentSnapshot['name'],
                   )));
     } else {

@@ -63,7 +63,6 @@ class NewTweetPostState extends State<NewTweetPost> {
   String tappedCategoryName = '';
   String tappedCategoryImage = '';
 
-  bool isSelectedCategory = false;
   List<CategorySelection> mCategorySelect = new List<CategorySelection>();
 
   NewTweetPostState(String _mCurrentId, String _mCurrentPhotoUrl) {

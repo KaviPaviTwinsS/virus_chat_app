@@ -28,6 +28,7 @@ String request_Accept = 'Invitation accepted';
 String request_Reject ='Invitation rejected';
 String pending_request ='No Pending Requests';
 String skip = 'Skip';
+String chat_hint = 'Type here....';
 //Header texts
 String profile_header = 'Profile setup';
 String recent_chats = 'Recent Chats';

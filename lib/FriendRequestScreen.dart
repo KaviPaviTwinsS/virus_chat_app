@@ -109,7 +109,7 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                         Container(
                           margin: EdgeInsets.only(top: 10.0, bottom: 35.0),
                           child: new IconButton(
-                              icon: Icon(Icons.arrow_back,
+                              icon: Icon(Icons.arrow_back_ios,
                                 color: white_color,),
                               onPressed: () {
 //                                Navigator.pop(context);

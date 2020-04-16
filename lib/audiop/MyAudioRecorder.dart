@@ -129,11 +129,11 @@ class MyAudioRecorder {
       });*/
     } catch (err) {
       print('startRecorder error: $err');
-      stopRecorder();
+     /* stopRecorder();
       if (_recorderSubscription != null) {
         _recorderSubscription.cancel();
         _recorderSubscription = null;
-      }
+      }*/
       /*  setState(() {
         stopRecorder();
         this._isRecording = false;

@@ -46,7 +46,7 @@ class LocationService {
           // If granted listen to the onLocationChanged stream and emit over our controller
           locationSubcription = location.onLocationChanged().listen((locationData) {
             if (locationData != null && !locationController.isClosed) {
-              print('LocationService  locationData ______ $currentUser');
+//              print('LocationService  locationData ______ $currentUser');
               locationController.add(UserLocation(
                 latitude: locationData.latitude,
                 longitude: locationData.longitude,
@@ -65,7 +65,7 @@ class LocationService {
                 }
               }
             }else{
-              print('LocationService  locationDataNULL ______ $currentUser');
+//              print('LocationService  locationDataNULL ______ $currentUser');
               /*    Firestore.instance
                   .collection('users')
                   .document(currentUserId)
@@ -104,7 +104,7 @@ class LocationService {
   }
 
   void updateLocation(LocationData locationData) async {
-    print('NAN updateLocation $currentUserId  ___ ${locationData}');
+//    print('NAN updateLocation $currentUserId  ___ ${locationData}');
 //    GeoFirePoint point = geo.point(
 //        latitude: locationData.latitude, longitude: locationData.longitude);
    /* databaseReference.collection('users').document(currentUserId).updateData({
