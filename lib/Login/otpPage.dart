@@ -43,6 +43,8 @@ class _OTPScreenState extends State<OTPScreen> {
 
   bool isCodeSent = false;
   String _verificationId;
+  bool isLoading = false;
+
 
   @override
   void initState() {
@@ -61,114 +63,136 @@ class _OTPScreenState extends State<OTPScreen> {
     print("mobiel ${widget.mobileNumber}");
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Align(
-                alignment: Alignment.topLeft,
-                child: Container(
-                  margin: const EdgeInsets.only(
-                      left: 5.0, top: 40.0, right: 20.0),
-                  child: new IconButton(
-                    icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (
-                                  context) => new PhoneNumberSelectionPage()));
-                    },
-                  ),
-                )
-            ),
-            Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                margin: const EdgeInsets.only(
-                    left: 20.0, top: 30.0, right: 20.0),
-                child: Text(verify_phone,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
-                ),
-              ),
-            ),
-            Container(
-                margin: const EdgeInsets.only(
-                    left: 20.0, top: 30.0, right: 20.0),
-                child: customTextSpan(
-                    otp_page, widget.mobileNumber)
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: PinInputTextField(
-                pinLength: 6,
-                decoration: _pinDecoration,
-                controller: _pinEditingController,
-                autoFocus: true,
-                textInputAction: TextInputAction.done,
-                onSubmit: (pin) {
-                  if (pin.length == 6) {
-                    _onFormSubmitted();
-                  } else {
-                    showToast("Invalid OTP", Colors.red);
-                  }
-                },
-              ),
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+      body: Stack(
+        children: <Widget>[
+          SingleChildScrollView(
+            child: Column(
               children: <Widget>[
-              Container(
-                    margin: const EdgeInsets.only(
-                        left: 20.0, top: 10.0, right: 10.0),
-                    child: Text(resend_otp),
-                  ),
-                new GestureDetector(
+                Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                          left: 5.0, top: 40.0, right: 20.0),
+                      child: new IconButton(
+                        icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (
+                                      context) => new PhoneNumberSelectionPage()));
+                        },
+                      ),
+                    )
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
                   child: Container(
                     margin: const EdgeInsets.only(
-                        top: 10.0, right: 10.0),
-                    child: Text(resend_code, style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Colors.blue,)
+                        left: 20.0, top: 30.0, right: 20.0),
+                    child: Text(verify_phone,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
                     ),
                   ),
-                  onTap: () {
-                    _onVerifyCode();
-                  },
                 ),
-              ],
-            ),
-
-          Container(
-                margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
-                padding: EdgeInsets.all(30.0),
-                width: double.infinity,
-                child: SizedBox(
-                  height: 45, // specific value
-                  child: RaisedButton(
-                    onPressed: () {
-                      if (_pinEditingController.text.length == 6) {
+                Container(
+                    margin: const EdgeInsets.only(
+                        left: 20.0, top: 30.0, right: 20.0),
+                    child: customTextSpan(
+                        otp_page, widget.mobileNumber)
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: PinInputTextField(
+                    pinLength: 6,
+                    decoration: _pinDecoration,
+                    controller: _pinEditingController,
+                    autoFocus: true,
+                    textInputAction: TextInputAction.done,
+                    onSubmit: (pin) {
+                      if (pin.length == 6) {
                         _onFormSubmitted();
                       } else {
                         showToast("Invalid OTP", Colors.red);
                       }
                     },
-                    color: facebook_color,
-                    textColor: text_color,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(18.0),
-                    ),
-                    child: Text(btn_otp_verify,
-                      style: TextStyle(fontSize: 17),),
                   ),
                 ),
-            )
-          ],
-        ),
-      ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.only(
+                          left: 20.0, top: 10.0, right: 10.0),
+                      child: Text(resend_otp),
+                    ),
+                    new GestureDetector(
+                      child: Container(
+                        margin: const EdgeInsets.only(
+                            top: 10.0, right: 10.0),
+                        child: Text(resend_code, style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Colors.blue,)
+                        ),
+                      ),
+                      onTap: () {
+                        _onVerifyCode();
+                      },
+                    ),
+                  ],
+                ),
+
+                Container(
+                  margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
+                  padding: EdgeInsets.all(30.0),
+                  width: double.infinity,
+                  child: SizedBox(
+                    height: 45, // specific value
+                    child: RaisedButton(
+                      onPressed: () {
+                        if (_pinEditingController.text.length == 6) {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          _onFormSubmitted();
+                        } else {
+                          showToast("Invalid OTP", Colors.red);
+                        }
+                      },
+                      color: facebook_color,
+                      textColor: text_color,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(20.0),
+                      ),
+                      child: Text(btn_otp_verify,
+                        style: TextStyle(fontSize: 17),),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          buildLoading(),
+        ],
+      )
     );
   }
 
+
+  Widget buildLoading() {
+    return Positioned(
+      child: isLoading
+          ? Container(
+        child: Center(
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+        ),
+        color: Colors.white.withOpacity(0.8),
+      )
+          : Container(),
+    );
+  }
 
   void showToast(message, Color color) {
     print(message);
@@ -286,6 +310,9 @@ class _OTPScreenState extends State<OTPScreen> {
               new ProfilePage(
                   'MobileNumber', currentUserId:firebaseUser.uid)));*/
     } else {
+      setState(() {
+        isLoading = false;
+      });
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -313,6 +340,9 @@ class _OTPScreenState extends State<OTPScreen> {
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('phoneNo', documents[0]['phoneNo']);
     await prefs.setString('signInType', signInType);
+    setState(() {
+      isLoading = false;
+    });
     Navigator.push(
         context,
         MaterialPageRoute(

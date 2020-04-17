@@ -204,12 +204,12 @@ class _SplashScreenState extends State<SplashScreenPage> {
     print('NANDHU SPLASH $walkThrough ___user $user');
     if(user == null || user == ''){
       if(walkThrough != '' && walkThrough != null) {
-        Navigator.push(
+        Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => new LoginSelectionPage()));
+                builder: (context) => new LoginSelection()));
       }else {
-        Navigator.push(
+        Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (context) => new WalkThroughOne()));
@@ -241,7 +241,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
     print('SPLASHHHHHHHHHHHHHHHHHH _____$user _____$userUrl');
     UserLocation currentLocation = await LocationService(user,).getLocation();
 
-    Navigator.push(
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => UsersList(signinType,user,userUrl)));

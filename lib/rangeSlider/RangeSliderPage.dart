@@ -18,7 +18,7 @@ class RangeSliderSample extends StatefulWidget {
 class _RangeSliderSampleState extends State<RangeSliderSample> {
 
   double _lowerValue = 0.0;
-  double _upperValue = 10.0;
+  double _upperValue = 100.0;
   SliderListener sliderListener;
 
 
@@ -29,7 +29,7 @@ class _RangeSliderSampleState extends State<RangeSliderSample> {
   @override
   void initState() {
     super.initState();
-    sliderListener.SliderChangeListener(_upperValue);
+//    sliderListener.SliderChangeListener(_upperValue);
   }
 
   @override
@@ -38,12 +38,12 @@ class _RangeSliderSampleState extends State<RangeSliderSample> {
               children: <Widget>[
                 frs.RangeSlider(
                   min: 0.0,
-                  max: 100.0,
+                  max: 1000.0,
                   lowerValue: _lowerValue,
                   upperValue: _upperValue,
                   divisions: 10,
                   showValueIndicator: true,
-                  valueIndicatorMaxDecimals: 1,
+                  valueIndicatorMaxDecimals: 4,
                   onChanged: (double newLowerValue, double newUpperValue) {
                     setState(() {
                       _lowerValue = newLowerValue;

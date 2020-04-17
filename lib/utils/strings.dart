@@ -27,7 +27,7 @@ String explore = 'Explore new ways to chat with people';
 String request_Accept = 'Invitation accepted';
 String request_Reject ='Invitation rejected';
 String pending_request ='No Pending Requests';
-String skip = 'Skip';
+String skip = 'Next';
 String chat_hint = 'Type here....';
 //Header texts
 String profile_header = 'Profile setup';

@@ -25,7 +25,9 @@ import '../ProfilePage.dart';
 class LoginSelectionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return WillPopScope(
+        onWillPop: () async => Future.value(false),
+    child: MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -41,6 +43,7 @@ class LoginSelectionPage extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: LoginSelection(),
+    ),
     );
   }
 }
@@ -88,7 +91,8 @@ class LoginSelectionOption extends State<LoginSelection> {
       isGoogleSignedIn()
     });
   }
-  void initialise() async{
+
+  void initialise() async {
     prefs = await SharedPreferences.getInstance();
     await prefs.setString(WALK_THROUGH, 'YES');
   }
@@ -188,145 +192,157 @@ class LoginSelectionOption extends State<LoginSelection> {
     await clearLocalData(prefs);
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        resizeToAvoidBottomPadding: false,
-        body: Container(
-          child: Column(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(top: 40.0, left: 20.0, right: 20.0),
-                child: Text(explore, style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 29.0)),
-              ),
-              new SvgPicture.asset(
-                'images/image.svg',
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height - 290,
-              ),
-              /*  new Image.asset(
+    return
+      new WillPopScope(
+          onWillPop: () async => false,
+          child: Scaffold(
+              resizeToAvoidBottomPadding: false,
+              body: Container(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(
+                          top: 40.0, left: 20.0, right: 20.0),
+                      child: Text(explore, style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 29.0)),
+                    ),
+                    new SvgPicture.asset(
+                      'images/image.svg',
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      height: MediaQuery
+                          .of(context)
+                          .size
+                          .height - 290,
+                    ),
+                    /*  new Image.asset(
             'images/image.svg',
             fit: BoxFit.fitWidth,
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height - 170,
           ),*/
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
-                  height: 170,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
                         width: MediaQuery
                             .of(context)
                             .size
                             .width,
-                        margin: EdgeInsets.only(left: 20.0, right: 20.0),
-                        child : RaisedButton.icon(
-                          icon: new SvgPicture.asset(
-                            'images/phone.svg',
-                            width: 20.0,
-                            height: 20.0,
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) {
-                                      return PhoneNumberSelectionPage();
-                                    }
-                                ));
-                          },
-                          label: Text('Continue with phone number'),
-                          color: white_color,
-                        ),
-                ),
-                      Container(
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width,
-                        margin: EdgeInsets.only(left: 20.0, right: 20.0,bottom: 10.0,top: 10.0),
-                        child: Text('Or connect using social account'),
-                      ),
-                      Container(
-                          width: MediaQuery
-                              .of(context)
-                              .size
-                              .width,
-                          margin: EdgeInsets.only(left: 20.0, right: 20.0),
-                          child:
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Container(
-                                width: ((MediaQuery
+                        height: 170,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width,
+                              margin: EdgeInsets.only(left: 20.0, right: 20.0),
+                              child: RaisedButton.icon(
+                                icon: new SvgPicture.asset(
+                                  'images/phone.svg',
+                                  width: 20.0,
+                                  height: 20.0,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) {
+                                            return PhoneNumberSelectionPage();
+                                          }
+                                      ));
+                                },
+                                label: Text('Continue with phone number'),
+                                color: white_color,
+                              ),
+                            ),
+                            Container(
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width,
+                              margin: EdgeInsets.only(left: 20.0,
+                                  right: 20.0,
+                                  bottom: 10.0,
+                                  top: 10.0),
+                              child: Text('Or connect using social account'),
+                            ),
+                            Container(
+                                width: MediaQuery
                                     .of(context)
                                     .size
-                                    .width) / 2) - 30,
-                                height: 40.0,
-                                child: RaisedButton.icon(
-                                  icon: new SvgPicture.asset(
-                                    'images/gmail.svg',
-                                    width: 20.0,
-                                    height: 20.0,
-                                  ),
-                                  onPressed: () {
-                                    HandleGoogleSignIn();
+                                    .width,
+                                margin: EdgeInsets.only(
+                                    left: 20.0, right: 20.0),
+                                child:
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .spaceBetween,
+                                  children: <Widget>[
+                                    Container(
+                                      width: ((MediaQuery
+                                          .of(context)
+                                          .size
+                                          .width) / 2) - 30,
+                                      height: 40.0,
+                                      child: RaisedButton.icon(
+                                        icon: new SvgPicture.asset(
+                                          'images/gmail.svg',
+                                          width: 20.0,
+                                          height: 20.0,
+                                        ),
+                                        onPressed: () {
+                                          HandleGoogleSignIn();
 //                  _settingModalBottomSheet(context);
-                                  },
-                                  label: Text('Google'),
-                                  color: white_color,
-                                ),
-                              ),
-                              Container(
-                                  height: 40.0,
-                                  width: ((MediaQuery
-                                      .of(context)
-                                      .size
-                                      .width) / 2) - 30,
-                                  child: RaisedButton.icon(
-                                    icon: new SvgPicture.asset(
-                                      'images/fb.svg',
-                                      width: 20.0,
-                                      height: 20.0,
+                                        },
+                                        label: Text('Google'),
+                                        color: white_color,
+                                      ),
                                     ),
-                                    onPressed: () {
-                                      this.setState(() {
-                                        isLoading = true;
-                                      });
-                                      facebookSignup.initiateFacebookLogin(
-                                          context, prefs);
-                                    },
-                                    label: Text('Facebook'),
-                                    color: white_color,
-                                  )
-                              )
-                            ],
-                          )
+                                    Container(
+                                        height: 40.0,
+                                        width: ((MediaQuery
+                                            .of(context)
+                                            .size
+                                            .width) / 2) - 30,
+                                        child: RaisedButton.icon(
+                                          icon: new SvgPicture.asset(
+                                            'images/fb.svg',
+                                            width: 20.0,
+                                            height: 20.0,
+                                          ),
+                                          onPressed: () {
+                                            this.setState(() {
+                                              isLoading = true;
+                                            });
+                                            facebookSignup
+                                                .initiateFacebookLogin(
+                                                context, prefs);
+                                          },
+                                          label: Text('Facebook'),
+                                          color: white_color,
+                                        )
+                                    )
+                                  ],
+                                )
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    )
+                  ],
                 ),
               )
-            ],
-          ),
-        )
-    );
+          )
+      );
   }
 
 

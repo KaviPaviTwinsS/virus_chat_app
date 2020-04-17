@@ -89,11 +89,11 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                         icon: new Icon(
                             Icons.arrow_back_ios, color: Colors.black),
                         onPressed: () {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                   builder: (
-                                      context) => new LoginSelectionPage()));
+                                      context) => new LoginSelection()));
                         },
                       ),
                     )
@@ -198,7 +198,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                         color: facebook_color,
                         textColor: text_color,
                         shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(18.0),
+                          borderRadius: new BorderRadius.circular(20.0),
                         ),
                         child: Text('CONTINUE',
                           style: TextStyle(fontSize: 17),),
@@ -215,11 +215,11 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
 
   Future<bool> onBackPress() async {
     print('onBackPress');
-    Navigator.pop(context);
-//    Navigator.push(
-//        context,
-//        MaterialPageRoute(
-//            builder: (context) => new LoginSelectionPage()));
-//    return Future.value(true);
+//    Navigator.pop(context);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => new LoginSelection()));
+    return Future.value(true);
   }
 }

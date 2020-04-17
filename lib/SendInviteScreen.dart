@@ -71,6 +71,24 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   bool isButtonPressed = false;
   bool isRequestSent = true;
 
+
+
+
+  Future<bool> onBackPress() {
+    /* if (isShowSticker) {
+      setState(() {
+        isShowSticker = false;
+      });
+    } else {
+      Firestore.instance.collection('users').document(id).updateData(
+          {'chattingWith': null});
+      Navigator.pop(context);
+    }*/
+    Navigator.pop(context);
+  }
+
+
+
   @override
   void initState() {
     initial();
@@ -100,81 +118,86 @@ class SendInviteToUserState extends State<SendInviteToUser> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Stack(
-            children: <Widget>[
-              SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Container(
-                            color: facebook_color,
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width,
-                            height: MediaQuery
-                                .of(context)
-                                .size
-                                .height - 530,
-                            child: Column(
-                                children: <Widget>[
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .center,
-                                    children: <Widget>[
-                                      Container(
-                                        margin: EdgeInsets.only(top: 30.0,bottom: 10.0),
-                                        child: new IconButton(
-                                            icon: Icon(Icons.arrow_back_ios,
-                                              color: white_color,),
-                                            onPressed: () {
-                                              Navigator.push(
-                                                  context, MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      UsersList(userSignInType,
-                                                          _mCurrentUserId,
-                                                          _userPhotoUrl)));
-                                            }),
-                                      ),
-                                      new Container(
-                                        margin: EdgeInsets.only(
-                                            top: 30.0, right: 10.0,bottom: 10.0),
-                                        child: Material(
-                                          child: CachedNetworkImage(
-                                            placeholder: (context, url) =>
-                                                Container(
-                                                  child: CircularProgressIndicator(
-                                                    strokeWidth: 1.0,
-                                                    valueColor: AlwaysStoppedAnimation<
-                                                        Color>(themeColor),
+    return WillPopScope(
+      onWillPop: (){
+        onBackPress();
+      },
+      child: Scaffold(
+          body: Stack(
+              children: <Widget>[
+                SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              color: facebook_color,
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width,
+                              height: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .height - 530,
+                              child: Column(
+                                  children: <Widget>[
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .center,
+                                      children: <Widget>[
+                                        Container(
+                                          margin: EdgeInsets.only(top: 30.0,bottom: 10.0),
+                                          child: new IconButton(
+                                              icon: Icon(Icons.arrow_back_ios,
+                                                color: white_color,),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+//                                                Navigator.push(
+//                                                    context, MaterialPageRoute(
+//                                                    builder: (context) =>
+//                                                        UsersList(userSignInType,
+//                                                            _mCurrentUserId,
+//                                                            _userPhotoUrl)));
+                                              }),
+                                        ),
+                                        new Container(
+                                          margin: EdgeInsets.only(
+                                              top: 30.0, right: 10.0,bottom: 10.0),
+                                          child: Material(
+                                            child: CachedNetworkImage(
+                                              placeholder: (context, url) =>
+                                                  Container(
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 1.0,
+                                                      valueColor: AlwaysStoppedAnimation<
+                                                          Color>(themeColor),
+                                                    ),
+                                                    width: 35.0,
+                                                    height: 35.0,
+                                                    padding: EdgeInsets.all(10.0),
                                                   ),
-                                                  width: 35.0,
-                                                  height: 35.0,
-                                                  padding: EdgeInsets.all(10.0),
-                                                ),
-                                            imageUrl: _mPhotoUrl,
-                                            width: 35.0,
-                                            height: 35.0,
-                                            fit: BoxFit.cover,
+                                              imageUrl: _mPhotoUrl,
+                                              width: 35.0,
+                                              height: 35.0,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(18.0),
+                                            ),
+                                            clipBehavior: Clip.hardEdge,
                                           ),
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(18.0),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              top: 30.0, right: 10.0,bottom: 10.0),
+                                          child: Text(
+                                            _mUserName, style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: text_color),
                                           ),
-                                          clipBehavior: Clip.hardEdge,
                                         ),
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            top: 30.0, right: 10.0,bottom: 10.0),
-                                        child: Text(
-                                          _mUserName, style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: text_color),
-                                        ),
-                                      ),
-                                      /* Column(
+                                        /* Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -197,122 +220,123 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                 )*/ /*
                               ],
                             )*/
-                                    ],
-                                  ),
+                                      ],
+                                    ),
 
-                                ]
+                                  ]
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  )
-              ),
-              Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width,
-                      height: 560,
-                      decoration: BoxDecoration(
-                          color: text_color,
-                          borderRadius: new BorderRadius.only(
-                            topLeft: const Radius.circular(30.0),
-                            topRight: const Radius.circular(30.0),
-                          )
-                      ),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            new SvgPicture.asset(
-                              'images/invite_sent.svg',
-                              width: 80.0,
-                              height: 80.0,
-                            ),
-                            !isButtonPressed ? RaisedButton(
-                                color: white_color,
-                                child: Text('Sent Invite',),
-                                onPressed: () {
-                                  if (!_misAlreadyRequestSent) {
-                                    var documentReference = Firestore.instance
-                                        .collection('users')
-                                        .document(_mCurrentUserId)
-                                        .collection('FriendsList')
-                                        .document(_mPeerId);
-                                    Firestore.instance.runTransaction((
-                                        transaction) async {
-                                      await transaction.set(
-                                        documentReference,
-                                        {
-                                          'requestFrom': _mCurrentUserId,
-                                          'receiveId': _mPeerId,
-                                          'IsAcceptInvitation': false,
-                                          'isRequestSent': true,
-                                          'friendPhotoUrl': _userPhotoUrl,
-                                          'friendName': _userName,
-                                          'isAlreadyRequestSent': true,
-                                          'timestamp': DateTime
-                                              .now()
-                                              .millisecondsSinceEpoch
-                                              .toString(),
-                                        },
-                                      );
-                                    });
-                                    var documentReference1 = Firestore.instance
-                                        .collection('users')
-                                        .document(_mPeerId)
-                                        .collection('FriendsList')
-                                        .document(_mCurrentUserId);
-                                    Firestore.instance.runTransaction((
-                                        transaction) async {
-                                      await transaction.set(
-                                        documentReference1,
-                                        {
-                                          'requestFrom': _mCurrentUserId,
-                                          'receiveId': _mPeerId,
-                                          'IsAcceptInvitation': false,
-                                          'isRequestSent': false,
-                                          'friendPhotoUrl': _userPhotoUrl,
-                                          'friendName': _userName,
-                                          'isAlreadyRequestSent': true,
-                                          'timestamp': DateTime
-                                              .now()
-                                              .millisecondsSinceEpoch
-                                              .toString(),
-                                        },
-                                      );
-                                    });
-                                    sendAndRetrieveMessage();
-                                    setState(() {
-                                      isButtonPressed = !isButtonPressed;
-                                    });
-                                  }
-                                }
-                            ) : !isRequestSent
-                                ? Text('Invitation Received', style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20.0),)
-                                : Text('Already invitation sent',
-                              style: TextStyle(fontWeight: FontWeight.bold,
-                                  fontSize: 20.0),),
-                           Align(
-                             alignment: Alignment.center,
-                             child:  Container(
-                               padding: EdgeInsets.all(20.0),
-                               child: Text(
-                                   'You\'ll be able to chat with VALENTINE once your invitation has been accepted.'),
-                             ),
-                           )
                           ],
                         ),
-                      )
-                  )
-              )
+                      ],
+                    )
+                ),
+                Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width,
+                        height: 560,
+                        decoration: BoxDecoration(
+                            color: text_color,
+                            borderRadius: new BorderRadius.only(
+                              topLeft: const Radius.circular(30.0),
+                              topRight: const Radius.circular(30.0),
+                            )
+                        ),
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              new SvgPicture.asset(
+                                'images/invite_sent.svg',
+                                width: 80.0,
+                                height: 80.0,
+                              ),
+                              !isButtonPressed ? RaisedButton(
+                                  color: white_color,
+                                  child: Text('Sent Invite',),
+                                  onPressed: () {
+                                    if (!_misAlreadyRequestSent) {
+                                      var documentReference = Firestore.instance
+                                          .collection('users')
+                                          .document(_mCurrentUserId)
+                                          .collection('FriendsList')
+                                          .document(_mPeerId);
+                                      Firestore.instance.runTransaction((
+                                          transaction) async {
+                                        await transaction.set(
+                                          documentReference,
+                                          {
+                                            'requestFrom': _mCurrentUserId,
+                                            'receiveId': _mPeerId,
+                                            'IsAcceptInvitation': false,
+                                            'isRequestSent': true,
+                                            'friendPhotoUrl': _userPhotoUrl,
+                                            'friendName': _userName,
+                                            'isAlreadyRequestSent': true,
+                                            'timestamp': DateTime
+                                                .now()
+                                                .millisecondsSinceEpoch
+                                                .toString(),
+                                          },
+                                        );
+                                      });
+                                      var documentReference1 = Firestore.instance
+                                          .collection('users')
+                                          .document(_mPeerId)
+                                          .collection('FriendsList')
+                                          .document(_mCurrentUserId);
+                                      Firestore.instance.runTransaction((
+                                          transaction) async {
+                                        await transaction.set(
+                                          documentReference1,
+                                          {
+                                            'requestFrom': _mCurrentUserId,
+                                            'receiveId': _mPeerId,
+                                            'IsAcceptInvitation': false,
+                                            'isRequestSent': false,
+                                            'friendPhotoUrl': _userPhotoUrl,
+                                            'friendName': _userName,
+                                            'isAlreadyRequestSent': true,
+                                            'timestamp': DateTime
+                                                .now()
+                                                .millisecondsSinceEpoch
+                                                .toString(),
+                                          },
+                                        );
+                                      });
+                                      sendAndRetrieveMessage();
+                                      setState(() {
+                                        isButtonPressed = !isButtonPressed;
+                                      });
+                                    }
+                                  }
+                              ) : !isRequestSent
+                                  ? Text('Invitation Received', style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20.0),)
+                                  : Text('Already invitation sent',
+                                style: TextStyle(fontWeight: FontWeight.bold,
+                                    fontSize: 20.0),),
+                              Align(
+                                alignment: Alignment.center,
+                                child:  Container(
+                                  padding: EdgeInsets.all(20.0),
+                                  child: Text(
+                                      'You\'ll be able to chat with VALENTINE once your invitation has been accepted.'),
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                    )
+                )
 
-            ])
+              ])
+      ),
     );
   }
 

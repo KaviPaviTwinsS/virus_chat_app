@@ -54,14 +54,13 @@ class MakeTweetPostState extends State<MakeTweetPost> {
 //    mPhotoUrl = await preferences.getString('photoUrl');
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomPadding: false,
-        appBar: AppBar(
-          title: Text(community),
-         /* actions: <Widget>[
+//        appBar: AppBar(
+//          title: Text(community),
+        /* actions: <Widget>[
             IconButton(
               icon: new SvgPicture.asset(
                 'images/community.svg', height: 50.0,
@@ -73,35 +72,96 @@ class MakeTweetPostState extends State<MakeTweetPost> {
               },
             )
           ],*/
-        ),
+//        ),
         body: WillPopScope(
           child: Stack(
             children: <Widget>[
               Column(
-                children: <Widget>[
-                  // List of messages
-                  buildListMessage(),
-                ],
+                  children: <Widget>[
+                    Container(
+                      color: facebook_color,
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      height: 130,
+                      child:
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment
+                            .center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
+                            child: new IconButton(
+                                icon: Icon(Icons.arrow_back_ios,
+                                  color: white_color,),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                }),
+                          ),
+                          new Container(
+                              margin: EdgeInsets.only(
+                                  top: 20.0, right: 10.0, bottom: 40.0),
+                              child: Text('My community', style: TextStyle(
+                                  color: text_color,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold),)
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]
               ),
               Align(
-                alignment: Alignment.bottomRight,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  child: IconButton(
-                    icon: new SvgPicture.asset(
-                      'images/post_icon.svg', height: 500.0,
-                      width: 500.0,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  NewTweetPost(mCurrentId, mPhotoUrl)));
-                    },
-                  ),
-                ),
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      height: MediaQuery
+                          .of(context)
+                          .size
+                          .height - 105,
+                      decoration: BoxDecoration(
+                          color: text_color,
+                          borderRadius: new BorderRadius.only(
+                            topLeft: const Radius.circular(30.0),
+                            topRight: const Radius.circular(30.0),
+                          )
+                      ),
+                      child: Stack(
+                        children: <Widget>[
+                          Column(
+                            children: <Widget>[
+                              // List of messages
+                              buildListMessage(),
+                            ],
+                          ),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              child: IconButton(
+                                icon: new SvgPicture.asset(
+                                  'images/post_icon.svg', height: 500.0,
+                                  width: 500.0,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              NewTweetPost(
+                                                  mCurrentId, mPhotoUrl)));
+                                },
+                              ),
+                            ),
+                          )
+                        ],
+                      )
+                  )
               )
             ],
           ),
@@ -149,6 +209,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
               Row(
                 children: <Widget>[
                   document['userPhoto'] != '' ? Container(
+                    margin: EdgeInsets.only(bottom: 15.0),
                       child: Material(
                         child: CachedNetworkImage(
                           placeholder: (context, url) =>
@@ -159,12 +220,12 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                       themeColor),
                                 ),
-                                width: 50.0,
-                                height: 50.0,
+                                width: 35.0,
+                                height: 35.0,
                               ),
                           imageUrl: document['userPhoto'],
-                          width: 50.0,
-                          height: 50.0,
+                          width: 35.0,
+                          height: 35.0,
                           fit: BoxFit.cover,
                         ),
                         borderRadius: BorderRadius.all(Radius.circular(45.0)),
@@ -178,15 +239,16 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
                         Row(
-                          children: <Widget>[document['userName'] != '' ? Container(
-                              margin: EdgeInsets.all(10.0),
-                              child: Center(
-                                child: Text(
-                                    capitalize(document['userName']),
-                                    style: TextStyle(color: facebook_color)
-                                ),
-                              )
-                          ) : Text(''),
+                          children: <Widget>[
+                            document['userName'] != '' ? Container(
+                                margin: EdgeInsets.all(5.0),
+                                child: Center(
+                                  child: Text(
+                                      capitalize(document['userName']),
+                                      style: TextStyle(color: facebook_color)
+                                  ),
+                                )
+                            ) : Text(''),
                             document['createdAt'] != '' ? Container(
                                 child: Center(
                                   child: Text(
@@ -198,58 +260,65 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                           ],
                         ),
                         document['content'] != '' ? Container(
-                            margin: EdgeInsets.all(10.0),
+                            margin: EdgeInsets.all(5.0),
                             child: Text(
                                 document['content'])
                         )
                             : Text(''),
-                        document['tweetPostImage'] != '' ? Center(child: Container(
-                          child: FlatButton(
-                            child: Material(
-                              child: CachedNetworkImage(
-                                placeholder: (context, url) =>
-                                    Container(
-                                      child: CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                            themeColor),
+                        document['tweetPostImage'] != '' ? Center(
+                          child: Container(
+                            child: FlatButton(
+                              child: Material(
+                                child: CachedNetworkImage(
+                                  placeholder: (context, url) =>
+                                      Center(
+                                      child:Container(
+                                        child: CircularProgressIndicator(
+                                          valueColor: AlwaysStoppedAnimation<
+                                              Color>(
+                                              themeColor),
+                                        ),
+                                        width: 150.0,
+                                        height: 200.0,
+                                        decoration: BoxDecoration(
+                                          color: greyColor2,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(5.0),
+                                          ),
+                                        ),
                                       ),
-                                      width: 150.0,
-                                      height: 200.0,
-                                      decoration: BoxDecoration(
-                                        color: greyColor2,
+                                      ),
+                                  errorWidget: (context, url, error) =>
+                                      Material(
+                                        child: Image.asset(
+                                          'images/img_not_available.jpeg',
+                                          width: 150.0,
+                                          height: 200.0,
+                                          fit: BoxFit.cover,
+                                        ),
                                         borderRadius: BorderRadius.all(
                                           Radius.circular(5.0),
                                         ),
+                                        clipBehavior: Clip.hardEdge,
                                       ),
-                                    ),
-                                errorWidget: (context, url, error) =>
-                                    Material(
-                                      child: Image.asset(
-                                        'images/img_not_available.jpeg',
-                                        width: 150.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(5.0),
-                                      ),
-                                      clipBehavior: Clip.hardEdge,
-                                    ),
-                                imageUrl: document['tweetPostImage'],
-                                width: 150.0,
-                                height: 200.0,
-                                fit: BoxFit.cover,
+                                  imageUrl: document['tweetPostImage'],
+                                  width: 150.0,
+                                  height: 200.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(5.0)),
+                                clipBehavior: Clip.hardEdge,
                               ),
-                              borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                              clipBehavior: Clip.hardEdge,
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        FullPhoto(
+                                            url: document['tweetPostImage'])));
+                              },
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                  context, MaterialPageRoute(builder: (context) =>
-                                  FullPhoto(url: document['tweetPostImage'])));
-                            },
-                          ),
-                        ),) : Text(''),
+                          ),) : Text(''),
                       ],
                     ),
                   ),
@@ -259,7 +328,8 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                   )
                 ],
               ),
-              Divider(color: greyColor,), //                           <-- Divider
+              Divider(color: greyColor,),
+              //                           <-- Divider
             ],
           ),
         )

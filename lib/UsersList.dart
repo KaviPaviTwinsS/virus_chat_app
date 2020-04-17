@@ -86,7 +86,7 @@ class UsersListState extends State<UsersListPage>
   String userSignInType = '';
   SharedPreferences prefs;
   bool sliderChanged = true;
-  double _msliderData;
+  double _msliderData = 100.0;
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
 
@@ -187,87 +187,88 @@ class UsersListState extends State<UsersListPage>
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        bottomNavigationBar: SizedBox(
-          height: 70,
-          child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: _curIndex,
-            // this will be set when a new tab is tapped
-            onTap: (index) {
-              setState(() {
-                print('CURENT IDEX____ $index');
-                _curIndex = index;
-                switch (_curIndex) {
-                  case 0:
-                    setState(() {
-                      homeClicked = true;
-                    });
-                    break;
-                  case 1:
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                NewTweetPost(
-                                    currentUser, currentUserPhotoUrl)));
-                    break;
-                  case 2:
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                MakeTweetPost(
-                                    currentUser, currentUserPhotoUrl)));
-                    break;
-                }
-              });
-            },
-            items: [
-              BottomNavigationBarItem(
-                icon: homeClicked ? Container(
-                  margin: EdgeInsets.only(top: 15.0),
-                  child: new SvgPicture.asset(
-                    'images/home_highlight.svg',
-                    height: 20.0,
-                    width: 20.0,
-                  ),
-                ) : Container(
-                  margin: EdgeInsets.only(top: 15.0),
-                  child: new SvgPicture.asset(
-                    'images/home.svg',
-                    height: 20.0,
-                    width: 20.0,
-                  ),
-                ),
-                title: new Text(''),
-              ),
-              BottomNavigationBarItem(
-                icon: Container(
-                  margin: EdgeInsets.only(top: 15.0),
-                  child: new SvgPicture.asset(
-                    'images/post.svg', height: 20.0,
-                    width: 20.0,
-                  ),
-                ),
-                title: new Text(''),
-              ),
-              BottomNavigationBarItem(
-                  icon: Container(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: new Scaffold(
+          bottomNavigationBar: SizedBox(
+            height: 70,
+            child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              currentIndex: _curIndex,
+              // this will be set when a new tab is tapped
+              onTap: (index) {
+                setState(() {
+                  print('CURENT IDEX____ $index');
+                  _curIndex = index;
+                  switch (_curIndex) {
+                    case 0:
+                      setState(() {
+                        homeClicked = true;
+                      });
+                      break;
+                    case 1:
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  NewTweetPost(
+                                      currentUser, currentUserPhotoUrl)));
+                      break;
+                    case 2:
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  MakeTweetPost(
+                                      currentUser, currentUserPhotoUrl)));
+                      break;
+                  }
+                });
+              },
+              items: [
+                BottomNavigationBarItem(
+                  icon: homeClicked ? Container(
                     margin: EdgeInsets.only(top: 15.0),
                     child: new SvgPicture.asset(
-                      'images/community.svg', height: 20.0,
+                      'images/home_highlight.svg',
+                      height: 20.0,
+                      width: 20.0,
+                    ),
+                  ) : Container(
+                    margin: EdgeInsets.only(top: 15.0),
+                    child: new SvgPicture.asset(
+                      'images/home.svg',
+                      height: 20.0,
                       width: 20.0,
                     ),
                   ),
-                  title: Text('')
-              ),
+                  title: new Text(''),
+                ),
+                BottomNavigationBarItem(
+                  icon: Container(
+                    margin: EdgeInsets.only(top: 15.0),
+                    child: new SvgPicture.asset(
+                      'images/post.svg', height: 20.0,
+                      width: 20.0,
+                    ),
+                  ),
+                  title: new Text(''),
+                ),
+                BottomNavigationBarItem(
+                    icon: Container(
+                      margin: EdgeInsets.only(top: 15.0),
+                      child: new SvgPicture.asset(
+                        'images/community.svg', height: 20.0,
+                        width: 20.0,
+                      ),
+                    ),
+                    title: Text('')
+                ),
 
-            ],
+              ],
+            ),
           ),
-        ),
-        body: WillPopScope(
-          child: Stack(
+          body:  Stack(
             children: <Widget>[
               SingleChildScrollView(
                 child: Container(
@@ -275,7 +276,7 @@ class UsersListState extends State<UsersListPage>
                     height: MediaQuery
                         .of(context)
                         .size
-                        .height - 360,
+                        .height - 260,
                     child: Column(
                       children: <Widget>[
                         Row(
@@ -284,7 +285,7 @@ class UsersListState extends State<UsersListPage>
                           children: <Widget>[
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
@@ -368,11 +369,11 @@ class UsersListState extends State<UsersListPage>
                                   ),
                                   onPressed: () {
                                     print('USER LIST getFriendList');
-                                    Navigator.pushReplacement(
+                                    Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                FriendRequestScreen(
+                                                FriendRequestScreenState(
                                                     currentUser,
                                                     currentUserPhotoUrl)));
                                   },
@@ -406,7 +407,7 @@ class UsersListState extends State<UsersListPage>
                             ),
                             Container(
                               margin: EdgeInsets.only(
-                                  top: 5.0, left: 10.0, right: 10.0),
+                                  top: 5.0, left: 3.0, right: 3.0),
                               child: UsersOnlinePage(
                                   currentUser, currentUserPhotoUrl, this),
                             )
@@ -453,7 +454,7 @@ class UsersListState extends State<UsersListPage>
                           .of(context)
                           .size
                           .width,
-                      height: 320,
+                      height: 260,
                       decoration: BoxDecoration(
                           color: text_color,
                           borderRadius: new BorderRadius.only(
@@ -469,7 +470,7 @@ class UsersListState extends State<UsersListPage>
                             alignment: Alignment.bottomLeft,
                             child: Container(
                                 margin: EdgeInsets.only(left: 20.0,
-                                    top: 10.0),
+                                    top: 5.0),
                                 child: Text('People', style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 19.0),)
@@ -478,10 +479,9 @@ class UsersListState extends State<UsersListPage>
                           new LoginUsersList(
                               currentUser, currentUserPhotoUrl),
                           Align(
-                            alignment: Alignment.bottomLeft,
+                            alignment: Alignment.topLeft,
                             child: Container(
-                                margin: EdgeInsets.only(left: 20.0,
-                                    top: 10.0),
+                                margin: EdgeInsets.only(left: 20.0,),
                                 child: Text('Active', style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 19.0),)
@@ -495,9 +495,8 @@ class UsersListState extends State<UsersListPage>
                   )
               ),
             ],
-          ), onWillPop: () {
-          onBackPress();
-        },)
+          )
+      ),
     );
   }
 
@@ -515,7 +514,7 @@ class UsersListState extends State<UsersListPage>
         _msliderData = sliderData;
         sliderChanged = false;
       });
-    } else if (_msliderData != null && sliderData == 10.0) {
+    } else if (_msliderData != null && sliderData == 100.0) {
       setState(() {
         _msliderData = sliderData;
         sliderChanged = true;
@@ -555,7 +554,7 @@ class UsersOnlinePage extends StatelessWidget implements SliderListener {
   void SliderChangeListener(double sliderData) {
     print('SliderChangeListener $sliderData');
 //    myAppState.userListUpdate(sliderData);
-    if (sliderData != 0.0 || sliderData != 10.0) {
+    if (sliderData != 0.0 || sliderData != 100.0) {
       sliderListener.SliderChangeListenerACTIVE(sliderData);
     }
   }
@@ -596,7 +595,7 @@ abstract class SliderListener {
 class ActiveUserListRadius extends StatelessWidget {
   String currentUserId = '';
   String mphotoUrl = '';
-  double msliderData = 0.0;
+  double msliderData = 100.0;
 
   GeoPoint mUserGeoPoint;
 
@@ -616,7 +615,7 @@ class ActiveUserListRadius extends StatelessWidget {
     _preferences = await SharedPreferences.getInstance();
     print('ActiveUserListRadius initialise $msliderData');
     isLoading = true;
-//    getCurrentUserLocation(currentUserId, msliderData);
+    getCurrentUserLocation(currentUserId, msliderData);
   }
 
   @override
@@ -664,9 +663,9 @@ class ActiveUserListRadius extends StatelessWidget {
                               children: <Widget>[
                                 new Container(
                                     margin: EdgeInsets.only(
-                                        left: 20.0, top: 20.0),
-                                    width: 80.0,
-                                    height: 80.0,
+                                        left: 20.0, top: 10.0),
+                                    width: 60.0,
+                                    height: 60.0,
                                     decoration: new BoxDecoration(
                                         shape: BoxShape.circle,
                                         image: new DecorationImage(
@@ -684,8 +683,11 @@ class ActiveUserListRadius extends StatelessWidget {
                               ],
                             ));
                       } else {
-                        return Center(
-                          child: Text(''),
+                        return Container(
+                            margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                            child : Center(
+                              child: Text(''),
+                            )
                         );
                       }
                       /*  return new ListTile(
@@ -838,7 +840,7 @@ class ActiveUserListRadius extends StatelessWidget {
         .document(userId).collection(
         'userLocation').document(userId)
         .get();
-    if (doc.data.length != 0) {
+    if (doc.data.length != 0 ) {
       DocumentSnapshot map = doc;
       GeoPoint geopoint = map['userLocation'];
       getDocumentNearBy(geopoint.latitude, geopoint.longitude, sliderData);
@@ -861,7 +863,7 @@ class ActiveUserListRadius extends StatelessWidget {
         new LatLng(geopoint.latitude, geopoint.longitude));
     print('USER DISTANCE $km');
     print('USER GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
-    if ((km == 0.0 || /*sliderData >= km*/ km < 1000.0) &&
+    if ((km == 0.0 || /*sliderData >= km*/ km < sliderData) &&
         userId != currentUserId) {
       DocumentSnapshot userDocs = await Firestore.instance.collection('users')
           .document(userId).get();
@@ -884,6 +886,7 @@ class ActiveUserListRadius extends StatelessWidget {
     var query = await Firestore.instance.collection('users').getDocuments();
     query.documents.forEach((doc) {
       print('User DOCCCCCCCCC' + doc.documentID);
+      if(doc.documentID != currentUserId )
       getUserLocation(latitude, longitude, doc.documentID, distance);
     });
   }
@@ -944,9 +947,9 @@ class LoginUsersList extends StatelessWidget {
                                 children: <Widget>[
                                   new Container(
                                       margin: EdgeInsets.only(
-                                          left: 20.0, top: 20.0),
-                                      width: 80.0,
-                                      height: 80.0,
+                                          left: 20.0, top: 10.0),
+                                      width: 60.0,
+                                      height: 60.0,
                                       decoration: new BoxDecoration(
                                           shape: BoxShape.circle,
                                           image: new DecorationImage(
@@ -962,9 +965,9 @@ class LoginUsersList extends StatelessWidget {
                                         width: 10.0,
 //                                          color: primaryColor,
                                       ),
-                                      margin: EdgeInsets.only(left: 80.0,
+                                      margin: EdgeInsets.only(left: 70.0,
                                           bottom: 30.0,
-                                          top: 20.0,
+                                          top: 10.0,
                                           right: 5.0)) : document['status'] ==
                                       'LoggedOut' ? Container(
                                     child: new SvgPicture.asset(
@@ -973,9 +976,9 @@ class LoginUsersList extends StatelessWidget {
                                       width: 10.0,
 //                                        color: primaryColor,
                                     ),
-                                    margin: EdgeInsets.only(left: 80.0,
+                                    margin: EdgeInsets.only(left: 70.0,
                                         bottom: 30.0,
-                                        top: 20.0,
+                                        top: 10.0,
                                         right: 5.0),
                                   ) : Container(
                                     child: new SvgPicture.asset(
@@ -983,9 +986,9 @@ class LoginUsersList extends StatelessWidget {
                                       width: 10.0,
 //                                        color: primaryColor,
                                     ),
-                                    margin: EdgeInsets.only(left: 80.0,
+                                    margin: EdgeInsets.only(left: 70.0,
                                         bottom: 30.0,
-                                        top: 20.0,
+                                        top: 10.0,
                                         right: 5.0),
                                   )
                                 ]
@@ -998,8 +1001,11 @@ class LoginUsersList extends StatelessWidget {
                           ],
                         ));
                   } else {
-                    return Center(
-                      child: Text(''),
+                    return Container(
+                        margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                        child : Center(
+                        child: Text(''),
+                      )
                     );
                   }
                   /*  return new ListTile(

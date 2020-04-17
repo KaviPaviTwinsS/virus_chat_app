@@ -118,6 +118,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   String imageUrl;
 
   final TextEditingController textEditingController = new TextEditingController();
+  String txtMsg = '';
   final ScrollController listScrollController = new ScrollController();
   final FocusNode focusNode = new FocusNode();
 
@@ -241,6 +242,9 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
         .toString();
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
     StorageUploadTask uploadTask = reference.putFile(File(mAudioPath));
+    setState(() {
+      isLoading = false;
+    });
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
     storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
       imageUrl = downloadUrl;
@@ -318,9 +322,19 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       if (fileName != '')
         audioTime = fileName;
     }
+    print('onSendMessage $txtMsg  ____ $imageUrl');
+
+    if(txtMsg != ''){
+      content = txtMsg;
+      type = 0;
+    }
+    if(imageUrl != ''){
+      content = imageUrl;
+      type = 1;
+    }
+
     if (content.trim() != '') {
       textEditingController.clear();
-
       var currTime = DateTime
           .now()
           .millisecondsSinceEpoch
@@ -360,6 +374,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     }
     setState(() {
       imageUrl = '';
+      txtMsg = '';
     });
   }
 
@@ -708,7 +723,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                         style: TextStyle(color: primaryColor),
                       ),
                       Align(
-                        alignment: Alignment.bottomRight,
+                        alignment: Alignment.bottomLeft,
                         child: Text(
                           DateFormat('kk:mm')
                               .format(DateTime.fromMillisecondsSinceEpoch(
@@ -813,7 +828,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                           ),
                         ),
                         Align(
-                          alignment: Alignment.bottomRight,
+                          alignment: Alignment.bottomLeft,
                           child: Text(
                             DateFormat('kk:mm')
                                 .format(DateTime.fromMillisecondsSinceEpoch(
@@ -850,7 +865,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             // Time
             isLastMessageLeft(index)
                 ? Align(
-              alignment: Alignment.bottomRight,
+              alignment: Alignment.bottomLeft,
               child: Container(
                 child: Text(
                   DateFormat('kk:mm')
@@ -860,7 +875,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                       fontSize: 12.0,
                       fontStyle: FontStyle.italic),
                 ),
-                margin: EdgeInsets.only(right: 70.0, bottom: 5.0),
+                margin: EdgeInsets.only(left: 70.0, bottom: 5.0),
               ),
             )
                 : Container()
@@ -1009,8 +1024,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
         onWillPop: onBackPress,
       );
     } else {
-      return WillPopScope(
-        child: Stack(
+      return Stack(
           children: <Widget>[
             Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -1193,8 +1207,6 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             // Loading
             buildLoading()
           ],
-        ),
-        onWillPop: onBackPress,
       );
     }
   }
@@ -1334,7 +1346,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
         children: <Widget>[
           Row(
             children: <Widget>[
-             /* Material(
+              /* Material(
                 child: new Container(
                   margin: EdgeInsets.only(left: 10.0),
                   child: new IconButton(
@@ -1478,8 +1490,11 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 child: Container(
                   margin: EdgeInsets.only(left: 20.0, bottom: 5.0, top: 5.0),
                   child: TextField(
-                    style: TextStyle(color: greyColor, fontSize: 15.0),
+                    style: TextStyle(color: black_color, fontSize: 15.0),
                     controller: textEditingController,
+                    onChanged: (value) {
+                      txtMsg = value;
+                    },
                     decoration: InputDecoration(
                       hintText: chat_hint,
                       hintStyle: TextStyle(color: greyColor),
@@ -1505,7 +1520,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                         width: 90.0,
                       ),
                       onPressed: () =>
-    onSendMessage(imageUrl, 1, ''),
+                          onSendMessage(imageUrl, 1, ''),
                       color: primaryColor,
                     )
                 ),
@@ -1524,6 +1539,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           color: Colors.white),
     );
   }
+
 
   Widget buildListMessage() {
     return Flexible(

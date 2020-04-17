@@ -264,7 +264,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                       color: facebook_color,
                       textColor: text_color,
                       shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(18.0),
+                        borderRadius: new BorderRadius.circular(20.0),
                       ),
                       child: Text(btn_register,
                         style: TextStyle(fontSize: 17),),

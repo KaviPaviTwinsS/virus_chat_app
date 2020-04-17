@@ -15,29 +15,32 @@ import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
-class PasswordSetup extends StatefulWidget{
-  String _signinType ='';
-  FirebaseUser _firebaseUser ;
-  String _accountId ='';
-  PasswordSetup(String signinType, {FirebaseUser mfirebaseUser, String maccountId}){
-    _signinType =signinType;
-    _firebaseUser =mfirebaseUser;
+class PasswordSetup extends StatefulWidget {
+  String _signinType = '';
+  FirebaseUser _firebaseUser;
+
+  String _accountId = '';
+
+  PasswordSetup(String signinType,
+      {FirebaseUser mfirebaseUser, String maccountId}) {
+    _signinType = signinType;
+    _firebaseUser = mfirebaseUser;
     _accountId = maccountId;
   }
 
   @override
   State<StatefulWidget> createState() {
-    return PasswordSetupState(_signinType,_firebaseUser,_accountId);
+    return PasswordSetupState(_signinType, _firebaseUser, _accountId);
   }
 
 }
 
-class PasswordSetupState extends State<PasswordSetup>{
+class PasswordSetupState extends State<PasswordSetup> {
 
-  String userPassword ='';
-  String userPhone='';
-  String newPassword ='';
-  String confirmPassword ='';
+  String userPassword = '';
+  String userPhone = '';
+  String newPassword = '';
+  String confirmPassword = '';
   TextEditingController passwordController;
   TextEditingController phoneController;
   TextEditingController newPasswordController;
@@ -45,16 +48,18 @@ class PasswordSetupState extends State<PasswordSetup>{
 
   String _signinType = '';
   String _accountId = '';
-  FirebaseUser _firebaseUser ;
+  FirebaseUser _firebaseUser;
+
   bool isLoading = false;
 
   SharedPreferences prefs;
   Geoflutterfire geo = Geoflutterfire();
 
-  String userToken ='';
+  String userToken = '';
   bool passwordVisible = true;
 
-  PasswordSetupState(String signinType, FirebaseUser firebaseUser, String accountId){
+  PasswordSetupState(String signinType, FirebaseUser firebaseUser,
+      String accountId) {
     _accountId = accountId;
     _signinType = signinType;
     _firebaseUser = firebaseUser;
@@ -67,9 +72,9 @@ class PasswordSetupState extends State<PasswordSetup>{
     readLocal();
   }
 
-  void readLocal() async{
+  void readLocal() async {
     passwordController = TextEditingController(text: userPassword);
-    phoneController = TextEditingController(text:userPhone );
+    phoneController = TextEditingController(text: userPhone);
     newPasswordController = TextEditingController(text: newPassword);
     confirmPasswordController = TextEditingController(text: confirmPassword);
     prefs = await SharedPreferences.getInstance();
@@ -82,87 +87,107 @@ class PasswordSetupState extends State<PasswordSetup>{
   GoogleSignIn googleSignIn = GoogleSignIn();
   var facebookLogin = FacebookLogin();
 
-  Future updateLogin() async{
+  Future updateLogin() async {
     await FirebaseAuth.instance.signOut();
     if (googleSignIn.isSignedIn() != null) {
       await googleSignIn.disconnect();
       await googleSignIn.signOut();
     }
-    if(facebookLogin.isLoggedIn != null ) {
+    if (facebookLogin.isLoggedIn != null) {
       await facebookLogin.logOut();
     }
   }
+
+
+  Future<bool> onBackPress() async {
+    print('onBackPress');
+    updateLogin();
+//    Navigator.pop(context);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => new LoginSelection()));
+    return Future.value(true);
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                margin: const EdgeInsets.only(left: 5.0, top: 40.0, right: 20.0),
-                child: new IconButton(
-                  icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
-                  onPressed: () {
-
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (
-                                context) => new LoginSelectionPage()));
-                    updateLogin();
-                  },
-                ),
-              )
-          ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: Container(
-              margin: const EdgeInsets.only(left: 20.0, top: 30.0, right: 20.0),
-              child: Text(password,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+    return WillPopScope(
+        onWillPop: () {
+          onBackPress();
+        },
+        child: Scaffold(
+          body: Column(
+            children: <Widget>[
+              Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                        left: 5.0, top: 40.0, right: 20.0),
+                    child: new IconButton(
+                      icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => new LoginSelection()));
+                        updateLogin();
+                      },
+                    ),
+                  )
               ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(
-                left: 20.0, top: 20.0, right: 20.0),
-            child: TextField(
-              obscureText: passwordVisible,
-              controller: passwordController,
-              onChanged: (value) {
-                userPassword = value;
-              },
-              autofocus: true,
-              decoration: new InputDecoration(
-                suffixIcon:  IconButton(
-                  icon: Icon(
-                    // Based on passwordVisible state choose the icon
-                    passwordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: Theme.of(context).primaryColorDark,
+              Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                  margin: const EdgeInsets.only(
+                      left: 20.0, top: 30.0, right: 20.0),
+                  child: Text(password,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
                   ),
-                  onPressed: () {
-                    // Update the state i.e. toogle the state of passwordVisible variable
-                    setState(() {
-                      passwordVisible = !passwordVisible;
-                    });
-                  },
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: focused_border_color, width: 2.0),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: greyColor2, width: 2.0),
-                ),
-                hintText: 'Enter your Password',
               ),
-            ),
-          ),
-         /* Align(
+              Container(
+                margin: const EdgeInsets.only(
+                    left: 20.0, top: 20.0, right: 20.0),
+                child: TextField(
+                  obscureText: passwordVisible,
+                  controller: passwordController,
+                  onChanged: (value) {
+                    userPassword = value;
+                  },
+                  autofocus: true,
+                  decoration: new InputDecoration(
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        // Based on passwordVisible state choose the icon
+                        passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: Theme
+                            .of(context)
+                            .primaryColorDark,
+                      ),
+                      onPressed: () {
+                        // Update the state i.e. toogle the state of passwordVisible variable
+                        setState(() {
+                          passwordVisible = !passwordVisible;
+                        });
+                      },
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: focused_border_color, width: 2.0),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: greyColor2, width: 2.0),
+                    ),
+                    hintText: 'Enter your Password',
+                  ),
+                ),
+              ),
+              /* Align(
             alignment: Alignment.topRight,
             child: GestureDetector(
               onTap: (){
@@ -174,35 +199,36 @@ class PasswordSetupState extends State<PasswordSetup>{
               ),
             )
           ),*/
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
-              padding: EdgeInsets.all(30.0),
-              width: double.infinity,
-              child: SizedBox(
-                height: 45, // specific value
-                child: RaisedButton(
-                  child: Text(log_in.toUpperCase()),
-                  color: facebook_color,
-                  textColor: text_color,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(18.0),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
+                  padding: EdgeInsets.all(30.0),
+                  width: double.infinity,
+                  child: SizedBox(
+                      height: 45, // specific value
+                      child: RaisedButton(
+                        child: Text(log_in.toUpperCase()),
+                        color: facebook_color,
+                        textColor: text_color,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(18.0),
+                        ),
+                        onPressed: () {
+                          if (userPassword != '') {
+                            HandleThirdPartySignIn();
+                          } else {
+                            Fluttertoast.showToast(msg: enter_password);
+                          }
+                        },
+                      )
                   ),
-                  onPressed: (){
-                    if(userPassword != '') {
-                      HandleThirdPartySignIn();
-                    }else{
-                      Fluttertoast.showToast(msg: enter_password);
-                    }
-                  },
-                )
-              ),
-            ),
-          )
+                ),
+              )
 
-        ],
-      ),
+            ],
+          ),
+        )
     );
   }
 
@@ -216,7 +242,9 @@ class PasswordSetupState extends State<PasswordSetup>{
             child: Container(
               child: _buildBottomNavigationMenu(),
               decoration: BoxDecoration(
-                color: Theme.of(context).canvasColor,
+                color: Theme
+                    .of(context)
+                    .canvasColor,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(10),
                   topRight: const Radius.circular(10),
@@ -227,10 +255,11 @@ class PasswordSetupState extends State<PasswordSetup>{
         });
   }
 
-  Column _buildBottomNavigationMenu(){
+  Column _buildBottomNavigationMenu() {
     return Column(
       children: <Widget>[
-        Text('Forgot Password?',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,),),
+        Text('Forgot Password?',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0,),),
         Container(
           child: Theme(
             data: Theme.of(context).copyWith(
@@ -257,7 +286,7 @@ class PasswordSetupState extends State<PasswordSetup>{
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(18.0),
           ),
-          onPressed: (){
+          onPressed: () {
             sendButton();
           },
         )
@@ -266,7 +295,7 @@ class PasswordSetupState extends State<PasswordSetup>{
     );
   }
 
-  void sendButton(){
+  void sendButton() {
     showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -276,7 +305,9 @@ class PasswordSetupState extends State<PasswordSetup>{
             child: Container(
               child: buildPasswordMenu(),
               decoration: BoxDecoration(
-                color: Theme.of(context).canvasColor,
+                color: Theme
+                    .of(context)
+                    .canvasColor,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(10),
                   topRight: const Radius.circular(10),
@@ -288,10 +319,11 @@ class PasswordSetupState extends State<PasswordSetup>{
   }
 
 
-  Column buildPasswordMenu(){
+  Column buildPasswordMenu() {
     return Column(
       children: <Widget>[
-        Text('Reset Password?',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,),),
+        Text('Reset Password?',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0,),),
         Container(
           child: Theme(
             data: Theme.of(context).copyWith(
@@ -335,16 +367,17 @@ class PasswordSetupState extends State<PasswordSetup>{
           color: facebook_color,
           textColor: text_color,
           shape: RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(18.0),
+            borderRadius: new BorderRadius.circular(20.0),
           ),
-          onPressed: (){
-            if(newPassword == '' || confirmPassword == ''){
+          onPressed: () {
+            if (newPassword == '' || confirmPassword == '') {
               Fluttertoast.showToast(msg: 'Enter new and confirm password');
             }
-            else if(newPassword == confirmPassword) {
+            else if (newPassword == confirmPassword) {
               updateUserPassword();
-            }else{
-              Fluttertoast.showToast(msg: 'Enter new and confirm password as identical');
+            } else {
+              Fluttertoast.showToast(
+                  msg: 'Enter new and confirm password as identical');
             }
           },
         )
@@ -353,35 +386,36 @@ class PasswordSetupState extends State<PasswordSetup>{
   }
 
   void updateUserPassword() async {
-    await Firestore.instance.collection('users').document(_firebaseUser.uid).updateData({
+    await Firestore.instance.collection('users')
+        .document(_firebaseUser.uid)
+        .updateData({
       'password': newPassword
     });
   }
 
 
   void HandleThirdPartySignIn() async {
-
     // Check is already sign up
     final QuerySnapshot result = await Firestore.instance
         .collection('users')
         .where('id', isEqualTo: _firebaseUser.uid)
         .getDocuments();
     final List<DocumentSnapshot> documents = result.documents;
-      if (documents.length == 0) {
+    if (documents.length == 0) {
+      // Write data to local
+      await updateLocalData(prefs, _firebaseUser, _signinType);
+      // Update data to server if new user
+      await _AddNewUser(_firebaseUser, '', _accountId, _signinType);
+    } else {
+      if (documents[0]['password'] == userPassword) {
         // Write data to local
-        await updateLocalData(prefs, _firebaseUser, _signinType);
-        // Update data to server if new user
-        await _AddNewUser(_firebaseUser, '', _accountId, _signinType);
+        await updateLocalListData(prefs, documents, _signinType);
       } else {
-        if(documents[0]['password'] == userPassword) {
-          // Write data to local
-          await updateLocalListData(prefs, documents, _signinType);
-        }else{
-          Fluttertoast.showToast(msg: enter_valid_password);
-        }
+        Fluttertoast.showToast(msg: enter_valid_password);
       }
+    }
 
-   /*await Navigator.push(
+    /*await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
@@ -421,13 +455,19 @@ class PasswordSetupState extends State<PasswordSetup>{
       'status': 'ACTIVE',
       'id': firebaseUser.uid,
       '$loginType': loginId,
-      'user_token':userToken,
+      'user_token': userToken,
       'createdAt':
-      ((new DateTime.now().toUtc().microsecondsSinceEpoch) / 1000).toInt()
+      ((new DateTime.now()
+          .toUtc()
+          .microsecondsSinceEpoch) / 1000).toInt()
     });
-    UserLocation currentLocation = await LocationService(firebaseUser.uid,).getLocation();
-    Firestore.instance.collection('users').document(firebaseUser.uid).collection('userLocation').document(firebaseUser.uid).setData({
-      'userLocation' : new GeoPoint(currentLocation.latitude, currentLocation.longitude),
+    UserLocation currentLocation = await LocationService(firebaseUser.uid,)
+        .getLocation();
+    Firestore.instance.collection('users').document(firebaseUser.uid)
+        .collection('userLocation').document(firebaseUser.uid)
+        .setData({
+      'userLocation': new GeoPoint(
+          currentLocation.latitude, currentLocation.longitude),
     });
 
     Navigator.push(
@@ -435,10 +475,8 @@ class PasswordSetupState extends State<PasswordSetup>{
         MaterialPageRoute(
             builder: (context) =>
                 UsersList(loginType,
-                    firebaseUser.uid,firebaseUser.photoUrl)));
-
+                    firebaseUser.uid, firebaseUser.photoUrl)));
   }
-
 
 
   Future<Null> updateLocalData(SharedPreferences prefs,
@@ -453,7 +491,9 @@ class PasswordSetupState extends State<PasswordSetup>{
     await prefs.setString('photoUrl', currentUser.photoUrl);
     await prefs.setString('signInType', signInType);
     await prefs.setInt('createdAt',
-        ((new DateTime.now().toUtc().microsecondsSinceEpoch) / 1000).toInt());
+        ((new DateTime.now()
+            .toUtc()
+            .microsecondsSinceEpoch) / 1000).toInt());
   }
 
   Future<Null> updateLocalListData(SharedPreferences prefs,
@@ -474,7 +514,7 @@ class PasswordSetupState extends State<PasswordSetup>{
         MaterialPageRoute(
             builder: (context) =>
                 UsersList('MobileNumber',
-                    documents[0]['id'],documents[0]['photoUrl'])));
+                    documents[0]['id'], documents[0]['photoUrl'])));
   }
 
 }

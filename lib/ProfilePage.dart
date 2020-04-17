@@ -6,8 +6,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FacebookSignup.dart';
@@ -160,7 +162,8 @@ class ProfilePageState extends State<ProfilePage> {
                                 icon: Icon(Icons.arrow_back_ios,
                                   color: white_color,),
                                 onPressed: () {
-                                  navigationPage();
+                                  Navigator.pop(context);
+//                                  navigationPage();
                                 }),
                           ),
                           new Container(
@@ -506,6 +509,15 @@ class ProfilePageState extends State<ProfilePage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
+
+                            RaisedButton(
+                              color: white_color,
+                              child: Text("No"),
+                              onPressed: () {
+                                Navigator.of(context, rootNavigator: true).pop(
+                                    'dialog');
+                              },
+                            ),
                             RaisedButton(
                               child: Text("Yes"),
                               color: white_color,
@@ -519,23 +531,22 @@ class ProfilePageState extends State<ProfilePage> {
                                   clearLocalData();
                                 prefs.setString('signInType', '');
                                 _updatestatus();
-                                Navigator.push(
+                               /* Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoginSelection()
+                                    ),
+                                    ModalRoute.withName("/HomeScreen")
+                                );*/
+                                Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                         builder: (
-                                            context) => new LoginSelectionPage()));
+                                            context) => new LoginSelection()));
                                 Navigator.of(context, rootNavigator: true).pop(
                                     'dialog');
                               },
                             ),
-                            RaisedButton(
-                              color: white_color,
-                              child: Text("No"),
-                              onPressed: () {
-                                Navigator.of(context, rootNavigator: true).pop(
-                                    'dialog');
-                              },
-                            )
                           ],
                         ),
                       )
@@ -882,7 +893,18 @@ class ProfilePageState extends State<ProfilePage> {
     await prefs.setString('password', password);
   }
 
+  GoogleSignIn googleSignIn = GoogleSignIn();
+  var facebookLogin = FacebookLogin();
+
   Future _updatestatus() async {
+    await FirebaseAuth.instance.signOut();
+    if (googleSignIn.isSignedIn() != null) {
+      await googleSignIn.disconnect();
+      await googleSignIn.signOut();
+    }
+    if (facebookLogin.isLoggedIn != null) {
+      await facebookLogin.logOut();
+    }
     LocationService('');
     Firestore.instance
         .collection('users')

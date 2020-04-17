@@ -21,7 +21,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     home: new SplashScreenPage(),
     routes: <String, WidgetBuilder>{
-      '/HomeScreen': (BuildContext context) => new LoginSelectionPage()
+      '/HomeScreen': (BuildContext context) => new LoginSelection()
     },
   ));
 }

@@ -103,7 +103,7 @@ class NewTweetPostState extends State<NewTweetPost> {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomPadding: true,
-        appBar: AppBar(
+        /*  appBar: AppBar(
           leading: new IconButton(
               icon: Icon(Icons.arrow_back_ios), onPressed: () {
             Navigator.push(context, MaterialPageRoute(
@@ -111,22 +111,82 @@ class NewTweetPostState extends State<NewTweetPost> {
                     UsersList(signInType,currentUserId, mCurrentPhotoUrl)));
           }),
           title: Text('Post Message'),
-        ),
+        ),*/
         body: Stack(
           children: <Widget>[
             Column(
-              children: <Widget>[
-                buildListTweetCategory(),
-                // List of messages
-                buildTweetInput(),
-                // Input content
-                buildInput(),
-              ],
+                children: <Widget>[
+                  Container(
+                    color: facebook_color,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    height: 150,
+                    child:
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
+                          child: new IconButton(
+                              icon: Icon(Icons.arrow_back_ios,
+                                color: white_color,),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              }),
+                        ),
+                        new Container(
+                            margin: EdgeInsets.only(
+                                top: 20.0, right: 10.0, bottom: 40.0),
+                            child: Text('Post Message', style: TextStyle(
+                                color: text_color,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold),)
+                        ),
+                      ],
+                    ),
+                  ),
+                ]
             ),
+
+            Align(
+                alignment: Alignment.bottomLeft,
+                child: Container(
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height - 100,
+                    decoration: BoxDecoration(
+                        color: text_color,
+                        borderRadius: new BorderRadius.only(
+                          topLeft: const Radius.circular(30.0),
+                          topRight: const Radius.circular(30.0),
+                        )
+                    ),
+                    child: Container(
+                      child: Column(
+                        children: <Widget>[
+                          buildListTweetCategory(),
+                          // List of messages
+                          buildTweetInput(),
+                          // Input content
+                          buildInput(),
+                        ],
+                      ),
+                    )
+                )
+            )
           ],
         )
     );
   }
+
 
   Widget buildListTweetCategory() {
     return Container(
@@ -155,10 +215,10 @@ class NewTweetPostState extends State<NewTweetPost> {
       ),
       width: double.infinity,
       height: 100.0,
-      decoration: new BoxDecoration(
-          border: new Border(
-              top: new BorderSide(color: Colors.white, width: 0.5)),
-          color: Colors.white),
+//      decoration: new BoxDecoration(
+//          border: new Border(
+//              top: new BorderSide(color: Colors.white, width: 0.5)),
+//          color: Colors.white),
     );
   }
 

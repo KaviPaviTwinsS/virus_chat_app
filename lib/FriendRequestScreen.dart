@@ -112,14 +112,14 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                               icon: Icon(Icons.arrow_back_ios,
                                 color: white_color,),
                               onPressed: () {
-//                                Navigator.pop(context);
-                                Navigator.push(
+                                Navigator.pop(context);
+                              /*  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
                                         new UsersList(
                                             userSignInType, _mcurrentUserId,
-                                            photoUrl)));
+                                            photoUrl)));*/
                               }),
                         ),
                         new Container(
