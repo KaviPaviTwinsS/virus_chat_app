@@ -177,7 +177,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
-                    margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
+                    margin: EdgeInsets.only(top: 40.0, left: 10.0, right: 10.0),
                     padding: EdgeInsets.all(30.0),
                     width: double.infinity,
                     child: SizedBox(
@@ -198,9 +198,9 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                         color: facebook_color,
                         textColor: text_color,
                         shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(20.0),
+                          borderRadius: new BorderRadius.circular(30.0),
                         ),
-                        child: Text('CONTINUE',
+                        child: Text(continue_txt,
                           style: TextStyle(fontSize: 17),),
                       ),
                     ),

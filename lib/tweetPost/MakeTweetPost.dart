@@ -1,14 +1,21 @@
+import 'dart:io';
+import 'dart:io' as Io;
+
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 import 'package:virus_chat_app/utils/strings.dart';
+import 'package:path_provider/path_provider.dart'
+    show getExternalStorageDirectory, getTemporaryDirectory;
 
 class MakeTweetPost extends StatefulWidget {
   String _mCurrentId = '';
@@ -91,7 +98,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                             .center,
                         children: <Widget>[
                           Container(
-                            margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
+                            margin: EdgeInsets.only(top: 40.0, bottom: 40.0),
                             child: new IconButton(
                                 icon: Icon(Icons.arrow_back_ios,
                                   color: white_color,),
@@ -101,7 +108,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                           ),
                           new Container(
                               margin: EdgeInsets.only(
-                                  top: 20.0, right: 10.0, bottom: 40.0),
+                                  top: 40.0, right: 10.0, bottom: 40.0),
                               child: Text('My community', style: TextStyle(
                                   color: text_color,
                                   fontSize: 20.0,
@@ -197,8 +204,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
       ),
     );
   }
-
-
+/*
   Widget buildItem(int index, DocumentSnapshot document) {
     return Container(
         padding: EdgeInsets.all(5.0),
@@ -207,14 +213,14 @@ class MakeTweetPostState extends State<MakeTweetPost> {
           child: Column(
             children: <Widget>[
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   document['userPhoto'] != '' ? Container(
-                    margin: EdgeInsets.only(bottom: 15.0),
+                      margin: EdgeInsets.only(top: 5.0,left : 10.0,bottom: document['tweetPostImage'] != '' ? 210.0 : 100.0),
                       child: Material(
                         child: CachedNetworkImage(
                           placeholder: (context, url) =>
                               Container(
-                                margin: EdgeInsets.all(5.0),
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.0,
                                   valueColor: AlwaysStoppedAnimation<Color>(
@@ -233,142 +239,301 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                       )
                   )
                       : Text(''),
-                  SingleChildScrollView(
-                    child: Column(
+                  Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
                         Row(
-                          children: <Widget>[
-                            document['userName'] != '' ? Container(
-                                margin: EdgeInsets.all(5.0),
-                                child: Center(
-                                  child: Text(
-                                      capitalize(document['userName']),
-                                      style: TextStyle(color: facebook_color)
-                                  ),
-                                )
-                            ) : Text(''),
+                          children: <Widget>[document['userName'] != '' ? Container(
+                              margin: EdgeInsets.only(left: 15.0,top: 5.0,bottom: 5.0,right: 5.0),
+                              child: Text(
+                                    document['userName'],
+                                    style: TextStyle(color: facebook_color,fontWeight: FontWeight.bold)
+                              )
+                          ) : Text(''),
                             document['createdAt'] != '' ? Container(
-                                child: Center(
-                                  child: Text(
+                                child: Text(
                                       document['createdAt'],
-                                      style: TextStyle(color: greyColor)
-                                  ),
+                                      style: TextStyle(color: greyColor,fontSize: 10.0)
                                 )
                             ) : Text(''),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Container(
+                              margin: EdgeInsets.only(left:20.0),
+                              child: getIconWidget(document),
+                            ),
+                          )
                           ],
                         ),
                         document['content'] != '' ? Container(
-                            margin: EdgeInsets.all(5.0),
+                          width: MediaQuery.of(context).size.width - 100,
+                            margin: EdgeInsets.only(left: 15.0,bottom: 10.0,right: 5.0,top: 5.0),
                             child: Text(
                                 document['content'])
                         )
                             : Text(''),
-                        document['tweetPostImage'] != '' ? Center(
-                          child: Container(
-                            child: FlatButton(
-                              child: Material(
-                                child: CachedNetworkImage(
-                                  placeholder: (context, url) =>
-                                      Center(
-                                      child:Container(
-                                        child: CircularProgressIndicator(
-                                          valueColor: AlwaysStoppedAnimation<
-                                              Color>(
-                                              themeColor),
-                                        ),
-                                        width: 150.0,
-                                        height: 200.0,
-                                        decoration: BoxDecoration(
-                                          color: greyColor2,
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(5.0),
-                                          ),
-                                        ),
+                        document['tweetPostImage'] != '' ? Center(child: Container(
+                          child: FlatButton(
+                            child: Material(
+                              child: CachedNetworkImage(
+                                placeholder: (context, url) =>
+                                    Container(
+                                      child: CircularProgressIndicator(
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                            themeColor),
                                       ),
-                                      ),
-                                  errorWidget: (context, url, error) =>
-                                      Material(
-                                        child: Image.asset(
-                                          'images/img_not_available.jpeg',
-                                          width: 150.0,
-                                          height: 200.0,
-                                          fit: BoxFit.cover,
-                                        ),
+                                      width: 50.0,
+                                      height: 50.0,
+                                      decoration: BoxDecoration(
+                                        color: greyColor2,
                                         borderRadius: BorderRadius.all(
                                           Radius.circular(5.0),
                                         ),
-                                        clipBehavior: Clip.hardEdge,
                                       ),
-                                  imageUrl: document['tweetPostImage'],
-                                  width: 150.0,
-                                  height: 200.0,
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0)),
-                                clipBehavior: Clip.hardEdge,
+                                    ),
+                                errorWidget: (context, url, error) =>
+                                    Material(
+                                      child: Image.asset(
+                                        'images/img_not_available.jpeg',
+                                        width: 150.0,
+                                        height: 200.0,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(5.0),
+                                      ),
+                                      clipBehavior: Clip.hardEdge,
+                                    ),
+                                imageUrl: document['tweetPostImage'],
+                                width: 150.0,
+                                height: 200.0,
+                                fit: BoxFit.cover,
                               ),
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) =>
-                                        FullPhoto(
-                                            url: document['tweetPostImage'])));
-                              },
+                              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                              clipBehavior: Clip.hardEdge,
                             ),
-                          ),) : Text(''),
+                            onPressed: () {
+                              Navigator.push(
+                                  context, MaterialPageRoute(builder: (context) =>
+                                  FullPhoto(url: document['tweetPostImage'])));
+                            },
+                          ),
+                        ),) : Text(''),
                       ],
                     ),
-                  ),
-                  Spacer(),
-                  Align(
-                    child: getIconWidget(document),
-                  )
+
                 ],
               ),
-              Divider(color: greyColor,),
-              //                           <-- Divider
+              Divider(color: greyColor,), //                           <-- Divider
             ],
           ),
         )
     );
+  }*/
+
+
+
+
+
+  Widget buildItem(int index, DocumentSnapshot document) {
+    var url =document['userName'] + index.toString();
+    if(document['tweetPostImage'] != '')
+    storeFile(document['tweetPostImage'],url);
+    return Container(
+        padding: EdgeInsets.all(5.0),
+        width: double.infinity,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+
+              Stack(
+                children: <Widget>[
+                  document['userPhoto'] != '' ? Container(
+                      margin: EdgeInsets.only(left : 10.0,bottom: document['tweetPostImage'] != '' ? 210.0 : 100.0),
+                      child: Material(
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) =>
+                              Container(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      themeColor),
+                                ),
+                                width: 35.0,
+                                height: 35.0,
+                              ),
+                          imageUrl: document['userPhoto'],
+                          width: 35.0,
+                          height: 35.0,
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(45.0)),
+                        clipBehavior: Clip.hardEdge,
+                      )
+                  )
+                      : Text(''),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[document['userName'] != '' ? Container(
+                              margin: EdgeInsets.only(left: 60.0,bottom: 5.0),
+                              child: Text(
+                                  capitalize(document['userName']),
+                                  style: TextStyle(color: facebook_color,fontWeight: FontWeight.bold)
+                              )
+                          ) : Text(''),
+                            document['createdAt'] != '' ? Container(
+                                margin: EdgeInsets.only(left : 10.0,right: 5.0),
+                                child: Text(
+                                    document['createdAt'],
+                                    style: TextStyle(color: greyColor,fontSize: 10.0)
+                                )
+                            ) : Text(''),
+                            Spacer(),
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: Container(
+                                margin: EdgeInsets.only(right: 5.0,bottom: 5.0),
+                                child: getIconWidget(document),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      document['content'] != '' ? Container(
+                          margin: EdgeInsets.only(left: 60.0,bottom: 15.0),
+                          width: MediaQuery.of(context).size.width - 100,
+                          child: Text(
+                              document['content'])
+                      )
+                          : Text(''),
+                      document['tweetPostImage'] != '' ? Container(
+                        margin: EdgeInsets.only(left: 40.0,bottom: 15.0),
+                        child: FlatButton(
+                          child: Material(
+                            child: CachedNetworkImage(
+                              placeholder: (context, url) =>
+                                  Container(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          themeColor),
+                                    ),
+                                    width: 50.0,
+                                    height: 50.0,
+                                    decoration: BoxDecoration(
+                                      color: greyColor2,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(5.0),
+                                      ),
+                                    ),
+                                  ),
+                              errorWidget: (context, url, error) =>
+                                  Material(
+                                    child: Image.asset(
+                                      'images/img_not_available.jpeg',
+                                      width: 150.0,
+                                      height: 200.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                    clipBehavior: Clip.hardEdge,
+                                  ),
+                              imageUrl: document['tweetPostImage'],
+                              width: 150.0,
+                              height: 200.0,
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                            clipBehavior: Clip.hardEdge,
+                          ),
+                          onPressed: () {
+                            isExistFile(document,index);
+                          },
+                      ),) : Text(''),
+
+                    ],
+                  )
+
+                ],
+              ),
+              Divider(),
+
+
+            ],
+          ),
+        )
+    );
+
   }
 
+  Future isExistFile(DocumentSnapshot document,int index) async{
+    var uriName = document['userName']+index.toString();
+    Directory tempDir = await getExternalStorageDirectory();
+    String uri = '${tempDir.path}/${uriName}' + '.jpeg';
+    bool isFileExist = await File(uri).exists();
+    print('MAKEEEEEEEEEEEE TWEET $uri _____ $isFileExist');
+//    if (isFileExist) {
+//      Navigator.push(
+//          context, MaterialPageRoute(builder: (context) =>
+//          FullPhoto(url: uri)));
+//    }else{
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) =>
+          FullPhoto(url: document['tweetPostImage'])));
+//    }
+  }
+
+  Future storeFile(String imageUrl, String fileName) async {
+    Directory tempDir = await getExternalStorageDirectory();
+    String uri = '${tempDir.path}/${fileName}' + '.jpeg';
+    print('uriuriuriuriuriuriuriuriuriuriuriuriuriuriuriuriuriuriuriuri __$uri');
+    if (!await File(uri).exists())
+      getImageFromNetwork(imageUrl, uri);
+  }
+
+  Future<Io.File> getImageFromNetwork(String url, String uri) async {
+    var response = await get(url);
+    File file = new File(
+        uri
+    );
+    file.writeAsBytes(response.bodyBytes);
+    return file;
+  }
 
   Widget getIconWidget(DocumentSnapshot document) {
     String documentName = document['categoryName'];
     if (documentName == 'Help') {
-      return IconButton(
-          icon: new SvgPicture.asset(
-            'images/tag_help.svg', height: 30.0,
-            width: 30.0,
-          ));
+      return new SvgPicture.asset(
+        'images/tag_help.svg', height: 30.0,
+        width: 30.0,
+      );
     } else if (documentName == 'Market Place') {
-      return IconButton(
-          icon: new SvgPicture.asset(
-            'images/tag_market_place.svg', height: 30.0,
-            width: 30.0,
-          ));
+      return new SvgPicture.asset(
+        'images/tag_market_place.svg', height: 30.0,
+        width: 30.0,
+      );
     } else if (documentName == 'Alert') {
-      return IconButton(
-          icon: new SvgPicture.asset(
-            'images/tag_alert.svg', height: 30.0,
-            width: 30.0,
-          ));
+      return  new SvgPicture.asset(
+        'images/tag_alert.svg', height: 30.0,
+        width: 30.0,
+      );
     } else if (documentName == 'Social') {
-      return IconButton(
-          icon: new SvgPicture.asset(
-            'images/tag_social.svg', height: 30.0,
-            width: 30.0,
-          ));
+      return  new SvgPicture.asset(
+        'images/tag_social.svg', height: 30.0,
+        width: 30.0,
+      );
     } else {
-      return IconButton(
-          icon: new SvgPicture.asset(
-            'images/tag_market_place.svg', height: 30.0,
-            width: 30.0,
-          ));
+      return new SvgPicture.asset(
+        'images/tag_market_place.svg', height: 30.0,
+        width: 30.0,
+      );
     }
   }
 

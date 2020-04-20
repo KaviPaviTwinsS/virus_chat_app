@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/const.dart';
@@ -83,9 +84,66 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                 ),
               ]
           ),
-          Container(
-            child: PhotoView(imageProvider: NetworkImage(url)),
-          ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Container(
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height - 100,
+              decoration: BoxDecoration(
+                  color: text_color,
+                  borderRadius: new BorderRadius.only(
+                    topLeft: const Radius.circular(30.0),
+                    topRight: const Radius.circular(30.0),
+                  )
+              ),
+              child: Container(
+                margin: EdgeInsets.all(30.0),
+//                child: PhotoView(imageProvider: NetworkImage(url)),
+                child: CachedNetworkImage(
+                  placeholder: (context, url) =>
+                      Center(
+                        child: Container(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                themeColor),
+                          ),
+                          width: 50.0,
+                          height: 50.0,
+                          decoration: BoxDecoration(
+                            color: greyColor2,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                  errorWidget: (context, url, error) =>
+                      Material(
+                        child: Image.asset(
+                          'images/img_not_available.jpeg',
+                          width: 150.0,
+                          height: 200.0,
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5.0),
+                        ),
+                        clipBehavior: Clip.hardEdge,
+                      ),
+                  imageUrl: url,
+                  width: 150.0,
+                  height: 200.0,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          )
         ]
     );
   }

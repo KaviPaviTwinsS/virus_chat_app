@@ -21,6 +21,7 @@ import 'package:virus_chat_app/userListCopy.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
 import 'package:intl/intl.dart';
+import 'package:virus_chat_app/utils/const.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:http/http.dart' as http;
 
@@ -49,7 +50,7 @@ class NewTweetPostState extends State<NewTweetPost> {
   File imageFile;
   bool isLoading;
   String mCurrentPhotoUrl = '';
-  final TextEditingController textEditingController = new TextEditingController();
+  final _controller = TextEditingController();
   final ScrollController listScrollController = new ScrollController();
 
   String mTweetMsg = '';
@@ -78,6 +79,18 @@ class NewTweetPostState extends State<NewTweetPost> {
     isLoading = false;
     focusNode.addListener(onFocusChange);
     initialise();
+    setState(() {
+
+    });
+
+    _controller.addListener(() {
+      final text = _controller.text.toLowerCase();
+      _controller.value = _controller.value.copyWith(
+        text: text,
+        selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+        composing: TextRange.empty,
+      );
+    });
     super.initState();
   }
 
@@ -112,76 +125,91 @@ class NewTweetPostState extends State<NewTweetPost> {
           }),
           title: Text('Post Message'),
         ),*/
-        body: Stack(
+        body:Stack(
           children: <Widget>[
-            Column(
-                children: <Widget>[
-                  Container(
-                    color: facebook_color,
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                    height: 150,
-                    child:
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment
-                          .center,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
-                          child: new IconButton(
-                              icon: Icon(Icons.arrow_back_ios,
-                                color: white_color,),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              }),
+            Stack(
+              children: <Widget>[
+                Column(
+                    children: <Widget>[
+                      Container(
+                        color: facebook_color,
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width,
+                        height: 150,
+                        child:
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment
+                              .center,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
+                              child: new IconButton(
+                                  icon: Icon(Icons.arrow_back_ios,
+                                    color: white_color,),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  }),
+                            ),
+                            new Container(
+                                margin: EdgeInsets.only(
+                                    top: 20.0, right: 10.0, bottom: 40.0),
+                                child: Text('Post Message', style: TextStyle(
+                                    color: text_color,
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold),)
+                            ),
+                          ],
                         ),
-                        new Container(
-                            margin: EdgeInsets.only(
-                                top: 20.0, right: 10.0, bottom: 40.0),
-                            child: Text('Post Message', style: TextStyle(
-                                color: text_color,
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold),)
-                        ),
-                      ],
-                    ),
-                  ),
-                ]
-            ),
-
-            Align(
-                alignment: Alignment.bottomLeft,
-                child: Container(
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .height - 100,
-                    decoration: BoxDecoration(
-                        color: text_color,
-                        borderRadius: new BorderRadius.only(
-                          topLeft: const Radius.circular(30.0),
-                          topRight: const Radius.circular(30.0),
-                        )
-                    ),
-                    child: Container(
-                      child: Column(
-                        children: <Widget>[
-                          buildListTweetCategory(),
-                          // List of messages
-                          buildTweetInput(),
-                          // Input content
-                          buildInput(),
-                        ],
                       ),
+                    ]
+                ),
+
+                Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Container(
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width,
+                        height: MediaQuery
+                            .of(context)
+                            .size
+                            .height - 100,
+                        decoration: BoxDecoration(
+                            color: text_color,
+                            borderRadius: new BorderRadius.only(
+                              topLeft: const Radius.circular(30.0),
+                              topRight: const Radius.circular(30.0),
+                            )
+                        ),
+                        child: Container(
+                          child: Column(
+                            children: <Widget>[
+                              buildListTweetCategory(),
+                              // List of messages
+                              buildTweetInput(),
+                              // Input content
+                              buildInput(),
+                            ],
+                          ),
+                        )
                     )
                 )
-            )
+              ],
+            ),
+            Positioned(
+              child: isLoading
+                  ? Container(
+                child: Center(
+                  child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+                ),
+                color: Colors.white.withOpacity(0.8),
+              )
+                  : Container(),
+            ),
           ],
         )
     );
@@ -357,10 +385,10 @@ class NewTweetPostState extends State<NewTweetPost> {
                       padding: EdgeInsets.only(left: 10.0),
                       child: TextField(
                         style: TextStyle(color: primaryColor, fontSize: 15.0),
-                        controller: textEditingController,
-                        onChanged: (value) {
+                        controller: _controller,
+                       /* onChanged: (value) {
                           mTweetMsg = value;
-                        },
+                        },*/
                         decoration: InputDecoration.collapsed(
                           hintText: 'What\'s happening?',
                           hintStyle: TextStyle(color: greyColor),
@@ -374,21 +402,26 @@ class NewTweetPostState extends State<NewTweetPost> {
                 ],
               ),
               imageUrl != '' ? Container(
+                width: 250.0,
+                height: 250.0,
                 child: FlatButton(
                   child: Material(
                     child: CachedNetworkImage(
                       placeholder: (context, url) =>
-                          Container(
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  themeColor),
-                            ),
-                            width: 200.0,
-                            height: 200.0,
-                            decoration: BoxDecoration(
-                              color: greyColor2,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5.0),
+                          Center(
+                            child:Container(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<
+                                    Color>(
+                                    themeColor),
+                              ),
+                              width: 50.0,
+                              height: 50.0,
+                              decoration: BoxDecoration(
+//                                          color: greyColor2,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5.0),
+                                ),
                               ),
                             ),
                           ),
@@ -396,8 +429,8 @@ class NewTweetPostState extends State<NewTweetPost> {
                           Material(
                             child: Image.asset(
                               'images/img_not_available.jpeg',
-                              width: 200.0,
-                              height: 200.0,
+                              width: 250.0,
+                              height: 250.0,
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.all(
@@ -406,8 +439,8 @@ class NewTweetPostState extends State<NewTweetPost> {
                             clipBehavior: Clip.hardEdge,
                           ),
                       imageUrl: imageUrl,
-                      width: 200.0,
-                      height: 200.0,
+                      width: 250.0,
+                      height: 250.0,
                       fit: BoxFit.cover,
                     ),
                     borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -424,12 +457,12 @@ class NewTweetPostState extends State<NewTweetPost> {
             ],
           ),
         ),
-        width: double.infinity,
+       /* width: double.infinity,
         height: 300.0,
         decoration: new BoxDecoration(
             border: new Border(
                 top: new BorderSide(color: greyColor2, width: 0.5)),
-            color: Colors.white),
+            color: Colors.white),*/
       ),
     );
   }
@@ -477,6 +510,21 @@ class NewTweetPostState extends State<NewTweetPost> {
               child: new Container(
                 child: new IconButton(
                   icon: new SvgPicture.asset(
+                    'images/camera.svg', height: 30.0,
+                    width: 30.0,
+                  ),
+                  onPressed: getCamera,
+                  color: primaryColor,
+                ),
+              ),
+              color: Colors.white,
+            ),
+          ),
+          Center(
+            child: Material(
+              child: new Container(
+                child: new IconButton(
+                  icon: new SvgPicture.asset(
                     'images/pic.svg', height: 30.0,
                     width: 30.0,
                   ),
@@ -512,7 +560,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                     width: 500.0,
                   ),
                   onPressed: () {
-                    onSendMessage(textEditingController.text, imageUrl);
+                    onSendMessage(_controller.text, imageUrl);
                   }
               ),
             ),
@@ -529,8 +577,19 @@ class NewTweetPostState extends State<NewTweetPost> {
   }
 
 
+  Future getCamera() async {
+    imageFile = await ImagePicker.pickImage(source: ImageSource.camera,imageQuality: 20);
+
+    if (imageFile != null) {
+      setState(() {
+        isLoading = true;
+      });
+      uploadFile();
+    }
+  }
+
   Future getImage() async {
-    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery,imageQuality: 20);
 
     if (imageFile != null) {
       setState(() {
@@ -571,11 +630,11 @@ class NewTweetPostState extends State<NewTweetPost> {
   }
 
 
-  void onSendMessage(String content, String tweetPostUrl) {
+  Future onSendMessage(String content, String tweetPostUrl) async {
     // type: 0 = text, 1 = image, 2 = sticker
     if (tappedCategoryName.trim() != '') {
       if (content.trim() != '' || tweetPostUrl.trim() != '') {
-        textEditingController.clear();
+        _controller.clear();
 
         var documentReference = Firestore.instance
             .collection('tweetPosts')
@@ -610,6 +669,8 @@ class NewTweetPostState extends State<NewTweetPost> {
         Navigator.push(context, MaterialPageRoute(
             builder: (context) =>
                 MakeTweetPost(currentUserId, mCurrentPhotoUrl)));
+        imageUrl ='';
+        _controller.clear();
         sendMsg();
       } else {
         Fluttertoast.showToast(msg: 'Nothing to send');
@@ -632,7 +693,7 @@ class NewTweetPostState extends State<NewTweetPost> {
   }
 
 
-  final String serverToken = 'AAAA1iQ7au4:APA91bGvPY8CpYvutHVhzh7RL-xyybt7lxPNU_OxXPCJdxDtyZain9hxgliGV9OQyaXLiKXJyVUhpQm0tygEz4YfisEdGIOLyNo3vgUguNMEpBVEaEwUfONgErCLALyrrLTroFhfq5YD';
+  final String serverToken =SERVER_KEY;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;

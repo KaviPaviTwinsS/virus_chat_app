@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 <!--    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>-->
+    <uses-sdk android:minSdkVersion="21" />
 
     <application
         android:name="io.flutter.app.FlutterApplication"
@@ -18,6 +19,9 @@
         android:usesCleartextTraffic="true"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher">
+
+<!--        <uses-sdk tools:overrideLibrary="com.arthenica.flutter.ffmpeg,"/>-->
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

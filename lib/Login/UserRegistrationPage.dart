@@ -22,7 +22,7 @@ class UserRegistrationPage extends StatelessWidget {
   FirebaseUser mFirebaseUser;
 
   UserRegistrationPage(
-      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode,@required this.mFirebaseUser})
+      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.mFirebaseUser})
       : super(key: key);
 
 
@@ -30,7 +30,7 @@ class UserRegistrationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomPadding: true,
-        appBar: AppBar(
+      /*  appBar: AppBar(
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
             onPressed: () {
@@ -41,9 +41,10 @@ class UserRegistrationPage extends StatelessWidget {
             },
           ),
           title: Text(user_registration),
-        ),
+        ),*/
       body: UserRegistrationState(userPhoneNumber: userPhoneNumber,
-          userPhoneNumberWithoutCountryCode: userPhoneNumberWithoutCountryCode,myFirebaseUser:mFirebaseUser),
+          userPhoneNumberWithoutCountryCode: userPhoneNumberWithoutCountryCode,
+          myFirebaseUser: mFirebaseUser),
     );
   }
 }
@@ -54,14 +55,16 @@ class UserRegistrationState extends StatefulWidget {
   String userPhoneNumberWithoutCountryCode = '';
 
   FirebaseUser myFirebaseUser;
+
   UserRegistrationState(
-      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode,@required this.myFirebaseUser})
+      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.myFirebaseUser})
       : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
     return UserRegistrationScreen(userPhoneNumber: userPhoneNumber,
-        userPhoneNumberWithoutCountryCode: userPhoneNumberWithoutCountryCode,firebaseUser: myFirebaseUser);
+        userPhoneNumberWithoutCountryCode: userPhoneNumberWithoutCountryCode,
+        firebaseUser: myFirebaseUser);
   }
 
 }
@@ -74,20 +77,18 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   TextEditingController userNockNameController = new TextEditingController();
   TextEditingController userEmailController = new TextEditingController();
 
-  String _mUserName =' ', _mUserNickName ='', _mUserEmail ='';
-
-  String userPhoneNumberWithoutCountryCode ='';
+  String userPhoneNumberWithoutCountryCode = '';
   String photoUrl = '';
 
   bool isLoading = false;
   File avatarImageFile;
 
   SharedPreferences prefs;
-  String userToken='';
+  String userToken = '';
 
 
   UserRegistrationScreen(
-      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode,@required this.firebaseUser});
+      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.firebaseUser});
 
   @override
   void initState() {
@@ -95,6 +96,36 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     isSignIn();
     // Force refresh input
     setState(() {});
+
+
+    userNameController.addListener(() {
+      final text = userNameController.text.toLowerCase();
+      userNameController.value = userNameController.value.copyWith(
+        text: text,
+        selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+        composing: TextRange.empty,
+      );
+    });
+
+
+    userNockNameController.addListener(() {
+      final text = userNockNameController.text.toLowerCase();
+      userNockNameController.value = userNockNameController.value.copyWith(
+        text: text,
+        selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+        composing: TextRange.empty,
+      );
+    });
+
+    userEmailController.addListener(() {
+      final text = userEmailController.text.toLowerCase();
+      userEmailController.value = userEmailController.value.copyWith(
+        text: text,
+        selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+        composing: TextRange.empty,
+      );
+    });
+
   }
 
   void isSignIn() async {
@@ -106,183 +137,254 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              // Avatar
-              Container(
-                child: Center(
-                  child: Stack(
-                    children: <Widget>[
-                      (avatarImageFile == null)
-                          ? (photoUrl != ''
-                          ? Material(
-                        child: CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.0,
-                              valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                            ),
-                            width: 90.0,
-                            height: 90.0,
-                            padding: EdgeInsets.all(20.0),
-                          ),
-                          imageUrl: photoUrl,
-                          width: 90.0,
-                          height: 90.0,
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(45.0)),
-                        clipBehavior: Clip.hardEdge,
-                      )
-                          : Icon(
-                        Icons.account_circle,
-                        size: 90.0,
-                        color: greyColor,
-                      ))
-                          : Material(
-                        child: Image.file(
-                          avatarImageFile,
-                          width: 90.0,
-                          height: 90.0,
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(45.0)),
-                        clipBehavior: Clip.hardEdge,
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.camera_alt,
-                          color: primaryColor.withOpacity(0.5),
-                        ),
-                        onPressed: getImage,
-                        padding: EdgeInsets.all(30.0),
-                        splashColor: Colors.transparent,
-                        highlightColor: greyColor,
-                        iconSize: 30.0,
-                      ),
-                    ],
-                  ),
-                ),
-                width: double.infinity,
-                margin: EdgeInsets.all(20.0),
-              ),
 
-              // Input
-              Column(
+        Stack(
+          children: <Widget>[
+            Column(
                 children: <Widget>[
-                  // Username
                   Container(
-                    margin: const EdgeInsets.only(
-                        left: 20.0, top: 20.0, right: 20.0),
-                    child: TextField(
-                      obscureText: false,
-                      controller: userNameController,
-                      onChanged: (userPhoneNumber) {
-                        _mUserName = userPhoneNumber;
-                      },
-                      decoration: new InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: focused_border_color, width: 2.0),
+                    color: facebook_color,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    height: 150,
+                    child:
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
+                          child: new IconButton(
+                              icon: Icon(Icons.arrow_back_ios,
+                                color: white_color,),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              }),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: enabled_border_color, width: 2.0),
+                        new Container(
+                            margin: EdgeInsets.only(
+                                top: 20.0, right: 10.0, bottom: 40.0),
+                            child: Text(user_registration, style: TextStyle(
+                                color: text_color,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold),)
                         ),
-                        hintText: 'Name',
-                      ),
+                      ],
                     ),
                   ),
-
-                  Container(
-                    margin: const EdgeInsets.only(
-                        left: 20.0, top: 5.0, right: 20.0),
-                    child: TextField(
-                      obscureText: false,
-                      controller: userNockNameController,
-                      onChanged: (userPhoneNumber) {
-                        _mUserNickName = userPhoneNumber;
-                      },
-                      decoration: new InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: focused_border_color, width: 2.0),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: enabled_border_color, width: 2.0),
-                        ),
-                        hintText: 'Nick Name',
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(
-                        left: 20.0, top: 5.0, right: 20.0),
-                    child: TextField(
-                      obscureText: false,
-                      controller: userEmailController,
-                      onChanged: (userPhoneNumber) {
-                        _mUserEmail = userPhoneNumber;
-                      },
-                      decoration: new InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: focused_border_color, width: 2.0),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: enabled_border_color, width: 2.0),
-                        ),
-                        hintText: 'Email',
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                  ),
-                ],
-                crossAxisAlignment: CrossAxisAlignment.start,
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
+                ]
+            ),
+            Align(
+                alignment: Alignment.bottomLeft,
                 child: Container(
-                  margin: EdgeInsets.only(top: 30.0,left: 10.0,right: 10.0),
-                  padding: EdgeInsets.all(30.0),
-                  width: double.infinity,
-                  child : SizedBox(
-                    height: 45, // specific value
-                    child: RaisedButton(onPressed: () {
-                      print('USER RIGISTRSST _mUserEmail$_mUserEmail ___mUserName$_mUserName __photoUrl$photoUrl');
-                      if (_mUserName != '' && _mUserEmail != '' &&
-                          photoUrl != '') {
-                        _AddNewUser(firebaseUser);
-                      } else {
-                        print('NAN registrationValidation');
-                        registrationValidation();
-                      }
-                    },
-                      color: facebook_color,
-                      textColor: text_color,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(20.0),
-                      ),
-                      child: Text(btn_register,
-                        style: TextStyle(fontSize: 17),),
-                    ),
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height - 100,
+                  decoration: BoxDecoration(
+                      color: text_color,
+                      borderRadius: new BorderRadius.only(
+                        topLeft: const Radius.circular(30.0),
+                        topRight: const Radius.circular(30.0),
+                      )
                   ),
-                ),
-              )
-            ],
-          ),
-          padding: EdgeInsets.only(left: 15.0, right: 15.0),
-        ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        // Avatar
+                        Container(
+                          child: Center(
+                            child: Stack(
+                              children: <Widget>[
+                                (avatarImageFile == null)
+                                    ? (photoUrl != ''
+                                    ? Material(
+                                  child: CachedNetworkImage(
+                                    placeholder: (context, url) =>
+                                        Container(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                            valueColor: AlwaysStoppedAnimation<
+                                                Color>(themeColor),
+                                          ),
+                                          width: 90.0,
+                                          height: 90.0,
+                                          padding: EdgeInsets.all(20.0),
+                                        ),
+                                    imageUrl: photoUrl,
+                                    width: 90.0,
+                                    height: 90.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(45.0)),
+                                  clipBehavior: Clip.hardEdge,
+                                )
+                                    : Icon(
+                                  Icons.account_circle,
+                                  size: 90.0,
+                                  color: greyColor,
+                                ))
+                                    : Material(
+                                  child: Image.file(
+                                    avatarImageFile,
+                                    width: 90.0,
+                                    height: 90.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(45.0)),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.camera_alt,
+                                    color: primaryColor.withOpacity(0.5),
+                                  ),
+                                  onPressed: getImage,
+                                  padding: EdgeInsets.all(30.0),
+                                  splashColor: Colors.transparent,
+                                  highlightColor: greyColor,
+                                  iconSize: 30.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                          width: double.infinity,
+                          margin: EdgeInsets.all(20.0),
+                        ),
 
+                        // Input
+                        Column(
+                          children: <Widget>[
+                            // Username
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  left: 20.0, top: 20.0, right: 20.0),
+                              child: TextField(
+                                obscureText: false,
+                                controller: userNameController,
+                               /* onChanged: (userPhoneNumber) {
+                                  _mUserName = userPhoneNumber;
+                                },*/
+                                decoration: new InputDecoration(
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: focused_border_color,
+                                        width: 2.0),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: enabled_border_color,
+                                        width: 2.0),
+                                  ),
+                                  hintText: 'Name',
+                                ),
+                              ),
+                            ),
+
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  left: 20.0, top: 5.0, right: 20.0),
+                              child: TextField(
+                                obscureText: false,
+                                controller: userNockNameController,
+                               /* onChanged: (userPhoneNumber) {
+                                  _mUserNickName = userPhoneNumber;
+                                },*/
+                                decoration: new InputDecoration(
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: focused_border_color,
+                                        width: 2.0),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: enabled_border_color,
+                                        width: 2.0),
+                                  ),
+                                  hintText: 'Nick Name',
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  left: 20.0, top: 5.0, right: 20.0),
+                              child: TextField(
+                                obscureText: false,
+                                controller: userEmailController,
+                             /*   onChanged: (userPhoneNumber) {
+                                  _mUserEmail = userPhoneNumber;
+                                },*/
+                                decoration: new InputDecoration(
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: focused_border_color,
+                                        width: 2.0),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: enabled_border_color,
+                                        width: 2.0),
+                                  ),
+                                  hintText: 'Email',
+                                ),
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                            ),
+                          ],
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            margin: EdgeInsets.only(
+                                top: 30.0, left: 10.0, right: 10.0),
+                            padding: EdgeInsets.all(30.0),
+                            width: double.infinity,
+                            child: SizedBox(
+                              height: 45, // specific value
+                              child: RaisedButton(onPressed: () {
+                                if (userNameController.text != '' && userEmailController.text != '' &&
+                                    photoUrl != '') {
+                                  _AddNewUser(firebaseUser);
+                                } else {
+                                  print('NAN registrationValidation');
+                                  registrationValidation();
+                                }
+                              },
+                                color: facebook_color,
+                                textColor: text_color,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(30.0),
+                                ),
+                                child: Text(btn_register,
+                                  style: TextStyle(fontSize: 17),),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                  ),
+                )
+            )
+          ],
+        ),
         // Loading
         Positioned(
           child: isLoading
               ? Container(
             child: Center(
-              child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+              child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
             ),
             color: Colors.white.withOpacity(0.8),
           )
@@ -293,7 +395,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   }
 
   Future getImage() async {
-    File image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    File image = await ImagePicker.pickImage(source: ImageSource.gallery,imageQuality: 20);
 
     if (image != null) {
       setState(() {
@@ -343,16 +445,17 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     String loginType = 'Mobile';
     loginType += 'AccountId';
     await updateLocalListData(prefs, 'MobileNumber');
-    UserLocation currentLocation = await LocationService(firebaseUser.uid,).getLocation();
+    UserLocation currentLocation = await LocationService(firebaseUser.uid,)
+        .getLocation();
 
     // Update data to server if new user
     try {
       Firestore.instance.collection('users').document(firebaseUser.uid).setData(
           {
-            'name': _mUserName,
+            'name': userNameController.text,
             'photoUrl': photoUrl,
-            'email': _mUserEmail,
-            'nickName': _mUserNickName,
+            'email': userEmailController.text,
+            'nickName': userNockNameController.text,
             'phoneNo': userPhoneNumber,
             'status': 'ACTIVE',
             'id': firebaseUser.uid,
@@ -364,9 +467,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                 .microsecondsSinceEpoch) / 1000).toInt()
           });
       print('NAN ADd user');
-
-    }catch(e){
-      print('Registration'+e);
+    } catch (e) {
+      print('Registration' + e);
     }
     Firestore.instance.collection('users').document(firebaseUser.uid)
         .collection('userLocation').document(firebaseUser.uid)
@@ -374,18 +476,16 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
       'userLocation': new GeoPoint(
           currentLocation.latitude, currentLocation.longitude),
     });
-
   }
 
 
   Future<Null> updateLocalListData(SharedPreferences prefs,
       String signInType) async {
-
     print('updateLocalListData');
     await prefs.setString('userId', firebaseUser.uid);
-    await prefs.setString('email', _mUserEmail);
-    await prefs.setString('name', _mUserName);
-    await prefs.setString('nickname', _mUserNickName);
+    await prefs.setString('email', userEmailController.text);
+    await prefs.setString('name', userNameController.text);
+    await prefs.setString('nickname', userNockNameController.text);
     await prefs.setString('status', 'ACTIVE');
     await prefs.setString('photoUrl', photoUrl);
     await prefs.setInt('createdAt', ((new DateTime.now()
@@ -398,8 +498,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
         MaterialPageRoute(
             builder: (context) =>
                 UsersList(signInType,
-                    firebaseUser.uid,photoUrl)));
-  /*  Navigator.push(
+                    firebaseUser.uid, photoUrl)));
+    /*  Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
@@ -409,26 +509,26 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   }
 
 
-  void registrationValidation(){
+  void registrationValidation() {
     bool emailValid = false;
 
-    print('_mUserEmail $_mUserEmail');
-    if(photoUrl =='' || photoUrl == null){
+    if (photoUrl == '' || photoUrl == null) {
       Fluttertoast.showToast(
           msg: upload_profile);
-    } else if(_mUserName == '' || _mUserName == null) {
+    } else if (userNameController.text == '' || userNameController.text == null) {
       Fluttertoast.showToast(
           msg: enter_name);
-    }else if(_mUserEmail == '' || _mUserEmail == null){
+    } else if (userEmailController.text == '' || userEmailController.text == null) {
       Fluttertoast.showToast(
           msg: enter_email);
-    }else{
-      emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_mUserEmail);
-      if(!emailValid){
+    } else {
+      emailValid = RegExp(
+          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+          .hasMatch(userEmailController.text);
+      if (!emailValid) {
         Fluttertoast.showToast(
             msg: enter_valid_email);
       }
     }
-
   }
 }

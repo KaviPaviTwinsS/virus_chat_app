@@ -12,6 +12,8 @@ import 'package:http/http.dart' as http;
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/splash/WalkThroughOne.dart';
+import 'package:virus_chat_app/splash/WalkThroughThree.dart';
+import 'package:virus_chat_app/splash/WalkThroughTwo.dart';
 import 'package:virus_chat_app/utils/const.dart';
 
 class SplashScreenPage extends StatefulWidget {
@@ -58,7 +60,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
 
     final headerss = {
       'content-type': 'application/json',
-      'Authorization': 'AAAA1iQ7au4:APA91bGvPY8CpYvutHVhzh7RL-xyybt7lxPNU_OxXPCJdxDtyZain9hxgliGV9OQyaXLiKXJyVUhpQm0tygEz4YfisEdGIOLyNo3vgUguNMEpBVEaEwUfONgErCLALyrrLTroFhfq5YD'
+      'Authorization': SERVER_KEY
     };
 
     final response = await http.post(postUrl,
@@ -79,7 +81,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
 
   }
 // Replace with server token from firebase console settings.
-  final String serverToken = 'AAAA1iQ7au4:APA91bGvPY8CpYvutHVhzh7RL-xyybt7lxPNU_OxXPCJdxDtyZain9hxgliGV9OQyaXLiKXJyVUhpQm0tygEz4YfisEdGIOLyNo3vgUguNMEpBVEaEwUfONgErCLALyrrLTroFhfq5YD';
+  final String serverToken =SERVER_KEY;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
   Future<Map<String, dynamic>> sendAndRetrieveMessage() async {
@@ -209,10 +211,21 @@ class _SplashScreenState extends State<SplashScreenPage> {
             MaterialPageRoute(
                 builder: (context) => new LoginSelection()));
       }else {
+        final controller = PageController(
+          initialPage: 0
+        );
+        var pageView = PageView(
+          controller: controller,
+            children : [
+              WalkThroughOne(),
+              WalkThroughTwo(),
+              WalkThroughThree(),
+            ]
+        );
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => new WalkThroughOne()));
+                builder: (context) => pageView));
       }
     }else {
       String signType = await preferences.getString('signInType');

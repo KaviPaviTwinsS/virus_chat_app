@@ -43,7 +43,7 @@ class _RangeSliderSampleState extends State<RangeSliderSample> {
                   upperValue: _upperValue,
                   divisions: 10,
                   showValueIndicator: true,
-                  valueIndicatorMaxDecimals: 4,
+                  valueIndicatorMaxDecimals: 1,
                   onChanged: (double newLowerValue, double newUpperValue) {
                     setState(() {
                       _lowerValue = newLowerValue;

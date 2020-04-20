@@ -118,76 +118,78 @@ class PasswordSetupState extends State<PasswordSetup> {
           onBackPress();
         },
         child: Scaffold(
-          body: Column(
+          body: Stack(
             children: <Widget>[
-              Align(
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    margin: const EdgeInsets.only(
-                        left: 5.0, top: 40.0, right: 20.0),
-                    child: new IconButton(
-                      icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => new LoginSelection()));
-                        updateLogin();
-                      },
-                    ),
-                  )
-              ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Container(
-                  margin: const EdgeInsets.only(
-                      left: 20.0, top: 30.0, right: 20.0),
-                  child: Text(password,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+              Column(
+                children: <Widget>[
+                  Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        margin: const EdgeInsets.only(
+                            left: 5.0, top: 40.0, right: 20.0),
+                        child: new IconButton(
+                          icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => new LoginSelection()));
+                            updateLogin();
+                          },
+                        ),
+                      )
                   ),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(
-                    left: 20.0, top: 20.0, right: 20.0),
-                child: TextField(
-                  obscureText: passwordVisible,
-                  controller: passwordController,
-                  onChanged: (value) {
-                    userPassword = value;
-                  },
-                  autofocus: true,
-                  decoration: new InputDecoration(
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        // Based on passwordVisible state choose the icon
-                        passwordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                        color: Theme
-                            .of(context)
-                            .primaryColorDark,
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                          left: 20.0, top: 30.0, right: 20.0),
+                      child: Text(password,
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
                       ),
-                      onPressed: () {
-                        // Update the state i.e. toogle the state of passwordVisible variable
-                        setState(() {
-                          passwordVisible = !passwordVisible;
-                        });
-                      },
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: focused_border_color, width: 2.0),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: greyColor2, width: 2.0),
-                    ),
-                    hintText: 'Enter your Password',
                   ),
-                ),
-              ),
-              /* Align(
+                  Container(
+                    margin: const EdgeInsets.only(
+                        left: 20.0, top: 20.0, right: 20.0),
+                    child: TextField(
+                      obscureText: passwordVisible,
+                      controller: passwordController,
+                      onChanged: (value) {
+                        userPassword = value;
+                      },
+                      autofocus: true,
+                      decoration: new InputDecoration(
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            // Based on passwordVisible state choose the icon
+                            passwordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Theme
+                                .of(context)
+                                .primaryColorDark,
+                          ),
+                          onPressed: () {
+                            // Update the state i.e. toogle the state of passwordVisible variable
+                            setState(() {
+                              passwordVisible = !passwordVisible;
+                            });
+                          },
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: focused_border_color, width: 2.0),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: greyColor2, width: 2.0),
+                        ),
+                        hintText: 'Enter your Password',
+                      ),
+                    ),
+                  ),
+                  /* Align(
             alignment: Alignment.topRight,
             child: GestureDetector(
               onTap: (){
@@ -199,35 +201,41 @@ class PasswordSetupState extends State<PasswordSetup> {
               ),
             )
           ),*/
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
-                  padding: EdgeInsets.all(30.0),
-                  width: double.infinity,
-                  child: SizedBox(
-                      height: 45, // specific value
-                      child: RaisedButton(
-                        child: Text(log_in.toUpperCase()),
-                        color: facebook_color,
-                        textColor: text_color,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(18.0),
-                        ),
-                        onPressed: () {
-                          if (userPassword != '') {
-                            HandleThirdPartySignIn();
-                          } else {
-                            Fluttertoast.showToast(msg: enter_password);
-                          }
-                        },
-                      )
-                  ),
-                ),
-              )
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      margin: EdgeInsets.only(top: 40.0, left: 10.0, right: 10.0),
+                      padding: EdgeInsets.all(30.0),
+                      width: double.infinity,
+                      child: SizedBox(
+                          height: 45, // specific value
+                          child: RaisedButton(
+                            child: Text(log_in),
+                            color: facebook_color,
+                            textColor: text_color,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(30.0),
+                            ),
+                            onPressed: () {
+                              if (userPassword != '') {
+                                this.setState(() {
+                                  isLoading = true;
+                                });
+                                HandleThirdPartySignIn();
+                              } else {
+                                Fluttertoast.showToast(msg: enter_password);
+                              }
+                            },
+                          )
+                      ),
+                    ),
+                  )
 
+                ],
+              ),
+              buildLoading()
             ],
-          ),
+          )
         )
     );
   }
@@ -470,7 +478,7 @@ class PasswordSetupState extends State<PasswordSetup> {
           currentLocation.latitude, currentLocation.longitude),
     });
 
-    Navigator.push(
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) =>
@@ -478,6 +486,21 @@ class PasswordSetupState extends State<PasswordSetup> {
                     firebaseUser.uid, firebaseUser.photoUrl)));
   }
 
+
+
+  Widget buildLoading() {
+    return Positioned(
+      child: isLoading
+          ? Container(
+        child: Center(
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+        ),
+        color: Colors.white.withOpacity(0.8),
+      )
+          : Container(),
+    );
+  }
 
   Future<Null> updateLocalData(SharedPreferences prefs,
       FirebaseUser currentUser, String signInType) async {
@@ -509,11 +532,11 @@ class PasswordSetupState extends State<PasswordSetup> {
     await prefs.setInt('createdAt', documents[0]['createdAt']);
     await prefs.setString('phoneNo', documents[0]['phoneNo']);
     await prefs.setString('signInType', signInType);
-    Navigator.push(
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) =>
-                UsersList('MobileNumber',
+                UsersList(signInType,
                     documents[0]['id'], documents[0]['photoUrl'])));
   }
 

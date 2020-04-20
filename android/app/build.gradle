@@ -54,6 +54,7 @@ android {
         }
     }
 }
+ext.flutterFFmpegPackage = 'audio-lts'
 
 flutter {
     source '../..'

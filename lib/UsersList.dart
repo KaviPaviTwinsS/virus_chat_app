@@ -114,6 +114,29 @@ class UsersListState extends State<UsersListPage>
       currentUserPhotoUrl = await prefs.getString('photoUrl');
     }
     print('USERLIST name_____ $currentUserName');
+    int currentTime = ((new DateTime.now()
+        .toUtc()
+        .microsecondsSinceEpoch) / 1000).toInt();
+
+
+    var query = await Firestore.instance.collection('users')
+        .document(currentUser).collection(
+        'userLocation').document(currentUser).get();
+    print('Recent Chats ___ ${currentUser} ___ ${query['UpdateTime']}');
+
+    if(currentUser != '') {
+      if (currentTime > query['UpdateTime']) {
+        Firestore.instance
+            .collection('users')
+            .document(currentUser)
+            .updateData({'status': 'INACTIVE'});
+      } else {
+        Firestore.instance
+            .collection('users')
+            .document(currentUser)
+            .updateData({'status': 'ACTIVE'});
+      }
+    }
     LocationService(currentUser).locationStream;
     /*for(int i=5;i<250;i+5){
       spinnerItems.add('$i m');
@@ -761,8 +784,8 @@ class ActiveUserListRadius extends StatelessWidget {
                   peerAvatar: documentSnapshot['photoUrl'],
                 )));*/
     bool isFriend = false;
-    bool isAlreadyRequestSent = false;
-    bool isRequestSent = false;
+    bool isAlreadyRequestSent;
+    bool isRequestSent;
 
     String friendId = documentSnapshot.documentID;
     var query = await Firestore.instance.collection('users')
@@ -796,7 +819,7 @@ class ActiveUserListRadius extends StatelessWidget {
                     peerAvatar: documentSnapshot['photoUrl'],
                   )));*/
     }
-    print('Friend Listttttt isFriend${documentSnapshot['photoUrl']}');
+    print('Friend Listttttt isFriend_______________________________________________${isRequestSent}');
 
     if (isFriend) {
       Navigator.push(
@@ -918,7 +941,7 @@ class LoginUsersList extends StatelessWidget {
         if (!snapshot.hasData) return new Container(
             margin: EdgeInsets.only(left: 20.0, top: 20.0),
             child: new Text('Loading...'));
-        return Expanded(
+        return Flexible(
             child: new ListView(
                 scrollDirection: Axis.horizontal,
                 children: snapshot.data.documents.map((document) {
@@ -1031,13 +1054,13 @@ class LoginUsersList extends StatelessWidget {
                   peerAvatar: documentSnapshot['photoUrl'],
                 )));*/
     bool isFriend = false;
-    bool isAlreadyRequestSent = false;
+    bool isAlreadyRequestSent;
     String friendId = documentSnapshot.documentID;
-    bool isRequestSent = false;
+    bool isRequestSent;
     var query = await Firestore.instance.collection('users')
         .document(currentUserId).collection(
         'FriendsList').getDocuments();
-    print('Friend Listttttt queryyyy${documentSnapshot.data['user_token']}');
+    print('Friend Listttttt queryyyy${isRequestSent}');
     await _preferences.setString(
         'FRIEND_USER_TOKEN', documentSnapshot.data['user_token']);
     if (query.documents.length != 0) {
@@ -1064,7 +1087,7 @@ class LoginUsersList extends StatelessWidget {
                     peerAvatar: documentSnapshot['photoUrl'],
                   )));*/
     }
-    print('Friend Listttttt isFriend${documentSnapshot['photoUrl']}');
+    print('Friend Listttttt isFriend_______________________________________________${isRequestSent}');
     if (isFriend) {
       Navigator.push(
           context,

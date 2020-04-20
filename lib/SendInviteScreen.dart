@@ -9,9 +9,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:virus_chat_app/FriendRequestScreen.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
+import 'package:virus_chat_app/utils/const.dart';
 
 
 class SendInviteToUser extends StatefulWidget {
@@ -97,7 +99,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
 
   void initial() async {
     prefs = await SharedPreferences.getInstance();
-    if (_misAlreadyRequestSent) {
+    if (_misAlreadyRequestSent != null && _misAlreadyRequestSent) {
       setState(() {
         isButtonPressed = !isButtonPressed;
       });
@@ -113,9 +115,21 @@ class SendInviteToUserState extends State<SendInviteToUser> {
     var initializationSettings = new InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
-    flutterLocalNotificationsPlugin.initialize(initializationSettings,);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+//    flutterLocalNotificationsPlugin.initialize(initializationSettings,);
   }
 
+
+  Future onSelectNotification(String payload) async {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    FriendRequestScreenState(
+                        _mCurrentUserId,
+                        _mcurrentPhotoUrl)));
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -136,10 +150,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                   .of(context)
                                   .size
                                   .width,
-                              height: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .height - 530,
+                              height:150,
                               child: Column(
                                   children: <Widget>[
                                     Row(
@@ -147,7 +158,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                           .center,
                                       children: <Widget>[
                                         Container(
-                                          margin: EdgeInsets.only(top: 30.0,bottom: 10.0),
+                                          margin: EdgeInsets.only(top: 40.0,bottom: 10.0),
                                           child: new IconButton(
                                               icon: Icon(Icons.arrow_back_ios,
                                                 color: white_color,),
@@ -163,7 +174,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                         ),
                                         new Container(
                                           margin: EdgeInsets.only(
-                                              top: 30.0, right: 10.0,bottom: 10.0),
+                                              top: 40.0, right: 10.0,bottom: 10.0),
                                           child: Material(
                                             child: CachedNetworkImage(
                                               placeholder: (context, url) =>
@@ -238,7 +249,10 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                             .of(context)
                             .size
                             .width,
-                        height: 560,
+                        height:MediaQuery
+                            .of(context)
+                            .size
+                            .height -  100,
                         decoration: BoxDecoration(
                             color: text_color,
                             borderRadius: new BorderRadius.only(
@@ -256,66 +270,18 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                 width: 80.0,
                                 height: 80.0,
                               ),
-                              !isButtonPressed ? RaisedButton(
+                              !isButtonPressed  ? RaisedButton(
                                   color: white_color,
                                   child: Text('Sent Invite',),
                                   onPressed: () {
-                                    if (!_misAlreadyRequestSent) {
-                                      var documentReference = Firestore.instance
-                                          .collection('users')
-                                          .document(_mCurrentUserId)
-                                          .collection('FriendsList')
-                                          .document(_mPeerId);
-                                      Firestore.instance.runTransaction((
-                                          transaction) async {
-                                        await transaction.set(
-                                          documentReference,
-                                          {
-                                            'requestFrom': _mCurrentUserId,
-                                            'receiveId': _mPeerId,
-                                            'IsAcceptInvitation': false,
-                                            'isRequestSent': true,
-                                            'friendPhotoUrl': _userPhotoUrl,
-                                            'friendName': _userName,
-                                            'isAlreadyRequestSent': true,
-                                            'timestamp': DateTime
-                                                .now()
-                                                .millisecondsSinceEpoch
-                                                .toString(),
-                                          },
-                                        );
-                                      });
-                                      var documentReference1 = Firestore.instance
-                                          .collection('users')
-                                          .document(_mPeerId)
-                                          .collection('FriendsList')
-                                          .document(_mCurrentUserId);
-                                      Firestore.instance.runTransaction((
-                                          transaction) async {
-                                        await transaction.set(
-                                          documentReference1,
-                                          {
-                                            'requestFrom': _mCurrentUserId,
-                                            'receiveId': _mPeerId,
-                                            'IsAcceptInvitation': false,
-                                            'isRequestSent': false,
-                                            'friendPhotoUrl': _userPhotoUrl,
-                                            'friendName': _userName,
-                                            'isAlreadyRequestSent': true,
-                                            'timestamp': DateTime
-                                                .now()
-                                                .millisecondsSinceEpoch
-                                                .toString(),
-                                          },
-                                        );
-                                      });
-                                      sendAndRetrieveMessage();
-                                      setState(() {
-                                        isButtonPressed = !isButtonPressed;
-                                      });
+//                                    if (!_misAlreadyRequestSent) {
+                                    sendInvite();
                                     }
-                                  }
-                              ) : !isRequestSent
+//                                  }
+                              ) :_misRequestSent == null ?  Container(
+                                child: Text('Invitation Sent successfully', style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20.0),),
+                              )  : !_misRequestSent
                                   ? Text('Invitation Received', style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 20.0),)
                                   : Text('Already invitation sent',
@@ -340,7 +306,64 @@ class SendInviteToUserState extends State<SendInviteToUser> {
     );
   }
 
-  final String serverToken = 'AAAA1iQ7au4:APA91bGvPY8CpYvutHVhzh7RL-xyybt7lxPNU_OxXPCJdxDtyZain9hxgliGV9OQyaXLiKXJyVUhpQm0tygEz4YfisEdGIOLyNo3vgUguNMEpBVEaEwUfONgErCLALyrrLTroFhfq5YD';
+
+  Future sendInvite() async{
+    var documentReference = Firestore.instance
+        .collection('users')
+        .document(_mCurrentUserId)
+        .collection('FriendsList')
+        .document(_mPeerId);
+    Firestore.instance.runTransaction((
+        transaction) async {
+      await transaction.set(
+        documentReference,
+        {
+          'requestFrom': _mCurrentUserId,
+          'receiveId': _mPeerId,
+          'IsAcceptInvitation': false,
+          'isRequestSent': true,
+          'friendPhotoUrl': _userPhotoUrl,
+          'friendName': _userName,
+          'isAlreadyRequestSent': true,
+          'timestamp': DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString(),
+        },
+      );
+    });
+    var documentReference1 = Firestore.instance
+        .collection('users')
+        .document(_mPeerId)
+        .collection('FriendsList')
+        .document(_mCurrentUserId);
+    Firestore.instance.runTransaction((
+        transaction) async {
+      await transaction.set(
+        documentReference1,
+        {
+          'requestFrom': _mCurrentUserId,
+          'receiveId': _mPeerId,
+          'IsAcceptInvitation': false,
+          'isRequestSent': false,
+          'friendPhotoUrl': _userPhotoUrl,
+          'friendName': _userName,
+          'isAlreadyRequestSent': true,
+          'timestamp': DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString(),
+        },
+      );
+    });
+    sendAndRetrieveMessage();
+    setState(() {
+      isButtonPressed = !isButtonPressed;
+      _misRequestSent = null;
+    });
+  }
+
+  final String serverToken = SERVER_KEY;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;

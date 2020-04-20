@@ -86,10 +86,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                         .of(context)
                         .size
                         .width,
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .height - 520,
+                    height:150,
                     child:
                     Row(
                       crossAxisAlignment: CrossAxisAlignment
@@ -126,7 +123,10 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                     .of(context)
                     .size
                     .width,
-                height: 550,
+                height:  MediaQuery
+                    .of(context)
+                    .size
+                    .height - 100,
                 decoration: BoxDecoration(
                     color: text_color,
                     borderRadius: new BorderRadius.only(

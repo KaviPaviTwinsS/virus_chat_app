@@ -118,6 +118,28 @@ class _OTPScreenState extends State<OTPScreen> {
                     },
                   ),
                 ),
+                /*Container(
+                  width: 50.0,
+                  height: 100.0,
+                  decoration: new BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      ),
+                  child: TextField(
+                    decoration: new InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: focused_border_color,
+                            width: 2.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: enabled_border_color,
+                            width: 2.0),
+                      ),
+                      hintText: '_',
+                    ),
+                  ),
+                ),*/
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
@@ -144,7 +166,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 ),
 
                 Container(
-                  margin: EdgeInsets.only(top: 30.0, left: 10.0, right: 10.0),
+                  margin: EdgeInsets.only(top: 40.0, left: 10.0, right: 10.0),
                   padding: EdgeInsets.all(30.0),
                   width: double.infinity,
                   child: SizedBox(
@@ -163,7 +185,7 @@ class _OTPScreenState extends State<OTPScreen> {
                       color: facebook_color,
                       textColor: text_color,
                       shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(20.0),
+                        borderRadius: new BorderRadius.circular(30.0),
                       ),
                       child: Text(btn_otp_verify,
                         style: TextStyle(fontSize: 17),),

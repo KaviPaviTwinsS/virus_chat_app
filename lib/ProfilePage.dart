@@ -112,6 +112,7 @@ class ProfilePageState extends State<ProfilePage> {
 
   void readLocal() async {
     prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('userId');
 //    name = prefs.getString('name');
 //    print('profile name $name');
     controllerName = new TextEditingController(text: name);
@@ -573,162 +574,164 @@ class ProfilePageState extends State<ProfilePage> {
           return Container(
             color: Color(0xFF737373),
             height: 300,
-            child: Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(
-                        left: 20.0, right: 30.0, top: 20.0),
-                    child: Text('Update Password?', style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 20.0),),
-                  ),
-                  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(
-                              left: 20.0, right: 30.0, top: 20.0),
-                          child: Text('New password'.toUpperCase()),
-                        ),
-                        Container(
-                          child: TextField(
-                            decoration: new InputDecoration(
-                              contentPadding: new EdgeInsets.all(
-                                  15.0),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: focused_border_color,
-                                    width: 1.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: greyColor, width: 1.0),
-                              ),
-                              hintText: 'Enter new password',
-                              hintStyle: TextStyle(color:primaryColor )
-                            ),
-                            controller: controllerNewPassword,
-                            obscureText: true,
-                            onChanged: (value) {
-                              newPassword = value;
-                            },
-                          ),
-                          margin: EdgeInsets.only(
-                              left: 20.0, right: 30.0, top: 5.0),
-                        ),
-                      ]
-                  ),
-                  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(
-                              left: 20.0, right: 30.0, top: 20.0),
-                          child: Text('Confirm password'.toUpperCase()),
-                        ),
-                        Container(
-                          child: TextField(
-                            decoration: new InputDecoration(
-                              contentPadding: new EdgeInsets.all(
-                                  15.0),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: focused_border_color,
-                                    width: 1.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: greyColor, width: 1.0),
-                              ),
-                              hintText: 'Enter confirm password',
-                                hintStyle: TextStyle(color:primaryColor )
-                            ),
-                            controller: controllerConfirmPassword,
-                            obscureText: true,
-                            onChanged: (value) {
-                              confirmPassword = value;
-                            },
-                          ),
-                          margin: EdgeInsets.only(
-                              left: 20.0, right: 30.0, top: 5.0),
-                        ),
-                      ]
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment
-                        .spaceEvenly,
+            child:SingleChildScrollView(
+              child:  Container(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Container(
-                        margin: EdgeInsets.only(top: 15.0,),
-                        child: RaisedButton(
-                          color: white_color,
-                          textColor: facebook_color,
-                          hoverColor: facebook_color,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(
-                                18.0),
-                          ),
-                          child: Text('Cancel'),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
+                        margin: EdgeInsets.only(
+                            left: 20.0, right: 30.0, top: 20.0),
+                        child: Text('Update Password?', style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20.0),),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 15.0,),
-                        child: RaisedButton(
-                          color: facebook_color,
-                          textColor: text_color,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(
-                                18.0),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(
+                                  left: 20.0, right: 30.0, top: 20.0),
+                              child: Text('New password'.toUpperCase()),
+                            ),
+                            Container(
+                              child: TextField(
+                                decoration: new InputDecoration(
+                                    contentPadding: new EdgeInsets.all(
+                                        15.0),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: focused_border_color,
+                                          width: 1.0),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: greyColor2, width: 1.0),
+                                    ),
+                                    hintText: 'Enter new password',
+                                    hintStyle: TextStyle(color:primaryColor,fontSize: 10.0)
+                                ),
+                                controller: controllerNewPassword,
+                                obscureText: true,
+                                onChanged: (value) {
+                                  newPassword = value;
+                                },
+                              ),
+                              margin: EdgeInsets.only(
+                                  left: 20.0, right: 30.0, top: 5.0),
+                            ),
+                          ]
+                      ),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(
+                                  left: 20.0, right: 30.0, top: 20.0),
+                              child: Text('Confirm password'.toUpperCase()),
+                            ),
+                            Container(
+                              child: TextField(
+                                decoration: new InputDecoration(
+                                    contentPadding: new EdgeInsets.all(
+                                        15.0),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: focused_border_color,
+                                          width: 1.0),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: greyColor2, width: 1.0),
+                                    ),
+                                    hintText: 'Enter confirm password',
+                                    hintStyle: TextStyle(color:primaryColor,fontSize: 10.0)
+                                ),
+                                controller: controllerConfirmPassword,
+                                obscureText: true,
+                                onChanged: (value) {
+                                  confirmPassword = value;
+                                },
+                              ),
+                              margin: EdgeInsets.only(
+                                  left: 20.0, right: 30.0, top: 5.0),
+                            ),
+                          ]
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment
+                            .spaceEvenly,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(top: 15.0,),
+                            child: RaisedButton(
+                              color: white_color,
+                              textColor: facebook_color,
+                              hoverColor: facebook_color,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(
+                                    18.0),
+                              ),
+                              child: Text('Cancel'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
                           ),
-                          child: Text('Save'),
-                          onPressed: () {
-                            if (newPassword == '' || newPassword == null) {
-                              Fluttertoast.showToast(msg: 'Please enter NewPassword');
-                            } else if (confirmPassword == '' || confirmPassword == null) {
-                              Fluttertoast.showToast(
-                                  msg: 'Please enter ConfirmPassword');
-                            } else if (confirmPassword == newPassword) {
-                              if (confirmPassword == userPassword) {
-                                Fluttertoast.showToast(
-                                    msg: 'Entered Password are same as existing password');
-                              } else {
-                                Firestore.instance.collection('users')
-                                    .document(userId)
-                                    .updateData({
-                                  'password': confirmPassword,
-                                });
-                                _updatePassword(confirmPassword);
-                                Fluttertoast.showToast(
-                                    msg: 'Password updated successfully');
-                                Navigator.of(context, rootNavigator: true).pop('dialog');
-                              }
-                            } else {
-                              Fluttertoast.showToast(
-                                  msg: 'Please enter NewPassword and ConfirmPassword identical');
-                            }
-                            Navigator.pop(context);
-                          },
-                        ),
+                          Container(
+                            margin: EdgeInsets.only(top: 15.0,),
+                            child: RaisedButton(
+                              color: facebook_color,
+                              textColor: text_color,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(
+                                    18.0),
+                              ),
+                              child: Text('Save'),
+                              onPressed: () {
+                                if (newPassword == '' || newPassword == null) {
+                                  Fluttertoast.showToast(msg: 'Please enter NewPassword');
+                                } else if (confirmPassword == '' || confirmPassword == null) {
+                                  Fluttertoast.showToast(
+                                      msg: 'Please enter ConfirmPassword');
+                                } else if (confirmPassword == newPassword) {
+                                  if (confirmPassword == userPassword) {
+                                    Fluttertoast.showToast(
+                                        msg: 'Entered Password are same as existing password');
+                                  } else {
+                                    Firestore.instance.collection('users')
+                                        .document(userId)
+                                        .updateData({
+                                      'password': confirmPassword,
+                                    });
+                                    _updatePassword(confirmPassword);
+                                    Fluttertoast.showToast(
+                                        msg: 'Password updated successfully');
+                                    Navigator.of(context, rootNavigator: true).pop('dialog');
+                                  }
+                                } else {
+                                  Fluttertoast.showToast(
+                                      msg: 'Please enter NewPassword and ConfirmPassword identical');
+                                }
+                                Navigator.pop(context);
+                              },
+                            ),
+                          )
+                        ],
                       )
-                    ],
-                  )
-                ]
-              ),
-              decoration: BoxDecoration(
-                color: Theme
-                    .of(context)
-                    .canvasColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(10),
-                  topRight: const Radius.circular(10),
+                    ]
+                ),
+                decoration: BoxDecoration(
+                  color: Theme
+                      .of(context)
+                      .canvasColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(10),
+                    topRight: const Radius.circular(10),
+                  ),
                 ),
               ),
-            ),
+            )
           );
         });
   }
@@ -908,7 +911,7 @@ class ProfilePageState extends State<ProfilePage> {
     LocationService('');
     Firestore.instance
         .collection('users')
-        .document(prefs.getString('userId'))
+        .document(userId)
         .updateData({'status': 'LoggedOut'});
   }
 
@@ -919,7 +922,7 @@ class ProfilePageState extends State<ProfilePage> {
   }
 
   Future getImage() async {
-    File image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    File image = await ImagePicker.pickImage(source: ImageSource.gallery,imageQuality: 30);
 
     if (image != null) {
       setState(() {
