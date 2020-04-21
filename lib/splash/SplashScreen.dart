@@ -252,8 +252,8 @@ class _SplashScreenState extends State<SplashScreenPage> {
                 currentUserId: prefs.getString('userId'))));
 */
     print('SPLASHHHHHHHHHHHHHHHHHH _____$user _____$userUrl');
-    UserLocation currentLocation = await LocationService(user,).getLocation();
-
+//    UserLocation currentLocation = await LocationService(user,).getLocation();
+//    LocationService(user).locationStream;
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(

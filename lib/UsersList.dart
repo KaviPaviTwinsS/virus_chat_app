@@ -114,17 +114,17 @@ class UsersListState extends State<UsersListPage>
       currentUserPhotoUrl = await prefs.getString('photoUrl');
     }
     print('USERLIST name_____ $currentUserName');
-    int currentTime = ((new DateTime.now()
-        .toUtc()
-        .microsecondsSinceEpoch) / 1000).toInt();
-
 
     var query = await Firestore.instance.collection('users')
         .document(currentUser).collection(
         'userLocation').document(currentUser).get();
     print('Recent Chats ___ ${currentUser} ___ ${query['UpdateTime']}');
+    int currentTime = ((new DateTime.now()
+        .toUtc()
+        .microsecondsSinceEpoch) / 1000).toInt();
 
     if(currentUser != '') {
+      print('USER STATUS_______________ $currentTime _____ ${query['UpdateTime']}');
       if (currentTime > query['UpdateTime']) {
         Firestore.instance
             .collection('users')
@@ -210,6 +210,7 @@ class UsersListState extends State<UsersListPage>
 
   @override
   Widget build(BuildContext context) {
+    initialise();
     return WillPopScope(
       onWillPop: () async => false,
       child: new Scaffold(
@@ -230,6 +231,9 @@ class UsersListState extends State<UsersListPage>
                       });
                       break;
                     case 1:
+
+                      break;
+                    case 2:
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -237,7 +241,7 @@ class UsersListState extends State<UsersListPage>
                                   NewTweetPost(
                                       currentUser, currentUserPhotoUrl)));
                       break;
-                    case 2:
+                    case 3:
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -266,6 +270,17 @@ class UsersListState extends State<UsersListPage>
                     ),
                   ),
                   title: new Text(''),
+                ),
+                BottomNavigationBarItem(
+                    title: new Text(''),
+                    icon:Container(
+                    margin: EdgeInsets.only(top: 15.0),
+                    child: new SvgPicture.asset(
+                      'images/business.svg',
+                      height: 20.0,
+                      width: 20.0,
+                    ),
+                  )
                 ),
                 BottomNavigationBarItem(
                   icon: Container(
@@ -931,8 +946,32 @@ class LoginUsersList extends StatelessWidget {
     _preferences = await SharedPreferences.getInstance();
   }
 
+  Future updateUserStatus() async{
+    if(currentUserId != '') {
+      int currentTime = ((new DateTime.now()
+          .toUtc()
+          .microsecondsSinceEpoch) / 1000).toInt();
+
+      var query = await Firestore.instance.collection('users')
+          .document(currentUserId).collection(
+          'userLocation').document(currentUserId).get();
+      print('USER STATUS_______________ $currentTime _____ ${query['UpdateTime']}');
+      if (currentTime > query['UpdateTime']) {
+        Firestore.instance
+            .collection('users')
+            .document(currentUserId)
+            .updateData({'status': 'INACTIVE'});
+      } else {
+        Firestore.instance
+            .collection('users')
+            .document(currentUserId)
+            .updateData({'status': 'ACTIVE'});
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
+    updateUserStatus();
     return new StreamBuilder(
       stream: Firestore.instance.collection('users') /*.where(
           'status', isEqualTo: 'ACTIVE')*/.snapshots(),

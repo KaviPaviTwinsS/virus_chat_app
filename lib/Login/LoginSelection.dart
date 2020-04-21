@@ -66,6 +66,7 @@ class LoginSelectionOption extends State<LoginSelection> {
   GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   SharedPreferences prefs;
+  BuildContext _mContext;
 
   bool isLoading = false;
   bool isLoggedIn = false;
@@ -116,6 +117,8 @@ class LoginSelectionOption extends State<LoginSelection> {
       navigateToProfilePageExistingUser(context, 'facebook', prefs);
     } else if (prefs.getString('signInType') == 'MobileNumber') {
       navigateToProfilePageExistingUser(context, 'MobileNumber', prefs);
+    }else{
+      print('NANDHUUUUUUUUUUUUUUU____________________________99999999999999999  ${prefs.getString('userId')}');
     }
     this.setState(() {
       isLoading = false;
@@ -132,11 +135,13 @@ class LoginSelectionOption extends State<LoginSelection> {
       String userEmail,
       String userId,
       {profileData}) async {
+    this._mContext = context;
     prefs = preferences;
     isFacebookLoggedIn = isLoggedIn;
 //    Fluttertoast.showToast(msg: "Faccebook login success ${profileData['picture']['data']['url']} ___ ${profileData['email']}");
     facebookProfileData = profileData;
     if (isFacebookLoggedIn) {
+      print('FACEBOKkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk $facebookProfileData');
       /*   if (facebookProfileData != null) {
         updateLocalData(prefs, facebookProfileData, 'facebook');
         _AddNewUser(facebookProfileData, userEmail, userId, 'facebook');
@@ -193,153 +198,313 @@ class LoginSelectionOption extends State<LoginSelection> {
   }
 
 
+
+  Future<Null> updateLocalData(SharedPreferences prefs,
+      FirebaseUser currentUser, String signInType) async {
+    await prefs.setString('userId', currentUser.uid);
+    await prefs.setString('email', currentUser.email);
+    await prefs.setString('name', currentUser.displayName);
+    await prefs.setString('phoneNo', currentUser.phoneNumber);
+    await prefs.setString('nickname', currentUser.displayName);
+    await prefs.setString('status', 'ACTIVE');
+    await prefs.setString('photoUrl', currentUser.photoUrl);
+    await prefs.setString('signInType', signInType);
+    await prefs.setInt('createdAt',
+        ((new DateTime.now()
+            .toUtc()
+            .microsecondsSinceEpoch) / 1000).toInt());
+  }
+
+  Future<Null> updateLocalListData(SharedPreferences prefs,
+      List<DocumentSnapshot> documents, String signInType) async {
+    await prefs.setString('userId', documents[0]['id']);
+    await prefs.setString('email', documents[0]['email']);
+    await prefs.setString('name', documents[0]['name']);
+    await prefs.setString('nickname', documents[0]['nickName']);
+    await prefs.setString('status', documents[0]['status']);
+    await prefs.setString('photoUrl', documents[0]['photoUrl']);
+    await prefs.setInt('createdAt', documents[0]['createdAt']);
+    await prefs.setString('phoneNo', documents[0]['phoneNo']);
+    await prefs.setString('signInType', signInType);
+    print('updateLocalListData___________ ${documents[0]['name']}');
+//    setState(() {
+      isLoading = false;
+//    });
+    if(signInType == 'facebook') {
+      Navigator.push(
+          _mContext,
+          MaterialPageRoute(
+              builder: (context) =>
+                  UsersList(signInType,
+                      documents[0]['id'], documents[0]['photoUrl'])));
+    }else{
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  UsersList(signInType,
+                      documents[0]['id'], documents[0]['photoUrl'])));
+    }
+  }
+
+
+  void HandleThirdPartySignIn(FirebaseUser _firebaseUser,String _signinType,String _accountId) async {
+    // Check is already sign up
+    final QuerySnapshot result = await Firestore.instance
+        .collection('users')
+        .where('id', isEqualTo: _firebaseUser.uid)
+        .getDocuments();
+    final List<DocumentSnapshot> documents = result.documents;
+//    this.setState(() {
+      isLoading = true;
+//    });
+    if (documents.length == 0) {
+      // Write data to local
+      await updateLocalData(prefs, _firebaseUser, _signinType);
+      // Update data to server if new user
+      await _AddNewUser(_firebaseUser, '', _accountId, _signinType);
+    } else {
+      await updateLocalListData(prefs, documents, _signinType);
+    }
+
+    /*await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                ProfilePageSetup(_signinType, currentUserId: _firebaseUser.uid)));*/
+
+  }
+
+
+  Future _AddNewUser(FirebaseUser firebaseUser, String userEmail, String userId,
+      String loginType) async {
+    var signupUserEmail = '';
+    var loginId = userId;
+    if (firebaseUser.email == null) {
+      signupUserEmail = userEmail;
+    } else {
+      signupUserEmail = firebaseUser.email;
+    }
+    loginType += 'AccountId';
+    /*var currentLocation = UserLocation();
+    var pos = currentLocationListener.whenComplete(() => {
+      currentLocation=
+    });*/
+//    GeoFirePoint point = geo.point(
+//        latitude: currentLocation.latitude,
+//        longitude: currentLocation.longitude);
+
+    // Update data to server if new user
+    Firestore.instance.collection('users').document(firebaseUser.uid).setData({
+      'name': firebaseUser.displayName,
+      'photoUrl': firebaseUser.photoUrl,
+      'email': signupUserEmail,
+      'nickName': firebaseUser.displayName,
+      'phoneNo': firebaseUser.phoneNumber,
+      'status': 'ACTIVE',
+      'id': firebaseUser.uid,
+      '$loginType': loginId,
+      'user_token': userToken,
+      'createdAt':
+      ((new DateTime.now()
+          .toUtc()
+          .microsecondsSinceEpoch) / 1000).toInt()
+    });
+    UserLocation currentLocation = await LocationService(firebaseUser.uid,)
+        .getLocation();
+    Firestore.instance.collection('users').document(firebaseUser.uid)
+        .collection('userLocation').document(firebaseUser.uid)
+        .setData({
+      'userLocation': new GeoPoint(
+          currentLocation.latitude, currentLocation.longitude),
+    });
+
+//    setState(() {
+      isLoading = false;
+//    });
+    if(loginType == 'facebook') {
+      Navigator.push(
+          _mContext,
+          MaterialPageRoute(
+              builder: (context) =>
+                  UsersList(loginType,
+                      firebaseUser.uid, firebaseUser.photoUrl)));
+    }else {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  UsersList(loginType,
+                      firebaseUser.uid, firebaseUser.photoUrl)));
+    }
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
+    _mContext = context;
     return
       new WillPopScope(
           onWillPop: () async => false,
           child: Scaffold(
               resizeToAvoidBottomPadding: false,
-              body: Container(
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(
-                          top: 40.0, left: 20.0, right: 20.0),
-                      child: Text(explore, style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 29.0)),
-                    ),
-                    new SvgPicture.asset(
-                      'images/image.svg',
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width,
-                      height: MediaQuery
-                          .of(context)
-                          .size
-                          .height - 290,
-                    ),
-                    /*  new Image.asset(
+              body: Stack(
+                children: <Widget>[
+                  Container(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: 40.0, left: 20.0, right: 20.0),
+                          child: Text(explore, style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 29.0)),
+                        ),
+                        new SvgPicture.asset(
+                          'images/image.svg',
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .width,
+                          height: MediaQuery
+                              .of(context)
+                              .size
+                              .height - 290,
+                        ),
+                        /*  new Image.asset(
             'images/image.svg',
             fit: BoxFit.fitWidth,
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height - 170,
           ),*/
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width,
-                        height: 170,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              width: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width,
-                              margin: EdgeInsets.only(left: 20.0, right: 20.0),
-                              child: RaisedButton.icon(
-                                icon: new SvgPicture.asset(
-                                  'images/phone.svg',
-                                  width: 20.0,
-                                  height: 20.0,
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) {
-                                            return PhoneNumberSelectionPage();
-                                          }
-                                      ));
-                                },
-                                label: Text('Continue with phone number'),
-                                color: white_color,
-                              ),
-                            ),
-                            Container(
-                              width: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width,
-                              margin: EdgeInsets.only(left: 20.0,
-                                  right: 20.0,
-                                  bottom: 10.0,
-                                  top: 10.0),
-                              child: Text('Or connect using social account'),
-                            ),
-                            Container(
-                                width: MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width,
-                                margin: EdgeInsets.only(
-                                    left: 20.0, right: 20.0),
-                                child:
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .spaceBetween,
-                                  children: <Widget>[
-                                    Container(
-                                      width: ((MediaQuery
-                                          .of(context)
-                                          .size
-                                          .width) / 2) - 30,
-                                      height: 40.0,
-                                      child: RaisedButton.icon(
-                                        icon: new SvgPicture.asset(
-                                          'images/gmail.svg',
-                                          width: 20.0,
-                                          height: 20.0,
-                                        ),
-                                        onPressed: () {
-                                          HandleGoogleSignIn();
-//                  _settingModalBottomSheet(context);
-                                        },
-                                        label: Text('Google'),
-                                        color: white_color,
-                                      ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            width: MediaQuery
+                                .of(context)
+                                .size
+                                .width,
+                            height: 170,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  width: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width,
+                                  margin: EdgeInsets.only(left: 20.0, right: 20.0),
+                                  child: RaisedButton.icon(
+                                    icon: new SvgPicture.asset(
+                                      'images/phone.svg',
+                                      width: 20.0,
+                                      height: 20.0,
                                     ),
-                                    Container(
-                                        height: 40.0,
-                                        width: ((MediaQuery
-                                            .of(context)
-                                            .size
-                                            .width) / 2) - 30,
-                                        child: RaisedButton.icon(
-                                          icon: new SvgPicture.asset(
-                                            'images/fb.svg',
-                                            width: 20.0,
-                                            height: 20.0,
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) {
+                                                return PhoneNumberSelectionPage();
+                                              }
+                                          ));
+                                    },
+                                    label: Text('Continue with phone number'),
+                                    color: white_color,
+                                  ),
+                                ),
+                                Container(
+                                  width: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width,
+                                  margin: EdgeInsets.only(left: 20.0,
+                                      right: 20.0,
+                                      bottom: 10.0,
+                                      top: 10.0),
+                                  child: Text('Or connect using social account'),
+                                ),
+                                Container(
+                                    width: MediaQuery
+                                        .of(context)
+                                        .size
+                                        .width,
+                                    margin: EdgeInsets.only(
+                                        left: 20.0, right: 20.0),
+                                    child:
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .spaceBetween,
+                                      children: <Widget>[
+                                        Container(
+                                          width: ((MediaQuery
+                                              .of(context)
+                                              .size
+                                              .width) / 2) - 30,
+                                          height: 40.0,
+                                          child: RaisedButton.icon(
+                                            icon: new SvgPicture.asset(
+                                              'images/gmail.svg',
+                                              width: 20.0,
+                                              height: 20.0,
+                                            ),
+                                            onPressed: () {
+                                              HandleGoogleSignIn();
+//                  _settingModalBottomSheet(context);
+                                            },
+                                            label: Text('Google'),
+                                            color: white_color,
                                           ),
-                                          onPressed: () {
-                                            this.setState(() {
-                                              isLoading = true;
-                                            });
-                                            facebookSignup
-                                                .initiateFacebookLogin(
-                                                context, prefs);
-                                          },
-                                          label: Text('Facebook'),
-                                          color: white_color,
+                                        ),
+                                        Container(
+                                            height: 40.0,
+                                            width: ((MediaQuery
+                                                .of(context)
+                                                .size
+                                                .width) / 2) - 30,
+                                            child: RaisedButton.icon(
+                                              icon: new SvgPicture.asset(
+                                                'images/fb.svg',
+                                                width: 20.0,
+                                                height: 20.0,
+                                              ),
+                                              onPressed: () {
+                                                this.setState(() {
+                                                  isLoading = true;
+                                                });
+                                                facebookSignup
+                                                    .initiateFacebookLogin(
+                                                    context, prefs);
+                                              },
+                                              label: Text('Facebook'),
+                                              color: white_color,
+                                            )
                                         )
+                                      ],
                                     )
-                                  ],
-                                )
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    child: isLoading
+                        ? Container(
+                      child: Center(
+                        child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
                       ),
+                      color: Colors.white.withOpacity(0.8),
                     )
-                  ],
-                ),
+                        : Container(),
+                  ),
+                ],
               )
           )
       );
@@ -348,18 +513,20 @@ class LoginSelectionOption extends State<LoginSelection> {
 
   Future navigateToProfilePage(BuildContext context, String signinType,
       FirebaseUser firebaseUser, String accountId) async {
+    print('LOGINGGGGGGGGGGGGGGGGGGGG $firebaseUser');
+    HandleThirdPartySignIn(firebaseUser,signinType,accountId);
     /*
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 ProfilePageSetup(signinType, currentUserId: firebaseUser.uid)));*/
-    Navigator.push(
+  /*  Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 PasswordSetup(signinType, maccountId: accountId,
-                    mfirebaseUser: firebaseUser)));
+                    mfirebaseUser: firebaseUser)));*/
   }
 
   Future navigateToProfilePageExistingUser(BuildContext context,
@@ -378,18 +545,6 @@ class LoginSelectionOption extends State<LoginSelection> {
                     prefs.getString('photoUrl'))));
   }
 
-  Future navigationLoginPage() async {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => new LoginSelectionPage()));
-  }
-
-  Future navigateToUsersPage(String userSignInType) async {
-    /* Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => UsersList(userSignInType,prefs.getString('userId'))));*/
-  }
-
   Future _updatestatus() async {
     LocationService('');
     Firestore.instance
@@ -398,43 +553,10 @@ class LoginSelectionOption extends State<LoginSelection> {
         .updateData({'status': 'LoggedOut'});
   }
 
-  Future<Null> updateLocalData(SharedPreferences prefs,
-      FirebaseUser currentUser, String signInType) async {
-    await prefs.setString('userId', currentUser.uid);
-    await prefs.setString('email', currentUser.email);
-    await prefs.setString('name', currentUser.displayName);
-    await prefs.setString('password', 'passwordstatic');
-    await prefs.setString('phoneNo', currentUser.phoneNumber);
-    await prefs.setString('nickname', currentUser.displayName);
-    await prefs.setString('status', 'ACTIVE');
-    await prefs.setString('photoUrl', currentUser.photoUrl);
-    await prefs.setString('signInType', signInType);
-    await prefs.setInt('createdAt',
-        ((new DateTime.now()
-            .toUtc()
-            .microsecondsSinceEpoch) / 1000).toInt());
-  }
-
-  Future<Null> updateLocalListData(SharedPreferences prefs,
-      List<DocumentSnapshot> documents, String signInType) async {
-    print('updateLocalListData');
-    await prefs.setString('userId', documents[0]['uid']);
-    await prefs.setString('email', documents[0]['email']);
-    await prefs.setString('name', documents[0]['displayName']);
-    await prefs.setString('nickname', documents[0]['displayName']);
-    await prefs.setString('password', documents[0]['password']);
-    await prefs.setString('status', documents[0]['status']);
-    await prefs.setString('photoUrl', documents[0]['photoUrl']);
-    await prefs.setInt('createdAt', documents[0]['createdAt']);
-    await prefs.setString('phoneNo', documents[0]['phoneNo']);
-    await prefs.setString('signInType', signInType);
-  }
-
   Future<Null> clearLocalData(SharedPreferences prefs) async {
     await prefs.setString('email', '');
     await prefs.setString('name', '');
     await prefs.setString('nickname', '');
-    await prefs.setString('password', '');
     await prefs.setString('status', '');
     await prefs.setString('photoUrl', '');
     await prefs.setString('createdAt', '');

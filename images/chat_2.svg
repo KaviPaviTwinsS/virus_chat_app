@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="54" height="54" viewBox="0 0 54 54">
+  <defs>
+    <filter id="add_round" x="0" y="0" width="54" height="54" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="chat_2" transform="translate(-289 -4)">
+    <g transform="matrix(1, 0, 0, 1, 289, 4)" filter="url(#add_round)">
+      <circle id="add_round-2" data-name="add_round" cx="18" cy="18" r="18" transform="translate(9 8)" fill="#fff"/>
+    </g>
+    <g id="form" transform="translate(307.8 22)">
+      <path id="Shape" d="M.646,16a.651.651,0,0,1-.457-.19.642.642,0,0,1-.156-.661L1.5,10.74A7.594,7.594,0,0,1,8.391,0h.462A7.577,7.577,0,0,1,16,7.147c0,.006,0,.013,0,.019s0,.012,0,.017v.408a7.6,7.6,0,0,1-7.591,7.592H8.39A7.556,7.556,0,0,1,5.26,14.5L.851,15.967A.637.637,0,0,1,.646,16ZM8.393,1.292a6.306,6.306,0,0,0-6.283,6.3A6.23,6.23,0,0,0,2.776,10.4a.642.642,0,0,1,.036.5L1.669,14.331,5.1,13.188a.647.647,0,0,1,.5.037,6.229,6.229,0,0,0,2.8.666h.016a6.305,6.305,0,0,0,6.3-6.3V7.2A6.281,6.281,0,0,0,8.8,1.292H8.393Z" transform="translate(0.2 0)" fill="#4285f4"/>
+    </g>
+  </g>
+</svg>

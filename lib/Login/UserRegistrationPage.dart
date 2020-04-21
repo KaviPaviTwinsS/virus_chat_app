@@ -242,7 +242,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                       Radius.circular(45.0)),
                                   clipBehavior: Clip.hardEdge,
                                 ),
-                                IconButton(
+                                photoUrl == '' ? IconButton(
                                   icon: Icon(
                                     Icons.camera_alt,
                                     color: primaryColor.withOpacity(0.5),
@@ -252,7 +252,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                   splashColor: Colors.transparent,
                                   highlightColor: greyColor,
                                   iconSize: 30.0,
-                                ),
+                                ) : Text(''),
                               ],
                             ),
                           ),
@@ -309,7 +309,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                         color: enabled_border_color,
                                         width: 2.0),
                                   ),
-                                  hintText: 'Nick Name',
+                                  hintText: 'Last name',
                                 ),
                               ),
                             ),

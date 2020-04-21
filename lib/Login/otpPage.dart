@@ -239,7 +239,7 @@ class _OTPScreenState extends State<OTPScreen> {
           .then((AuthResult value) {
         if (value.user != null) {
           // Handle loogged in state
-          print(value.user.phoneNumber);
+          print(value.user.phoneNumber +"VERIFY___________" + _pinEditingController.text);
           navigationToUser(value.user);
           /* Navigator.pushAndRemoveUntil(
               context,
@@ -289,6 +289,7 @@ class _OTPScreenState extends State<OTPScreen> {
   }
 
   void _onFormSubmitted() async {
+    print('ONFORM SUBMITTED ${_pinEditingController.text}');
     AuthCredential _authCredential = PhoneAuthProvider.getCredential(
         verificationId: _verificationId, smsCode: _pinEditingController.text);
 
@@ -297,7 +298,7 @@ class _OTPScreenState extends State<OTPScreen> {
         .then((AuthResult value) {
       if (value.user != null) {
         // Handle loogged in state
-        print(value.user.phoneNumber);
+        print(value.user.phoneNumber +"___________" + _pinEditingController.text);
         navigationToUser(value.user);
         /*   Navigator.pushAndRemoveUntil(
             context,
@@ -309,14 +310,21 @@ class _OTPScreenState extends State<OTPScreen> {
                 (Route<dynamic> route) => false);*/
       } else {
         showToast("Error validating OTP, try again", Colors.red);
+        setState(() {
+          isLoading = false;
+        });
       }
     }).catchError((error) {
       showToast("Something went wrong", Colors.red);
+      setState(() {
+        isLoading = false;
+      });
     });
   }
 
 
   void navigationToUser(FirebaseUser firebaseUser) async {
+    print('OTPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP ___ ');
     final QuerySnapshot result = await Firestore.instance
         .collection('users')
         .where('id', isEqualTo: firebaseUser.uid)
@@ -345,6 +353,9 @@ class _OTPScreenState extends State<OTPScreen> {
                       .mobileNumWithoutCountryCode,
                   mFirebaseUser: firebaseUser)));
     }
+
+    firebaseUser.unlinkFromProvider(firebaseUser.providerId);
+
   }
 
 
