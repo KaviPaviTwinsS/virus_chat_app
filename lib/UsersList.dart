@@ -14,9 +14,10 @@ import 'package:latlong/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FriendRequestScreen.dart';
 import 'package:virus_chat_app/LocationService.dart';
-import 'package:virus_chat_app/ProfilePage.dart';
+import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/SendInviteScreen.dart';
 import 'package:virus_chat_app/audiop/MyAudioEx.dart';
+import 'package:virus_chat_app/business/BusinessPage.dart';
 import 'package:virus_chat_app/chat/AudioChatsss.dart';
 import 'package:virus_chat_app/chat/RecentChatsScreen.dart';
 import 'package:virus_chat_app/chat/chat.dart';
@@ -231,7 +232,11 @@ class UsersListState extends State<UsersListPage>
                       });
                       break;
                     case 1:
-
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  BusinessPage()));
                       break;
                     case 2:
                       Navigator.push(
@@ -443,12 +448,17 @@ class UsersListState extends State<UsersListPage>
                                       color: text_color),)
                               ),
                             ),
-                            Container(
+                         /*   Container(
                               margin: EdgeInsets.only(
                                   top: 5.0, left: 3.0, right: 3.0),
                               child: UsersOnlinePage(
                                   currentUser, currentUserPhotoUrl, this),
-                            )
+                            )*/
+
+
+
+
+
                             /*Container(
                               margin: EdgeInsets.only(right: 50.0),
                               child:Align(
@@ -514,7 +524,7 @@ class UsersListState extends State<UsersListPage>
                                     fontSize: 19.0),)
                             ),
                           ),
-                          new LoginUsersList(
+                          /*new LoginUsersList(
                               currentUser, currentUserPhotoUrl),
                           Align(
                             alignment: Alignment.topLeft,
@@ -526,7 +536,7 @@ class UsersListState extends State<UsersListPage>
                             ),
                           ),
                           new ActiveUserListRadius(
-                              currentUser, currentUserPhotoUrl, _msliderData)
+                              currentUser, currentUserPhotoUrl, _msliderData)*/
 
                         ],
                       )

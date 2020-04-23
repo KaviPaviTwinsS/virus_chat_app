@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FacebookSignup.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
-import 'package:virus_chat_app/ProfilePage.dart';
+import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/splash/SplashScreen.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 

@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/Login/UserRegistrationPage.dart';
-import 'package:virus_chat_app/ProfilePage.dart';
+import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/CustomTextSpan.dart';
 import 'package:virus_chat_app/utils/colors.dart';
@@ -368,6 +368,7 @@ class _OTPScreenState extends State<OTPScreen> {
     await prefs.setString('nickname', documents[0]['nickName']);
     await prefs.setString('status', 'ACTIVE');
     await prefs.setString('photoUrl', documents[0]['photoUrl']);
+    await prefs.setString('BUSINESS_ID', documents[0]['businessId']);
     await prefs.setInt('createdAt', ((new DateTime.now()
         .toUtc()
         .microsecondsSinceEpoch) / 1000).toInt());

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:intl/intl.dart';
+
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,11 +18,13 @@ import 'package:virus_chat_app/FacebookSignup.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/UsersList.dart';
+import 'package:virus_chat_app/business/AddEmployee.dart';
+import 'package:virus_chat_app/business/UpgradeBusiness.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
 import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
-import 'utils/const.dart';
+import '../utils/const.dart';
 
 class ProfilePageSetup extends StatelessWidget {
   final String currentUserId;
@@ -82,12 +86,17 @@ class ProfilePageState extends State<ProfilePage> {
   String photoUrl = '';
   File avatarImageFile;
   bool isLoading = false;
-
   String userEmail = '';
   String userPassword = '';
   String newPassword = '';
   String confirmPassword = '';
   String mobileNumber = '';
+  String businessId = '';
+  String businessName = '';
+  String businessNumber = '';
+  String businessAddress = '';
+  String businessImage = '';
+  String businessCreatedTime = '';
   TextEditingController controllerName;
   TextEditingController controllerNickName;
   TextEditingController controllerEmail;
@@ -106,17 +115,20 @@ class ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    super.initState();
     readLocal();
     loginSelectionOption = LoginSelectionOption();
     facebookSignup = new FacebookSignup();
+    super.initState();
   }
 
   void readLocal() async {
     prefs = await SharedPreferences.getInstance();
+    fetchAllUsersData();
     userId = prefs.getString('userId');
-    signinType  = prefs.getString('signInType');
+    signinType = prefs.getString('signInType');
     userEmail = prefs.getString('email');
+    businessId = prefs.getString('BUSINESS_ID');
+    print('businessId $businessId');
     mobileNumber = prefs.getString('phoneNo');
 //    name = prefs.getString('name');
 //    print('profile name $name');
@@ -127,15 +139,52 @@ class ProfilePageState extends State<ProfilePage> {
     controllerNewPassword = new TextEditingController(text: newPassword);
     controllerConfirmPassword =
     new TextEditingController(text: confirmPassword);
-    fetchAllUsersData();
 
     // Force refresh input
     setState(() {});
   }
 
+  Future getBusinessDetails()async{
+    if(businessId != '' && businessName == '') {
+      var document = await Firestore.instance.collection('business').document(
+          businessId).get();
+      if(document.exists) {
+        var businessDetails = document.data;
+        setState(() {
+          this.businessId = businessDetails['businessId'];
+          this.businessName = businessDetails['businessName'];
+          this.businessAddress = businessDetails['businessAddress'];
+          this.businessNumber = businessDetails['businessNumber'];
+          this.businessImage = businessDetails['photoUrl'];
+          this.businessCreatedTime = businessDetails['createdAt'].toString();
+        });
+        await prefs.setString('BUSINESS_ID', businessId);
+        await prefs.setString('BUSINESS_NAME', businessName);
+        await prefs.setString('BUSINESS_ADDRESS', businessAddress);
+        await prefs.setString('BUSINESS_NUMBER', businessNumber);
+        await prefs.setString('BUSINESS_IMAGE', businessImage);
+        await prefs.setString('BUSINESS_CREATED_AT', businessCreatedTime);
+      }
+    }else{
+      setState(() {
+        businessId =  prefs.getString('BUSINESS_ID');
+        businessName =  prefs.getString('BUSINESS_NAME');
+        businessAddress =  prefs.getString('BUSINESS_ADDRESS');
+        businessNumber =  prefs.getString('BUSINESS_NUMBER');
+        businessImage =  prefs.getString('BUSINESS_IMAGE');
+        businessCreatedTime = prefs.getString('BUSINESS_CREATED_AT');
+      });
+    }
+
+    print('businessName__________________ $businessId __________$businessImage');
+
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('profile build $name');
+    businessId = prefs.getString('BUSINESS_ID');
+    print('profile build $businessId');
+
     return Scaffold(
       /*  appBar: AppBar(
           leading: new IconButton(
@@ -303,7 +352,11 @@ class ProfilePageState extends State<ProfilePage> {
                                   children: <Widget>[
                                     Container(
                                       margin: EdgeInsets.only(
-                                        left: 30.0, right: 30.0,top:signinType != 'MobileNumber' ? 20.0 : 0.0),
+                                          left: 10.0,
+                                          right: 10.0,
+                                          top: signinType != 'MobileNumber'
+                                              ? 20.0
+                                              : 0.0),
                                       child: Text('First name'.toUpperCase()),
                                     ),
                                     Container(
@@ -328,7 +381,7 @@ class ProfilePageState extends State<ProfilePage> {
                                         },
                                       ),
                                       margin: EdgeInsets.only(
-                                          left: 30.0, right: 30.0, top: 5.0),
+                                          left: 10.0, right: 10.0, top: 5.0),
                                     ),
                                   ],
                                 ),
@@ -338,7 +391,7 @@ class ProfilePageState extends State<ProfilePage> {
                                     children: <Widget>[
                                       Container(
                                         margin: EdgeInsets.only(
-                                            left: 30.0, right: 30.0, top: 20.0),
+                                            left: 10.0, right: 10.0, top: 20.0),
                                         child: Text('Last name'.toUpperCase()),
                                       ),
                                       Container(
@@ -363,7 +416,7 @@ class ProfilePageState extends State<ProfilePage> {
                                           },
                                         ),
                                         margin: EdgeInsets.only(
-                                            left: 30.0, right: 30.0, top: 5.0),
+                                            left: 10.0, right: 10.0, top: 5.0),
                                       ),
                                     ]
                                 ),
@@ -373,16 +426,24 @@ class ProfilePageState extends State<ProfilePage> {
                                     children: <Widget>[
                                       Container(
                                         margin: EdgeInsets.only(
-                                            left: 30.0, right: 30.0, top: 20.0),
+                                            left: 10.0, right: 10.0, top: 20.0),
                                         child: Text('Email'.toUpperCase()),
                                       ),
                                       Container(
                                         decoration: new BoxDecoration(
-                                          shape: BoxShape.rectangle,
-                                          color: signinType == 'facebook' ? greyColor2 : (signinType == 'google' && userEmail != '') ? greyColor2 : white_color
+                                            shape: BoxShape.rectangle,
+                                            color: signinType == 'facebook'
+                                                ? greyColor2
+                                                : (signinType == 'google' &&
+                                                userEmail != '')
+                                                ? greyColor2
+                                                : white_color
                                         ),
                                         child: TextField(
-                                          enabled: signinType == 'facebook' ? false : (signinType == 'google' && userEmail != '') ? false : true ,
+                                          enabled: signinType == 'facebook'
+                                              ? false
+                                              : (signinType == 'google' &&
+                                              userEmail != '') ? false : true,
                                           decoration: new InputDecoration(
                                             contentPadding: new EdgeInsets.all(
                                                 15.0),
@@ -401,31 +462,33 @@ class ProfilePageState extends State<ProfilePage> {
                                           onChanged: (value) {
                                             userEmail = value;
                                           },
-                                          keyboardType: TextInputType.emailAddress,
+                                          keyboardType: TextInputType
+                                              .emailAddress,
                                         ),
                                         margin: EdgeInsets.only(
-                                            left: 30.0, right: 30.0, top: 5.0),
+                                            left: 10.0, right: 10.0, top: 5.0),
                                       ),
                                     ]
                                 ),
 
-                                signinType == 'MobileNumber'  ? Column(
+                                signinType == 'MobileNumber' ? Column(
                                     crossAxisAlignment: CrossAxisAlignment
                                         .start,
                                     children: <Widget>[
                                       Container(
                                         margin: EdgeInsets.only(
-                                            left: 30.0, right: 30.0, top: 20.0),
-                                        child: Text('Mobile number'.toUpperCase()),
+                                            left: 10.0, right: 10.0, top: 20.0),
+                                        child: Text(
+                                            'Mobile number'.toUpperCase()),
                                       ),
                                       Container(
                                         decoration: new BoxDecoration(
                                             shape: BoxShape.rectangle,
-                                            color:  greyColor2
+                                            color: greyColor2
                                         ),
                                         child: TextField(
                                           enabled: false,
-                                          controller:controllerMobileNumber ,
+                                          controller: controllerMobileNumber,
                                           decoration: new InputDecoration(
                                             contentPadding: new EdgeInsets.all(
                                                 15.0),
@@ -442,7 +505,7 @@ class ProfilePageState extends State<ProfilePage> {
                                           ),
                                         ),
                                         margin: EdgeInsets.only(
-                                            left: 30.0, right: 30.0, top: 5.0),
+                                            left: 10.0, right: 10.0, top: 5.0),
                                       ),
                                     ]
                                 ) : Text(''),
@@ -471,7 +534,11 @@ class ProfilePageState extends State<ProfilePage> {
                                     alignment: Alignment.bottomCenter,
                                     child: Container(
                                         margin: EdgeInsets.only(
-                                            top:signinType == 'MobileNumber'? 15.0 : 30.0, left: 30.0, right: 30.0),
+                                            top: signinType == 'MobileNumber'
+                                                ? 10.0
+                                                : 5.0,
+                                            left: 10.0,
+                                            right: 10.0),
                                         width: double.infinity,
                                         child: SizedBox(
                                           height: 45, // specific value
@@ -485,18 +552,22 @@ class ProfilePageState extends State<ProfilePage> {
                                             ),
                                             child: Text('Update Profile'),
                                             onPressed: () {
-                                              if(name != '' || nickName != '' || photoUrl !='' || userEmail!= '') {
-                                                if(name == ''){
+                                              if (name != '' ||
+                                                  nickName != '' ||
+                                                  photoUrl != '' ||
+                                                  userEmail != '') {
+                                                if (name == '') {
                                                   Fluttertoast.showToast(
                                                       msg: enter_names);
-                                                }else if(nickName == ''){
+                                                } else if (nickName == '') {
                                                   Fluttertoast.showToast(
                                                       msg: enter_nickname);
-                                                }else if(userEmail == ''){
+                                                } else if (userEmail == '') {
                                                   Fluttertoast.showToast(
                                                       msg: enter_Email);
                                                 }
-                                                else if ((prefs.getString('name') !=
+                                                else
+                                                if ((prefs.getString('name') !=
                                                     name && name != '') ||
                                                     (nickName != '' &&
                                                         prefs.getString(
@@ -517,7 +588,7 @@ class ProfilePageState extends State<ProfilePage> {
                                                     isLoading = false;
                                                     Fluttertoast.showToast(
                                                         msg: enter_valid_email);
-                                                  }else {
+                                                  } else {
                                                     Firestore.instance
                                                         .collection(
                                                         'users')
@@ -540,7 +611,7 @@ class ProfilePageState extends State<ProfilePage> {
                                                   Fluttertoast.showToast(
                                                       msg: no_data_change);
                                                 }
-                                              }else{
+                                              } else {
                                                 Fluttertoast.showToast(
                                                     msg: no_data_change);
                                               }
@@ -548,15 +619,162 @@ class ProfilePageState extends State<ProfilePage> {
                                           ),
                                         )
                                     )
-                                )
+                                ),
+                                (businessId != ''  && businessId != null )? Column(
+                                  crossAxisAlignment:CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      margin: EdgeInsets.only(left: 10.0,top: 15.0),
+                                      child : Divider(),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 10.0,top: 10.0,bottom: 15.0),
+                                      child: Text(business,style: TextStyle(fontWeight: FontWeight.bold),),
+                                    ),
+                                    Center(
+                                    child : Container(
+                                    margin: EdgeInsets.only(bottom: 15.0),
+                                    child:Material(
+                                      child: CachedNetworkImage(
+                                        placeholder: (context, url) =>
+                                            Container(
+                                              child: CircularProgressIndicator(
+                                                valueColor: AlwaysStoppedAnimation<Color>(
+                                                    themeColor),
+                                              ),
+                                              width: 50,
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                color: greyColor2,
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(5.0),
+                                                ),
+                                              ),
+                                            ),
+                                        errorWidget: (context, url, error) =>
+                                            Material(
+                                              child: Image.asset(
+                                                'images/img_not_available.jpeg',
+                                                width: MediaQuery.of(context).size.width - 30,
+                                                height: 200.0,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(5.0),
+                                              ),
+                                              clipBehavior: Clip.hardEdge,
+                                            ),
+                                        imageUrl: businessImage,
+                                        width: MediaQuery.of(context).size.width - 30,
+                                        height: 200.0,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                    ),
+                                    )
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 10.0,bottom: 10.0),
+                                      child: Text(businessName,style: TextStyle(fontWeight: FontWeight.bold),),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 10.0,bottom: 15.0),
+                                      child: Text(businessAddress,),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 10.0,bottom: 15.0),
+                                      child: Text(created_at+'\t'+DateFormat('dd-MM-yyyy')
+        .format(DateTime.fromMillisecondsSinceEpoch(
+    int.parse(businessCreatedTime)),)),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child:GestureDetector(
+                                        onTap: (){
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AddEmployee(signinType,userId)));
+                                        },
+                                        child:  Container(
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: <Widget>[
+                                              Container(
+                                                margin: EdgeInsets.only(
+                                                    right: 10.0,bottom: 20.0),
+                                                child: new SvgPicture.asset(
+                                                  'images/employee_add.svg',
+                                                  height: 20.0,
+                                                  width: 20.0,
+                                                ),
+                                              ),
+                                              Container(
+                                                margin: EdgeInsets.only(
+                                                    right: 10.0,bottom: 20.0),
+                                                child: Text(add_employee,
+                                                  style: TextStyle(
+                                                      color: facebook_color,
+                                                      fontSize: 15.0),),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    )
 //                                ],
+                                  ],
+                                ) : Text(''),
+
 //                              )
                               ]
-                          )
-                      )
+                          ),
+                      ),
+
                   )
               ),
             ),
+
+            businessId == '' || businessId == null ? Align(
+              alignment: Alignment.bottomRight,
+              child: GestureDetector(
+                onTap: (){
+                  print('Business click');
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              UpgradeBusiness(userId)));
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(
+                          right: 10.0,bottom: 20.0),
+                      child: new SvgPicture.asset(
+                        'images/business_highlight.svg',
+                        height: 20.0,
+                        width: 20.0,
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(
+                          right: 10.0,bottom: 20.0),
+                      child: Text(upgrade_business,
+                        style: TextStyle(
+                            color: facebook_color,
+                            fontSize: 15.0),),
+                    )
+
+                  ],
+                ),
+              )
+            ) : Text(''),
             // Loading
             Positioned(
               child: isLoading
@@ -625,10 +843,10 @@ class ProfilePageState extends State<ProfilePage> {
                                       prefs);
                                 else if (signinType == 'facebook')
                                   facebookSignup.facebookLogout(context, prefs);
-                                else if (signinType == 'MobileNumber')
-                                  clearLocalData();
+                              /*  else if (signinType == 'MobileNumber')
+                                  clearLocalData();*/
                                 prefs.setString('signInType', '');
-                                _updatestatus();
+//                                _updatestatus();
                                 /* Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
@@ -1002,12 +1220,12 @@ class ProfilePageState extends State<ProfilePage> {
   var facebookLogin = FacebookLogin();
 
   Future _updatestatus() async {
-    clearLocalData();
-
+    print('PROFILE _updatestatus');
     Firestore.instance
         .collection('users')
         .document(userId)
         .updateData({'status': 'LoggedOut'});
+    await clearLocalData();
     if (googleSignIn.isSignedIn() != null) {
       await googleSignIn.signOut();
     }
@@ -1015,8 +1233,6 @@ class ProfilePageState extends State<ProfilePage> {
       await facebookLogin.logOut();
     }
     await FirebaseAuth.instance.signOut();
-
-
   }
 
   Future<Null> setLoader() async {
@@ -1083,6 +1299,7 @@ class ProfilePageState extends State<ProfilePage> {
   Future fetchAllUsersData() async {
     if (prefs.containsKey('userId') && prefs.getString('userId') != null) {
       if (prefs.getString('userId') == '') {
+        print('NANDHU FETCH USER');
         var document = await Firestore.instance.collection('users').document(
             userId).get();
         var profile = document.data;
@@ -1094,20 +1311,28 @@ class ProfilePageState extends State<ProfilePage> {
           this.userEmail = profile['email'];
           this.nickName = profile['nickName'];
           this.userPassword = profile['password'];
-          if(profile['phoneNo'] != null && signinType == 'MobileNumber')
-          this.mobileNumber = profile['phoneNo'];
+          if (profile['phoneNo'] != null && signinType == 'MobileNumber')
+            this.mobileNumber = profile['phoneNo'];
+          this.businessId = profile['businessOwnerId'];
           this.controllerName = new TextEditingController(text: name);
           this.controllerNickName = new TextEditingController(text: nickName);
           this.controllerEmail = new TextEditingController(text: userEmail);
         });
       } else {
+        print('NANDHU FETCH USER_________________________');
         setState(() {
           this.name = prefs.getString('name');
           this.photoUrl = prefs.getString('photoUrl');
           this.userEmail = prefs.getString('email');
           this.nickName = prefs.getString('nickname');
           this.userPassword = prefs.getString('password');
-          if(prefs.getString('phoneNo') != null && signinType == 'MobileNumber')
+          this.businessId = prefs.getString('BUSINESS_ID');
+          this.businessCreatedTime = prefs.getString('BUSINESS_CREATED_AT');
+          this.businessName = prefs.getString('BUSINESS_NAME');
+          this.businessAddress = prefs.getString('BUSINESS_ADDRESS');
+          this.businessImage = prefs.getString('BUSINESS_IMAGE');
+          if (prefs.getString('phoneNo') != null &&
+              signinType == 'MobileNumber')
             this.mobileNumber = prefs.getString('phoneNo');
           this.controllerName = new TextEditingController(text: name);
           this.controllerNickName = new TextEditingController(text: nickName);
@@ -1115,7 +1340,8 @@ class ProfilePageState extends State<ProfilePage> {
         });
       }
     } else {
-      var document = await Firestore.instance.collection('users').document(
+      print('NANDHU FETCH USER____________NOT NULL');
+    var document = await Firestore.instance.collection('users').document(
           userId).get();
       var profile = document.data;
       print('document ${profile['name']}');
@@ -1126,17 +1352,22 @@ class ProfilePageState extends State<ProfilePage> {
         this.userEmail = profile['email'];
         this.nickName = profile['nickName'];
         this.userPassword = profile['password'];
-        if(profile['phoneNo'] != null && signinType == 'MobileNumber')
+        this.businessId = profile['businessOwnerId'];
+        if (profile['phoneNo'] != null && signinType == 'MobileNumber')
           this.mobileNumber = profile['phoneNo'];
         this.controllerName = new TextEditingController(text: name);
         this.controllerNickName = new TextEditingController(text: nickName);
         this.controllerEmail = new TextEditingController(text: userEmail);
       });
     }
+    if(businessId != '' && businessId != null){
+      getBusinessDetails();
+    }
   }
 
 
   Future storeLocalData(Map<String, dynamic> profile) async {
+    await prefs.setString('BUSINESS_ID', profile['businessOwnerId']);
     await prefs.setString('userId', profile['id']);
     await prefs.setString('email', profile['email']);
     await prefs.setString('name', profile['name']);
@@ -1178,6 +1409,12 @@ class ProfilePageState extends State<ProfilePage> {
     await prefs.setInt('phoneNo', 0);
     await prefs.setString('signInType', '');
     await prefs.setString('userId', '');
+    await prefs.setString('BUSINESS_ID', '');
+    await prefs.setString('BUSINESS_NAME', '');
+    await prefs.setString('BUSINESS_ADDRESS', '');
+    await prefs.setString('BUSINESS_NUMBER', '');
+    await prefs.setString('BUSINESS_IMAGE', '');
+    await prefs.setString('BUSINESS_CREATED_AT', '');
     LocationService('').locationStream;
   }
 }

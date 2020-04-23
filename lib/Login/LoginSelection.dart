@@ -7,7 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
+//import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FacebookSignup.dart';
@@ -20,7 +20,7 @@ import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/const.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
-import '../ProfilePage.dart';
+import '../profile/ProfilePage.dart';
 
 class LoginSelectionPage extends StatelessWidget {
   @override
@@ -77,7 +77,7 @@ class LoginSelectionOption extends State<LoginSelection> {
 
   var facebookSignup;
 
-  Geoflutterfire geo = Geoflutterfire();
+//  Geoflutterfire geo = Geoflutterfire();
 
   String userToken = '';
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -185,6 +185,9 @@ class LoginSelectionOption extends State<LoginSelection> {
     isLoading = true;
     isLoggedIn = true;
     await FirebaseAuth.instance.signOut();
+    if(googleSignIn == null){
+      googleSignIn = GoogleSignIn();
+    }
     print('SIGN OUT VALLLL ${googleSignIn.isSignedIn() !=
         null}   ____ isLoggg $isLoggedIn');
     if (googleSignIn.isSignedIn() != null && isLoggedIn) {
@@ -209,6 +212,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     await prefs.setString('status', 'ACTIVE');
     await prefs.setString('photoUrl', currentUser.photoUrl);
     await prefs.setString('signInType', signInType);
+    await prefs.setString('BUSINESS_ID', '');
     await prefs.setInt('createdAt',
         ((new DateTime.now()
             .toUtc()
@@ -225,8 +229,9 @@ class LoginSelectionOption extends State<LoginSelection> {
     await prefs.setString('photoUrl', documents[0]['photoUrl']);
     await prefs.setInt('createdAt', documents[0]['createdAt']);
     await prefs.setString('phoneNo', documents[0]['phoneNo']);
+    await prefs.setString('BUSINESS_ID', documents[0]['businessId']);
     await prefs.setString('signInType', signInType);
-    print('updateLocalListData___________ ${documents[0]['name']}');
+    print('updateLocalListData___________ ${documents[0]['name']} _________ ${documents[0]['businessId']} ______${documents[0]['id']}');
 //    setState(() {
       isLoading = false;
 //    });
@@ -305,6 +310,7 @@ class LoginSelectionOption extends State<LoginSelection> {
       'id': firebaseUser.uid,
       '$loginType': loginId,
       'user_token': userToken,
+      'businessId' : '',
       'createdAt':
       ((new DateTime.now()
           .toUtc()

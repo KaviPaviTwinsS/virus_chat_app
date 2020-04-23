@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
+//import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:location/location.dart';
 
@@ -10,7 +10,7 @@ class LocationService {
   var location = Location();
   String currentUserId = '';
 
-  Geoflutterfire geo = Geoflutterfire();
+//  Geoflutterfire geo = Geoflutterfire();
 
   Future<UserLocation> getLocation() async {
 //    print('LocationService  ___ getLocation');
@@ -126,8 +126,8 @@ class LocationService {
   Future<DocumentReference> _addGeoPoint(LocationData locationData) async {
 //    print('NAN _addGeoPoint $currentUserId  ___locationData $locationData');
     var pos = locationData;
-    GeoFirePoint point =
-    geo.point(latitude: pos.latitude, longitude: pos.longitude);
+//    GeoFirePoint point =
+//    geo.point(latitude: pos.latitude, longitude: pos.longitude);
 //    databaseReference.collection('users').document(currentUserId).updateData({'position': point.data});
 /*
     return databaseReference.collection('users').add({

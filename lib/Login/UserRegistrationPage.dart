@@ -461,6 +461,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
             'id': firebaseUser.uid,
             '$loginType': firebaseUser.uid,
             'user_token': userToken,
+            'businessId' : '',
             'createdAt':
             ((new DateTime.now()
                 .toUtc()
@@ -492,6 +493,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
         .toUtc()
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('phoneNo', userPhoneNumberWithoutCountryCode);
+    await prefs.setString('BUSINESS_ID', '');
     await prefs.setString('signInType', signInType);
     Navigator.push(
         context,

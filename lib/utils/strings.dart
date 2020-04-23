@@ -42,9 +42,16 @@ String friend_request = 'Friend Requests';
 
 String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
-
-
-
-
+String business ='Business';
+String upgrade_business= 'Upgrade Business';
+String business_header = 'Businesses';
+String business_name = 'Name';
+String business_address = 'Address';
+String business_number = 'Register number';
+String business_cancel ='Cancel';
+String business_upgrade ='Upgrade';
+String add_employee = 'Add Employee';
+String created_at = 'Created at';
+String search = 'Search';
 
 

@@ -11,4 +11,5 @@ String SERVER_KEY = 'AAAAoOGpnsA:APA91bG089tSOMG4ImkVCuzr0ANuzeg1a0wPxMndUbT5DSR
 String WALK_THROUGH = 'walk_throuch';
 int PASSWORD_LENGTH = 8;
 int MOBILE_NUMBER_LENGTH = 10;
+const kGoogleApiKey = "AIzaSyBzWFtBj_GgXD71n6iDKp3xSkswdcdHeVc";
 

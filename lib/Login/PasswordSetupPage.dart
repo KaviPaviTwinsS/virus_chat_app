@@ -4,12 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
+//import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
-import 'package:virus_chat_app/ProfilePage.dart';
+import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
@@ -53,7 +53,7 @@ class PasswordSetupState extends State<PasswordSetup> {
   bool isLoading = false;
 
   SharedPreferences prefs;
-  Geoflutterfire geo = Geoflutterfire();
+//  Geoflutterfire geo = Geoflutterfire();
 
   String userToken = '';
   bool passwordVisible = true;
