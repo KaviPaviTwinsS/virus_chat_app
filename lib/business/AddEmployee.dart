@@ -6,27 +6,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+//import 'package:flutter_sms/flutter_sms.dart';
+//import 'package:flutter_sms/flutter_sms.dart';
+
+//import 'package:intl/intl_browser.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:virus_chat_app/LocationService.dart';
+import 'package:virus_chat_app/UserLocation.dart';
+import 'package:virus_chat_app/business/flutter_sms.dart';
 import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/const.dart';
 import 'package:virus_chat_app/utils/strings.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class AddEmployee extends StatefulWidget {
   String _currUserId = '';
   String _currUserSignInType = '';
+  String _mBusinessId = '';
 
-  AddEmployee(String signInType, String currentUserId) {
+  AddEmployee(String signInType, String currentUserId,String businessId) {
     _currUserSignInType = signInType;
     _currUserId = currentUserId;
+    _mBusinessId = businessId;
   }
 
   @override
   State<StatefulWidget> createState() {
-    return AddEmployeeState(_currUserSignInType, _currUserId);
+    return AddEmployeeState(_currUserSignInType, _currUserId,_mBusinessId);
   }
 
 }
@@ -35,18 +45,23 @@ class AddEmployeeState extends State<AddEmployee> {
 
   String _mCurrUserId = '';
   String _mCurrUserSignInType = '';
+  String _mBusinessId ='';
+  int _noOfEmployee = 0;
   TextEditingController searchController;
   String _mSearchContact = '';
   Iterable<Contact> _contacts;
   Uint8List avatar;
-  List<String> userList = new List<String>();
+//  List<String> userList = new List<String>();
+  List<DocumentSnapshot> documents;
   SharedPreferences prefs;
   final ScrollController listScrollController = new ScrollController();
   bool isLoading = false;
+  String _mBusinessName = '';
 
-  AddEmployeeState(String signInType, String currentUserId) {
-    _mCurrUserId = signInType;
-    _mCurrUserSignInType = currentUserId;
+  AddEmployeeState(String signInType, String currentUserId, String mBusinessId) {
+    _mCurrUserId = currentUserId;
+    _mCurrUserSignInType = signInType;
+    _mBusinessId = mBusinessId;
   }
 
   @override
@@ -58,34 +73,65 @@ class AddEmployeeState extends State<AddEmployee> {
   @override
   void dispose() {
     listScrollController.dispose();
-    print('Leng________________________________________________dispose${_contacts.length}');
+    print('NANDHU AddEmployeeState dispose');
     super.dispose();
   }
 
-  Future loadUsers() async{
-    final QuerySnapshot result = await Firestore.instance
-        .collection('users')
-        .getDocuments();
-    final List<DocumentSnapshot> documents = result.documents;
-    if (documents.length == 0) {
+  Future<List<DocumentSnapshot>> loadUsers() async{
+    print('NANDHU AddEmployeeState loadUsers');
+    try{
+      QuerySnapshot result = await Firestore.instance
+          .collection('users')
+          .getDocuments();
+      return result.documents;
+    }on Exception catch (e) {
+      print('NANDHU AddEmployeeState loadUsers Exception ${e.toString()}');
+    }
+    print('NANDHU AddEmployeeState loadUsers length ${documents.length}');
 
+    /*Firestore.instance
+          .collection('users')
+          .getDocuments().then((result){
+        documents = result.documents;
+        print('loadUsers_______________________${documents.length}');
+*//*
+        if (documents.length == 0) {
+
+        }else {
+          for (int i = 0; i < documents.length;i++){
+            if(documents[i]['phoneNo'] != null && documents[i]['phoneNo'] != '')
+              userList.add(documents[i]['phoneNo']);
+          }
+        }*//*
+      });*/
+
+ /*   if (documents.length == 0) {
+      print('loadUsers_______________________LENGTH${documents.length}');
     }else {
       for (int i = 0; i < documents.length;i++){
-        if(documents[i]['phoneNo'] != null || documents[i]['phoneNo'] != '')
-        userList.add(documents[i]['phoneNo']);
+//        if(documents[i]['phoneNo'] != null && documents[i]['phoneNo'] != '')
+          print('loadUsers_______________________LENGTH${documents.length} ______________________${documents[i]['phoneNo']}');
       }
-    }
-    Timer(Duration(seconds: 5), () {
-      refreshContacts('a');
-    });
-  }
-  void initialise() async {
-    print('searchKey_____________________searchKey initialise');
+    }*/
 
+  }
+
+  Future  initialise() async {
+    documents = new List<DocumentSnapshot>();
+    print('NANDHU AddEmployeeState initialise');
     searchController = new TextEditingController(text: _mSearchContact);
     prefs = await SharedPreferences.getInstance();
+    _mBusinessName = await prefs.getString('BUSINESS_NAME');
+    _noOfEmployee = await prefs.getInt('BUSINESS_EMPLOYEES_COUNT');
+    documents = await loadUsers();
+    Timer(Duration(seconds: 2), ()  {
+      refreshContacts('a');
+    });
+/* QuerySnapshot querySnapshot = await Firestore.instance.collection("users").getDocuments();
+    userList= querySnapshot.documents;
+    print('refreshContacts_____________ ${userList.length}');
+*/
 //    loadContacts();
-    loadUsers();
  /*   listScrollController.addListener(() {
       print('Listenerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
       if (listScrollController.position.pixels ==
@@ -93,11 +139,11 @@ class AddEmployeeState extends State<AddEmployee> {
         refreshContacts('');
       }
     });*/
-
   }
 
   @override
   Widget build(BuildContext context) {
+    print('NANDHU AddEmployeeState build');
     return Scaffold(
         body: Stack(
           children: <Widget>[
@@ -114,13 +160,14 @@ class AddEmployeeState extends State<AddEmployee> {
                             icon: new Icon(
                                 Icons.arrow_back_ios, color: Colors.black),
                             onPressed: () {
-                              Navigator.push(
+                             /* Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
                                       new ProfilePage(
                                         _mCurrUserSignInType,
-                                        currentUserId: _mCurrUserId,)));
+                                        currentUserId: _mCurrUserId,)));*/
+                             Navigator.pop(context);
                             },
                           ),
                         )
@@ -238,93 +285,44 @@ class AddEmployeeState extends State<AddEmployee> {
 // Get contacts matching a string
     Iterable<Contact> johns = await ContactsService.getContacts(*/
 /*query : "john"*/ /*
-);
+);_getContactPermission
 */
 
   }
 
 
   Future refreshContacts(String searchKey) async {
-    if (!isLoading) {
-      setState(() {
-        isLoading = true;
-      });
-      Iterable<Contact> tempContacts;
-      print('searchKey_____________________searchKey $searchKey');
-
-      if(searchKey == ''){
-        tempContacts = await ContactsService.getContacts(query: _mSearchContact);
-      }else {
-        tempContacts = await ContactsService.getContacts(
-            query: searchKey);
-      }
-     /* setState(() {
-        _contacts = tempContacts;
-      });
-
-*/
-      // Lazy load thumbnails after rendering initial contacts.
-      for (final contact in tempContacts) {
-        ContactsService.getAvatar(contact).then((mavatar) {
-          print('${contact.displayName}_contacts____________avatar ${mavatar}');
-
-          if (mavatar == null) return; // Don't redraw if no c
-          setState(() {
-            contact.avatar = mavatar;
-            prefs.setString('KEYYYYYYY', mavatar.toList().toString());
-            avatar = mavatar;
-          });
-        });
-        Iterable<Item> mPhone = contact.phones;
-
-        for (final phone in mPhone) {
-//          print('_contacts____________PHONE ${phone.value} ____ ${phone.label}');
-        }
-        print('_contacts____________${tempContacts.length}');
-      }
-      setState(() {
-        isLoading = false;
-        _contacts = tempContacts;
-      });
-    }
-/*
-//    PermissionStatus permissionStatus = await _getContactPermission();
-//    if (permissionStatus == PermissionStatus.granted) {
-    // Load without thumbnails initially.
-    Iterable<Contact> contacts;
-    if(_mSearchContact == ''){
-      contacts = await ContactsService.getContacts();
-    }else {
-      contacts = await ContactsService.getContacts(
-          query: _mSearchContact);
-    }
-    setState(() {
-      _contacts = contacts;
-    });
-
-
-    // Lazy load thumbnails after rendering initial contacts.
-    for (final contact in contacts) {
-      ContactsService.getAvatar(contact).then((mavatar) {
-        print('${contact.displayName}_contacts____________avatar ${mavatar}');
-
-        if (mavatar == null) return; // Don't redraw if no c
+    print('NANDHU AddEmployeeState refreshContacts key ___${searchKey} ___text ${searchController.text}');
+    PermissionStatus permissionStatus = await _getContactPermission();
+    if (permissionStatus == PermissionStatus.granted) {
+      if (!isLoading) {
         setState(() {
-          contact.avatar = mavatar;
-          prefs.setString('KEYYYYYYY', mavatar.toList().toString());
-          avatar = mavatar;
+          isLoading = true;
         });
-      });
-      Iterable<Item> mPhone = contact.phones;
-      for (final phone in mPhone) {
-//          print('_contacts____________PHONE ${phone.value} ____ ${phone.label}');
+        Iterable<Contact> tempContacts;
+        if(searchKey == ''){
+          tempContacts = await ContactsService.getContactsForPhone(searchController.text);
+        }else {
+          tempContacts = await ContactsService.getContacts(query: searchKey);
+        }
+        print('NANDHU AddEmployeeState tempContacts length ${tempContacts.length}');
+        // Lazy load thumbnails after rendering initial contacts.
+        for (final contact in tempContacts) {
+          ContactsService.getAvatar(contact).then((mavatar) {
+            setState(() {
+              contact.avatar = mavatar;
+              avatar = mavatar;
+            });
+          });
+        }
+        setState(() {
+          isLoading = false;
+          _contacts = tempContacts;
+        });
       }
-      print('_contacts____________${contacts.length}');
+    } else {
+     _handleInvalidPermissions(permissionStatus);
     }
-//    } else {
-//      _handleInvalidPermissions(permissionStatus);
-//    }
-*/
   }
 
   updateContact() async {
@@ -338,7 +336,12 @@ class AddEmployeeState extends State<AddEmployee> {
   }
 
   Future<PermissionStatus> _getContactPermission() async {
-    /*PermissionStatus permission = await Permissions()
+    print('_getContactPermission');
+    var status = await Permission.contacts.status;
+    if (await Permission.contacts.request().isGranted) {
+
+    }
+   /* PermissionStatus permission = await Permissions()
         .checkPermissionStatus(PermissionGroup.contacts);
     if (permission != PermissionStatus.granted &&
         permission != PermissionStatus.restricted) {
@@ -350,16 +353,19 @@ class AddEmployeeState extends State<AddEmployee> {
     } else {
       return permission;
     }*/
+   return status;
   }
 
-  void _handleInvalidPermissions(PermissionStatus permissionStatus) {
+  void  _handleInvalidPermissions(PermissionStatus permissionStatus) {
     if (permissionStatus == PermissionStatus.denied) {
+      Fluttertoast.showToast(msg: 'Contact permission denied');
       throw new PlatformException(
           code: "PERMISSION_DENIED",
           message: "Access to location data denied",
           details: null);
     } else
       /*if (permissionStatus == PermissionStatus.disabled) {*/ {
+//      Fluttertoast.showToast(msg: 'Contact permission disabled');
       throw new PlatformException(
           code: "PERMISSION_DISABLED",
           message: "Location data is not available on device",
@@ -367,120 +373,416 @@ class AddEmployeeState extends State<AddEmployee> {
     }
   }
 
-/*
-  Future<Widget> BuildList() async {
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      itemBuilder: (context, index) =>
-          buildItem(_contacts),
-      itemCount: _contacts.length,
-      controller: listScrollController,
-    );
-  }*/
+  String mContactPhone = '';
+  String mContactName = '';
+  bool alreadyUser = false;
+  String alreadyUserInBusiness = '';
+  String alreadyUserId = '';
+  String alreadyUserbusinessId = '';
+  Contact _mContacts;
 
-  Widget buildItem(Contact contacts) {
-    print('LEGTHTHHHHHHHHHHHHHHHH ${_contacts.length}');
-    String mContactPhone = '';
-    String mContactName = '';
-    bool alreadyUser = false;
-    // Lazy load thumbnails after rendering initial contacts.
-//    for (final contact in contacts) {
-//      ContactsService.getAvatar(contacts).then((mavatar) {
-////        print('${contacts.displayName}_contacts____________avatar ${mavatar}');
-//
-////        if (mavatar == null) return; // Don't redraw if no c
-//        setState(() {
-//          contacts.avatar = mavatar;
-//          avatar = mavatar;
-//        });
-//      });
+  String getPhoneValidation(String mPhone){
+    print('NANDHU AddEmployeeState getPhoneValidation mPhone length ${mPhone.length} ___________________________$mPhone');
+    var _tempPhone = '';
+    if(mPhone.length == 10){
+      _tempPhone = mPhone;
+    }else if(mPhone.length == 11){
+      _tempPhone = mPhone.substring(1,mPhone.length);
+    }else if(mPhone.length == 12){
+      _tempPhone = mPhone.substring(2,mPhone.length);
+    }else if(mPhone.length == 13){
+      _tempPhone = mPhone.substring(3,mPhone.length);
+    }else if(mPhone.length == 14){
+      _tempPhone = mPhone.substring(4,mPhone.length);
+    }else if(mPhone.length == 15){
+      _tempPhone = mPhone.substring(5,mPhone.length);
+    }else if(mPhone.length == 16){
+      _tempPhone = mPhone.substring(6,mPhone.length);
+    }
+    return _tempPhone;
+  }
+
+
+  Future contactCheck(Contact contacts) async{
+    print('NANDHU AddEmployeeState contactCheck');
+    _mContacts = contacts;
+    alreadyUserInBusiness = '';
     Iterable<Item> mPhone = contacts.phones;
     avatar = contacts.avatar;
     for (final phone in mPhone) {
       mContactPhone = phone.value;
-//        print('_contacts____________PHONE ${phone.value} ____ ${phone.label}');
+      mContactPhone = getPhoneValidation(mContactPhone.trim());
     }
     mContactName = contacts.displayName;
-//      print('_contacts____________${contacts.displayName} __ ${contacts
-//          .avatar} ____${mPhone}');
-//    }
-    for(int i= 0;i<userList.length;i++){
-      if(mContactPhone == userList[i]){
-        alreadyUser = true;
+    if(documents.length !=0) {
+      alreadyUser = false;
+      for (int i = 0; i < documents.length; i++) {
+        print('NANDHU AddEmployeeState documents phoneNo____${documents[i]['phoneNo']} _____mContactPhone$mContactPhone');
+        if(documents[i]['phoneNo'] != '' && documents[i]['phoneNo'] != null) {
+          var _mPhone = getPhoneValidation(documents[i]['phoneNo'].toString().replaceAll(' ', ''));
+          print('____________________________ $mContactPhone _____________$_mPhone');
+          if (mContactPhone == _mPhone) {
+              print('NANDHU AddEmployeeState documents mContactPhone____EQUAL}');
+              alreadyUser = true;
+              alreadyUserId = documents[i]['id'];
+              alreadyUserbusinessId = documents[i]['businessId'];
+              print('NANDHU AddEmployeeState documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}');
+              if(alreadyUserbusinessId != null && alreadyUserbusinessId == _mBusinessId)
+                alreadyUserInBusiness = 'SAME';
+              else if(alreadyUserbusinessId != null && alreadyUserbusinessId != '')
+                alreadyUserInBusiness = 'DIFF';
+              else
+                alreadyUserInBusiness ='';
+            } else {
+              print('NANDHU AddEmployeeState documents mContactPhone____NOT___EQUAL}');
+            }
+        }
       }
     }
-    return Container(
-      margin: EdgeInsets.all(15.0),
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              avatar != null && avatar != '' ? Material(
-                child: Image.memory(
-                  avatar,
-                  width: 70,
-                  height: 70.0,
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(40.0),
-                ),
-                clipBehavior: Clip.hardEdge,
-              ) : Material(
-                child: Icon(
-                  Icons.account_circle,
-                  size: 70.0,
-                  color: greyColor,
-                ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(40.0),
-                ),
-                clipBehavior: Clip.hardEdge,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
+  }
 
-                  Container(
-                    margin: EdgeInsets.only(left: 10.0),
-                    child: Text(mContactName,
-                      style: TextStyle(fontWeight: FontWeight.bold),),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 5.0),
-                    child: Text(mContactPhone),
-                  ),
-                ],
-              ),
-              !alreadyUser && _mSearchContact.length == MOBILE_NUMBER_LENGTH ? Align(
-                alignment: Alignment.topRight,
-                child:  IconButton(
-                  icon: new SvgPicture.asset(
-                    'images/employee_add.svg', height: 20.0,
-                    width: 20.0,
-                  ),
-                  onPressed: () {
+  Widget buildItem(Contact contacts) {
+    _mContacts = contacts;
+    alreadyUserInBusiness = '';
+    Iterable<Item> mPhone = contacts.phones;
+    avatar = contacts.avatar;
+    for (final phone in mPhone) {
+      mContactPhone = phone.value;
+      mContactPhone = getPhoneValidation(mContactPhone.trim());
+    }
+    mContactName = contacts.displayName;
+    if(documents.length !=0) {
+      alreadyUser = false;
+      for (int i = 0; i < documents.length; i++) {
+        print('NANDHU AddEmployeeState buildItem ___documents phoneNo____${documents[i]['phoneNo']} _____mContactPhone$mContactPhone');
+        if(documents[i]['phoneNo'] != '' && documents[i]['phoneNo'] != null) {
+          print('TRIMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM ${documents[i]['phoneNo'].toString().replaceAll(' ', '')}');
+          var _mPhone = getPhoneValidation(documents[i]['phoneNo'].toString().replaceAll(' ', ''));
+          print('____________________________ $mContactPhone _____________$_mPhone');
+          if (mContactPhone == _mPhone) {
+            print('NANDHU AddEmployeeState buildItem ___documents mContactPhone____EQUAL}');
+            alreadyUser = true;
+            alreadyUserId = documents[i]['id'];
+            alreadyUserbusinessId = documents[i]['businessId'];
+            print('NANDHU AddEmployeeState buildItem ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}');
+            if(alreadyUserbusinessId != null && alreadyUserbusinessId == _mBusinessId)
+              alreadyUserInBusiness = 'SAME';
+            else if(alreadyUserbusinessId != null && alreadyUserbusinessId != '')
+              alreadyUserInBusiness = 'DIFF';
+            else
+              alreadyUserInBusiness ='';
+          } else {
+            print('NANDHU AddEmployeeState buildItem ___documents mContactPhone____NOT___EQUAL}');
+          }
+        }
+      }
+    }
+    return GestureDetector(
+      onTap: (){
+
+      },
+      child: Container(
+//        margin: EdgeInsets.all(10.0),
+        child: Column(
+          children: <Widget>[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+               Container(
+                 margin: EdgeInsets.only(top: 10.0,left: 15.0),
+                 child:  avatar != null && avatar != '' ? Material(
+                   child: Image.memory(
+                     avatar,
+                     width: 70,
+                     height: 70.0,
+                     fit: BoxFit.cover,
+                   ),
+                   borderRadius: BorderRadius.all(
+                     Radius.circular(40.0),
+                   ),
+                   clipBehavior: Clip.hardEdge,
+                 ) : Material(
+                   child: Icon(
+                     Icons.account_circle,
+                     size: 70.0,
+                     color: greyColor,
+                   ),
+                   borderRadius: BorderRadius.all(
+                     Radius.circular(40.0),
+                   ),
+                   clipBehavior: Clip.hardEdge,
+                 ),
+               ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(left: 10.0,top: 20.0),
+                      child: Text(mContactName,
+                        style: TextStyle(fontWeight: FontWeight.bold),),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 5.0),
+                      child: Text(mContactPhone),
+                    ),
+                  ],
+                ),
+                Spacer(),
+                !alreadyUser && _contacts.length !=0 ? GestureDetector(
+                  onTap: (){
+                    print('ADD Employeee $contacts');
+                    AddNewEmployee(contacts);
 
                   },
-                ),
-              ): alreadyUser && _mSearchContact.length == MOBILE_NUMBER_LENGTH ? Align(
-                alignment: Alignment.topRight,
-                child:  IconButton(
-                  icon: new SvgPicture.asset(
-                    'images/employee_invite.svg', height: 20.0,
-                    width: 20.0,
+                  child:Container(
+                    margin: EdgeInsets.only(right: 10.0,left : 0.0,top: 0.0, bottom: 0.0),
+                    child:  Align(
+                      alignment: Alignment.topRight,
+                      child:
+                         new SvgPicture.asset(
+                          'images/employee_invite.svg', height: 60.0,
+                          width: 60.0,
+                        ),
+                    ),
+                  )
+                ): alreadyUser && _mSearchContact.length == MOBILE_NUMBER_LENGTH ? GestureDetector(
+                    onTap: (){
+                      print('ADD AddUserAsEmployee $alreadyUserId');
+                      AddUserAsEmployee(contacts);
+                    },
+                    child:Container(
+                  margin: EdgeInsets.only(right: 10.0, top: 0.0, bottom: 5.0),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child:new SvgPicture.asset(
+                        'images/employee_add.svg', height: 60.0,
+                        width: 60.0,
+                      ),
                   ),
-                  onPressed: () {
-
-                  },
-                ),
-              ):Text('')
-            ],
-          ),
-          Divider()
-        ],
+                    )
+                ):Text('')
+              ],
+            ),
+            Divider()
+          ],
+        ),
       ),
     );
   }
 
+  Future AddNewEmployee(Contact contacts) async{
+    Iterable<Item> mPhone = contacts.phones;
+    Iterable<Item> mEmail = contacts.emails;
+    String _mContactEmail = '';
+    String _mContactPhone = '';
+    for (final phone in mEmail) {
+      _mContactEmail = phone.value;
+    }
+    avatar = contacts.avatar;
+    _mContacts = contacts;
+    alreadyUserInBusiness = '';
+    for (final phone in mPhone) {
+      _mContactPhone = phone.value;
+      mContactPhone = phone.value;
+      mContactPhone = getPhoneValidation(mContactPhone.trim());
+    }
+    mContactName = contacts.displayName;
+    if(documents.length !=0) {
+      alreadyUser = false;
+      for (int i = 0; i < documents.length; i++) {
+        print('NANDHU AddEmployeeState AddNewEmployee ___documents phoneNo____${documents[i]['phoneNo']} _____mContactPhone$mContactPhone');
+        if(documents[i]['phoneNo'] != '' && documents[i]['phoneNo'] != null) {
+          var _mPhone = getPhoneValidation(documents[i]['phoneNo'].toString().replaceAll(' ', ''));
+          print('____________________________ $mContactPhone _____________$_mPhone');
+          if (mContactPhone == _mPhone) {
+            print('NANDHU AddEmployeeState AddNewEmployee ___documents mContactPhone____EQUAL}');
+            alreadyUser = true;
+            alreadyUserId = documents[i]['id'];
+            alreadyUserbusinessId = documents[i]['businessId'];
+            print('NANDHU AddEmployeeState AddNewEmployee ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}');
+            if(alreadyUserbusinessId != null && alreadyUserbusinessId == _mBusinessId)
+              alreadyUserInBusiness = 'SAME';
+            else if(alreadyUserbusinessId != null && alreadyUserbusinessId != '')
+              alreadyUserInBusiness = 'DIFF';
+            else
+              alreadyUserInBusiness ='';
+          } else {
+            print('NANDHU AddEmployeeState AddNewEmployee___documents mContactPhone____NOT___EQUAL');
+          }
+        }
+      }
+    }
+    DocumentReference reference = Firestore.instance.collection('users').document();
+    print('NANDHU AddEmployeeState AddNewEmployee Reference check ___alreadyUserInBusiness_${alreadyUserInBusiness}');
+    if(alreadyUserInBusiness == 'SAME'){
+      Fluttertoast.showToast(msg: 'Already user in this business');
+    } else if( alreadyUserInBusiness == 'DIFF'){
+      Fluttertoast.showToast(msg: 'Already user in this  some other business');
+    }else {
+      alreadyUserInBusiness = 'SAME';
+      try {
+        reference.setData({
+          'name': contacts.displayName,
+//      'photoUrl': _mUserPhotoUrl,
+          'email': _mContactEmail,
+          'nickName': contacts.middleName,
+          'phoneNo': COUNTRY_CODE + "\t" + _mContactPhone,
+          'status': '',
+          'id': reference.documentID,
+          'MobileNumber': reference.documentID,
+          'user_token': '',
+          'businessId': _mBusinessId,
+          'businessType' : BUSINESS_TYPE_EMPLOYEE,
+          'businessName' : _mBusinessName,
+          'photoUrl' : '',
+          'createdAt':
+          ((new DateTime.now()
+              .toUtc()
+              .microsecondsSinceEpoch) / 1000).toInt()
+        }).whenComplete(() async {
+          UserLocation currentLocation = await LocationService('').getLocation();
+          print('NANDHU AddEmployeeState AddNewEmployee Reference LOCATIon UPDATE${currentLocation}');
+          Firestore.instance.collection('users').document(reference.documentID).collection(
+              'userLocation').document(reference.documentID).setData({
+            'userLocation':
+            new GeoPoint(currentLocation.latitude, currentLocation.longitude),
+            'UpdateTime': ((new DateTime.now()
+                .toUtc()
+                .microsecondsSinceEpoch) / 1000).toInt(),
+          }).whenComplete((){
+            print('NANDHU AddEmployeeState AddNewEmployee Reference load users');
+            loadUsers();
+          }).whenComplete((){
+            print('NANDHU AddEmployeeState AddNewEmployee Reference Employee count');
+            _noOfEmployee = _noOfEmployee + 1;
+            Firestore.instance.collection('business')
+                .document(_mBusinessId)
+                .updateData({
+              'employeeCount': _noOfEmployee,
+            });
+            prefs.setInt('BUSINESS_EMPLOYEES_COUNT', _noOfEmployee);
+          });
+        });
+      } on Exception catch (e) {
+        print('NANDHU AddEmployeeState AddNewEmployee Reference Could not add employee:  ${e.toString()}');
+      }
+      /* Firestore.instance.runTransaction((
+        transaction) async {
+      await transaction.set(
+        reference,
+        {
+          'name': contacts.displayName,
+//          'photoUrl': _mUserPhotoUrl,
+          'email': _mUserEmail,
+          'nickName': contacts.middleName,
+          'phoneNo': COUNTRY_CODE+"\t"+_mUserPhone,
+          'status': '',
+          'id': reference.documentID,
+          'MobileNumber': reference.documentID,
+          'user_token': '',
+          'businessId' : _mBusinessId,
+          'createdAt':
+          ((new DateTime.now()
+              .toUtc()
+              .microsecondsSinceEpoch) / 1000).toInt()
+        },
+      );
+    });*/
+
+    }
+
+  }
+
+
+  Future AddUserAsEmployee(Contact contacts) async{
+    _mContacts = contacts;
+    alreadyUserInBusiness = '';
+    Iterable<Item> mPhone = contacts.phones;
+    avatar = contacts.avatar;
+    for (final phone in mPhone) {
+      mContactPhone = phone.value;
+      mContactPhone = getPhoneValidation(mContactPhone.trim());
+    }
+    mContactName = contacts.displayName;
+      if(documents.length !=0) {
+        alreadyUser = false;
+        for (int i = 0; i < documents.length; i++) {
+          print('NANDHU AddEmployeeState AddUserAsEmployee ___documents phoneNo____${documents[i]['phoneNo']} _____mContactPhone$mContactPhone');
+          if(documents[i]['phoneNo'] != '' && documents[i]['phoneNo'] != null) {
+            var _mPhone = getPhoneValidation(documents[i]['phoneNo'].toString().replaceAll(' ', ''));
+            print('____________________________ $mContactPhone _____________$_mPhone');
+            if (mContactPhone == _mPhone) {
+              print('NANDHU AddEmployeeState AddUserAsEmployee ___documents mContactPhone____EQUAL}');
+              alreadyUser = true;
+              alreadyUserId = documents[i]['id'];
+              alreadyUserbusinessId = documents[i]['businessId'];
+              print('NANDHU AddEmployeeState AddUserAsEmployee ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}');
+              if(alreadyUserbusinessId != null && alreadyUserbusinessId == _mBusinessId)
+                alreadyUserInBusiness = 'SAME';
+              else if(alreadyUserbusinessId != null && alreadyUserbusinessId != '')
+                alreadyUserInBusiness = 'DIFF';
+              else
+                alreadyUserInBusiness ='';
+            } else {
+              print('NANDHU AddEmployeeState AddUserAsEmployee ___documents mContactPhone____NOT___EQUAL');
+            }
+          }
+        }
+    }
+    print('NANDHU AddEmployeeState AddUserAsEmployee ___alreadyUserInBusiness  $alreadyUserInBusiness');
+
+    if(alreadyUserInBusiness == 'SAME'){
+      Fluttertoast.showToast(msg: 'Already user in this business');
+    } else if( alreadyUserInBusiness == 'DIFF'){
+      Fluttertoast.showToast(msg: 'Already user in this  some other business');
+    }else {
+      print('NANDHU AddEmployeeState AddUserAsEmployee ___alreadyUserId $alreadyUserId');
+      Firestore.instance.collection('users')
+          .document(alreadyUserId)
+          .updateData({
+        'businessId': _mBusinessId,
+        'businessType': BUSINESS_TYPE_EMPLOYEE,
+        'businessName' : _mBusinessName
+      }).whenComplete((){
+        print('NANDHU AddEmployeeState AddUserAsEmployee ___employeeCount');
+        _noOfEmployee = _noOfEmployee + 1;
+        alreadyUserInBusiness = 'SAME';
+        Firestore.instance.collection('business')
+            .document(_mBusinessId)
+            .updateData({
+          'employeeCount': _noOfEmployee,
+        });
+        prefs.setInt('BUSINESS_EMPLOYEES_COUNT', _noOfEmployee);
+        Iterable<Item> mPhones = contacts.phones;
+        String _mUserPhone = '';
+        for (final phone in mPhones) {
+          _mUserPhone = phone.value;
+        }
+
+        String message = "This is a test message!";
+        List<String> recipents = [_mUserPhone,];
+
+        _sendSMS(message, recipents);
+      });
+
+
+    }
+  }
+
+
+  void _sendSMS(String message, List<String> recipents) async {
+    String _result = await FlutterSms
+        .sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
+ /*   String _result = await sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+      Fluttertoast.showToast(msg: 'onError $onError');
+    });
+    print(_result);
+    Fluttertoast.showToast(msg: '_result $_result');*/
+  }
 }

@@ -38,6 +38,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
   String businessName = '';
   String businessAddress = '';
   String businessNumber = '';
+  String _ownerName= '';
 
   SharedPreferences preferences;
   UpgradeBusinessState(String mUserId) {
@@ -52,6 +53,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
 
   Future initialise() async {
     preferences = await SharedPreferences.getInstance();
+    _ownerName = await preferences.getString('name');
     controllerName = new TextEditingController(text: businessName);
     controllerAddress = new TextEditingController(text: businessAddress);
     controllerNumber = new TextEditingController(text: businessNumber);
@@ -366,20 +368,25 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
           .microsecondsSinceEpoch) / 1000).toInt();
       DocumentReference reference = Firestore.instance.collection('business').document();
       print('_______________________________addBusiness');
-      Firestore.instance.runTransaction((
-          transaction) async {
-        await transaction.set(
-          reference,
-          {
-            'businessName': businessName,
-            'photoUrl': photoUrl,
-            'businessNumber': businessNumber,
-            'businessAddress': businessAddress,
-            'businessId': reference.documentID,
-            'createdAt':currTime
-          },
-        );
-      });
+     try{
+       Firestore.instance.runTransaction((
+           transaction) async {
+         await transaction.set(
+           reference,
+           {
+             'businessName': businessName,
+             'photoUrl': photoUrl,
+             'businessNumber': businessNumber,
+             'businessAddress': businessAddress,
+             'businessId': reference.documentID,
+             'ownerName' :_ownerName,
+             'createdAt':currTime
+           },
+         );
+       });
+     } on Exception catch (e) {
+       print('Could not get Add businesss: ${e.toString()}');
+     }
       /*reference.setData({
         'businessName': businessName,
         'photoUrl': photoUrl,
@@ -389,13 +396,16 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
         'createdAt':currTime
       });*/
       Firestore.instance.collection('users').document(userId).updateData({
-        'businessOwnerId':reference.documentID,
+        'businessId':reference.documentID,
+        'businessType' : BUSINESS_TYPE_OWNER
       });
       await preferences.setString('BUSINESS_ID', reference.documentID);
       await preferences.setString('BUSINESS_NAME', businessName);
       await preferences.setString('BUSINESS_ADDRESS', businessAddress);
       await preferences.setString('BUSINESS_NUMBER', businessNumber);
       await preferences.setString('BUSINESS_IMAGE', photoUrl);
+      await preferences.setString('BUSINESS_TYPE', BUSINESS_TYPE_OWNER);
+      await preferences.setInt('BUSINESS_EMPLOYEES_COUNT', 0);
       await preferences.setString('BUSINESS_CREATED_AT', currTime.toString());
 
       Navigator.pop(context);
@@ -497,7 +507,7 @@ Future<Null> displayPrediction(Prediction p, ScaffoldState scaffold) async {
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           photoUrl = downloadUrl;
           print('DOWNLOAD URL PROFILE $photoUrl');
-          Fluttertoast.showToast(msg: "Upload success");
+          Fluttertoast.showToast(msg: "Profile picture updated successfully");
           setState(() {
             isLoading = false;
           });

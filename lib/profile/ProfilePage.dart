@@ -96,7 +96,9 @@ class ProfilePageState extends State<ProfilePage> {
   String businessNumber = '';
   String businessAddress = '';
   String businessImage = '';
+  String _mBusinessType = '';
   String businessCreatedTime = '';
+  int _noOfEmployees = 0;
   TextEditingController controllerName;
   TextEditingController controllerNickName;
   TextEditingController controllerEmail;
@@ -145,7 +147,8 @@ class ProfilePageState extends State<ProfilePage> {
   }
 
   Future getBusinessDetails()async{
-    if(businessId != '' && businessName == '') {
+    print('businessName_____________$businessName');
+    if(businessId != '' && ((businessName == null ||  businessName == '') || (businessImage ==null || businessImage == ''))) {
       var document = await Firestore.instance.collection('business').document(
           businessId).get();
       if(document.exists) {
@@ -157,6 +160,7 @@ class ProfilePageState extends State<ProfilePage> {
           this.businessNumber = businessDetails['businessNumber'];
           this.businessImage = businessDetails['photoUrl'];
           this.businessCreatedTime = businessDetails['createdAt'].toString();
+          this._noOfEmployees = businessDetails['employeeCount'];
         });
         await prefs.setString('BUSINESS_ID', businessId);
         await prefs.setString('BUSINESS_NAME', businessName);
@@ -164,6 +168,7 @@ class ProfilePageState extends State<ProfilePage> {
         await prefs.setString('BUSINESS_NUMBER', businessNumber);
         await prefs.setString('BUSINESS_IMAGE', businessImage);
         await prefs.setString('BUSINESS_CREATED_AT', businessCreatedTime);
+        await prefs.setInt('BUSINESS_EMPLOYEES_COUNT',_noOfEmployees);
       }
     }else{
       setState(() {
@@ -173,19 +178,29 @@ class ProfilePageState extends State<ProfilePage> {
         businessNumber =  prefs.getString('BUSINESS_NUMBER');
         businessImage =  prefs.getString('BUSINESS_IMAGE');
         businessCreatedTime = prefs.getString('BUSINESS_CREATED_AT');
+        _noOfEmployees = prefs.getInt('BUSINESS_EMPLOYEES_COUNT');
       });
     }
 
     print('businessName__________________ $businessId __________$businessImage');
 
   }
+  void onBackpress(){
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     businessId = prefs.getString('BUSINESS_ID');
     print('profile build $businessId');
+    if(businessId != null && businessId != '')
+    fetchAllUsersData();
 
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: (){
+          onBackpress();
+    },
+    child: Scaffold(
       /*  appBar: AppBar(
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back_ios, color: white_color),
@@ -279,7 +294,7 @@ class ProfilePageState extends State<ProfilePage> {
                                     child: Stack(
                                       children: <Widget>[
                                         (avatarImageFile == null)
-                                            ? (photoUrl != ''
+                                            ? (photoUrl != null && photoUrl != ''
                                             ? GestureDetector(
                                           onTap: getImage,
                                           child: Material(
@@ -367,11 +382,11 @@ class ProfilePageState extends State<ProfilePage> {
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: focused_border_color,
-                                                width: 1.0),
+                                                width: 0.5),
                                           ),
                                           enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
-                                                color: greyColor, width: 1.0),
+                                                color: greyColor, width: 0.5),
                                           ),
                                           hintText: 'Enter your name',
                                         ),
@@ -402,11 +417,11 @@ class ProfilePageState extends State<ProfilePage> {
                                             focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: focused_border_color,
-                                                  width: 1.0),
+                                                  width:0.5),
                                             ),
                                             enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: greyColor, width: 1.0),
+                                                  color: greyColor, width:0.5),
                                             ),
                                             hintText: 'Enter your LastName',
                                           ),
@@ -450,11 +465,11 @@ class ProfilePageState extends State<ProfilePage> {
                                             focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: focused_border_color,
-                                                  width: 1.0),
+                                                  width:0.5),
                                             ),
                                             enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: greyColor, width: 1.0),
+                                                  color: greyColor, width:0.5),
                                             ),
                                             hintText: 'Enter your Email',
                                           ),
@@ -495,11 +510,11 @@ class ProfilePageState extends State<ProfilePage> {
                                             focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: focused_border_color,
-                                                  width: 1.0),
+                                                  width:0.5),
                                             ),
                                             enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: greyColor, width: 1.0),
+                                                  color: greyColor, width:0.5),
                                             ),
                                             hintText: 'Enter Mobile number',
                                           ),
@@ -631,7 +646,7 @@ class ProfilePageState extends State<ProfilePage> {
                                       margin: EdgeInsets.only(left: 10.0,top: 10.0,bottom: 15.0),
                                       child: Text(business,style: TextStyle(fontWeight: FontWeight.bold),),
                                     ),
-                                    Center(
+                                    businessImage != null && businessImage != '' ? Center(
                                     child : Container(
                                     margin: EdgeInsets.only(bottom: 15.0),
                                     child:Material(
@@ -673,58 +688,68 @@ class ProfilePageState extends State<ProfilePage> {
                                       clipBehavior: Clip.hardEdge,
                                     ),
                                     )
-                                    ),
-                                    Container(
+                                    ) : Text(''),
+                                    businessName != null && businessName != '' ? Container(
                                       margin: EdgeInsets.only(left: 10.0,bottom: 10.0),
                                       child: Text(businessName,style: TextStyle(fontWeight: FontWeight.bold),),
-                                    ),
-                                    Container(
+                                    ) : Text(''),
+                                    businessAddress != null && businessAddress != '' ? Container(
                                       margin: EdgeInsets.only(left: 10.0,bottom: 15.0),
                                       child: Text(businessAddress,),
-                                    ),
-                                    Container(
+                                    ) : Text(''),
+                                    businessCreatedTime != null && businessCreatedTime != '' ?Container(
                                       margin: EdgeInsets.only(left: 10.0,bottom: 15.0),
                                       child: Text(created_at+'\t'+DateFormat('dd-MM-yyyy')
         .format(DateTime.fromMillisecondsSinceEpoch(
     int.parse(businessCreatedTime)),)),
-                                    ),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child:GestureDetector(
-                                        onTap: (){
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      AddEmployee(signinType,userId)));
-                                        },
-                                        child:  Container(
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                            children: <Widget>[
-                                              Container(
-                                                margin: EdgeInsets.only(
-                                                    right: 10.0,bottom: 20.0),
-                                                child: new SvgPicture.asset(
-                                                  'images/employee_add.svg',
-                                                  height: 20.0,
-                                                  width: 20.0,
-                                                ),
+                                    ): Text(''),
+                                   Row(
+                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          _noOfEmployees != null && _noOfEmployees != 0 ? Align(
+                                            child: Container(
+                                              margin: EdgeInsets.only(
+                                                  left: 10.0,),
+                                              child: Text(_noOfEmployees.toString() +'\t'+ employees),
+                                            ),
+                                          ) : Text(''),
+                                          GestureDetector(
+                                            onTap: (){
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          AddEmployee(signinType,userId,businessId)));
+                                            },
+                                            child:  Container(
+                                              child: Row(
+//                                                mainAxisAlignment: MainAxisAlignment.end,
+//                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                children: <Widget>[
+                                                  Container(
+                                                    margin: EdgeInsets.only(
+                                                        right: 10.0,bottom: 20.0),
+                                                    child: new SvgPicture.asset(
+                                                      'images/employee_add.svg',
+                                                      height: 20.0,
+                                                      width: 20.0,
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    margin: EdgeInsets.only(
+                                                        right: 10.0,bottom: 20.0),
+                                                    child: Text(add_employee,
+                                                      style: TextStyle(
+                                                          color: facebook_color,
+                                                          fontSize: 15.0),),
+                                                  )
+                                                ],
                                               ),
-                                              Container(
-                                                margin: EdgeInsets.only(
-                                                    right: 10.0,bottom: 20.0),
-                                                child: Text(add_employee,
-                                                  style: TextStyle(
-                                                      color: facebook_color,
-                                                      fontSize: 15.0),),
-                                              )
-                                            ],
-                                          ),
-                                        ),
+                                            ),
+                                          )
+                                        ],
                                       )
-                                    )
 //                                ],
                                   ],
                                 ) : Text(''),
@@ -755,7 +780,10 @@ class ProfilePageState extends State<ProfilePage> {
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.only(
-                          right: 10.0,bottom: 20.0),
+                          right: 10.0,
+                          bottom: signinType != 'MobileNumber'
+                              ? 20.0
+                              : 10.0),
                       child: new SvgPicture.asset(
                         'images/business_highlight.svg',
                         height: 20.0,
@@ -764,7 +792,9 @@ class ProfilePageState extends State<ProfilePage> {
                     ),
                     Container(
                       margin: EdgeInsets.only(
-                          right: 10.0,bottom: 20.0),
+                          right: 10.0,bottom: signinType != 'MobileNumber'
+                          ? 20.0
+                          : 10.0),
                       child: Text(upgrade_business,
                         style: TextStyle(
                             color: facebook_color,
@@ -789,6 +819,7 @@ class ProfilePageState extends State<ProfilePage> {
             ),
           ],
         )
+    )
     );
   }
 
@@ -847,6 +878,7 @@ class ProfilePageState extends State<ProfilePage> {
                                   clearLocalData();*/
                                 prefs.setString('signInType', '');
 //                                _updatestatus();
+                                clearLocalData();
                                 /* Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
@@ -916,11 +948,11 @@ class ProfilePageState extends State<ProfilePage> {
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color: focused_border_color,
-                                            width: 1.0),
+                                            width:0.5),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: greyColor2, width: 1.0),
+                                            color: greyColor2, width:0.5),
                                       ),
                                       hintText: 'Enter new password',
                                       hintStyle: TextStyle(
@@ -953,11 +985,11 @@ class ProfilePageState extends State<ProfilePage> {
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color: focused_border_color,
-                                            width: 1.0),
+                                            width:0.5),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: greyColor2, width: 1.0),
+                                            color: greyColor2, width:0.5),
                                       ),
                                       hintText: 'Enter confirm password',
                                       hintStyle: TextStyle(
@@ -1265,7 +1297,7 @@ class ProfilePageState extends State<ProfilePage> {
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           photoUrl = downloadUrl;
           print('DOWNLOAD URL PROFILE $photoUrl');
-          Fluttertoast.showToast(msg: "Upload success");
+          Fluttertoast.showToast(msg: "Profile picture updated successfully");
           setState(() {
             isLoading = false;
           });
@@ -1298,7 +1330,7 @@ class ProfilePageState extends State<ProfilePage> {
 
   Future fetchAllUsersData() async {
     if (prefs.containsKey('userId') && prefs.getString('userId') != null) {
-      if (prefs.getString('userId') == '') {
+      if (prefs.getString('userId') == '' || prefs.getString('BUSINESS_ID') == '') {
         print('NANDHU FETCH USER');
         var document = await Firestore.instance.collection('users').document(
             userId).get();
@@ -1313,7 +1345,8 @@ class ProfilePageState extends State<ProfilePage> {
           this.userPassword = profile['password'];
           if (profile['phoneNo'] != null && signinType == 'MobileNumber')
             this.mobileNumber = profile['phoneNo'];
-          this.businessId = profile['businessOwnerId'];
+          this.businessId = profile['businessId'];
+          this._mBusinessType = profile['businessType'];
           this.controllerName = new TextEditingController(text: name);
           this.controllerNickName = new TextEditingController(text: nickName);
           this.controllerEmail = new TextEditingController(text: userEmail);
@@ -1331,6 +1364,7 @@ class ProfilePageState extends State<ProfilePage> {
           this.businessName = prefs.getString('BUSINESS_NAME');
           this.businessAddress = prefs.getString('BUSINESS_ADDRESS');
           this.businessImage = prefs.getString('BUSINESS_IMAGE');
+          this._mBusinessType = prefs.getString('BUSINESS_TYPE');
           if (prefs.getString('phoneNo') != null &&
               signinType == 'MobileNumber')
             this.mobileNumber = prefs.getString('phoneNo');
@@ -1352,7 +1386,8 @@ class ProfilePageState extends State<ProfilePage> {
         this.userEmail = profile['email'];
         this.nickName = profile['nickName'];
         this.userPassword = profile['password'];
-        this.businessId = profile['businessOwnerId'];
+        this.businessId = profile['businessId'];
+        this._mBusinessType = profile['businessType'];
         if (profile['phoneNo'] != null && signinType == 'MobileNumber')
           this.mobileNumber = profile['phoneNo'];
         this.controllerName = new TextEditingController(text: name);
@@ -1367,7 +1402,7 @@ class ProfilePageState extends State<ProfilePage> {
 
 
   Future storeLocalData(Map<String, dynamic> profile) async {
-    await prefs.setString('BUSINESS_ID', profile['businessOwnerId']);
+    await prefs.setString('BUSINESS_ID', profile['businessId']);
     await prefs.setString('userId', profile['id']);
     await prefs.setString('email', profile['email']);
     await prefs.setString('name', profile['name']);
@@ -1408,13 +1443,13 @@ class ProfilePageState extends State<ProfilePage> {
     await prefs.setString('createdAt', '');
     await prefs.setInt('phoneNo', 0);
     await prefs.setString('signInType', '');
-    await prefs.setString('userId', '');
     await prefs.setString('BUSINESS_ID', '');
     await prefs.setString('BUSINESS_NAME', '');
     await prefs.setString('BUSINESS_ADDRESS', '');
     await prefs.setString('BUSINESS_NUMBER', '');
     await prefs.setString('BUSINESS_IMAGE', '');
     await prefs.setString('BUSINESS_CREATED_AT', '');
+    await prefs.setInt('BUSINESS_EMPLOYEES_COUNT', 0);
     LocationService('').locationStream;
   }
 }

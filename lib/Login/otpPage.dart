@@ -328,6 +328,7 @@ class _OTPScreenState extends State<OTPScreen> {
     final QuerySnapshot result = await Firestore.instance
         .collection('users')
         .where('id', isEqualTo: firebaseUser.uid)
+        .where('phoneNo',isEqualTo: widget.mobileNumber)
         .getDocuments();
     final List<DocumentSnapshot> documents = result.documents;
     print('OTPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP ${documents.length} ___ ');
@@ -354,7 +355,7 @@ class _OTPScreenState extends State<OTPScreen> {
                   mFirebaseUser: firebaseUser)));
     }
 
-    firebaseUser.unlinkFromProvider(firebaseUser.providerId);
+//    firebaseUser.unlinkFromProvider(firebaseUser.providerId);
 
   }
 
@@ -374,6 +375,7 @@ class _OTPScreenState extends State<OTPScreen> {
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('phoneNo', documents[0]['phoneNo']);
     await prefs.setString('signInType', signInType);
+    await prefs.setString('BUSINESS_TYPE', documents[0]['businessType']);
     setState(() {
       isLoading = false;
     });

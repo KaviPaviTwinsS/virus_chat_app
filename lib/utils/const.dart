@@ -11,5 +11,8 @@ String SERVER_KEY = 'AAAAoOGpnsA:APA91bG089tSOMG4ImkVCuzr0ANuzeg1a0wPxMndUbT5DSR
 String WALK_THROUGH = 'walk_throuch';
 int PASSWORD_LENGTH = 8;
 int MOBILE_NUMBER_LENGTH = 10;
+String COUNTRY_CODE = '+91';
 const kGoogleApiKey = "AIzaSyBzWFtBj_GgXD71n6iDKp3xSkswdcdHeVc";
 
+String BUSINESS_TYPE_OWNER = 'owner';
+String BUSINESS_TYPE_EMPLOYEE = 'employee';

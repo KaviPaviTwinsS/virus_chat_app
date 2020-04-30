@@ -200,8 +200,6 @@ class LoginSelectionOption extends State<LoginSelection> {
     await clearLocalData(prefs);
   }
 
-
-
   Future<Null> updateLocalData(SharedPreferences prefs,
       FirebaseUser currentUser, String signInType) async {
     await prefs.setString('userId', currentUser.uid);
@@ -213,6 +211,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     await prefs.setString('photoUrl', currentUser.photoUrl);
     await prefs.setString('signInType', signInType);
     await prefs.setString('BUSINESS_ID', '');
+    await prefs.setString('BUSINESS_TYPE', '');
     await prefs.setInt('createdAt',
         ((new DateTime.now()
             .toUtc()
@@ -230,6 +229,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     await prefs.setInt('createdAt', documents[0]['createdAt']);
     await prefs.setString('phoneNo', documents[0]['phoneNo']);
     await prefs.setString('BUSINESS_ID', documents[0]['businessId']);
+    await prefs.setString('BUSINESS_TYPE', documents[0]['businessType']);
     await prefs.setString('signInType', signInType);
     print('updateLocalListData___________ ${documents[0]['name']} _________ ${documents[0]['businessId']} ______${documents[0]['id']}');
 //    setState(() {
@@ -271,7 +271,6 @@ class LoginSelectionOption extends State<LoginSelection> {
     } else {
       await updateLocalListData(prefs, documents, _signinType);
     }
-
     /*await Navigator.push(
         context,
         MaterialPageRoute(
@@ -311,6 +310,8 @@ class LoginSelectionOption extends State<LoginSelection> {
       '$loginType': loginId,
       'user_token': userToken,
       'businessId' : '',
+      'businessType' : '',
+      'businessName' : '',
       'createdAt':
       ((new DateTime.now()
           .toUtc()
@@ -556,7 +557,9 @@ class LoginSelectionOption extends State<LoginSelection> {
     Firestore.instance
         .collection('users')
         .document(prefs.getString('userId'))
-        .updateData({'status': 'LoggedOut'});
+        .updateData({'status': 'LoggedOut'}).whenComplete((){
+       prefs.setString('userId', '');
+    });
   }
 
   Future<Null> clearLocalData(SharedPreferences prefs) async {

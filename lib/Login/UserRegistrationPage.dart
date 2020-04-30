@@ -277,12 +277,12 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: focused_border_color,
-                                        width: 2.0),
+                                        width: 0.5),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: enabled_border_color,
-                                        width: 2.0),
+                                        width: 0.5),
                                   ),
                                   hintText: 'Name',
                                 ),
@@ -302,12 +302,12 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: focused_border_color,
-                                        width: 2.0),
+                                        width: 0.5),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: enabled_border_color,
-                                        width: 2.0),
+                                        width: 0.5),
                                   ),
                                   hintText: 'Last name',
                                 ),
@@ -326,12 +326,12 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: focused_border_color,
-                                        width: 2.0),
+                                        width: 0.5),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: enabled_border_color,
-                                        width: 2.0),
+                                        width: 0.5),
                                   ),
                                   hintText: 'Email',
                                 ),
@@ -416,7 +416,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           photoUrl = downloadUrl;
-          Fluttertoast.showToast(msg: "Upload success");
+          Fluttertoast.showToast(msg: "Profile picture updated successfully");
           setState(() {
             isLoading = false;
           });
@@ -462,6 +462,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
             '$loginType': firebaseUser.uid,
             'user_token': userToken,
             'businessId' : '',
+            'businessType' : '',
+            'businessName' : '',
             'createdAt':
             ((new DateTime.now()
                 .toUtc()
@@ -494,6 +496,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('phoneNo', userPhoneNumberWithoutCountryCode);
     await prefs.setString('BUSINESS_ID', '');
+    await prefs.setString('BUSINESS_TYPE', '');
     await prefs.setString('signInType', signInType);
     Navigator.push(
         context,

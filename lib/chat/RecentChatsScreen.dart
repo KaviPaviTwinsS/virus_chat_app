@@ -31,6 +31,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
   String _userSignInType = '';
   String _muserId = '';
   String _muserPhoto = '';
+  List<DocumentSnapshot> documents;
 
   RecentChatsScreenState(String userId, String userPhoto) {
     _muserId = userId;
@@ -40,8 +41,8 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
 
   @override
   void initState() {
-    super.initState();
     initialise();
+    super.initState();
   }
 
   Future initialise() async {
@@ -52,13 +53,23 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
         .toUtc()
         .microsecondsSinceEpoch) / 1000).toInt();
 
+    final QuerySnapshot result = await Firestore.instance
+        .collection('messages')
+        .getDocuments();
+    documents = result.documents;
+//    var query = await Firestore.instance.collection('users')
+//        .document(_muserId).collection(
+//        'userLocation').document(_muserId).get();
+//    print('Recent Chats ___ ${_muserId} ___ ${query['UpdateTime']}');
 
-    var query = await Firestore.instance.collection('users')
-        .document(_muserId).collection(
-        'userLocation').document(_muserId).get();
-    print('Recent Chats ___ ${_muserId} ___ ${query['UpdateTime']}');
-
-    if(_muserId != '') {
+    print('Recent Chats ____________${documents.length} _______');
+    if (documents.length == 0) {
+    }else {
+      for (int i = 0; i < documents.length;i++){
+        print('RECENT CHATTTTTTTTTTTTTTTTTTT_____${documents.length} ______________________${documents[i].documentID}');
+      }
+    }
+  /*  if(_muserId != '') {
       if (currentTime > query['UpdateTime']) {
         Firestore.instance
             .collection('users')
@@ -70,7 +81,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
             .document(_muserId)
             .updateData({'status': 'ACTIVE'});
       }
-    }
+    }*/
   }
 
   @override
@@ -134,7 +145,8 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                       topRight: const Radius.circular(30.0),
                     )
                 ),
-                child: UsersRecentChats(_muserId),
+//                child: UsersRecentChats(_muserId),
+              child : Text('NAN'),
               ),
             )
           ],
@@ -159,6 +171,7 @@ class UsersRecentChats extends StatelessWidget {
   UsersRecentChats(String _mcurrentUserId) {
     currentUserId = _mcurrentUserId;
   }
+
 
   @override
   Widget build(BuildContext context) {

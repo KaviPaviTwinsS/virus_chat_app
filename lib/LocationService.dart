@@ -7,13 +7,15 @@ import 'package:location/location.dart';
 
 class LocationService {
   UserLocation _currentLocation = null;
+  LocationData _mCurrentLocation = null;
+
   var location = Location();
   String currentUserId = '';
 
 //  Geoflutterfire geo = Geoflutterfire();
 
   Future<UserLocation> getLocation() async {
-//    print('LocationService  ___ getLocation');
+    print('LocationService  ___ getLocation');
 
     try {
       var userLocation = await location.getLocation();
@@ -37,80 +39,83 @@ class LocationService {
   bool mUserCancelListen = false;
 
   LocationService(String currentUser) {
-    currentUserId = currentUser;
+    if(currentUser != '') {
+      currentUserId = currentUser;
 //    print(
 //        'LocationService NANDHUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu ___ $currentUserId');
-    if (currentUserId != '') {} else {
+      if (currentUserId != '') {} else {
 //      location = null;
-      locationController.close();
-      if (locationSubcription != null)
-        locationSubcription.cancel();
-    }
-    // Request permission to use location
-    location.requestPermission().then((granted) {
-      if (granted != null) {
+        locationController.close();
+        if (locationSubcription != null)
+          locationSubcription.cancel();
+      }
+      // Request permission to use location
+      location.requestPermission().then((granted) {
+        if (granted != null) {
 //        print('LocationService  ___granted__ $currentUser');
-        // If granted listen to the onLocationChanged stream and emit over our controller
-        if (location != null) {
-          locationSubcription =
-              location.onLocationChanged.listen((locationData) {
+          // If granted listen to the onLocationChanged stream and emit over our controller
+          if (location != null) {
+            locationSubcription =
+                location.onLocationChanged.listen((locationData) {
 //                print(
 //                    'LocationService  isClosed currentUser $currentUserId ____________NANDHU ${locationController
 //                        .isClosed}');
-                if (locationController.isClosed) {
-                  mUserCancelListen = locationController.isClosed;
+                  if (locationController.isClosed) {
+                    mUserCancelListen = locationController.isClosed;
 //                  print('mUserCancelListen_____condition $mUserCancelListen');
-                }
-                if (mUserCancelListen) {
+                  }
+                  if (mUserCancelListen) {
 //                  print(
 //                      'LocationService  locationSubcription $locationData');
-                  locationSubcription.cancel();
-                  locationController.close();
-                  currentUserId = '';
-                }
+                    locationSubcription.cancel();
+                    locationController.close();
+                    currentUserId = '';
+                  }
 //                print('mUserCancelListen_____ $mUserCancelListen');
-                if (locationData != null && !mUserCancelListen) {
+                  if (locationData != null && !mUserCancelListen) {
 //              print('LocationService  locationData ______ $currentUser');
-                  locationController.add(UserLocation(
-                    latitude: locationData.latitude,
-                    longitude: locationData.longitude,
-                  ));
-                  /* _currentLocation = UserLocation(
+                    locationController.add(UserLocation(
+                      latitude: locationData.latitude,
+                      longitude: locationData.longitude,
+                    ));
+                    /* _currentLocation = UserLocation(
               latitude: locationData.latitude,
               longitude: locationData.longitude,
             );*/
 //                  print('_currentLocation $_currentLocation');
-                  if (_currentLocation == null) {
+                    _mCurrentLocation = locationData;
+                    if (_currentLocation == null) {
 //              _addGeoPoint(locationData);
-                    updateLocation(locationData);
-                  } else {
-                    if (currentUser != '') {
                       updateLocation(locationData);
+                    } else {
+                      if (currentUser != '') {
+                        updateLocation(locationData);
+                      }
                     }
-                  }
-                } else {
-                  locationController.close();
-                  locationSubcription.cancel();
+                  } else {
+                    locationController.close();
+                    locationSubcription.cancel();
 //                  print('LocationService  NOT LOCATIONNULL $locationData');
 
 //              print('LocationService  locationDataNULL ______ $currentUser');
-                  /*    Firestore.instance
+                    /*    Firestore.instance
                   .collection('users')
                   .document(currentUserId)
                   .updateData({'status': 'INACTIVE'});*/
-                }
-              });
-        } else {
+                  }
+                });
+          } else {
 //          print('LocationService  ___NOTgranted__ $location');
-        }
-      } else {
+          }
+        } else {
 //        print('LocationService  ___NOTgranted__ $currentUser');
-        /* Firestore.instance_currentLocation
+          /* Firestore.instance_currentLocation
               .collection('users')
               .document(currentUserId)
               .updateData({'status': 'INACTIVE'});*/
-      }
-    });
+        }
+      });
+    }
   }
 
   final databaseReference = Firestore.instance;
@@ -136,7 +141,7 @@ class LocationService {
   }
 
   void updateLocation(LocationData locationData) async {
-    print('NAN LocationService $currentUserId  ___ ${locationData}');
+//    print('NAN LocationService $currentUserId  ___ ${locationData}');
 //    GeoFirePoint point = geo.point(
 //        latitude: locationData.latitude, longitude: locationData.longitude);
     /* databaseReference.collection('users').document(currentUserId).updateData({
@@ -151,5 +156,28 @@ class LocationService {
           .toUtc()
           .microsecondsSinceEpoch) / 1000).toInt(),
     });
+  }
+
+  void updateLocationOfNewUser(String UserId) async {
+    if(_currentLocation == null){
+      print('NAN updateLocationOfNewUser ______________$_mCurrentLocation');
+      databaseReference.collection('users').document(UserId).collection(
+          'userLocation').document(UserId).updateData({
+        'userLocation':
+        new GeoPoint(_mCurrentLocation.latitude, _mCurrentLocation.longitude),
+        'UpdateTime': ((new DateTime.now()
+            .toUtc()
+            .microsecondsSinceEpoch) / 1000).toInt(),
+      });
+    }else{
+      await getLocation();
+    }
+//    GeoFirePoint point = geo.point(
+//        latitude: locationData.latitude, longitude: locationData.longitude);
+    /* databaseReference.collection('users').document(currentUserId).updateData({
+      'userLocation':
+          new GeoPoint(locationData.latitude, locationData.longitude)
+    });*/
+
   }
 }

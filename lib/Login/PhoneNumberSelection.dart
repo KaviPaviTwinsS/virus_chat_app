@@ -159,11 +159,11 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                         decoration: new InputDecoration(
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: focused_border_color, width: 2.0),
+                                color: focused_border_color, width: 0.5),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: greyColor2, width: 2.0),
+                                color: greyColor2, width:0.5),
                           ),
                           hintText: 'Phone Number',
                         ),
@@ -188,9 +188,8 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) =>
                                 new OTPScreen(
-                                    mobileNumber: _userCountryCode +
-                                        _userPhoneNumber,
-                                    mobileNumWithoutCountryCode: _userPhoneNumber)));
+                                    mobileNumber: _userCountryCode + _userPhoneNumber,
+                                    mobileNumWithoutCountryCode: _userPhoneNumber,)));
                           } else {
                             Fluttertoast.showToast(msg: enter_phone_number);
                           }
