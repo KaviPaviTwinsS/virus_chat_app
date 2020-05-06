@@ -152,10 +152,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     imageUrl = '';
     recorder = new MyAudioRecorder(this);
     readLocal();
-    recorder.initializeExample(FlutterSound());
-    setState(() {
 
-    });
 
     _controller.addListener(() {
       final text = _controller.text.toLowerCase();
@@ -231,12 +228,21 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   readLocal() async {
     prefs = await SharedPreferences.getInstance();
     id = prefs.getString('id') ?? currentUserId;
+    print('RECENT CHAT $id ___________peer $peerId');
     if (id.hashCode <= peerId.hashCode) {
       groupChatId = '$id-$peerId';
     } else {
       groupChatId = '$peerId-$id';
     }
-    await getUserActiveTime();
+    try {
+//      recorder.initializeExample(FlutterSound());
+    }on Exception catch (e){
+      e.toString();
+    }
+    setState(() {
+
+    });
+//    await getUserActiveTime();
     /* Firestore.instance.collection('users').document(id).updateData(
         {'chattingWith': peerId});*/
     _friendToken = await prefs.getString('FRIEND_USER_TOKEN');
@@ -454,14 +460,20 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
         if (mUsersList[j] == peerId) {
           isExistUser = true;
         } else {
-          mUsersList.add(peerId);
+          if(peerId != currentUserId)
+           mUsersList.add(peerId);
+          else
+            mUsersList.add(id);
           mUsersListName.add(peerName);
         }
       }
     } else {
       mUsersList = new List();
       mUsersListName = new List();
-      mUsersList.add(peerId);
+      if(peerId != currentUserId)
+        mUsersList.add(peerId);
+      else
+        mUsersList.add(id);
       mUsersListName.add(peerName);
     }
     if (!isExistUser) {
@@ -1716,6 +1728,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
 
   Widget buildListMessage() {
+    groupChatId = '$peerId-$id';
     return Flexible(
       child: groupChatId == ''
           ? Center(child: CircularProgressIndicator(
@@ -1730,6 +1743,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
+            print('chat ___buildListMessage _____________NOTTT______$groupChatId ___');
+
             return Center(
                 child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(themeColor)));

@@ -411,7 +411,8 @@ class AddEmployeeState extends State<AddEmployee> {
     avatar = contacts.avatar;
     for (final phone in mPhone) {
       mContactPhone = phone.value;
-      mContactPhone = getPhoneValidation(mContactPhone.trim());
+      mContactPhone = mContactPhone.replaceAll(' ', '');
+      mContactPhone = getPhoneValidation(mContactPhone.replaceAll(' ', ''));
     }
     mContactName = contacts.displayName;
     if(documents.length !=0) {
@@ -619,9 +620,36 @@ class AddEmployeeState extends State<AddEmployee> {
     } else if( alreadyUserInBusiness == 'DIFF'){
       Fluttertoast.showToast(msg: 'Already user in this  some other business');
     }else {
+      print('NANDHU AddEmployeeState AddNewEmployee Reference check ___alreadyUserInBusiness_ELSEEEEEEEEEEEEEEEEE___${reference.documentID}');
       alreadyUserInBusiness = 'SAME';
       try {
-        reference.setData({
+
+        Firestore.instance.runTransaction((
+            transaction) async {
+          await transaction.set(
+            reference,
+            {
+              'name': contacts.displayName,
+//      'photoUrl': _mUserPhotoUrl,
+              'email': _mContactEmail,
+              'nickName': contacts.middleName,
+              'phoneNo': COUNTRY_CODE + "\t" + _mContactPhone,
+              'status': '',
+              'id': reference.documentID,
+              'MobileNumber': reference.documentID,
+              'user_token': '',
+              'businessId': _mBusinessId,
+              'businessType' : BUSINESS_TYPE_EMPLOYEE,
+              'businessName' : _mBusinessName,
+              'photoUrl' : '',
+              'createdAt':
+              ((new DateTime.now()
+                  .toUtc()
+                  .microsecondsSinceEpoch) / 1000).toInt()
+            },
+          );
+        })
+        /*reference.setData({
           'name': contacts.displayName,
 //      'photoUrl': _mUserPhotoUrl,
           'email': _mContactEmail,
@@ -639,7 +667,7 @@ class AddEmployeeState extends State<AddEmployee> {
           ((new DateTime.now()
               .toUtc()
               .microsecondsSinceEpoch) / 1000).toInt()
-        }).whenComplete(() async {
+        })*/.whenComplete(() async {
           UserLocation currentLocation = await LocationService('').getLocation();
           print('NANDHU AddEmployeeState AddNewEmployee Reference LOCATIon UPDATE${currentLocation}');
           Firestore.instance.collection('users').document(reference.documentID).collection(

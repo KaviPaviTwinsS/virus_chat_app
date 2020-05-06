@@ -73,23 +73,9 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   bool isButtonPressed = false;
   bool isRequestSent = true;
 
-
-
-
   Future<bool> onBackPress() {
-    /* if (isShowSticker) {
-      setState(() {
-        isShowSticker = false;
-      });
-    } else {
-      Firestore.instance.collection('users').document(id).updateData(
-          {'chattingWith': null});
-      Navigator.pop(context);
-    }*/
     Navigator.pop(context);
   }
-
-
 
   @override
   void initState() {
@@ -208,32 +194,8 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                               color: text_color),
                                           ),
                                         ),
-                                        /* Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  margin: EdgeInsets.only(
-                                      top: 30.0, right: 10.0),
-                                  child: Text(
-                                    currentUserName, style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: text_color),
-                                  ),
-                                ),
-                                */ /*Container(
-                                  margin: EdgeInsets.only(
-                                      top: 5.0, right: 10.0),
-                                  child: Text(
-                                    'Active Now', style: TextStyle(
-                                      color: text_color),
-                                  ),
-                                )*/ /*
-                              ],
-                            )*/
                                       ],
                                     ),
-
                                   ]
                               ),
                             ),
@@ -308,6 +270,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
 
 
   Future sendInvite() async{
+    print('sendInvite____________');
     var documentReference = Firestore.instance
         .collection('users')
         .document(_mCurrentUserId)
@@ -331,32 +294,35 @@ class SendInviteToUserState extends State<SendInviteToUser> {
               .toString(),
         },
       );
+    }).whenComplete((){
+      var documentReference1 = Firestore.instance
+          .collection('users')
+          .document(_mPeerId)
+          .collection('FriendsList')
+          .document(_mCurrentUserId);
+      Firestore.instance.runTransaction((
+          transaction) async {
+        await transaction.set(
+          documentReference1,
+          {
+            'requestFrom': _mCurrentUserId,
+            'receiveId': _mPeerId,
+            'IsAcceptInvitation': false,
+            'isRequestSent': false,
+            'friendPhotoUrl': _userPhotoUrl,
+            'friendName': _userName,
+            'isAlreadyRequestSent': true,
+            'timestamp': DateTime
+                .now()
+                .millisecondsSinceEpoch
+                .toString(),
+          },
+        );
+      });
+    }).whenComplete((){
+      sendAndRetrieveMessage();
     });
-    var documentReference1 = Firestore.instance
-        .collection('users')
-        .document(_mPeerId)
-        .collection('FriendsList')
-        .document(_mCurrentUserId);
-    Firestore.instance.runTransaction((
-        transaction) async {
-      await transaction.set(
-        documentReference1,
-        {
-          'requestFrom': _mCurrentUserId,
-          'receiveId': _mPeerId,
-          'IsAcceptInvitation': false,
-          'isRequestSent': false,
-          'friendPhotoUrl': _userPhotoUrl,
-          'friendName': _userName,
-          'isAlreadyRequestSent': true,
-          'timestamp': DateTime
-              .now()
-              .millisecondsSinceEpoch
-              .toString(),
-        },
-      );
-    });
-    sendAndRetrieveMessage();
+
     setState(() {
       isButtonPressed = !isButtonPressed;
       _misRequestSent = null;

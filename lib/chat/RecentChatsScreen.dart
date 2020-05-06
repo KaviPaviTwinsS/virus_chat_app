@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/UsersList.dart';
+import 'package:virus_chat_app/business/UsersData.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -25,63 +26,67 @@ class RecentChatsScreen extends StatefulWidget {
 }
 
 class RecentChatsScreenState extends State<RecentChatsScreen> {
-
   SharedPreferences prefs;
-
   String _userSignInType = '';
   String _muserId = '';
   String _muserPhoto = '';
   List<DocumentSnapshot> documents;
+  final ScrollController listScrollController = new ScrollController();
+  List<String> _mChatIds = new List<String>();
+  List<UsersData> _mUsersData = new List<UsersData>();
+  bool isLoading = false;
 
   RecentChatsScreenState(String userId, String userPhoto) {
     _muserId = userId;
     _muserPhoto = userPhoto;
   }
 
-
   @override
   void initState() {
-    initialise();
     super.initState();
+    initialise();
   }
 
   Future initialise() async {
+    _mChatIds.clear();
+    _mUsersData.clear();
+    print('Recent Chats ____________TEST INIT${_mChatIds
+        .length} ________muserId $_muserId');
+    isLoading = true;
+    await Firestore.instance
+        .collection('users')
+        .document(_muserId).get().then((DocumentSnapshot snapshot) {
+      setState(() {
+        isLoading = false;
+      });
+      if (snapshot.data['chattingWith'] != null) {
+        _mChatIds = List.from(snapshot.data['chattingWith']);
+        for (int i = 0; i < _mChatIds.length; i++) {
+          Firestore.instance
+              .collection('users')
+              .document(_mChatIds[i]).get().then((DocumentSnapshot snapshot) {
+            _mUsersData.add(UsersData(businessId: snapshot.data['businessId'],
+                businessName: snapshot.data['businessName'],
+                businessType: snapshot.data['businessType'],
+                createdAt: snapshot.data['createdAt'],
+                email: snapshot.data['email'],
+                id: snapshot.data['id'],
+                name: snapshot.data['name'],
+                nickName: snapshot.data['nickName'],
+                phoneNo: snapshot.data['phoneNo'],
+                photoUrl: snapshot.data['photoUrl'],
+                status: snapshot.data['status'],
+                userDistanceISWITHINRADIUS: snapshot
+                    .data['userDistanceISWITHINRADIUS'],
+                user_token: snapshot.data['user_token']));
+          });
+        }
+      }
+      print('Recent Chats ___________chatting_${_mChatIds.length} _______');
+    });
     prefs = await SharedPreferences.getInstance();
     _userSignInType = await prefs.getString('signInType');
-
-    int currentTime = ((new DateTime.now()
-        .toUtc()
-        .microsecondsSinceEpoch) / 1000).toInt();
-
-    final QuerySnapshot result = await Firestore.instance
-        .collection('messages')
-        .getDocuments();
-    documents = result.documents;
-//    var query = await Firestore.instance.collection('users')
-//        .document(_muserId).collection(
-//        'userLocation').document(_muserId).get();
-//    print('Recent Chats ___ ${_muserId} ___ ${query['UpdateTime']}');
-
-    print('Recent Chats ____________${documents.length} _______');
-    if (documents.length == 0) {
-    }else {
-      for (int i = 0; i < documents.length;i++){
-        print('RECENT CHATTTTTTTTTTTTTTTTTTT_____${documents.length} ______________________${documents[i].documentID}');
-      }
-    }
-  /*  if(_muserId != '') {
-      if (currentTime > query['UpdateTime']) {
-        Firestore.instance
-            .collection('users')
-            .document(_muserId)
-            .updateData({'status': 'INACTIVE'});
-      } else {
-        Firestore.instance
-            .collection('users')
-            .document(_muserId)
-            .updateData({'status': 'ACTIVE'});
-      }
-    }*/
+    print('Recent Chats ___________TESTTTTTTTTTTTTTT_______');
   }
 
   @override
@@ -97,25 +102,24 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                         .of(context)
                         .size
                         .width,
-                    height:150,
+                    height: 150,
                     child:
                     Row(
                       crossAxisAlignment: CrossAxisAlignment
                           .center,
                       children: <Widget>[
                         Container(
-                          margin: EdgeInsets.only(top: 20.0, bottom: 20.0),
+                          margin: EdgeInsets.only(top: 0.0, bottom: 20.0),
                           child: new IconButton(
                               icon: Icon(Icons.arrow_back_ios,
                                 color: white_color,),
                               onPressed: () {
                                 Navigator.pop(context);
-//                                navigationPage();
                               }),
                         ),
                         new Container(
                             margin: EdgeInsets.only(
-                                top: 20.0, right: 10.0, bottom: 20.0),
+                                top: 0.0, right: 10.0, bottom: 20.0),
                             child: Text(recent_chats, style: TextStyle(
                                 color: text_color,
                                 fontSize: 20.0,
@@ -127,33 +131,71 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                   ),
                 ]
             ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Container(
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
-                height:  MediaQuery
-                    .of(context)
-                    .size
-                    .height - 100,
-                decoration: BoxDecoration(
-                    color: text_color,
-                    borderRadius: new BorderRadius.only(
-                      topLeft: const Radius.circular(30.0),
-                      topRight: const Radius.circular(30.0),
-                    )
+            Stack(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height - 100,
+                    decoration: BoxDecoration(
+                        color: text_color,
+                        borderRadius: new BorderRadius.only(
+                          topLeft: const Radius.circular(30.0),
+                          topRight: const Radius.circular(30.0),
+                        )
+                    ),
+                    child: buildListMessage(),
+                  ),
                 ),
-//                child: UsersRecentChats(_muserId),
-              child : Text('NAN'),
-              ),
+                Positioned(
+                  child: isLoading
+                      ? Container(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              themeColor)),
+                    ),
+                    color: Colors.white.withOpacity(0.8),
+                  )
+                      : Container(),
+                ),
+              ],
             )
           ],
         )
     );
   }
 
+  Widget buildListMessage() {
+    print('Recent chat buildListMessage ___CHAT $_mChatIds  ___len ${_mChatIds
+        .length}');
+    return Container(
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height - 100,
+        child:
+        _mChatIds != null && _mChatIds.length != 0 ? ListView.builder(
+          itemBuilder: (context, index) =>
+              buildRecentUsers(index, _mChatIds),
+          itemCount: _mChatIds.length,
+          controller: listScrollController,
+        ) : Center(
+          child: Text(''),
+        )
+    );
+  }
 
   void navigationPage() {
     Navigator.pushReplacement(
@@ -162,153 +204,166 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
             builder: (context) =>
             new UsersList(_userSignInType, _muserId, _muserPhoto)));
   }
-}
 
-class UsersRecentChats extends StatelessWidget {
 
-  String currentUserId = '';
-
-  UsersRecentChats(String _mcurrentUserId) {
-    currentUserId = _mcurrentUserId;
+  Future<DocumentSnapshot> getUserData(String mChatId) async {
+    isLoading = true;
+    _mDocumentSnapShot =
+    await Firestore.instance.collection('users').document(mChatId)
+        .get()
+        .whenComplete(() {
+      isLoading = false;
+    });
+    if (_mDocumentSnapShot != null) {
+      print('Recent chat _mdocumentSnapshot ${_mDocumentSnapShot['id']}');
+      this.name = _mDocumentSnapShot['name'];
+      this.photoUrl = _mDocumentSnapShot['photoUrl'];
+      this._userStatus = _mDocumentSnapShot['status'];
+    }
+    return _mDocumentSnapShot;
   }
 
+  DocumentSnapshot _mDocumentSnapShot;
+  String name = '';
+  String photoUrl = '';
+  String _userStatus = '';
 
-  @override
-  Widget build(BuildContext context) {
-    return new StreamBuilder(
-        stream: Firestore.instance.collection('users').snapshots(),
-        builder:
-            (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.data == null || !snapshot.hasData) {
-            /* return Center(
-                    child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(themeColor)));*/
-            return Center(
-              child: Text('No Recent chats'),
-            );
-          } else {
-            return (snapshot.data.documents.length == 0) ? Center(
-              child: Text('No Recent chats'),
-            ) : Stack(
-              children: <Widget>[
-                new ListView(
-                    scrollDirection: Axis.vertical,
-                    children: snapshot.data.documents.map((document) {
-                      if (document.documentID != currentUserId) {
-                        print('CHATS SCREEEN ___ ${document.documentID}');
-                        return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          Chat(
-                                              currentUserId: currentUserId,
-                                              peerId: document.documentID,
-                                              peerAvatar: document['photoUrl'],
-                                              isFriend: true,
-                                              isAlreadyRequestSent: true,
-                                            peerName : document['name']
-                                          )));
-                            },
-                            child: new Row(
-                              crossAxisAlignment: CrossAxisAlignment
-                                  .center,
-                              mainAxisAlignment: MainAxisAlignment
-                                  .start,
-                              children: <Widget>[
-                                new Stack(
-                                  children: <Widget>[
-                                    new Container(
-                                      margin: EdgeInsets.all(15.0),
-                                      child: Align(
-                                        alignment: Alignment.topLeft,
-                                        child: Material(
-                                          child: CachedNetworkImage(
-                                            placeholder: (context, url) =>
-                                                Container(
-                                                  child: CircularProgressIndicator(
-                                                    strokeWidth: 1.0,
-                                                    valueColor: AlwaysStoppedAnimation<
-                                                        Color>(themeColor),
-                                                  ),
-                                                  width: 35.0,
-                                                  height: 35.0,
-                                                  padding: EdgeInsets.all(10.0),
-                                                ),
-                                            imageUrl: document['photoUrl'],
-                                            width: 35.0,
-                                            height: 35.0,
-                                            fit: BoxFit.cover,
-                                          ),
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(18.0),
-                                          ),
-                                          clipBehavior: Clip.hardEdge,
-                                        ),
-                                      ),
+  Widget buildRecentUsers(int index, List<String> _mChatList) {
+    if (_mChatList.length == 0) {
+      return Center(
+          child: Text(no_Recent_chat));
+    } else if (_mChatList.length > 0 && _mUsersData.length != 0) {
+      for (int i = 0; i < _mChatList.length; i++) {
+        print('Recent chat _mChatList ${_mChatList[i]}');
+        UsersData usersData = _mUsersData[i];
+        return usersData != null ? GestureDetector(
+            onTap: () {
+              print(
+                  'Recent chat onTAP _________$_muserId _____peer ${usersData
+                      .id}');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Chat(
+                            currentUserId: _muserId,
+                            peerId: usersData.id,
+                            peerAvatar: usersData.photoUrl,
+                            isFriend: true,
+                            isAlreadyRequestSent: true,
+                            peerName: usersData.name,
+                          )));
+            },
+            child: Container(
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
+              margin: EdgeInsets.all(5.0),
+              child: new Row(
+                crossAxisAlignment: CrossAxisAlignment
+                    .center,
+                mainAxisAlignment: MainAxisAlignment
+                    .start,
+                children: <Widget>[
+                  new Stack(
+                    children: <Widget>[
+                      usersData != null &&
+                          usersData.photoUrl != null ? new Container(
+                        margin: EdgeInsets.all(15.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Material(
+                            child: CachedNetworkImage(
+                              placeholder: (context, url) =>
+                                  Container(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.0,
+                                      valueColor: AlwaysStoppedAnimation<
+                                          Color>(themeColor),
                                     ),
-                                    document['status'] == 'ACTIVE' ? Container(
-                                        child: new SvgPicture.asset(
-                                          'images/online_active.svg', height: 10.0,
-                                          width: 10.0,
-//                                          color: primaryColor,
-                                        ),
-                                        margin: EdgeInsets.only(left: 45.0,
-                                            bottom: 40.0,
-                                            top: 15.0,
-                                            right: 5.0)) : document['status'] == 'LoggedOut' ? Container(
-                                      child: new SvgPicture.asset(
-                                        'images/online_inactive.svg', height: 10.0,
-                                        width: 10.0,
-//                                        color: primaryColor,
-                                      ),
-                                      margin: EdgeInsets.only(left: 45.0,
-                                          bottom: 40.0,
-                                          top: 15.0,
-                                          right: 5.0),
-                                    ) :  Container(
-                                      child: new SvgPicture.asset(
-                                        'images/online_idle.svg', height: 10.0,
-                                        width: 10.0,
-//                                        color: primaryColor,
-                                      ),
-                                      margin: EdgeInsets.only(left: 45.0,
-                                          bottom: 40.0,
-                                          top: 15.0,
-                                          right: 5.0),
-                                    )
-                                  ],
-                                ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment
-                                    .center,
-                                mainAxisAlignment: MainAxisAlignment
-                                    .start,
-                                children: <Widget>[
-                                  new Container(
-                                    child: Text(
-                                      capitalize(document['name']),style: TextStyle(fontWeight: FontWeight.bold),),
+                                    width: 35.0,
+                                    height: 35.0,
+                                    padding: EdgeInsets.all(10.0),
                                   ),
-                                  new Container(
-                                    child: Text(
-                                      capitalize(document['name']),),
-                                  ),
-                                ],
-                              )
-                              ],
-                            ));
-                      } else {
-                        return Center(
-                            child: Text('')
-                        );
-                      }
-                    }).toList()
-                )
-              ],
-            );
-          }
-        }
-    );
+                              imageUrl: usersData.photoUrl,
+                              width: 35.0,
+                              height: 35.0,
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(18.0),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                          ),
+                        ),
+                      ) : new Container(
+                          margin: EdgeInsets.all(15.0),
+                          width: 35.0,
+                          height: 35.0,
+                          child: new SvgPicture.asset(
+                            'images/user_unavailable.svg',
+                            width: 35.0,
+                            height: 35.0,
+                          ),
+                          decoration: new BoxDecoration(
+                            shape: BoxShape.circle,
+                          )),
+                      usersData != null &&
+                          usersData.status == 'ACTIVE' ? Container(
+                          child: new SvgPicture.asset(
+                            'images/online_active.svg', height: 10.0,
+                            width: 10.0,
+                          ),
+                          margin: EdgeInsets.only(left: 45.0,
+                              bottom: 40.0,
+                              top: 15.0,
+                              right: 5.0)) : usersData != null &&
+                          usersData.status == 'LoggedOut'
+                          ? Container(
+                        child: new SvgPicture.asset(
+                          'images/online_inactive.svg', height: 10.0,
+                          width: 10.0,
+                        ),
+                        margin: EdgeInsets.only(left: 45.0,
+                            bottom: 40.0,
+                            top: 15.0,
+                            right: 5.0),
+                      )
+                          : Container(
+                        child: new SvgPicture.asset(
+                          'images/online_idle.svg', height: 10.0,
+                          width: 10.0,
+                        ),
+                        margin: EdgeInsets.only(left: 45.0,
+                            bottom: 40.0,
+                            top: 15.0,
+                            right: 5.0),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment
+                        .center,
+                    mainAxisAlignment: MainAxisAlignment
+                        .start,
+                    children: <Widget>[
+                      usersData != null && usersData.name != '' ? new Container(
+                        child: Text(
+                          capitalize(usersData.name),
+                          style: TextStyle(fontWeight: FontWeight.bold),),
+                      ) : Text(''),
+                      usersData != null && usersData.name != '' ? new Container(
+                        child: Text(
+                          capitalize(usersData.name),),
+                      ) : Text(''),
+                    ],
+                  )
+                ],
+              ),
+            )
+        ) : Center(child: Text(no_Recent_chat),);
+      }
+    }
   }
 }

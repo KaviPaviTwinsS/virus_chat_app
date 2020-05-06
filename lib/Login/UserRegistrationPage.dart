@@ -396,7 +396,6 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
 
   Future getImage() async {
     File image = await ImagePicker.pickImage(source: ImageSource.gallery,imageQuality: 20);
-
     if (image != null) {
       setState(() {
         avatarImageFile = image;

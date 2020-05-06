@@ -33,6 +33,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
   SharedPreferences preferences ;
   List<DocumentSnapshot> documents = new List<DocumentSnapshot>();
 
+  bool isLoading = false;
 
   BusinessDetailPageState(String businessId, String businessName) {
     _businessId = businessId;
@@ -48,28 +49,32 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
 
   void initialise() async {
     preferences = await SharedPreferences.getInstance();
-    DocumentSnapshot documentReference = await Firestore.instance
-        .collection('business')
-        .document(_businessId).get();
-    if(documentReference.documentID.isNotEmpty) {
-      print('Business detail___________ ${documentReference
-          .documentID} _______${documentReference.data['photoUrl']} __________');
-      _businessAddress =documentReference.data['businessAddress'];
-      _businessNumber =documentReference.data['businessNumber'];
-      _businessImage = documentReference.data['photoUrl'];
-      print('BUSINESS IMAGE ___${_businessImage != null && _businessImage != ''}');
-    }else{
-
-    }
     setState(() {
-
+      isLoading = true;
     });
+    Firestore.instance
+        .collection('business')
+        .document(_businessId).get().then((DocumentSnapshot documentReference) {
+      if(documentReference.documentID.isNotEmpty) {
+        print('Business detail___________ ${documentReference
+            .documentID} _______${documentReference.data['photoUrl']} __________');
+        _businessAddress =documentReference.data['businessAddress'];
+        _businessNumber =documentReference.data['businessNumber'];
+        _businessImage = documentReference.data['photoUrl'];
+        print('BUSINESS IMAGE ___${_businessImage != null && _businessImage != ''}');
+      }else{
+      }
+      setState(() {
+        isLoading = false;
+      });
+    });
+
   }
 
 
   @override
   Widget build(BuildContext context) {
-    print('BUSINESS IMAGE ___${_businessImage != null && _businessImage != ''}');
+    print('BUSINESS IMAGE ___build${_businessImage != null && _businessImage != ''}');
     return Scaffold(
         body: Scaffold(
           body: Stack(
@@ -124,86 +129,102 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                       ),
                       child:Stack(
                         children: <Widget>[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          Positioned(
+                              child: isLoading
+                                  ? Container(
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          themeColor)),
+                                ),
+                                color: Colors.white.withOpacity(0.8),
+                              ) : Container()
+                          ),
+                          Stack(
                             children: <Widget>[
-                              (_businessImage != null && _businessImage != '') ? Center(
-                                  child: Container(
-                                    margin: EdgeInsets.only(bottom: 15.0,top: 15.0),
-                                    child: Material(
-                                      child: CachedNetworkImage(
-                                        placeholder: (context, url) =>
-                                            Container(
-                                              child: CircularProgressIndicator(
-                                                valueColor: AlwaysStoppedAnimation<
-                                                    Color>(
-                                                    themeColor),
-                                              ),
-                                              width: 50,
-                                              height: 50,
-                                              decoration: BoxDecoration(
-                                                color: greyColor2,
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(5.0),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  (_businessImage != null && _businessImage != '') ? Center(
+                                      child: Container(
+                                        margin: EdgeInsets.only(bottom: 15.0,top: 15.0),
+                                        child: Material(
+                                          child: CachedNetworkImage(
+                                            placeholder: (context, url) =>
+                                                Container(
+                                                  child: CircularProgressIndicator(
+                                                    valueColor: AlwaysStoppedAnimation<
+                                                        Color>(
+                                                        themeColor),
+                                                  ),
+                                                  width: 50,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    color: greyColor2,
+                                                    borderRadius: BorderRadius.all(
+                                                      Radius.circular(5.0),
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                        errorWidget: (context, url, error) =>
-                                            Material(
-                                              child: Image.asset(
-                                                'images/img_not_available.jpeg',
-                                                width: MediaQuery
-                                                    .of(context)
-                                                    .size
-                                                    .width - 30,
-                                                height: 200.0,
-                                                fit: BoxFit.cover,
-                                              ),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(5.0),
-                                              ),
-                                              clipBehavior: Clip.hardEdge,
-                                            ),
-                                        imageUrl: _businessImage,
-                                        width: MediaQuery
-                                            .of(context)
-                                            .size
-                                            .width - 30,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(15.0)),
-                                      clipBehavior: Clip.hardEdge,
+                                            errorWidget: (context, url, error) =>
+                                                Material(
+                                                  child: Image.asset(
+                                                    'images/img_not_available.jpeg',
+                                                    width: MediaQuery
+                                                        .of(context)
+                                                        .size
+                                                        .width - 30,
+                                                    height: 200.0,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                  borderRadius: BorderRadius.all(
+                                                    Radius.circular(5.0),
+                                                  ),
+                                                  clipBehavior: Clip.hardEdge,
+                                                ),
+                                            imageUrl: _businessImage,
+                                            width: MediaQuery
+                                                .of(context)
+                                                .size
+                                                .width - 30,
+                                            height: 200.0,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15.0)),
+                                          clipBehavior: Clip.hardEdge,
+                                        ),
+                                      )
+                                  ) : Text(''),
+                                  _businessName != null && _businessName != '' ? Container(
+                                    margin: EdgeInsets.only(left: 15.0,bottom: 10.0),
+                                    child: Text(_businessName,style: TextStyle(fontWeight: FontWeight.bold),),
+                                  ) : Text(''),
+                                  _businessAddress != null && _businessAddress != '' ? Container(
+                                    margin: EdgeInsets.only(left: 15.0,bottom: 15.0),
+                                    child: Text(_businessAddress,),
+                                  ) : Text(''),
+                                ],
+                              ),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Container(
+                                  width: 100,
+                                  height: 100,
+                                  child: IconButton(
+                                    icon: new SvgPicture.asset(
+                                      'images/business_chat.svg', height: 500.0,
+                                      width: 500.0,
                                     ),
-                                  )
-                              ) : Text(''),
-                              _businessName != null && _businessName != '' ? Container(
-                                margin: EdgeInsets.only(left: 15.0,bottom: 10.0),
-                                child: Text(_businessName,style: TextStyle(fontWeight: FontWeight.bold),),
-                              ) : Text(''),
-                              _businessAddress != null && _businessAddress != '' ? Container(
-                                margin: EdgeInsets.only(left: 15.0,bottom: 15.0),
-                                child: Text(_businessAddress,),
-                              ) : Text(''),
+                                    onPressed: () {
+                                      getBusinessUsers();
+                                    },
+                                  ),
+                                ),
+                              )
                             ],
                           ),
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              child: IconButton(
-                                icon: new SvgPicture.asset(
-                                  'images/business_chat.svg', height: 500.0,
-                                  width: 500.0,
-                                ),
-                                onPressed: () {
-                                  getBusinessUsers();
-                                },
-                              ),
-                            ),
-                          )
+
                         ],
                       )
                   )
@@ -223,6 +244,10 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
           .where('businessId',isEqualTo: _businessId)
           .getDocuments();
       print('Business Detail document list ${result.documents.length}');
+      result.documents.forEach((doc) {
+//        if(doc.documentID)
+      print('Business Detail document ____________' + doc.documentID);
+    });
       return result.documents;
     }on Exception catch (e) {
       print('NANDHU BusinessDetail loadUsers Exception ${e.toString()}');

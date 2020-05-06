@@ -1088,7 +1088,6 @@ class ProfilePageState extends State<ProfilePage> {
         });
   }
 
-
   showAlertDialog(BuildContext context) {
     // set up the button
     Widget okButton = RaisedButton(
@@ -1242,7 +1241,6 @@ class ProfilePageState extends State<ProfilePage> {
       },
     );
   }
-
 
   Future _updatePassword(String password) async {
     await prefs.setString('password', password);

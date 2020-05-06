@@ -38,7 +38,7 @@ String continue_txt ='Continue';
 String profile_header = 'Profile setup';
 String recent_chats = 'Recent Chats';
 String friend_request = 'Friend Requests';
-
+String no_Recent_chat ='No Recent Chats';
 
 String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
