@@ -19,10 +19,11 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="virus_chat_app"
+        android:label="mespace"
         android:allowClearUserData="true"
         android:usesCleartextTraffic="true"
         android:allowBackup="false"
+        android:extractNativeLibs="false"
         android:icon="@mipmap/ic_launcher">
 
         <uses-library android:name="org.apache.http.legacy"

@@ -242,7 +242,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     setState(() {
 
     });
-//    await getUserActiveTime();
+    await getUserActiveTime();
     /* Firestore.instance.collection('users').document(id).updateData(
         {'chattingWith': peerId});*/
     _friendToken = await prefs.getString('FRIEND_USER_TOKEN');

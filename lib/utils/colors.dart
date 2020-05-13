@@ -17,3 +17,5 @@ final button_fill_color =Color(0xFF1E88E5);
 final white_color =Color(0xFFFFFFFF);
 final black_color =Color(0xff203152);
 final timestamp_color = Color(0xFF1E88E5);
+final sky_blue = Color(0XFF90CAF9);
+final icon_color = Color(0xFF2962FF);

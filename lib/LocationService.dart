@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 //import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:location/location.dart';
@@ -38,8 +40,15 @@ class LocationService {
 
   bool mUserCancelListen = false;
 
+  void initialise() async {
+    preferences = await SharedPreferences.getInstance();
+  }
+
   LocationService(String currentUser) {
-    if(currentUser != '') {
+    if (preferences == null) {
+      initialise();
+    }
+    if (currentUser != '') {
       currentUserId = currentUser;
 //    print(
 //        'LocationService NANDHUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu ___ $currentUserId');
@@ -119,6 +128,8 @@ class LocationService {
   }
 
   final databaseReference = Firestore.instance;
+  SharedPreferences preferences = null;
+  String _userStatus = '';
 
   void insertLocation(LocationData locationData) async {
     DocumentReference ref = await databaseReference.collection("users").add({
@@ -134,32 +145,49 @@ class LocationService {
 //    GeoFirePoint point =
 //    geo.point(latitude: pos.latitude, longitude: pos.longitude);
 //    databaseReference.collection('users').document(currentUserId).updateData({'position': point.data});
-/*
-    return databaseReference.collection('users').add({
+/* return databaseReference.collection('users').add({
       'position': point.data,
     });*/
   }
 
   void updateLocation(LocationData locationData) async {
-//    print('NAN LocationService $currentUserId  ___ ${locationData}');
 //    GeoFirePoint point = geo.point(
 //        latitude: locationData.latitude, longitude: locationData.longitude);
     /* databaseReference.collection('users').document(currentUserId).updateData({
       'userLocation':
           new GeoPoint(locationData.latitude, locationData.longitude)
     });*/
-    databaseReference.collection('users').document(currentUserId).collection(
-        'userLocation').document(currentUserId).updateData({
-      'userLocation':
-      new GeoPoint(locationData.latitude, locationData.longitude),
-      'UpdateTime': ((new DateTime.now()
-          .toUtc()
-          .microsecondsSinceEpoch) / 1000).toInt(),
+
+    Timer(Duration(seconds: 10),(){
+//      print("_________$currentUserId");
+      databaseReference.collection('users').document(currentUserId).collection(
+          'userLocation').document(currentUserId).updateData({
+        'userLocation':
+        new GeoPoint(locationData.latitude, locationData.longitude),
+        'UpdateTime': ((new DateTime.now()
+            .toUtc()
+            .microsecondsSinceEpoch) / 1000).toInt(),
+      });
     });
+
+//    Timer(Duration(seconds: 5), () {
+//      print('NAN LocationService $currentUserId  ___ ${locationData}');
+      /*databaseReference.collection('users').document(currentUserId).collection(
+          'userLocation').document(currentUserId).updateData({
+        'userLocation':
+        new GeoPoint(locationData.latitude, locationData.longitude),
+        'UpdateTime': ((new DateTime.now()
+            .toUtc()
+            .microsecondsSinceEpoch) / 1000).toInt(),
+      });*/
+//    });
+//    Timer(Duration(minutes: 5), () {
+//    });
   }
 
+
   void updateLocationOfNewUser(String UserId) async {
-    if(_currentLocation == null){
+    if (_currentLocation == null) {
       print('NAN updateLocationOfNewUser ______________$_mCurrentLocation');
       databaseReference.collection('users').document(UserId).collection(
           'userLocation').document(UserId).updateData({
@@ -169,7 +197,7 @@ class LocationService {
             .toUtc()
             .microsecondsSinceEpoch) / 1000).toInt(),
       });
-    }else{
+    } else {
       await getLocation();
     }
 //    GeoFirePoint point = geo.point(

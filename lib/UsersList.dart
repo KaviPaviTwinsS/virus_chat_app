@@ -110,6 +110,7 @@ class UsersListState extends State<UsersListPage>
 
   Future initialise() async {
     prefs = await SharedPreferences.getInstance();
+    await prefs.setString('USERSTATUS', 'LOGIN');
     currentUserName = await prefs.getString('name');
     if (userSignInType == '') {
       userSignInType = await prefs.getString('signInType');
@@ -687,6 +688,7 @@ class ActiveUserListRadius extends StatelessWidget {
 
   SharedPreferences _preferences;
   String _businessType = '';
+  String _userStatus = '';
 
   ActiveUserListRadius(String currentUser, String photoUrl, double data) {
     currentUserId = currentUser;
@@ -698,7 +700,7 @@ class ActiveUserListRadius extends StatelessWidget {
   void initialise() async {
     _preferences = await SharedPreferences.getInstance();
     _businessType = await _preferences.getString('BUSINESS_TYPE');
-    print('ActiveUserListRadius initialise $msliderData');
+    print('ActiveUserListRadius initialise $_userStatus');
     isLoading = true;
     getCurrentUserLocation(currentUserId, msliderData);
   }
@@ -868,6 +870,7 @@ class ActiveUserListRadius extends StatelessWidget {
 
     if ((businessUserId == null || businessUserId == '') &&
         (businessUserType == '' || businessUserType == null)) {
+
       var query = await Firestore.instance.collection('users')
           .document(currentUserId).collection(
           'FriendsList').getDocuments();
@@ -916,6 +919,7 @@ class ActiveUserListRadius extends StatelessWidget {
                       peerName: documentSnapshot['name'],
                     )));
       } else {
+        print('USER lIST__________________________$isAlreadyRequestSent');
         Navigator.push(
             context, MaterialPageRoute(builder: (context) =>
             SendInviteToUser(
@@ -953,37 +957,11 @@ class ActiveUserListRadius extends StatelessWidget {
     if (doc.data.length != 0) {
       DocumentSnapshot map = doc;
       GeoPoint geopoint = map['userLocation'];
-      await updateUserStatus();
       getDocumentNearBy(geopoint.latitude, geopoint.longitude, sliderData);
       print('USERCURRENT  GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
     }
   }
 
-  Future updateUserStatus() async {
-    if (currentUserId != '') {
-      int currentTime = ((new DateTime.now()
-          .toUtc()
-          .microsecondsSinceEpoch) / 1000).toInt();
-
-      var query = await Firestore.instance.collection('users')
-          .document(currentUserId).collection(
-          'userLocation').document(currentUserId).get();
-      print(
-          'USER STATUS_______________ $currentTime _____ ${query['UpdateTime']}______________${(currentTime >
-              query['UpdateTime'])}');
-      if (currentTime > query['UpdateTime']) {
-        Firestore.instance
-            .collection('users')
-            .document(currentUserId)
-            .updateData({'status': 'INACTIVE'});
-      } else {
-        Firestore.instance
-            .collection('users')
-            .document(currentUserId)
-            .updateData({'status': 'ACTIVE'});
-      }
-    }
-  }
 
   Future<DocumentSnapshot> getUserLocation(double latitude, double longtitude,
       String userId, double sliderData) async {
@@ -992,9 +970,11 @@ class ActiveUserListRadius extends StatelessWidget {
         'userLocation').document(userId)
         .get();
     DocumentSnapshot map = doc;
-    print('map_______________________________________ ${userId}');
+    print('map_______________________________________ ${_userStatus}');
     isLoading = true;
-    if (map['userLocation'] != null) {
+
+    if (map['userLocation'] != null  && (_userStatus !='' && _userStatus == 'LOGIN') ) {
+
       GeoPoint geopoint = map['userLocation'];
       // km = 423 // distance.as(LengthUnit.Kilometer,
       final double km = distance.distance(new LatLng(latitude, longtitude),
@@ -1017,8 +997,42 @@ class ActiveUserListRadius extends StatelessWidget {
           'NO'
         });
       }
+
+      await updateUserStatus();
+
     }
   }
+
+
+  Future updateUserStatus() async {
+    _userStatus = await _preferences.getString('USERSTATUS');
+    if (currentUserId != '') {
+      int currentTime = ((new DateTime.now()
+          .toUtc()
+          .microsecondsSinceEpoch) / 1000).toInt();
+
+      var query = await Firestore.instance.collection('users')
+          .document(currentUserId).collection(
+          'userLocation').document(currentUserId).get();
+      print(
+          'USER STATUS_______________ $currentTime _____ ${query['UpdateTime']}______________${(currentTime >
+              query['UpdateTime'])} ___________________________userStatus $_userStatus');
+    /*  if ((_userStatus != '' && _userStatus == 'LOGIN')) {
+        if (currentTime > (query['UpdateTime'] + INACTIVE_TIME )) {
+          Firestore.instance
+              .collection('users')
+              .document(currentUserId)
+              .updateData({'status': 'INACTIVE'});
+        } else {
+          Firestore.instance
+              .collection('users')
+              .document(currentUserId)
+              .updateData({'status': 'ACTIVE'});
+        }
+      }*/
+    }
+  }
+
 
   Future getDocumentNearBy(double latitude, double longitude,
       double distance) async {
@@ -1037,6 +1051,7 @@ class LoginUsersList extends StatelessWidget {
 
   SharedPreferences _preferences;
   String _businessType = '';
+  String _userStatus = '';
 
   LoginUsersList(String currentUser, String photoUrl) {
     currentUserId = currentUser;
@@ -1047,6 +1062,7 @@ class LoginUsersList extends StatelessWidget {
   void initialise() async {
     _preferences = await SharedPreferences.getInstance();
     _businessType = await _preferences.getString('BUSINESS_TYPE');
+    _userStatus = await _preferences.getString('USERSTATUS');
   }
 
 
@@ -1203,7 +1219,7 @@ class LoginUsersList extends StatelessWidget {
                   peerAvatar: documentSnapshot['photoUrl'],
                 )));*/
     bool isFriend = false;
-    bool isAlreadyRequestSent;
+    bool isAlreadyRequestSent = false;
     String friendId = documentSnapshot.documentID;
     bool isRequestSent;
     /* var businessUser = await Firestore.instance.collection('users')
@@ -1225,7 +1241,80 @@ class LoginUsersList extends StatelessWidget {
         'Friend Listttttt queryyyy _____businessUserId ${businessUserId} _____businessType $businessUserType _______ friendId ${friendId}');
     if ((businessUserId == null || businessUserId == '') &&
         (businessUserType == '' || businessUserType == null)) {
-      Firestore.instance.collection('users')
+
+      print(
+          'Friend Listttttt queryyyy _____');
+
+
+      var query = await Firestore.instance.collection('users')
+          .document(currentUserId).collection(
+          'FriendsList').getDocuments();
+
+      await _preferences.setString(
+          'FRIEND_USER_TOKEN', documentSnapshot.data['user_token']);
+      if (query.documents.length != 0) {
+        query.documents.forEach((doc) {
+          print('Friend Listttttt ${doc.data}');
+          if (doc.documentID == friendId &&
+              doc.data['IsAcceptInvitation'] == true) {
+            isFriend = true;
+          }
+
+          if (doc.documentID == friendId) {
+            isAlreadyRequestSent = doc.data['isAlreadyRequestSent'];
+            isRequestSent = doc.data['isRequestSent'];
+          }
+        });
+      } else {
+        isAlreadyRequestSent = false;
+        /*Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  Chat(
+                    currentUserId: currentUserId,
+                    peerId: friendId,
+                    peerAvatar: documentSnapshot['photoUrl'],
+                  )));*/
+      }
+      print(
+          'Friend Listttttt isFriend_______________________________________________${isRequestSent}');
+
+      if (isFriend) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    Chat(
+                      currentUserId: currentUserId,
+                      peerId: friendId,
+                      peerAvatar: mphotoUrl,
+                      isFriend: true,
+                      isAlreadyRequestSent: isAlreadyRequestSent,
+                      peerName: documentSnapshot['name'],
+                    )));
+      } else {
+        print('USER lIST__________________________$isAlreadyRequestSent');
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) =>
+            SendInviteToUser(
+                friendId, currentUserId, documentSnapshot['photoUrl'],
+                isAlreadyRequestSent,
+                isRequestSent, documentSnapshot['name'])));
+        /*   Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  Chat(
+                      currentUserId: currentUserId,
+                      peerId: friendId,
+                      peerAvatar: mphotoUrl,
+                      isFriend: false,
+                      isAlreadyRequestSent: isAlreadyRequestSent
+                  )));*/
+      }
+/*
+     Firestore.instance.collection('users')
           .document(currentUserId).collection(
           'FriendsList').snapshots().listen((data) =>
           data.documents.forEach((doc) =>
@@ -1247,23 +1336,22 @@ class LoginUsersList extends StatelessWidget {
             print(
                 'Friend Listttttt isFriend_______________________________________________${isRequestSent}'),
 
-          }));
-
-      if (isFriend) {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    Chat(
-                      currentUserId: currentUserId,
-                      peerId: friendId,
-                      peerAvatar: documentSnapshot['photoUrl'],
-                      isFriend: true,
-                      isAlreadyRequestSent: isAlreadyRequestSent,
-                      peerName: documentSnapshot['name'],
-                    )));
-      } else {
-        /*Navigator.push(
+          })).onDone((){
+        if (isFriend) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      Chat(
+                        currentUserId: currentUserId,
+                        peerId: friendId,
+                        peerAvatar: documentSnapshot['photoUrl'],
+                        isFriend: true,
+                        isAlreadyRequestSent: isAlreadyRequestSent,
+                        peerName: documentSnapshot['name'],
+                      )));
+        } else {
+          *//*Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
@@ -1273,14 +1361,18 @@ class LoginUsersList extends StatelessWidget {
                       peerAvatar: mphotoUrl,
                       isFriend: false,
                       isAlreadyRequestSent: isAlreadyRequestSent
-                  )));*/
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) =>
-            SendInviteToUser(
-                friendId, currentUserId, documentSnapshot['photoUrl'],
-                isAlreadyRequestSent, isRequestSent,
-                documentSnapshot['name'])));
-      }
+                  )));*//*
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) =>
+              SendInviteToUser(
+                  friendId, currentUserId, documentSnapshot['photoUrl'],
+                  isAlreadyRequestSent, isRequestSent,
+                  documentSnapshot['name'])));
+        }
+      });*/
+
+
+
     } else {
       var businessUserName = documentSnapshot['businessName'];
       Navigator.push(

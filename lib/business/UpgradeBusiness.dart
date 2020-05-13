@@ -290,6 +290,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                 onChanged: (value) {
                                   businessNumber = value;
                                 },
+                                keyboardType: TextInputType.phone,
                               ),
                               margin: EdgeInsets.only(
                                   left: 10.0, right: 10.0, top: 5.0),
@@ -376,7 +377,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
            {
              'businessName': businessName,
              'photoUrl': photoUrl,
-             'businessNumber': businessNumber,
+             'businessNumber': COUNTRY_CODE+businessNumber,
              'businessAddress': businessAddress,
              'businessId': reference.documentID,
              'ownerName' :_ownerName,
@@ -402,7 +403,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
       await preferences.setString('BUSINESS_ID', reference.documentID);
       await preferences.setString('BUSINESS_NAME', businessName);
       await preferences.setString('BUSINESS_ADDRESS', businessAddress);
-      await preferences.setString('BUSINESS_NUMBER', businessNumber);
+      await preferences.setString('BUSINESS_NUMBER', COUNTRY_CODE+businessNumber);
       await preferences.setString('BUSINESS_IMAGE', photoUrl);
       await preferences.setString('BUSINESS_TYPE', BUSINESS_TYPE_OWNER);
       await preferences.setInt('BUSINESS_EMPLOYEES_COUNT', 0);

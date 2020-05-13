@@ -107,7 +107,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                             left: 20.0, top: 20.0, right: 20.0),
                         child: Text(phone_no,
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 19),
+                              fontWeight: FontWeight.bold, fontSize: 19,fontFamily: 'GoogleSansBold'),
                         ),
                       ),
                     ),
@@ -117,7 +117,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                         margin: const EdgeInsets.only(
                             left: 20.0, top: 10.0, right: 20.0),
                         child: Text(phone_no_sub,
-                          style: TextStyle(fontSize: 15),
+                          style: TextStyle(fontSize: 15,fontFamily: 'GoogleSansRegular',fontWeight: FontWeight.w400),
                         ),
                       ),
                     ),
@@ -165,7 +165,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                             borderSide: BorderSide(
                                 color: greyColor2, width:0.5),
                           ),
-                          hintText: 'Phone Number',
+                          hintText: 'Phone number',
                         ),
                         keyboardType: TextInputType.phone,
                       ),

@@ -641,6 +641,7 @@ class AddEmployeeState extends State<AddEmployee> {
               'businessId': _mBusinessId,
               'businessType' : BUSINESS_TYPE_EMPLOYEE,
               'businessName' : _mBusinessName,
+              'businessChatPeriority' : 0,
               'photoUrl' : '',
               'createdAt':
               ((new DateTime.now()
@@ -761,8 +762,10 @@ class AddEmployeeState extends State<AddEmployee> {
 
     if(alreadyUserInBusiness == 'SAME'){
       Fluttertoast.showToast(msg: 'Already user in this business');
+      Navigator.pop(context);
     } else if( alreadyUserInBusiness == 'DIFF'){
       Fluttertoast.showToast(msg: 'Already user in this  some other business');
+      Navigator.pop(context);
     }else {
       print('NANDHU AddEmployeeState AddUserAsEmployee ___alreadyUserId $alreadyUserId');
       Firestore.instance.collection('users')
@@ -787,9 +790,9 @@ class AddEmployeeState extends State<AddEmployee> {
           _mUserPhone = phone.value;
         }
 
-        String message = "This is a test message!";
+        String message = "You are added in the "+"business";
         List<String> recipents = [_mUserPhone,];
-
+        Navigator.pop(context);
         _sendSMS(message, recipents);
       });
 

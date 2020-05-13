@@ -146,14 +146,16 @@ class ProfilePageState extends State<ProfilePage> {
     setState(() {});
   }
 
-  Future getBusinessDetails()async{
+  Future getBusinessDetails() async {
     print('businessName_____________$businessName');
-    if(businessId != '' && ((businessName == null ||  businessName == '') || (businessImage ==null || businessImage == ''))) {
+    if (businessId != '' && ((businessName == null || businessName == '') ||
+        (businessImage == null || businessImage == ''))) {
       var document = await Firestore.instance.collection('business').document(
           businessId).get();
-      if(document.exists) {
+      if (document.exists) {
         var businessDetails = document.data;
         setState(() {
+          isLoading = false;
           this.businessId = businessDetails['businessId'];
           this.businessName = businessDetails['businessName'];
           this.businessAddress = businessDetails['businessAddress'];
@@ -168,24 +170,26 @@ class ProfilePageState extends State<ProfilePage> {
         await prefs.setString('BUSINESS_NUMBER', businessNumber);
         await prefs.setString('BUSINESS_IMAGE', businessImage);
         await prefs.setString('BUSINESS_CREATED_AT', businessCreatedTime);
-        await prefs.setInt('BUSINESS_EMPLOYEES_COUNT',_noOfEmployees);
+        await prefs.setInt('BUSINESS_EMPLOYEES_COUNT', _noOfEmployees);
       }
-    }else{
+    } else {
       setState(() {
-        businessId =  prefs.getString('BUSINESS_ID');
-        businessName =  prefs.getString('BUSINESS_NAME');
-        businessAddress =  prefs.getString('BUSINESS_ADDRESS');
-        businessNumber =  prefs.getString('BUSINESS_NUMBER');
-        businessImage =  prefs.getString('BUSINESS_IMAGE');
+        isLoading = false;
+        businessId = prefs.getString('BUSINESS_ID');
+        businessName = prefs.getString('BUSINESS_NAME');
+        businessAddress = prefs.getString('BUSINESS_ADDRESS');
+        businessNumber = prefs.getString('BUSINESS_NUMBER');
+        businessImage = prefs.getString('BUSINESS_IMAGE');
         businessCreatedTime = prefs.getString('BUSINESS_CREATED_AT');
         _noOfEmployees = prefs.getInt('BUSINESS_EMPLOYEES_COUNT');
       });
     }
 
-    print('businessName__________________ $businessId __________$businessImage');
-
+    print(
+        'businessName__________________ $businessId __________$businessImage');
   }
-  void onBackpress(){
+
+  void onBackpress() {
     Navigator.pop(context);
   }
 
@@ -193,15 +197,15 @@ class ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     businessId = prefs.getString('BUSINESS_ID');
     print('profile build $businessId');
-    if(businessId != null && businessId != '')
-    fetchAllUsersData();
+    if (businessId != null && businessId != '')
+      fetchAllUsersData();
 
     return WillPopScope(
-        onWillPop: (){
+        onWillPop: () {
           onBackpress();
-    },
-    child: Scaffold(
-      /*  appBar: AppBar(
+        },
+        child: Scaffold(
+          /*  appBar: AppBar(
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back_ios, color: white_color),
             onPressed: () {
@@ -210,82 +214,82 @@ class ProfilePageState extends State<ProfilePage> {
           ),
           title: Text('Profile Page setup'),
         ),*/
-        body: Stack(
-          children: <Widget>[
-            Column(
-                children: <Widget>[
-                  Container(
-                    color: facebook_color,
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                    height: 150,
-                    child:
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment
-                          .center,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
-                          child: new IconButton(
-                              icon: Icon(Icons.arrow_back_ios,
-                                color: white_color,),
-                              onPressed: () {
-                                Navigator.pop(context);
+            body: Stack(
+              children: <Widget>[
+                Column(
+                    children: <Widget>[
+                      Container(
+                        color: facebook_color,
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width,
+                        height: 150,
+                        child:
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment
+                              .center,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
+                              child: new IconButton(
+                                  icon: Icon(Icons.arrow_back_ios,
+                                    color: white_color,),
+                                  onPressed: () {
+                                    Navigator.pop(context);
 //                                  navigationPage();
-                              }),
-                        ),
-                        new Container(
-                            margin: EdgeInsets.only(
-                                top: 20.0, right: 10.0, bottom: 40.0),
-                            child: Text(profile_header, style: TextStyle(
-                                color: text_color,
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold),)
-                        ),
-                        Spacer(),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Container(
-                            margin: EdgeInsets.only(
-                                top: 40, bottom: 20.0, right: 10.0),
-                            child: IconButton(
-                              icon: new SvgPicture.asset(
-                                'images/logout.svg', height: 20.0,
-                                width: 20.0,
-                              ),
-                              onPressed: () {
-                                showLogoutAlertDialog(context);
-                              },
+                                  }),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ]
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Container(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height - 100,
-                  decoration: BoxDecoration(
-                      color: text_color,
-                      borderRadius: new BorderRadius.only(
-                        topLeft: const Radius.circular(30.0),
-                        topRight: const Radius.circular(30.0),
-                      )
-                  ),
-                  child: SingleChildScrollView(
-                      child: Container(
+                            new Container(
+                                margin: EdgeInsets.only(
+                                    top: 20.0, right: 10.0, bottom: 40.0),
+                                child: Text(profile_header, style: TextStyle(
+                                    color: text_color,
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold),)
+                            ),
+                            Spacer(),
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: Container(
+                                margin: EdgeInsets.only(
+                                    top: 40, bottom: 20.0, right: 10.0),
+                                child: IconButton(
+                                  icon: new SvgPicture.asset(
+                                    'images/logout.svg', height: 20.0,
+                                    width: 20.0,
+                                  ),
+                                  onPressed: () {
+                                    showLogoutAlertDialog(context);
+                                  },
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ]
+                ),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      height: MediaQuery
+                          .of(context)
+                          .size
+                          .height - 100,
+                      decoration: BoxDecoration(
+                          color: text_color,
+                          borderRadius: new BorderRadius.only(
+                            topLeft: const Radius.circular(30.0),
+                            topRight: const Radius.circular(30.0),
+                          )
+                      ),
+                      child: SingleChildScrollView(
+                        child: Container(
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
@@ -294,7 +298,8 @@ class ProfilePageState extends State<ProfilePage> {
                                     child: Stack(
                                       children: <Widget>[
                                         (avatarImageFile == null)
-                                            ? (photoUrl != null && photoUrl != ''
+                                            ? (photoUrl != null &&
+                                            photoUrl != ''
                                             ? GestureDetector(
                                           onTap: getImage,
                                           child: Material(
@@ -417,11 +422,11 @@ class ProfilePageState extends State<ProfilePage> {
                                             focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: focused_border_color,
-                                                  width:0.5),
+                                                  width: 0.5),
                                             ),
                                             enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: greyColor, width:0.5),
+                                                  color: greyColor, width: 0.5),
                                             ),
                                             hintText: 'Enter your LastName',
                                           ),
@@ -465,11 +470,11 @@ class ProfilePageState extends State<ProfilePage> {
                                             focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: focused_border_color,
-                                                  width:0.5),
+                                                  width: 0.5),
                                             ),
                                             enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: greyColor, width:0.5),
+                                                  color: greyColor, width: 0.5),
                                             ),
                                             hintText: 'Enter your Email',
                                           ),
@@ -510,11 +515,11 @@ class ProfilePageState extends State<ProfilePage> {
                                             focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: focused_border_color,
-                                                  width:0.5),
+                                                  width: 0.5),
                                             ),
                                             enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: greyColor, width:0.5),
+                                                  color: greyColor, width: 0.5),
                                             ),
                                             hintText: 'Enter Mobile number',
                                           ),
@@ -635,191 +640,232 @@ class ProfilePageState extends State<ProfilePage> {
                                         )
                                     )
                                 ),
-                                (businessId != ''  && businessId != null )? Column(
-                                  crossAxisAlignment:CrossAxisAlignment.start,
+                                (businessId != '' && businessId != null)
+                                    ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Container(
-                                      margin: EdgeInsets.only(left: 10.0,top: 15.0),
-                                      child : Divider(),
+                                      margin: EdgeInsets.only(
+                                          left: 10.0, top: 15.0),
+                                      child: Divider(),
                                     ),
                                     Container(
-                                      margin: EdgeInsets.only(left: 10.0,top: 10.0,bottom: 15.0),
-                                      child: Text(business,style: TextStyle(fontWeight: FontWeight.bold),),
+                                      margin: EdgeInsets.only(
+                                          left: 10.0, top: 10.0, bottom: 15.0),
+                                      child: Text(business, style: TextStyle(
+                                          fontWeight: FontWeight.bold),),
                                     ),
-                                    businessImage != null && businessImage != '' ? Center(
-                                    child : Container(
-                                    margin: EdgeInsets.only(bottom: 15.0),
-                                    child:Material(
-                                      child: CachedNetworkImage(
-                                        placeholder: (context, url) =>
-                                            Container(
-                                              child: CircularProgressIndicator(
-                                                valueColor: AlwaysStoppedAnimation<Color>(
-                                                    themeColor),
-                                              ),
-                                              width: 50,
-                                              height: 50,
-                                              decoration: BoxDecoration(
-                                                color: greyColor2,
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(5.0),
-                                                ),
-                                              ),
-                                            ),
-                                        errorWidget: (context, url, error) =>
-                                            Material(
-                                              child: Image.asset(
-                                                'images/img_not_available.jpeg',
-                                                width: MediaQuery.of(context).size.width - 30,
-                                                height: 200.0,
-                                                fit: BoxFit.cover,
-                                              ),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(5.0),
-                                              ),
-                                              clipBehavior: Clip.hardEdge,
-                                            ),
-                                        imageUrl: businessImage,
-                                        width: MediaQuery.of(context).size.width - 30,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                    ),
-                                    )
-                                    ) : Text(''),
-                                    businessName != null && businessName != '' ? Container(
-                                      margin: EdgeInsets.only(left: 10.0,bottom: 10.0),
-                                      child: Text(businessName,style: TextStyle(fontWeight: FontWeight.bold),),
-                                    ) : Text(''),
-                                    businessAddress != null && businessAddress != '' ? Container(
-                                      margin: EdgeInsets.only(left: 10.0,bottom: 15.0),
-                                      child: Text(businessAddress,),
-                                    ) : Text(''),
-                                    businessCreatedTime != null && businessCreatedTime != '' ?Container(
-                                      margin: EdgeInsets.only(left: 10.0,bottom: 15.0),
-                                      child: Text(created_at+'\t'+DateFormat('dd-MM-yyyy')
-        .format(DateTime.fromMillisecondsSinceEpoch(
-    int.parse(businessCreatedTime)),)),
-                                    ): Text(''),
-                                   Row(
-                                     crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          _noOfEmployees != null && _noOfEmployees != 0 ? Align(
-                                            child: Container(
-                                              margin: EdgeInsets.only(
-                                                  left: 10.0,),
-                                              child: Text(_noOfEmployees.toString() +'\t'+ employees),
-                                            ),
-                                          ) : Text(''),
-                                          GestureDetector(
-                                            onTap: (){
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          AddEmployee(signinType,userId,businessId)));
-                                            },
-                                            child:  Container(
-                                              child: Row(
-//                                                mainAxisAlignment: MainAxisAlignment.end,
-//                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                children: <Widget>[
+                                    businessImage != null && businessImage != ''
+                                        ? Center(
+                                        child: Container(
+                                          margin: EdgeInsets.only(bottom: 15.0),
+                                          child: Material(
+                                            child: CachedNetworkImage(
+                                              placeholder: (context, url) =>
                                                   Container(
-                                                    margin: EdgeInsets.only(
-                                                        right: 10.0,bottom: 20.0),
-                                                    child: new SvgPicture.asset(
-                                                      'images/employee_add.svg',
-                                                      height: 20.0,
-                                                      width: 20.0,
+                                                    child: CircularProgressIndicator(
+                                                      valueColor: AlwaysStoppedAnimation<
+                                                          Color>(
+                                                          themeColor),
+                                                    ),
+                                                    width: 50,
+                                                    height: 50,
+                                                    decoration: BoxDecoration(
+                                                      color: greyColor2,
+                                                      borderRadius: BorderRadius
+                                                          .all(
+                                                        Radius.circular(5.0),
+                                                      ),
                                                     ),
                                                   ),
-                                                  Container(
-                                                    margin: EdgeInsets.only(
-                                                        right: 10.0,bottom: 20.0),
-                                                    child: Text(add_employee,
-                                                      style: TextStyle(
-                                                          color: facebook_color,
-                                                          fontSize: 15.0),),
-                                                  )
-                                                ],
-                                              ),
+                                              errorWidget: (context, url,
+                                                  error) =>
+                                                  Material(
+                                                    child: Image.asset(
+                                                      'images/img_not_available.jpeg',
+                                                      width: MediaQuery
+                                                          .of(context)
+                                                          .size
+                                                          .width - 30,
+                                                      height: 200.0,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                    borderRadius: BorderRadius
+                                                        .all(
+                                                      Radius.circular(5.0),
+                                                    ),
+                                                    clipBehavior: Clip.hardEdge,
+                                                  ),
+                                              imageUrl: businessImage,
+                                              width: MediaQuery
+                                                  .of(context)
+                                                  .size
+                                                  .width - 30,
+                                              height: 200.0,
+                                              fit: BoxFit.cover,
                                             ),
-                                          )
-                                        ],
-                                      )
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15.0)),
+                                            clipBehavior: Clip.hardEdge,
+                                          ),
+                                        )
+                                    )
+                                        : Text(''),
+                                    businessName != null && businessName != ''
+                                        ? Container(
+                                      margin: EdgeInsets.only(
+                                          left: 10.0, bottom: 10.0),
+                                      child: Text(businessName,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),),
+                                    )
+                                        : Text(''),
+                                    businessAddress != null &&
+                                        businessAddress != '' ? Container(
+                                      margin: EdgeInsets.only(
+                                          left: 10.0, bottom: 15.0),
+                                      child: Text(businessAddress,),
+                                    ) : Text(''),
+                                    businessCreatedTime != null &&
+                                        businessCreatedTime != '' ? Container(
+                                      margin: EdgeInsets.only(
+                                          left: 10.0, bottom: 15.0),
+                                      child: Text(created_at + '\t' +
+                                          DateFormat('dd-MM-yyyy')
+                                              .format(
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                                int.parse(
+                                                    businessCreatedTime)),)),
+                                    ) : Text(''),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .start,
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .spaceBetween,
+                                      children: <Widget>[
+                                        _noOfEmployees != null &&
+                                            _noOfEmployees != 0 ? Align(
+                                          child: Container(
+                                            margin: EdgeInsets.only(
+                                              left: 10.0,),
+                                            child: Text(
+                                                _noOfEmployees.toString() +
+                                                    '\t' + employees),
+                                          ),
+                                        ) : Text(''),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AddEmployee(
+                                                            signinType, userId,
+                                                            businessId)));
+                                          },
+                                          child: Container(
+                                            child: Row(
+//                                                mainAxisAlignment: MainAxisAlignment.end,
+//                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                              children: <Widget>[
+                                                Container(
+                                                  margin: EdgeInsets.only(
+                                                      right: 10.0,
+                                                      bottom: 20.0),
+                                                  child: new SvgPicture.asset(
+                                                    'images/employee_add.svg',
+                                                    height: 20.0,
+                                                    width: 20.0,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin: EdgeInsets.only(
+                                                      right: 10.0,
+                                                      bottom: 20.0),
+                                                  child: Text(add_employee,
+                                                    style: TextStyle(
+                                                        color: facebook_color,
+                                                        fontSize: 15.0),),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    )
 //                                ],
                                   ],
-                                ) : Text(''),
+                                )
+                                    : Text(''),
 
 //                              )
                               ]
                           ),
-                      ),
+                        ),
 
-                  )
-              ),
-            ),
+                      )
+                  ),
+                ),
 
-            businessId == '' || businessId == null ? Align(
-              alignment: Alignment.bottomRight,
-              child: GestureDetector(
-                onTap: (){
-                  print('Business click');
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              UpgradeBusiness(userId)));
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(
-                          right: 10.0,
-                          bottom: signinType != 'MobileNumber'
-                              ? 20.0
-                              : 10.0),
-                      child: new SvgPicture.asset(
-                        'images/business_highlight.svg',
-                        height: 20.0,
-                        width: 20.0,
+                businessId == '' || businessId == null ? Align(
+                    alignment: Alignment.bottomRight,
+                    child: GestureDetector(
+                      onTap: () {
+                        print('Business click');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    UpgradeBusiness(userId)));
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(
+                                right: 10.0,
+                                bottom: signinType != 'MobileNumber'
+                                    ? 20.0
+                                    : 10.0),
+                            child: new SvgPicture.asset(
+                              'images/business_highlight.svg',
+                              height: 20.0,
+                              width: 20.0,
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(
+                                right: 10.0,
+                                bottom: signinType != 'MobileNumber'
+                                    ? 20.0
+                                    : 10.0),
+                            child: Text(upgrade_business,
+                              style: TextStyle(
+                                  color: facebook_color,
+                                  fontSize: 15.0),),
+                          )
+
+                        ],
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(
-                          right: 10.0,bottom: signinType != 'MobileNumber'
-                          ? 20.0
-                          : 10.0),
-                      child: Text(upgrade_business,
-                        style: TextStyle(
-                            color: facebook_color,
-                            fontSize: 15.0),),
                     )
-
-                  ],
+                ) : Text(''),
+                // Loading
+                Positioned(
+                  child: isLoading
+                      ? Container(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              themeColor)),
+                    ),
+                    color: Colors.white.withOpacity(0.8),
+                  )
+                      : Container(),
                 ),
-              )
-            ) : Text(''),
-            // Loading
-            Positioned(
-              child: isLoading
-                  ? Container(
-                child: Center(
-                  child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
-                ),
-                color: Colors.white.withOpacity(0.8),
-              )
-                  : Container(),
-            ),
-          ],
+              ],
+            )
         )
-    )
     );
   }
 
@@ -869,15 +915,20 @@ class ProfilePageState extends State<ProfilePage> {
                               child: Text("Yes"),
                               color: white_color,
                               onPressed: () {
-                                if (signinType == 'google')
+                                if (signinType == 'google') {
                                   loginSelectionOption.handleGoogleSignOut(
                                       prefs);
+                                  prefs.setString('userId', '');
+                                }
                                 else if (signinType == 'facebook')
                                   facebookSignup.facebookLogout(context, prefs);
-                              /*  else if (signinType == 'MobileNumber')
+                                else {
+
+                                }
+                                /*  else if (signinType == 'MobileNumber')
                                   clearLocalData();*/
                                 prefs.setString('signInType', '');
-//                                _updatestatus();
+                                _updatestatus();
                                 clearLocalData();
                                 /* Navigator.pushAndRemoveUntil(
                                     context,
@@ -911,7 +962,6 @@ class ProfilePageState extends State<ProfilePage> {
       },
     );
   }
-
 
   void updatePassword() {
     showModalBottomSheet(
@@ -948,11 +998,11 @@ class ProfilePageState extends State<ProfilePage> {
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color: focused_border_color,
-                                            width:0.5),
+                                            width: 0.5),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: greyColor2, width:0.5),
+                                            color: greyColor2, width: 0.5),
                                       ),
                                       hintText: 'Enter new password',
                                       hintStyle: TextStyle(
@@ -985,11 +1035,11 @@ class ProfilePageState extends State<ProfilePage> {
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color: focused_border_color,
-                                            width:0.5),
+                                            width: 0.5),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: greyColor2, width:0.5),
+                                            color: greyColor2, width: 0.5),
                                       ),
                                       hintText: 'Enter confirm password',
                                       hintStyle: TextStyle(
@@ -1250,8 +1300,9 @@ class ProfilePageState extends State<ProfilePage> {
   var facebookLogin = FacebookLogin();
 
   Future _updatestatus() async {
-    print('PROFILE _updatestatus');
-    Firestore.instance
+    print('PROFILE _updatestatus ___________user $userId');
+    await prefs.setString('USERSTATUS', 'LOGOUT');
+    await Firestore.instance
         .collection('users')
         .document(userId)
         .updateData({'status': 'LoggedOut'});
@@ -1328,8 +1379,12 @@ class ProfilePageState extends State<ProfilePage> {
 
   Future fetchAllUsersData() async {
     if (prefs.containsKey('userId') && prefs.getString('userId') != null) {
-      if (prefs.getString('userId') == '' || prefs.getString('BUSINESS_ID') == '') {
+      if (prefs.getString('userId') == '' ||
+          prefs.getString('BUSINESS_ID') == '') {
         print('NANDHU FETCH USER');
+        setState(() {
+          isLoading = true;
+        });
         var document = await Firestore.instance.collection('users').document(
             userId).get();
         var profile = document.data;
@@ -1373,7 +1428,8 @@ class ProfilePageState extends State<ProfilePage> {
       }
     } else {
       print('NANDHU FETCH USER____________NOT NULL');
-    var document = await Firestore.instance.collection('users').document(
+      this.isLoading = true;
+      var document = await Firestore.instance.collection('users').document(
           userId).get();
       var profile = document.data;
       print('document ${profile['name']}');
@@ -1393,8 +1449,11 @@ class ProfilePageState extends State<ProfilePage> {
         this.controllerEmail = new TextEditingController(text: userEmail);
       });
     }
-    if(businessId != '' && businessId != null){
+    if (businessId != '' && businessId != null) {
+      isLoading = true;
       getBusinessDetails();
+    }else{
+      isLoading = false;
     }
   }
 

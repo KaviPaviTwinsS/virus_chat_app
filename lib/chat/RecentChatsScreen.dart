@@ -56,16 +56,19 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
     await Firestore.instance
         .collection('users')
         .document(_muserId).get().then((DocumentSnapshot snapshot) {
-      setState(() {
-        isLoading = false;
-      });
+
       if (snapshot.data['chattingWith'] != null) {
-        _mChatIds = List.from(snapshot.data['chattingWith']);
-        for (int i = 0; i < _mChatIds.length; i++) {
+       List<String> _chatIds = List.from(snapshot.data['chattingWith']);
+
+       List<UsersData> _usersData  = new List<UsersData> ();
+        for (int i = 0; i < _chatIds.length; i++) {
           Firestore.instance
               .collection('users')
-              .document(_mChatIds[i]).get().then((DocumentSnapshot snapshot) {
-            _mUsersData.add(UsersData(businessId: snapshot.data['businessId'],
+              .document(_chatIds[i]).get().then((DocumentSnapshot snapshot) {
+            setState(() {
+              isLoading = false;
+            });
+            _usersData.add(UsersData(businessId: snapshot.data['businessId'],
                 businessName: snapshot.data['businessName'],
                 businessType: snapshot.data['businessType'],
                 createdAt: snapshot.data['createdAt'],
@@ -79,9 +82,17 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                 userDistanceISWITHINRADIUS: snapshot
                     .data['userDistanceISWITHINRADIUS'],
                 user_token: snapshot.data['user_token']));
+            if(i+1 == _chatIds.length) {
+              print('Recent Chats ___________chatting_${i}VALUEEEEEEEEE _______');
+              setState(() {
+                this._mChatIds = _chatIds;
+                this._mUsersData = _usersData;
+              });
+            }
           });
         }
       }
+
       print('Recent Chats ___________chatting_${_mChatIds.length} _______');
     });
     prefs = await SharedPreferences.getInstance();
@@ -186,7 +197,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
             .size
             .height - 100,
         child:
-        _mChatIds != null && _mChatIds.length != 0 ? ListView.builder(
+        (_mChatIds != null && _mChatIds.length != 0) && (_mUsersData != null && _mUsersData.length != 0)? ListView.builder(
           itemBuilder: (context, index) =>
               buildRecentUsers(index, _mChatIds),
           itemCount: _mChatIds.length,
@@ -229,13 +240,13 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
   String _userStatus = '';
 
   Widget buildRecentUsers(int index, List<String> _mChatList) {
+    print('buildRecentUsers_____________${_mUsersData.length } __________${(_mChatList[index])}');
     if (_mChatList.length == 0) {
       return Center(
           child: Text(no_Recent_chat));
     } else if (_mChatList.length > 0 && _mUsersData.length != 0) {
-      for (int i = 0; i < _mChatList.length; i++) {
-        print('Recent chat _mChatList ${_mChatList[i]}');
-        UsersData usersData = _mUsersData[i];
+        print('Recent chat _mChatList ${_mChatList[index]}');
+        UsersData usersData = _mUsersData[index];
         return usersData != null ? GestureDetector(
             onTap: () {
               print(
@@ -363,7 +374,6 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
               ),
             )
         ) : Center(child: Text(no_Recent_chat),);
-      }
     }
   }
 }

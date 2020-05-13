@@ -177,6 +177,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
 
   void initialise() async{
     preferences = await SharedPreferences.getInstance();
+    await preferences.setString('USERSTATUS', '');
     print( 'token FCMMMMMMM   ___ ${await preferences.getString('signInType')}');
     await preferences.setString('PUSH_TOKEN', userToken);
     user = await preferences.getString('userId');

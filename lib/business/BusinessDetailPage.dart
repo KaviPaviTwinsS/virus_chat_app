@@ -2,7 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 
 class BusinessDetailPage extends StatefulWidget {
@@ -26,11 +28,13 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
   String _businessId = '';
   String _businessName = '';
   String _businessImage = '';
-  String _businessAddress= '';
+  String _businessAddress = '';
   String _businessOwnerName = '';
   String _businessNumber = '';
 
-  SharedPreferences preferences ;
+  SharedPreferences preferences;
+
+  String _currentUserId = '';
   List<DocumentSnapshot> documents = new List<DocumentSnapshot>();
 
   bool isLoading = false;
@@ -49,65 +53,68 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
 
   void initialise() async {
     preferences = await SharedPreferences.getInstance();
+    _currentUserId = await preferences.getString('userId');
     setState(() {
       isLoading = true;
     });
     Firestore.instance
         .collection('business')
         .document(_businessId).get().then((DocumentSnapshot documentReference) {
-      if(documentReference.documentID.isNotEmpty) {
+      if (documentReference.documentID.isNotEmpty) {
         print('Business detail___________ ${documentReference
-            .documentID} _______${documentReference.data['photoUrl']} __________');
-        _businessAddress =documentReference.data['businessAddress'];
-        _businessNumber =documentReference.data['businessNumber'];
+            .documentID} _______${documentReference
+            .data['photoUrl']} __________$_businessId');
+        _businessAddress = documentReference.data['businessAddress'];
+        _businessNumber = documentReference.data['businessNumber'];
         _businessImage = documentReference.data['photoUrl'];
-        print('BUSINESS IMAGE ___${_businessImage != null && _businessImage != ''}');
-      }else{
-      }
+        _businessName = documentReference.data['businessName'];
+        print('BUSINESS IMAGE ___${_businessImage != null &&
+            _businessImage != ''}');
+      } else {}
       setState(() {
         isLoading = false;
       });
     });
-
   }
 
 
   @override
   Widget build(BuildContext context) {
-    print('BUSINESS IMAGE ___build${_businessImage != null && _businessImage != ''}');
+    print('BUSINESS IMAGE ___build${_businessImage != null &&
+        _businessImage != ''}');
     return Scaffold(
         body: Scaffold(
           body: Stack(
             children: <Widget>[
               Container(
-                color: facebook_color,
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
-                height: 150,
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only( left: 0.0,bottom: 25.0),
-                      child: new IconButton(
-                          icon: Icon(Icons.arrow_back_ios,
-                            color: white_color,),
-                          onPressed: () {
-                            Navigator.pop(context);
+                  color: facebook_color,
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                  height: 150,
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(left: 0.0, bottom: 25.0),
+                        child: new IconButton(
+                            icon: Icon(Icons.arrow_back_ios,
+                              color: white_color,),
+                            onPressed: () {
+                              Navigator.pop(context);
 //                                  navigationPage();
-                          }),
-                    ),
-                    new Container(
-                        margin: EdgeInsets.only(
-                          left: 0.0,bottom: 25.0),
-                        child: Text(_businessName, style: TextStyle(
-                            color: text_color,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold),)
-                    ),
-                  ],
-                )
+                            }),
+                      ),
+                      new Container(
+                          margin: EdgeInsets.only(
+                              left: 0.0, bottom: 25.0),
+                          child: Text(_businessName, style: TextStyle(
+                              color: text_color,
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold),)
+                      ),
+                    ],
+                  )
               ),
               Align(
                   alignment: Alignment.bottomLeft,
@@ -127,7 +134,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                             topRight: const Radius.circular(30.0),
                           )
                       ),
-                      child:Stack(
+                      child: Stack(
                         children: <Widget>[
                           Positioned(
                               child: isLoading
@@ -145,9 +152,11 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  (_businessImage != null && _businessImage != '') ? Center(
+                                  (_businessImage != null &&
+                                      _businessImage != '') ? Center(
                                       child: Container(
-                                        margin: EdgeInsets.only(bottom: 15.0,top: 15.0),
+                                        margin: EdgeInsets.only(
+                                            bottom: 15.0, top: 15.0),
                                         child: Material(
                                           child: CachedNetworkImage(
                                             placeholder: (context, url) =>
@@ -161,12 +170,14 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                                   height: 50,
                                                   decoration: BoxDecoration(
                                                     color: greyColor2,
-                                                    borderRadius: BorderRadius.all(
+                                                    borderRadius: BorderRadius
+                                                        .all(
                                                       Radius.circular(5.0),
                                                     ),
                                                   ),
                                                 ),
-                                            errorWidget: (context, url, error) =>
+                                            errorWidget: (context, url,
+                                                error) =>
                                                 Material(
                                                   child: Image.asset(
                                                     'images/img_not_available.jpeg',
@@ -177,7 +188,8 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                                     height: 200.0,
                                                     fit: BoxFit.cover,
                                                   ),
-                                                  borderRadius: BorderRadius.all(
+                                                  borderRadius: BorderRadius
+                                                      .all(
                                                     Radius.circular(5.0),
                                                   ),
                                                   clipBehavior: Clip.hardEdge,
@@ -196,12 +208,18 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                         ),
                                       )
                                   ) : Text(''),
-                                  _businessName != null && _businessName != '' ? Container(
-                                    margin: EdgeInsets.only(left: 15.0,bottom: 10.0),
-                                    child: Text(_businessName,style: TextStyle(fontWeight: FontWeight.bold),),
-                                  ) : Text(''),
-                                  _businessAddress != null && _businessAddress != '' ? Container(
-                                    margin: EdgeInsets.only(left: 15.0,bottom: 15.0),
+                                  _businessName != null && _businessName != ''
+                                      ? Container(
+                                    margin: EdgeInsets.only(
+                                        left: 15.0, bottom: 10.0),
+                                    child: Text(_businessName, style: TextStyle(
+                                        fontWeight: FontWeight.bold),),
+                                  )
+                                      : Text(''),
+                                  _businessAddress != null &&
+                                      _businessAddress != '' ? Container(
+                                    margin: EdgeInsets.only(
+                                        left: 15.0, bottom: 15.0),
                                     child: Text(_businessAddress,),
                                   ) : Text(''),
                                 ],
@@ -235,21 +253,122 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
     );
   }
 
-  Future getBusinessUsers() async{
+  Future getBusinessUsers() async {
     print('Business Detail document list');
 
-    try{
+    try {
+      isLoading = true;
       QuerySnapshot result = await Firestore.instance
           .collection('users')
-          .where('businessId',isEqualTo: _businessId)
-          .getDocuments();
+          .where('businessId', isEqualTo: _businessId)
+          .getDocuments().whenComplete(() {
+        isLoading = false;
+      }).catchError((error) {
+        Fluttertoast.showToast(msg: '${error.toString()}');
+      });
       print('Business Detail document list ${result.documents.length}');
-      result.documents.forEach((doc) {
+      var _mCheck = false;
+
+      if (result.documents.length != 0) {
+        result.documents.forEach((doc) {
 //        if(doc.documentID)
-      print('Business Detail document ____________' + doc.documentID);
-    });
+          var reference = doc.data;
+          var _mStatus = reference['status'];
+          var _businessChatPeriority = -1;
+          if (reference.containsKey('businessChatPeriority')) {
+            _businessChatPeriority = reference['businessChatPeriority'];
+          } else {
+            _businessChatPeriority = 0;
+          }
+          print('Business Detail document ____________ ${_businessChatPeriority}');
+          if (!_mCheck && _businessChatPeriority == 0) {
+            if (_mStatus != '' && _mStatus != 'LoggedOut') {
+              Firestore.instance.collection('users')
+                  .document(reference['id'])
+                  .updateData({
+                'businessChatPeriority': 1
+              }).whenComplete(() {
+                _mCheck = true;
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Chat(
+                              currentUserId: _currentUserId,
+                              peerId: reference['id'],
+                              peerAvatar: reference['photoUrl'],
+                              isFriend: true,
+                              isAlreadyRequestSent: true,
+                              peerName: reference['name'],
+                            )));
+              });
+            } else if (_mStatus == 'LoggedOut' && !_mCheck) {
+              _mCheck = false;
+              Fluttertoast.showToast(
+                  msg: 'Business user is in LoggedOut state');
+            }
+          } else if (_businessChatPeriority == 1) {
+            if (_mStatus != '' && _mStatus != 'LoggedOut') {
+              Firestore.instance.collection('users')
+                  .document(reference['id'])
+                  .updateData({
+                'businessChatPeriority': 2
+              })
+                  .whenComplete(() {
+
+              });
+              _mCheck = true;
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Chat(
+                            currentUserId: _currentUserId,
+                            peerId: reference['id'],
+                            peerAvatar: reference['photoUrl'],
+                            isFriend: true,
+                            isAlreadyRequestSent: true,
+                            peerName: reference['name'],
+                          )));
+            } else if (_mStatus == 'LoggedOut' && !_mCheck) {
+              _mCheck = false;
+              Fluttertoast.showToast(
+                  msg: 'Business user is in LoggedOut state');
+            }
+          } else {
+            if (_mStatus != '' && _mStatus != 'LoggedOut') {
+              Firestore.instance.collection('users')
+                  .document(reference['id'])
+                  .updateData({
+                'businessChatPeriority': 3
+              })
+                  .whenComplete(() {
+                _mCheck = true;
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Chat(
+                              currentUserId: _currentUserId,
+                              peerId: reference['id'],
+                              peerAvatar: reference['photoUrl'],
+                              isFriend: true,
+                              isAlreadyRequestSent: true,
+                              peerName: reference['name'],
+                            )));
+              });
+            } else if (_mStatus == 'LoggedOut' && !_mCheck) {
+              _mCheck = false;
+              Fluttertoast.showToast(
+                  msg: 'Business user is in LoggedOut state');
+            }
+          }
+        });
+      } else {
+        Fluttertoast.showToast(msg: 'No business users');
+      }
       return result.documents;
-    }on Exception catch (e) {
+    } on Exception catch (e) {
       print('NANDHU BusinessDetail loadUsers Exception ${e.toString()}');
     }
   }

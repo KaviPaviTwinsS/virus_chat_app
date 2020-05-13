@@ -26,6 +26,14 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 apply plugin: 'com.google.gms.google-services'
 android {
+    signingConfigs {
+        mespace {
+            storePassword 'mespace'
+            keyAlias = 'mespace'
+            keyPassword 'mespace'
+            storeFile file('C:/Users/Nandhini S/Documents/mespace.jks')
+        }
+    }
     compileSdkVersion 29
 
     sourceSets {
@@ -38,7 +46,7 @@ android {
 
     defaultConfig {
         applicationId "com.virus_chat_app"
-        minSdkVersion 24
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -64,10 +72,16 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.facebook.android:facebook-android-sdk:5.15.3'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.google.firebase:firebase-analytics:17.3.0'
-    implementation 'com.google.firebase:firebase-messaging:20.1.4'
-    implementation 'com.google.firebase:firebase-auth:19.3.0'
-    implementation 'androidx.multidex:multidex:2.0.0'
+//    implementation 'com.google.firebase:firebase-analytics:17.3.0'
+    implementation 'com.google.firebase:firebase-messaging:20.1.7'
+//    implementation 'com.google.firebase:firebase-auth:19.3.0'
+    implementation 'com.google.firebase:firebase-analytics:17.4.1'
+//For Firebase Analytics Service
+    implementation 'com.google.firebase:firebase-auth:19.3.1'
+//For Firebase Authentication Service
+    implementation 'com.google.firebase:firebase-firestore:21.4.3'
+//For Firebase Firestore Database Service
+    implementation 'androidx.multidex:multidex:2.0.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

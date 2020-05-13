@@ -36,7 +36,7 @@ class WalkThroughThree extends StatelessWidget {
                     .width,
                 height: 50.0,
                 child:Container(
-                  margin: EdgeInsets.only(right: 30.0,bottom: 10.0),
+                  margin: EdgeInsets.only(right: 20.0,bottom: 10.0),
                   padding: EdgeInsets.all(10.0),
                   child:  Align(
                     alignment: Alignment.bottomRight,
@@ -47,7 +47,7 @@ class WalkThroughThree extends StatelessWidget {
                             MaterialPageRoute(
                                 builder: (context) => new LoginSelection()));
                       },
-                      child: Text(skip, style: TextStyle(color: facebook_color),),
+                      child: Text(skip, style: TextStyle(color: sky_blue,fontSize: 17.0,fontFamily: 'GoogleSansBold',),),
                     ),
                   ),
                 )

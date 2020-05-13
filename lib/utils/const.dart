@@ -16,3 +16,5 @@ const kGoogleApiKey = "AIzaSyBzWFtBj_GgXD71n6iDKp3xSkswdcdHeVc";
 
 String BUSINESS_TYPE_OWNER = 'owner';
 String BUSINESS_TYPE_EMPLOYEE = 'employee';
+
+int INACTIVE_TIME = 600000; //10minutes

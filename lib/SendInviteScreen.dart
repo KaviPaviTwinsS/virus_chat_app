@@ -61,13 +61,13 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   SendInviteToUserState(String peerId, String currentUserId,
       String friendPhotoUrl, bool isAlreadyRequestSent, bool isRequestSent,
       String mName) {
-    print('PERRRR IDD $peerId');
     _mPeerId = peerId;
     _mCurrentUserId = currentUserId;
     _mPhotoUrl = friendPhotoUrl;
     _misAlreadyRequestSent = isAlreadyRequestSent;
     _misRequestSent = isRequestSent;
     _mUserName = mName;
+    print('PERRRR IDD $_misAlreadyRequestSent _____________misRequestSent $_misRequestSent');
   }
 
   bool isButtonPressed = false;
@@ -243,7 +243,8 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                               ) :_misRequestSent == null ?  Container(
                                 child: Text('Invitation Sent successfully', style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 20.0),),
-                              )  : !_misRequestSent
+                              ) :( !_misAlreadyRequestSent != null && !_misAlreadyRequestSent) ? Text('Invitation Received', style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20.0),) : !_misRequestSent
                                   ? Text('Invitation Received', style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 20.0),)
                                   : Text('Already invitation sent',
@@ -271,44 +272,20 @@ class SendInviteToUserState extends State<SendInviteToUser> {
 
   Future sendInvite() async{
     print('sendInvite____________');
-    var documentReference = Firestore.instance
-        .collection('users')
-        .document(_mCurrentUserId)
-        .collection('FriendsList')
-        .document(_mPeerId);
-    Firestore.instance.runTransaction((
-        transaction) async {
-      await transaction.set(
-        documentReference,
-        {
-          'requestFrom': _mCurrentUserId,
-          'receiveId': _mPeerId,
-          'IsAcceptInvitation': false,
-          'isRequestSent': true,
-          'friendPhotoUrl': _userPhotoUrl,
-          'friendName': _userName,
-          'isAlreadyRequestSent': true,
-          'timestamp': DateTime
-              .now()
-              .millisecondsSinceEpoch
-              .toString(),
-        },
-      );
-    }).whenComplete((){
-      var documentReference1 = Firestore.instance
+    try {
+      var documentReference = await Firestore.instance
           .collection('users')
-          .document(_mPeerId)
+          .document(_mCurrentUserId)
           .collection('FriendsList')
-          .document(_mCurrentUserId);
-      Firestore.instance.runTransaction((
-          transaction) async {
+          .document(_mPeerId);
+      Firestore.instance.runTransaction((transaction) async {
         await transaction.set(
-          documentReference1,
+          documentReference,
           {
             'requestFrom': _mCurrentUserId,
             'receiveId': _mPeerId,
             'IsAcceptInvitation': false,
-            'isRequestSent': false,
+            'isRequestSent': true,
             'friendPhotoUrl': _userPhotoUrl,
             'friendName': _userName,
             'isAlreadyRequestSent': true,
@@ -317,12 +294,41 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                 .millisecondsSinceEpoch
                 .toString(),
           },
-        );
+        ).catchError((error){
+          error.toString();
+        });
+      }).whenComplete(() {
+        var documentReference1 = Firestore.instance
+            .collection('users')
+            .document(_mPeerId)
+            .collection('FriendsList')
+            .document(_mCurrentUserId);
+        Firestore.instance.runTransaction((transaction) async {
+          await transaction.set(
+            documentReference1,
+            {
+              'requestFrom': _mCurrentUserId,
+              'receiveId': _mPeerId,
+              'IsAcceptInvitation': false,
+              'isRequestSent': false,
+              'friendPhotoUrl': _userPhotoUrl,
+              'friendName': _userName,
+              'isAlreadyRequestSent': true,
+              'timestamp': DateTime
+                  .now()
+                  .millisecondsSinceEpoch
+                  .toString(),
+            },
+          ).catchError((error){
+            error.toString();
+          });
+        });
+      }).whenComplete(() {
+        sendAndRetrieveMessage();
       });
-    }).whenComplete((){
-      sendAndRetrieveMessage();
-    });
-
+    }on Exception catch(e){
+      e.toString();
+    }
     setState(() {
       isButtonPressed = !isButtonPressed;
       _misRequestSent = null;
