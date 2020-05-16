@@ -44,6 +44,9 @@ class LocationService {
     preferences = await SharedPreferences.getInstance();
   }
 
+
+
+
   LocationService(String currentUser) {
     if (preferences == null) {
       initialise();
@@ -150,7 +153,7 @@ class LocationService {
     });*/
   }
 
-  void updateLocation(LocationData locationData) async {
+  void updateLocation(LocationData locationData)  {
 //    GeoFirePoint point = geo.point(
 //        latitude: locationData.latitude, longitude: locationData.longitude);
     /* databaseReference.collection('users').document(currentUserId).updateData({
@@ -158,17 +161,17 @@ class LocationService {
           new GeoPoint(locationData.latitude, locationData.longitude)
     });*/
 
-    Timer(Duration(seconds: 10),(){
-//      print("_________$currentUserId");
-      databaseReference.collection('users').document(currentUserId).collection(
+//    Timer(Duration(seconds: 10),(){
+      print("_________$currentUserId");
+     /* databaseReference.collection('users').document(currentUserId).collection(
           'userLocation').document(currentUserId).updateData({
         'userLocation':
         new GeoPoint(locationData.latitude, locationData.longitude),
         'UpdateTime': ((new DateTime.now()
             .toUtc()
             .microsecondsSinceEpoch) / 1000).toInt(),
-      });
-    });
+      });*/
+//    });
 
 //    Timer(Duration(seconds: 5), () {
 //      print('NAN LocationService $currentUserId  ___ ${locationData}');

@@ -15,6 +15,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "690980757184-i23odm373jlijs3t72b58giokl9rqnqt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.virus_chat_app",
+            "certificate_hash": "ce785b89cd6c271ab119cbe014c71819b74c175d"
+          }
+        },
+        {
+          "client_id": "690980757184-ghbfojbtf63a4eojdcuifbne81b9g5ce.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.virus_chat_app",
+            "certificate_hash": "40a780dd424e0a21fded4f827a20ef5dad2fb41f"
+          }
+        },
+        {
+          "client_id": "690980757184-veibmmac2u74dfh40phnlm4l6s7am0ge.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.virus_chat_app",
+            "certificate_hash": "0b2b2484a56677fd3fbb046d7ee1357878956643"
+          }
+        },
+        {
           "client_id": "690980757184-9nblmqgf58r35elto5a4lp3k022bjdut.apps.googleusercontent.com",
           "client_type": 3
         }

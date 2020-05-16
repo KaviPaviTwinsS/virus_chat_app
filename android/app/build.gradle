@@ -46,7 +46,7 @@ android {
 
     defaultConfig {
         applicationId "com.virus_chat_app"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -79,7 +79,7 @@ dependencies {
 //For Firebase Analytics Service
     implementation 'com.google.firebase:firebase-auth:19.3.1'
 //For Firebase Authentication Service
-    implementation 'com.google.firebase:firebase-firestore:21.4.3'
+//    implementation 'com.google.firebase:firebase-firestore:21.4.3'
 //For Firebase Firestore Database Service
     implementation 'androidx.multidex:multidex:2.0.1'
     testImplementation 'junit:junit:4.12'

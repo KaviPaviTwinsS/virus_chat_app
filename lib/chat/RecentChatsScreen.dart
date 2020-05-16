@@ -57,41 +57,48 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
         .collection('users')
         .document(_muserId).get().then((DocumentSnapshot snapshot) {
 
-      if (snapshot.data['chattingWith'] != null) {
-       List<String> _chatIds = List.from(snapshot.data['chattingWith']);
+          if(snapshot.data.length != 0) {
+            if (snapshot.data['chattingWith'] != null) {
+              List<String> _chatIds = List.from(snapshot.data['chattingWith']);
 
-       List<UsersData> _usersData  = new List<UsersData> ();
-        for (int i = 0; i < _chatIds.length; i++) {
-          Firestore.instance
-              .collection('users')
-              .document(_chatIds[i]).get().then((DocumentSnapshot snapshot) {
-            setState(() {
-              isLoading = false;
-            });
-            _usersData.add(UsersData(businessId: snapshot.data['businessId'],
-                businessName: snapshot.data['businessName'],
-                businessType: snapshot.data['businessType'],
-                createdAt: snapshot.data['createdAt'],
-                email: snapshot.data['email'],
-                id: snapshot.data['id'],
-                name: snapshot.data['name'],
-                nickName: snapshot.data['nickName'],
-                phoneNo: snapshot.data['phoneNo'],
-                photoUrl: snapshot.data['photoUrl'],
-                status: snapshot.data['status'],
-                userDistanceISWITHINRADIUS: snapshot
-                    .data['userDistanceISWITHINRADIUS'],
-                user_token: snapshot.data['user_token']));
-            if(i+1 == _chatIds.length) {
-              print('Recent Chats ___________chatting_${i}VALUEEEEEEEEE _______');
-              setState(() {
-                this._mChatIds = _chatIds;
-                this._mUsersData = _usersData;
-              });
+              List<UsersData> _usersData = new List<UsersData> ();
+              for (int i = 0; i < _chatIds.length; i++) {
+                Firestore.instance
+                    .collection('users')
+                    .document(_chatIds[i]).get().then((
+                    DocumentSnapshot snapshot) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  _usersData.add(
+                      UsersData(businessId: snapshot.data['businessId'],
+                          businessName: snapshot.data['businessName'],
+                          businessType: snapshot.data['businessType'],
+                          createdAt: snapshot.data['createdAt'],
+                          email: snapshot.data['email'],
+                          id: snapshot.data['id'],
+                          name: snapshot.data['name'],
+                          nickName: snapshot.data['nickName'],
+                          phoneNo: snapshot.data['phoneNo'],
+                          photoUrl: snapshot.data['photoUrl'],
+                          status: snapshot.data['status'],
+                          userDistanceISWITHINRADIUS: snapshot
+                              .data['userDistanceISWITHINRADIUS'],
+                          user_token: snapshot.data['user_token']));
+                  if (i + 1 == _chatIds.length) {
+                    print(
+                        'Recent Chats ___________chatting_${i}VALUEEEEEEEEE _______');
+                    setState(() {
+                      this._mChatIds = _chatIds;
+                      this._mUsersData = _usersData;
+                    });
+                  }
+                });
+              }
             }
-          });
-        }
-      }
+          }else{
+            isLoading =false;
+          }
 
       print('Recent Chats ___________chatting_${_mChatIds.length} _______');
     });
