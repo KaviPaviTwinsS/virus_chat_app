@@ -211,7 +211,7 @@ class PasswordSetupState extends State<PasswordSetup> {
                           height: 45, // specific value
                           child: RaisedButton(
                             child: Text(log_in),
-                            color: facebook_color,
+                            color: button_fill_color,
                             textColor: text_color,
                             shape: RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(30.0),
@@ -289,7 +289,7 @@ class PasswordSetupState extends State<PasswordSetup> {
         ),
         RaisedButton(
           child: Text(send.toUpperCase()),
-          color: facebook_color,
+          color: button_fill_color,
           textColor: text_color,
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(18.0),
@@ -372,7 +372,7 @@ class PasswordSetupState extends State<PasswordSetup> {
         ),
         RaisedButton(
           child: Text(done.toUpperCase()),
-          color: facebook_color,
+          color: button_fill_color,
           textColor: text_color,
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(20.0),
@@ -494,7 +494,7 @@ class PasswordSetupState extends State<PasswordSetup> {
           ? Container(
         child: Center(
           child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+              valueColor: AlwaysStoppedAnimation<Color>(progress_color)),
         ),
         color: Colors.white.withOpacity(0.8),
       )

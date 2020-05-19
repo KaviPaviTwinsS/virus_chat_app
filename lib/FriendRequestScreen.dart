@@ -88,6 +88,7 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
 
   @override
   Widget build(BuildContext context) {
+    print('Friend Request Build__________ ');
     return Scaffold(
         body: Stack(
           children: <Widget>[
@@ -95,7 +96,7 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Container(
-                    color: facebook_color,
+                    color: button_fill_color,
                     width: MediaQuery
                         .of(context)
                         .size
@@ -185,6 +186,8 @@ class friendlist extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('Friend Request Build__________ Stream');
+
     return new StreamBuilder(
         stream: Firestore.instance.collection('users').document(
             currentUserId).collection('FriendsList').where(
@@ -195,7 +198,7 @@ class friendlist extends StatelessWidget {
           if (snapshot.data == null || !snapshot.hasData) {
             /* return Center(
                     child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(themeColor)));*/
+                        valueColor: AlwaysStoppedAnimation<Color>(progress_color)));*/
             return Center(
               child: Text(pending_request),
             );

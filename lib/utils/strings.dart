@@ -1,8 +1,9 @@
-
+String app_name ="mespace";
 String verify_phone ='Verify phone number';
 String resend_otp = 'Didn\'t receive SMS?';
 String resend_code ='Resend Code';
-String enter_phone_number ='Enter valid phone number';
+String enter_valid_phone_number ='Enter valid phone number';
+String enter_phone_number ='Enter phone number';
 String enter_password = 'Please enter Password';
 String enter_valid_password ='Please enter valid Password';
 String no_data_change='No changes found';

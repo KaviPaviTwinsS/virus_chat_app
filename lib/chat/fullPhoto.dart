@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:virus_chat_app/utils/colors.dart';
-import 'package:virus_chat_app/utils/const.dart';
-import 'package:photo_view/photo_view.dart';
+
 
 class FullPhoto extends StatelessWidget {
   final String url;
@@ -51,7 +51,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
           Column(
               children: <Widget>[
                 Container(
-                  color: facebook_color,
+                  color: button_fill_color,
                   width: MediaQuery
                       .of(context)
                       .size
@@ -125,10 +125,9 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                       ),
                   errorWidget: (context, url, error) =>
                       Material(
-                        child: Image.asset(
-                          'images/img_not_available.jpeg',
-                          width: 150.0,
-                          height: 200.0,
+                        child: new SvgPicture.asset(
+                          'images/user_unavailable.svg', height: 200.0,
+                          width:150.0,
                           fit: BoxFit.cover,
                         ),
                         borderRadius: BorderRadius.all(

@@ -91,7 +91,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     margin: const EdgeInsets.only(
                         left: 20.0, top: 30.0, right: 20.0),
                     child: Text(verify_phone,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 19,fontFamily: 'GoogleSansFamily'),
                     ),
                   ),
                 ),
@@ -113,7 +113,7 @@ class _OTPScreenState extends State<OTPScreen> {
                       if (pin.length == 6) {
                         _onFormSubmitted();
                       } else {
-                        showToast("Invalid OTP", Colors.red);
+                        showToast("Invalid OTP", Colors.white);
                       }
                     },
                   ),
@@ -153,9 +153,9 @@ class _OTPScreenState extends State<OTPScreen> {
                         margin: const EdgeInsets.only(
                             top: 10.0, right: 10.0),
                         child: Text(resend_code, style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w700,
                           fontSize: 15,
-                          color: Colors.blue,)
+                          color: Colors.blue,fontFamily: 'GoogleSansFamily')
                         ),
                       ),
                       onTap: () {
@@ -182,13 +182,13 @@ class _OTPScreenState extends State<OTPScreen> {
                           showToast("Invalid OTP", Colors.red);
                         }
                       },
-                      color: facebook_color,
+                      color: button_fill_color,
                       textColor: text_color,
                       shape: RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0),
                       ),
                       child: Text(btn_otp_verify,
-                        style: TextStyle(fontSize: 17),),
+                        style: TextStyle(fontSize: 17,fontFamily: 'GoogleSansFamily'),),
                     ),
                   ),
                 )
@@ -208,7 +208,7 @@ class _OTPScreenState extends State<OTPScreen> {
           ? Container(
         child: Center(
           child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+              valueColor: AlwaysStoppedAnimation<Color>(progress_color)),
         ),
         color: Colors.white.withOpacity(0.8),
       )
@@ -224,7 +224,7 @@ class _OTPScreenState extends State<OTPScreen> {
         gravity: ToastGravity.CENTER,
         timeInSecForIos: 2,
         backgroundColor: color,
-        textColor: Colors.white,
+        textColor: Colors.black,
         fontSize: 16.0);
   }
 
@@ -376,6 +376,10 @@ class _OTPScreenState extends State<OTPScreen> {
     await prefs.setString('phoneNo', documents[0]['phoneNo']);
     await prefs.setString('signInType', signInType);
     await prefs.setString('BUSINESS_TYPE', documents[0]['businessType']);
+    await Firestore.instance
+        .collection('users')
+        .document(documents[0]['id'])
+        .updateData({'status': 'ACTIVE'});
     setState(() {
       isLoading = false;
     });

@@ -4,13 +4,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+
 //import 'package:flutter_google_places/flutter_google_places.dart';
 //import 'package:google_maps_webservice/places.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/utils/colors.dart';
-import 'package:virus_chat_app/utils/const.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 class UpgradeBusiness extends StatefulWidget {
@@ -38,9 +39,10 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
   String businessName = '';
   String businessAddress = '';
   String businessNumber = '';
-  String _ownerName= '';
+  String _ownerName = '';
 
   SharedPreferences preferences;
+
   UpgradeBusinessState(String mUserId) {
     userId = mUserId;
   }
@@ -67,7 +69,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
           Column(
               children: <Widget>[
                 Container(
-                  color: facebook_color,
+                  color: button_fill_color,
                   width: MediaQuery
                       .of(context)
                       .size
@@ -92,8 +94,9 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                               top: 20.0, right: 10.0, bottom: 40.0),
                           child: Text(upgrade_business, style: TextStyle(
                               color: text_color,
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold),)
+                              fontSize: TOOL_BAR_TITLE_SIZE,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'GoogleSansFamily'),)
                       ),
                     ],
                   ),
@@ -119,229 +122,266 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                       )
                   ),
                   child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          child: Center(
-                            child: Stack(
-                              children: <Widget>[
-                                (avatarImageFile == null)
-                                    ? (photoUrl != ''
-                                    ? GestureDetector(
-                                  onTap: getImage,
-                                  child: Material(
-                                    child: CachedNetworkImage(
-                                      placeholder: (context, url) =>
-                                          Container(
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.0,
-                                              valueColor: AlwaysStoppedAnimation<
-                                                  Color>(
-                                                  themeColor),
-                                            ),
-                                            width: 70.0,
-                                            height: 70.0,
-                                            padding: EdgeInsets.all(
-                                                20.0),
-                                          ),
-                                      imageUrl: photoUrl,
-                                      width: 80.0,
-                                      height: 80.0,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(45.0)),
-                                    clipBehavior: Clip.hardEdge,
-                                  ),
-                                )
-                                    : IconButton(
-                                  icon: Icon(
-                                    Icons.account_circle,
-                                    size: 80.0,
-                                    color: greyColor,
-                                  ),
-                                  onPressed: () {
-                                    getImage();
-                                  },))
-                                    : Material(
-                                  child: Image.file(
-                                    avatarImageFile,
-                                    width: 80.0,
-                                    height: 80.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(
-                                          45.0)),
-                                  clipBehavior: Clip.hardEdge,
-                                ),
-                                photoUrl == '' ? IconButton(
-                                  icon: Icon(
-                                    Icons.camera_alt,
-                                    color: primaryColor.withOpacity(
-                                        0.5),
-                                  ),
-                                  onPressed: getImage,
-                                  padding: EdgeInsets.all(30.0),
-                                  splashColor: Colors.transparent,
-                                  highlightColor: greyColor,
-                                  iconSize: 30.0,
-                                ) : Text('')
-                              ],
-                            ),
-                          ),
-                          width: double.infinity,
-                          margin: EdgeInsets.all(20.0),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Container(
+                        child: Column(
                           children: <Widget>[
                             Container(
-                              margin: EdgeInsets.only(
-                                left: 10.0,
-                                right: 10.0,
-                              ),
-                              child: Text(business_name.toUpperCase()),
-                            ),
-                            Container(
-                              child: TextField(
-                                decoration: new InputDecoration(
-                                  contentPadding: new EdgeInsets.all(
-                                      15.0),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: focused_border_color,
-                                        width: 1.0),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: greyColor, width: 1.0),
-                                  ),
-                                  hintText: 'Enter your name',
-                                ),
-                                controller: controllerName,
-                                onChanged: (value) {
-                                  businessName = value;
-                                },
-                              ),
-                              margin: EdgeInsets.only(
-                                  left: 10.0, right: 10.0, top: 5.0),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 10.0,
-                                  right: 10.0,
-                                  top: 20.0),
-                              child: Text(business_address.toUpperCase()),
-                            ),
-                            GestureDetector(
-                              onTap: (){
-
-                              },
-                              child:  Container(
-                                child: TextField(
-                                  decoration: new InputDecoration(
-                                    contentPadding: new EdgeInsets.all(
-                                        15.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: focused_border_color,
-                                          width: 1.0),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: greyColor, width: 1.0),
-                                    ),
-                                    hintText: 'Enter your address',
-                                  ),
-                                  controller: controllerAddress,
-                                  onChanged: (value) {
-                                    businessAddress = value;
+                              child: Center(
+                                child: Stack(
+                                  children: <Widget>[
+                                    (avatarImageFile == null)
+                                        ? (photoUrl != null &&
+                                        photoUrl != ''
+                                        ? GestureDetector(
+                                      onTap: (){
+                                        print('getImage');
+                                            },
+                                      child: Material(
+                                        child: CachedNetworkImage(
+                                          placeholder: (context, url) =>
+                                              Container(
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 2.0,
+                                                  valueColor: AlwaysStoppedAnimation<
+                                                      Color>(
+                                                      themeColor),
+                                                ),
+                                                width: 70.0,
+                                                height: 70.0,
+                                                padding: EdgeInsets.all(
+                                                    20.0),
+                                              ),
+                                          imageUrl: photoUrl,
+                                          width: 70.0,
+                                          height: 70.0,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(45.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                      ),
+                                    )
+                                        : IconButton(
+                                      icon: Icon(
+                                        Icons.account_circle,
+                                        size: 70.0,
+                                        color: greyColor,
+                                      ),
+                                      onPressed: () {
+                                        getImage();
+                                      },))
+                                        :  GestureDetector(
+                                  onTap: (){
+                                    print('getImage');
+                                    getImage();
                                   },
+                                  child : Material(
+                                      child: Image.file(
+                                        avatarImageFile,
+                                        width: 70.0,
+                                        height: 70.0,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(
+                                              45.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                    ),
+                                    ),
+                                    photoUrl == '' ? IconButton(
+                                      icon: Icon(
+                                        Icons.camera_alt,
+                                        color: primaryColor.withOpacity(
+                                            0.5),
+                                      ),
+                                      onPressed: getImage,
+                                      padding: EdgeInsets.all(30.0),
+                                      splashColor: Colors.transparent,
+                                      highlightColor: greyColor,
+                                      iconSize: 30.0,
+                                    ) : Text('')
+                                  ],
                                 ),
-                                margin: EdgeInsets.only(
-                                    left: 10.0, right: 10.0, top: 5.0),
                               ),
+                              width: double.infinity,
+                              margin: EdgeInsets.all(20.0),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  margin: EdgeInsets.only(
+                                    left: 10.0,
+                                    right: 10.0,
+                                  ),
+                                  child: Text(business_name.toUpperCase(),
+                                    style: TextStyle(
+                                        fontFamily: 'GoogleSansFamily'),),
+                                ),
+                                Container(
+                                  child: TextField(
+                                    decoration: new InputDecoration(
+                                      contentPadding: new EdgeInsets.all(
+                                          15.0),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: focused_border_color,
+                                            width: 1.0),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: greyColor, width: 1.0),
+                                      ),
+                                      hintText: 'Enter business name',
+                                      hintStyle: TextStyle(
+                                          fontSize: HINT_TEXT_SIZE,
+                                          fontFamily: 'GoogleSansFamily'),
+                                    ),
+                                    controller: controllerName,
+                                    onChanged: (value) {
+                                      businessName = value;
+                                    },
+                                  ),
+                                  margin: EdgeInsets.only(
+                                      left: 10.0, right: 10.0, top: 5.0),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      left: 10.0,
+                                      right: 10.0,
+                                      top: 20.0),
+                                  child: Text(business_address.toUpperCase(),
+                                    style: TextStyle(
+                                        fontFamily: 'GoogleSansFamily'),),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+
+                                  },
+                                  child: Container(
+                                    child: TextField(
+                                      decoration: new InputDecoration(
+                                        contentPadding: new EdgeInsets.all(
+                                            15.0),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: focused_border_color,
+                                              width: 1.0),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: greyColor, width: 1.0),
+                                        ),
+                                        hintText: 'Enter business address',
+                                        hintStyle: TextStyle(
+                                            fontSize: HINT_TEXT_SIZE,
+                                            fontFamily: 'GoogleSansFamily'),
+                                      ),
+                                      controller: controllerAddress,
+                                      onChanged: (value) {
+                                        businessAddress = value;
+                                      },
+                                    ),
+                                    margin: EdgeInsets.only(
+                                        left: 10.0, right: 10.0, top: 5.0),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      left: 10.0,
+                                      right: 10.0,
+                                      top: 20.0),
+                                  child: Text(business_number.toUpperCase(),
+                                    style: TextStyle(
+                                        fontFamily: 'GoogleSansFamily'),),
+                                ),
+                                Container(
+                                  child: TextField(
+                                    decoration: new InputDecoration(
+                                      contentPadding: new EdgeInsets.all(
+                                          15.0),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: focused_border_color,
+                                            width: 1.0),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: greyColor, width: 1.0),
+                                      ),
+                                      hintText: 'Enter business Number',
+                                      hintStyle: TextStyle(
+                                          fontSize: HINT_TEXT_SIZE,
+                                          fontFamily: 'GoogleSansFamily'),
+                                    ),
+                                    controller: controllerNumber,
+                                    onChanged: (value) {
+                                      businessNumber = value;
+                                    },
+                                    keyboardType: TextInputType.phone,
+                                  ),
+                                  margin: EdgeInsets.only(
+                                      left: 10.0, right: 10.0, top: 5.0),
+                                ),
+                              ],
                             ),
                             Container(
-                              margin: EdgeInsets.only(
-                                  left: 10.0,
-                                  right: 10.0,
-                                  top: 20.0),
-                              child: Text(business_number.toUpperCase()),
-                            ),
-                            Container(
-                              child: TextField(
-                                decoration: new InputDecoration(
-                                  contentPadding: new EdgeInsets.all(
-                                      15.0),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: focused_border_color,
-                                        width: 1.0),
+                              margin: EdgeInsets.only(top: 20.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment
+                                    .spaceEvenly,
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 45.0,
+                                    width: MediaQuery
+                                        .of(context)
+                                        .size
+                                        .width / 2 - 25,
+                                    child: RaisedButton(
+                                        color: white_color,
+                                        textColor: button_fill_color,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: new BorderRadius
+                                              .circular(
+                                              30.0),
+                                        ),
+                                        child: Text(business_cancel,
+                                          style: TextStyle(
+                                              fontFamily: 'GoogleSansFamily'),),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        }
+                                    ),
                                   ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: greyColor, width: 1.0),
-                                  ),
-                                  hintText: 'Enter your Number',
-                                ),
-                                controller: controllerNumber,
-                                onChanged: (value) {
-                                  businessNumber = value;
-                                },
-                                keyboardType: TextInputType.phone,
+                                  SizedBox(
+                                      height: 45.0,
+                                      width: MediaQuery
+                                          .of(context)
+                                          .size
+                                          .width / 2 - 25,
+                                      child: RaisedButton(
+                                          color: button_fill_color,
+                                          textColor: text_color,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: new BorderRadius
+                                                .circular(
+                                                30.0),
+                                          ),
+                                          child: Text(business_upgrade,
+                                            style: TextStyle(
+                                                fontFamily: 'GoogleSansFamily'),),
+                                          onPressed: () {
+                                            businessValidation();
+                                          }
+                                      )
+                                  )
+                                ],
                               ),
-                              margin: EdgeInsets.only(
-                                  left: 10.0, right: 10.0, top: 5.0),
-                            ),
+                            )
                           ],
                         ),
-                        Container(
-                          margin: EdgeInsets.only(top: 20.0),
-                          child:  Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              SizedBox(
-                                height: 45.0,
-                                width: MediaQuery.of(context).size.width/2 - 25,
-                                child: RaisedButton(
-                                    color: white_color,
-                                    textColor: facebook_color,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: new BorderRadius
-                                          .circular(
-                                          30.0),
-                                    ),
-                                    child: Text(business_cancel),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    }
-                                ),
-                              ),
-                              SizedBox(
-                                  height: 45.0,
-                                  width: MediaQuery.of(context).size.width/2 - 25,
-                                  child: RaisedButton(
-                                      color: facebook_color,
-                                      textColor: text_color,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: new BorderRadius
-                                            .circular(
-                                            30.0),
-                                      ),
-                                      child: Text(business_upgrade),
-                                      onPressed: () {
-                                        businessValidation();
-                                      }
-                                  )
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+                      )
                   )
               )
           ),
@@ -350,7 +390,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                 ? Container(
               child: Center(
                 child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+                    valueColor: AlwaysStoppedAnimation<Color>(progress_color)),
               ),
               color: Colors.white.withOpacity(0.8),
             )
@@ -363,14 +403,16 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
 
 
   Future addBusiness() async {
-    if((businessNumber != '') || (businessName != '' && businessAddress != '' && photoUrl !='')) {
+    if ((businessNumber != '') ||
+        (businessName != '' && businessAddress != '' && photoUrl != '')) {
       int currTime = ((new DateTime.now()
           .toUtc()
           .microsecondsSinceEpoch) / 1000).toInt();
-      DocumentReference reference = Firestore.instance.collection('business').document();
+      DocumentReference reference = Firestore.instance.collection('business')
+          .document();
       print('_______________________________addBusiness');
-     try{
-       Firestore.instance.runTransaction((
+      try {
+        /*  Firestore.instance.runTransaction((
            transaction) async {
          await transaction.set(
            reference,
@@ -384,10 +426,20 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
              'createdAt':currTime
            },
          );
-       });
-     } on Exception catch (e) {
-       print('Could not get Add businesss: ${e.toString()}');
-     }
+       });*/
+
+        reference.setData({
+          'businessName': businessName,
+          'photoUrl': photoUrl,
+          'businessNumber': COUNTRY_CODE + businessNumber,
+          'businessAddress': businessAddress,
+          'businessId': reference.documentID,
+          'ownerName': _ownerName,
+          'createdAt': currTime
+        });
+      } on Exception catch (e) {
+        print('Could not get Add businesss: ${e.toString()}');
+      }
       /*reference.setData({
         'businessName': businessName,
         'photoUrl': photoUrl,
@@ -397,40 +449,43 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
         'createdAt':currTime
       });*/
       Firestore.instance.collection('users').document(userId).updateData({
-        'businessId':reference.documentID,
-        'businessType' : BUSINESS_TYPE_OWNER
+        'businessId': reference.documentID,
+        'businessType': BUSINESS_TYPE_OWNER
       });
       await preferences.setString('BUSINESS_ID', reference.documentID);
       await preferences.setString('BUSINESS_NAME', businessName);
       await preferences.setString('BUSINESS_ADDRESS', businessAddress);
-      await preferences.setString('BUSINESS_NUMBER', COUNTRY_CODE+businessNumber);
+      await preferences.setString(
+          'BUSINESS_NUMBER', COUNTRY_CODE + businessNumber);
       await preferences.setString('BUSINESS_IMAGE', photoUrl);
       await preferences.setString('BUSINESS_TYPE', BUSINESS_TYPE_OWNER);
       await preferences.setInt('BUSINESS_EMPLOYEES_COUNT', 0);
       await preferences.setString('BUSINESS_CREATED_AT', currTime.toString());
 
-      Navigator.pop(context);
+      Navigator.of(context).pop(context);
     }
   }
 
-  Future businessValidation() async{
-    if(photoUrl == ''){
+  Future businessValidation() async {
+    if (photoUrl == '') {
       Fluttertoast.showToast(msg: 'Enter business profile image');
-    }else if(businessName == ''){
+    } else if (businessName == '') {
       Fluttertoast.showToast(msg: 'Enter business name');
-    }else if(businessAddress == ''){
+    } else if (businessAddress == '') {
       Fluttertoast.showToast(msg: 'Enter business address');
-    }/*else if(businessNumber == ''){
+    }
+    /*else if(businessNumber == ''){
       Fluttertoast.showToast(msg: 'Enter business number');
-    }*/else{
+    }*/ else {
       await addBusiness();
     }
   }
 
-  Future showPlaces() async{
+  Future showPlaces() async {
     print('showPlaces');
 //   await _handlePressButton();
   }
+
 /*
 
   GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
@@ -458,7 +513,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
     */
 /*homeScaffoldKey.currentState.showSnackBar(
       SnackBar(content: Text(response.errorMessage)),
-    );*//*
+    );*/ /*
 
   }
 
@@ -478,7 +533,7 @@ Future<Null> displayPrediction(Prediction p, ScaffoldState scaffold) async {
   */
 /*  scaffold.showSnackBar(
       SnackBar(content: Text("${p.description} - $lat/$lng")),
-    );*//*
+    );*/ /*
 
   }
 }

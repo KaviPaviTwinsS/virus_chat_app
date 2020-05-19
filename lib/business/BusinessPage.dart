@@ -5,6 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:virus_chat_app/business/BusinessDetailPage.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
+import 'package:virus_chat_app/utils/constants.dart';
+
 
 class BusinessPage extends StatefulWidget {
   @override
@@ -26,20 +28,43 @@ class BusinessPageState extends State<BusinessPage> {
       body: Stack(
         children: <Widget>[
           Container(
-            color: facebook_color,
+            color: button_fill_color,
             width: MediaQuery
                 .of(context)
                 .size
                 .width,
             height: 150,
-            child: new Container(
+           child :  Row(
+             crossAxisAlignment: CrossAxisAlignment
+                 .center,
+             children: <Widget>[
+               Container(
+                 margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
+                 child: new IconButton(
+                     icon: Icon(Icons.arrow_back_ios,
+                       color: white_color,),
+                     onPressed: () {
+                       Navigator.pop(context);
+                     }),
+               ),
+               new Container(
+                   margin: EdgeInsets.only(
+                       top: 20.0,bottom: 40.0),
+                   child: Text(business_header, style: TextStyle(
+                       color: text_color,
+                       fontSize: TOOL_BAR_TITLE_SIZE,
+                       fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),)
+               ),
+             ],
+           ),
+           /* child: new Container(
                 margin: EdgeInsets.only(
                   top: 50.0, left: 20.0,),
                 child: Text(business_header, style: TextStyle(
                     color: text_color,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold),)
-            ),
+                    fontSize: TOOL_BAR_TITLE_SIZE,
+                    fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),)
+            ),*/
           ),
           Align(
               alignment: Alignment.bottomLeft,
@@ -78,7 +103,7 @@ class BusinessPageState extends State<BusinessPage> {
         if (!snapshot.hasData) {
           return Center(
               child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+                  valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
         } else {
           listMessage = snapshot.data.documents;
           return ListView.builder(
@@ -180,7 +205,7 @@ class BusinessPageState extends State<BusinessPage> {
                 ? Container(
                 margin: EdgeInsets.only(left: 10.0, bottom: 5.0),
                 child : Text(capitalize(document['businessName']),
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),)
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18.0,fontFamily: 'GoogleSansFamily'),)
             )
                 : Text('')
           ],

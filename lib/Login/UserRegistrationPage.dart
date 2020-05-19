@@ -14,6 +14,7 @@ import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 
 class UserRegistrationPage extends StatelessWidget {
 
@@ -102,7 +103,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
       final text = userNameController.text.toLowerCase();
       userNameController.value = userNameController.value.copyWith(
         text: text,
-        selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+        selection: TextSelection(
+            baseOffset: text.length, extentOffset: text.length),
         composing: TextRange.empty,
       );
     });
@@ -112,7 +114,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
       final text = userNockNameController.text.toLowerCase();
       userNockNameController.value = userNockNameController.value.copyWith(
         text: text,
-        selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+        selection: TextSelection(
+            baseOffset: text.length, extentOffset: text.length),
         composing: TextRange.empty,
       );
     });
@@ -121,11 +124,11 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
       final text = userEmailController.text.toLowerCase();
       userEmailController.value = userEmailController.value.copyWith(
         text: text,
-        selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+        selection: TextSelection(
+            baseOffset: text.length, extentOffset: text.length),
         composing: TextRange.empty,
       );
     });
-
   }
 
   void isSignIn() async {
@@ -143,7 +146,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
             Column(
                 children: <Widget>[
                   Container(
-                    color: facebook_color,
+                    color: button_fill_color,
                     width: MediaQuery
                         .of(context)
                         .size
@@ -169,7 +172,9 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                             child: Text(user_registration, style: TextStyle(
                                 color: text_color,
                                 fontSize: 20.0,
-                                fontWeight: FontWeight.bold),)
+                                fontWeight: FontWeight.w700,
+                                fontFamily: 'GoogleSansFamily'
+                            ),)
                         ),
                       ],
                     ),
@@ -203,34 +208,42 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                             child: Stack(
                               children: <Widget>[
                                 (avatarImageFile == null)
-                                    ? (photoUrl != ''
-                                    ? Material(
-                                  child: CachedNetworkImage(
-                                    placeholder: (context, url) =>
-                                        Container(
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                            valueColor: AlwaysStoppedAnimation<
-                                                Color>(themeColor),
-                                          ),
-                                          width: 90.0,
-                                          height: 90.0,
-                                          padding: EdgeInsets.all(20.0),
-                                        ),
-                                    imageUrl: photoUrl,
-                                    width: 90.0,
-                                    height: 90.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(45.0)),
-                                  clipBehavior: Clip.hardEdge,
+                                    ? (photoUrl != null &&
+                                    photoUrl != ''
+                                    ? GestureDetector(
+                                    onTap: getImage,
+                                    child: Material(
+                                      child: CachedNetworkImage(
+                                        placeholder: (context, url) =>
+                                            Container(
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2.0,
+                                                valueColor: AlwaysStoppedAnimation<
+                                                    Color>(themeColor),
+                                              ),
+                                              width: 90.0,
+                                              height: 90.0,
+                                              padding: EdgeInsets.all(20.0),
+                                            ),
+                                        imageUrl: photoUrl,
+                                        width: 90.0,
+                                        height: 90.0,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(45.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                    )
                                 )
-                                    : Icon(
-                                  Icons.account_circle,
-                                  size: 90.0,
-                                  color: greyColor,
-                                ))
+                                    : IconButton(
+                                  icon: Icon(
+                                    Icons.account_circle,
+                                    size: 70.0,
+                                    color: greyColor,
+                                  ),
+                                  onPressed: () {
+                                    getImage();
+                                  },))
                                     : Material(
                                   child: Image.file(
                                     avatarImageFile,
@@ -270,7 +283,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                               child: TextField(
                                 obscureText: false,
                                 controller: userNameController,
-                               /* onChanged: (userPhoneNumber) {
+                                /* onChanged: (userPhoneNumber) {
                                   _mUserName = userPhoneNumber;
                                 },*/
                                 decoration: new InputDecoration(
@@ -285,6 +298,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                         width: 0.5),
                                   ),
                                   hintText: 'Name',
+                                  hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,
+                                      fontFamily: 'GoogleSansFamily'),
                                 ),
                               ),
                             ),
@@ -295,7 +310,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                               child: TextField(
                                 obscureText: false,
                                 controller: userNockNameController,
-                               /* onChanged: (userPhoneNumber) {
+                                /* onChanged: (userPhoneNumber) {
                                   _mUserNickName = userPhoneNumber;
                                 },*/
                                 decoration: new InputDecoration(
@@ -310,6 +325,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                         width: 0.5),
                                   ),
                                   hintText: 'Last name',
+                                  hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,
+                                      fontFamily: 'GoogleSansFamily'),
                                 ),
                               ),
                             ),
@@ -319,7 +336,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                               child: TextField(
                                 obscureText: false,
                                 controller: userEmailController,
-                             /*   onChanged: (userPhoneNumber) {
+                                /*   onChanged: (userPhoneNumber) {
                                   _mUserEmail = userPhoneNumber;
                                 },*/
                                 decoration: new InputDecoration(
@@ -334,6 +351,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                         width: 0.5),
                                   ),
                                   hintText: 'Email',
+                                  hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,
+                                      fontFamily: 'GoogleSansFamily'),
                                 ),
                                 keyboardType: TextInputType.emailAddress,
                               ),
@@ -350,22 +369,25 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                             width: double.infinity,
                             child: SizedBox(
                               height: 45, // specific value
-                              child: RaisedButton(onPressed: () {
-                                if (userNameController.text != '' && userEmailController.text != '' &&
-                                    photoUrl != '') {
-                                  _AddNewUser(firebaseUser);
-                                } else {
-                                  print('NAN registrationValidation');
-                                  registrationValidation();
-                                }
-                              },
-                                color: facebook_color,
+                              child: RaisedButton(
+                                onPressed: () {
+                                  if (userNameController.text != '' &&
+                                      userEmailController.text != '' &&
+                                      photoUrl != '') {
+                                    _AddNewUser(firebaseUser);
+                                  } else {
+                                    print('NAN registrationValidation');
+                                    registrationValidation();
+                                  }
+                                },
+                                color: button_fill_color,
                                 textColor: text_color,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: new BorderRadius.circular(30.0),
                                 ),
                                 child: Text(btn_register,
-                                  style: TextStyle(fontSize: 17),),
+                                  style: TextStyle(fontSize: BUTTON_TEXT_SIZE,
+                                      fontFamily: 'GoogleSansFamily'),),
                               ),
                             ),
                           ),
@@ -384,7 +406,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
               ? Container(
             child: Center(
               child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+                  valueColor: AlwaysStoppedAnimation<Color>(progress_color)),
             ),
             color: Colors.white.withOpacity(0.8),
           )
@@ -395,7 +417,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   }
 
   Future getImage() async {
-    File image = await ImagePicker.pickImage(source: ImageSource.gallery,imageQuality: 20);
+    File image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 20);
     if (image != null) {
       setState(() {
         avatarImageFile = image;
@@ -460,9 +483,9 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
             'id': firebaseUser.uid,
             '$loginType': firebaseUser.uid,
             'user_token': userToken,
-            'businessId' : '',
-            'businessType' : '',
-            'businessName' : '',
+            'businessId': '',
+            'businessType': '',
+            'businessName': '',
             'createdAt':
             ((new DateTime.now()
                 .toUtc()
@@ -519,10 +542,12 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     if (photoUrl == '' || photoUrl == null) {
       Fluttertoast.showToast(
           msg: upload_profile);
-    } else if (userNameController.text == '' || userNameController.text == null) {
+    } else
+    if (userNameController.text == '' || userNameController.text == null) {
       Fluttertoast.showToast(
           msg: enter_name);
-    } else if (userEmailController.text == '' || userEmailController.text == null) {
+    } else
+    if (userEmailController.text == '' || userEmailController.text == null) {
       Fluttertoast.showToast(
           msg: enter_email);
     } else {

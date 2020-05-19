@@ -14,7 +14,7 @@ import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/splash/WalkThroughOne.dart';
 import 'package:virus_chat_app/splash/WalkThroughThree.dart';
 import 'package:virus_chat_app/splash/WalkThroughTwo.dart';
-import 'package:virus_chat_app/utils/const.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 
 class SplashScreenPage extends StatefulWidget {
   @override
@@ -254,7 +254,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
 */
     print('SPLASHHHHHHHHHHHHHHHHHH _____$user _____$userUrl');
 //    UserLocation currentLocation = await LocationService(user,).getLocation();
-//    LocationService(user).locationStream;
+    LocationService(user);
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(

@@ -18,7 +18,7 @@ class LocationService {
 
   Future<UserLocation> getLocation() async {
     print('LocationService  ___ getLocation');
-
+    location.changeSettings(interval: 30000);
     try {
       var userLocation = await location.getLocation();
       _currentLocation = UserLocation(
@@ -44,48 +44,50 @@ class LocationService {
     preferences = await SharedPreferences.getInstance();
   }
 
-
-
-
   LocationService(String currentUser) {
+
+
+    location.changeSettings(interval: 30000);
+
+    print(
+        'LocationService NANDHUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu ___ $currentUser');
     if (preferences == null) {
       initialise();
     }
     if (currentUser != '') {
       currentUserId = currentUser;
-//    print(
-//        'LocationService NANDHUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu ___ $currentUserId');
+
       if (currentUserId != '') {} else {
 //      location = null;
         locationController.close();
         if (locationSubcription != null)
           locationSubcription.cancel();
       }
+
       // Request permission to use location
       location.requestPermission().then((granted) {
         if (granted != null) {
-//        print('LocationService  ___granted__ $currentUser');
+        print('LocationService  ___granted__ $currentUser');
           // If granted listen to the onLocationChanged stream and emit over our controller
           if (location != null) {
-            locationSubcription =
-                location.onLocationChanged.listen((locationData) {
+                locationSubcription = location.onLocationChanged().listen((locationData) async {
 //                print(
-//                    'LocationService  isClosed currentUser $currentUserId ____________NANDHU ${locationController
+//                    'LocationService  isClosed NOWWWWWWWW ${new DateTime.now()} ____________NANDHU ${locationController
 //                        .isClosed}');
-                  if (locationController.isClosed) {
-                    mUserCancelListen = locationController.isClosed;
+//                  if (locationController.isClosed) {
+//                    mUserCancelListen = locationController.isClosed;
 //                  print('mUserCancelListen_____condition $mUserCancelListen');
-                  }
-                  if (mUserCancelListen) {
+//                  }
+                 /* if (mUserCancelListen) {
 //                  print(
 //                      'LocationService  locationSubcription $locationData');
                     locationSubcription.cancel();
                     locationController.close();
                     currentUserId = '';
-                  }
+                  }*/
 //                print('mUserCancelListen_____ $mUserCancelListen');
                   if (locationData != null && !mUserCancelListen) {
-//              print('LocationService  locationData ______ $currentUser');
+              print('LocationService  locationData ______ $currentUser');
                     locationController.add(UserLocation(
                       latitude: locationData.latitude,
                       longitude: locationData.longitude,
@@ -95,13 +97,18 @@ class LocationService {
               longitude: locationData.longitude,
             );*/
 //                  print('_currentLocation $_currentLocation');
+//                    Timer timer = Timer.periodic(Duration(minutes: 1), (Timer _) {
+//                      print('NANDHU Location service Update ____Now ____${new DateTime.now()}');
+//                });
+
                     _mCurrentLocation = locationData;
+                    await Future.delayed(Duration(milliseconds: 30000));
                     if (_currentLocation == null) {
 //              _addGeoPoint(locationData);
-                      updateLocation(locationData);
+                        updateLocation(locationData);
                     } else {
                       if (currentUser != '') {
-                        updateLocation(locationData);
+                            updateLocation(locationData);
                       }
                     }
                   } else {
@@ -153,7 +160,8 @@ class LocationService {
     });*/
   }
 
-  void updateLocation(LocationData locationData)  {
+  Future<void> updateLocation(LocationData locationData)  async {
+    print('______________________________________updateLocation ${new DateTime.now()}');
 //    GeoFirePoint point = geo.point(
 //        latitude: locationData.latitude, longitude: locationData.longitude);
     /* databaseReference.collection('users').document(currentUserId).updateData({
@@ -161,16 +169,19 @@ class LocationService {
           new GeoPoint(locationData.latitude, locationData.longitude)
     });*/
 
+
+    await Future.delayed(Duration(milliseconds: 30000));
+//    await Future.delayed(Duration(seconds: 30));
+    print('______________________________________Delay ${new DateTime.now()}');
 //    Timer(Duration(seconds: 10),(){
-      print("_________$currentUserId");
-     /* databaseReference.collection('users').document(currentUserId).collection(
+      databaseReference.collection('users').document(currentUserId).collection(
           'userLocation').document(currentUserId).updateData({
         'userLocation':
         new GeoPoint(locationData.latitude, locationData.longitude),
         'UpdateTime': ((new DateTime.now()
             .toUtc()
             .microsecondsSinceEpoch) / 1000).toInt(),
-      });*/
+      });
 //    });
 
 //    Timer(Duration(seconds: 5), () {
@@ -184,8 +195,22 @@ class LocationService {
             .microsecondsSinceEpoch) / 1000).toInt(),
       });*/
 //    });
-//    Timer(Duration(minutes: 5), () {
-//    });
+
+   /*Timer.periodic(Duration(milliseconds: 60000), (Timer _) {
+//      print("MY Timer_________$currentUserId _____Now __${new DateTime.now()}");
+      databaseReference.collection('users').document(currentUserId).collection(
+          'userLocation').document(currentUserId).updateData({
+        'userLocation':
+        new GeoPoint(locationData.latitude, locationData.longitude),
+        'UpdateTime': ((new DateTime.now()
+            .toUtc()
+            .microsecondsSinceEpoch) / 1000).toInt(),
+      });
+    });*/
+
+   /* Timer(Duration(seconds: 60), () {
+      print("Timer_________$currentUserId _____Now __${new DateTime.now()}");
+    });*/
   }
 
 

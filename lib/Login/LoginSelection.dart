@@ -18,7 +18,7 @@ import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
-import 'package:virus_chat_app/utils/const.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 import '../profile/ProfilePage.dart';
@@ -30,7 +30,7 @@ class LoginSelectionPage extends StatelessWidget {
       onWillPop: () async => Future.value(false),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: app_name,
         theme: ThemeData(
           // This is the theme of your application.
           //
@@ -42,7 +42,7 @@ class LoginSelectionPage extends StatelessWidget {
           // Notice that the counter didn't reset back to zero; the application
           // is not restarted.
             primarySwatch: Colors.blue,
-            fontFamily: 'GoogleSansRegular'
+            fontFamily: 'GoogleSansFamily'
         ),
         home: LoginSelection(),
       ),
@@ -235,11 +235,16 @@ class LoginSelectionOption extends State<LoginSelection> {
     await prefs.setString('BUSINESS_ID', documents[0]['businessId']);
     await prefs.setString('BUSINESS_TYPE', documents[0]['businessType']);
     await prefs.setString('signInType', signInType);
+    await Firestore.instance
+        .collection('users')
+        .document(documents[0]['id'])
+        .updateData({'status': 'ACTIVE'});
     print(
         'updateLocalListData___________ ${documents[0]['name']} _________ ${documents[0]['businessId']} ______${documents[0]['id']}');
 //    setState(() {
     isLoading = false;
 //    });
+    LocationService(documents[0]['id']);
     if (signInType == 'facebook') {
       Navigator.push(
           _mContext,
@@ -364,15 +369,18 @@ class LoginSelectionOption extends State<LoginSelection> {
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(left: 40.0, right: 40.0),
-                          child: new SvgPicture.asset(
-                            'images/Logo_inner.svg',
+                        Center(
+                          child: Container(
+                            padding: EdgeInsets.all(60.0),
+                            height: 300,
                             width: MediaQuery
                                 .of(context)
                                 .size
                                 .width,
-                            height: 300,
+                            child: new SvgPicture.asset(
+                              'images/Logo_inner.svg',
+                              height: 150,
+                            ),
                           ),
                         ),
                         Align(
@@ -396,7 +404,41 @@ class LoginSelectionOption extends State<LoginSelection> {
                                     margin: EdgeInsets.only(
                                         left: 20.0, right: 20.0),
                                     height: 45.0,
-                                    child: RaisedButton.icon(
+                                    child:RaisedButton(
+                                    color: white_color,
+    shape: RoundedRectangleBorder(
+    borderRadius: new BorderRadius.circular(
+    30.0),
+    ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                                  return PhoneNumberSelectionPage();
+                                                }
+                                            ));
+                                      },
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment
+                                            .center,
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .spaceAround,
+                                        children: <Widget>[
+                                          new SvgPicture.asset(
+                                            'images/phone.svg',
+                                            width: 20.0,
+                                            height: 20.0,
+                                            color: icon_color,
+                                          ),
+                                          Text('Continue with phone number',
+                                            style: TextStyle(
+                                                fontFamily: 'GoogleSansFamily',
+                                                fontWeight: FontWeight.w400),),
+                                        ],
+                                      ),
+                                    )
+                                   /* RaisedButton.icon(
                                       icon: new SvgPicture.asset(
                                         'images/phone.svg',
                                         width: 20.0,
@@ -414,14 +456,14 @@ class LoginSelectionOption extends State<LoginSelection> {
                                       },
                                       label: Text('Continue with phone number',
                                         style: TextStyle(
-                                            fontFamily: 'GoogleSansRegular',
+                                            fontFamily: 'GoogleSansFamily',
                                             fontWeight: FontWeight.w400),),
                                       color: white_color,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: new BorderRadius.circular(
                                             30.0),
                                       ),
-                                    ),
+                                    ),*/
                                   ),
                                   Container(
                                     width: MediaQuery
@@ -435,7 +477,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                                     child: Text(
                                       'Or connect using social account',
                                       style: TextStyle(
-                                          fontFamily: 'GoogleSansRegular',
+                                          fontFamily: 'GoogleSansFamily',
                                           fontWeight: FontWeight.w400),),
                                   ),
                                   Container(
@@ -458,21 +500,28 @@ class LoginSelectionOption extends State<LoginSelection> {
                                               .size
                                               .width) / 2) - 30,
                                           height: 45.0,
-                                          child: RaisedButton.icon(
-                                            icon: new SvgPicture.asset(
-                                              'images/gmail.svg',
-                                              width: 20.0,
-                                              height: 20.0,
-                                            ),
-                                            onPressed: () {
+                                          child: RaisedButton(
+                                            onPressed: (){
                                               HandleGoogleSignIn();
-//                  _settingModalBottomSheet(context);
                                             },
-                                            label: Text('Google',
-                                              style: TextStyle(
-                                                  fontFamily: 'GoogleSansRegular',
-                                                  fontWeight: FontWeight
-                                                      .w400),),
+                                            child : Row(
+                                              crossAxisAlignment: CrossAxisAlignment
+                                                  .center,
+                                              mainAxisAlignment: MainAxisAlignment
+                                                  .spaceAround,
+                                            children: <Widget>[
+                                              new SvgPicture.asset(
+                                                'images/gmail.svg',
+                                                width: 20.0,
+                                                height: 20.0,
+                                              ),
+                                              Text('Google',
+                                                style: TextStyle(
+                                                    fontFamily: 'GoogleSansFamily',
+                                                    fontWeight: FontWeight
+                                                        .w400),),
+                                            ],
+                                            ),
                                             color: white_color,
                                             shape: RoundedRectangleBorder(
                                               borderRadius: new BorderRadius
@@ -487,12 +536,26 @@ class LoginSelectionOption extends State<LoginSelection> {
                                                 .of(context)
                                                 .size
                                                 .width) / 2) - 30,
-                                            child: RaisedButton.icon(
-                                              icon: new SvgPicture.asset(
-                                                'images/fb.svg',
-                                                width: 20.0,
-                                                height: 20.0,
-                                              ),
+                                            child: RaisedButton(
+                                              child : Row(
+                                                crossAxisAlignment: CrossAxisAlignment
+                                                    .center,
+                                                mainAxisAlignment: MainAxisAlignment
+                                                    .spaceAround,
+    children: <Widget>[
+      new SvgPicture.asset(
+        'images/fb.svg',
+        width: 20.0,
+        height: 20.0,
+      ),
+      Text('Facebook',
+        style: TextStyle(
+            fontFamily: 'GoogleSansFamily',
+            fontWeight: FontWeight
+                .w400),),
+    ],
+    ),
+
                                               onPressed: () {
                                                 this.setState(() {
                                                   isLoading = true;
@@ -501,11 +564,6 @@ class LoginSelectionOption extends State<LoginSelection> {
                                                     .initiateFacebookLogin(
                                                     context, prefs);
                                               },
-                                              label: Text('Facebook',
-                                                style: TextStyle(
-                                                    fontFamily: 'GoogleSansRegular',
-                                                    fontWeight: FontWeight
-                                                        .w400),),
                                               color: white_color,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: new BorderRadius
@@ -699,7 +757,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                         ? Container(
                       child: Center(
                         child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+                            valueColor: AlwaysStoppedAnimation<Color>(progress_color)),
                       ),
                       color: Colors.white.withOpacity(0.8),
                     )
@@ -747,7 +805,7 @@ class LoginSelectionOption extends State<LoginSelection> {
   }
 
   Future _updatestatus() async {
-    LocationService('');
+//    LocationService('');
     /*if(prefs.getString('userId') != '') {
       Firestore.instance
           .collection('users')

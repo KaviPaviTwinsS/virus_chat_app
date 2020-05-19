@@ -9,6 +9,7 @@ import 'package:virus_chat_app/Login/OtpScreenPage.dart';
 import 'package:virus_chat_app/Login/otpPage.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 
 class PhoneNumberSelectionPage extends StatelessWidget {
   @override
@@ -107,7 +108,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                             left: 20.0, top: 20.0, right: 20.0),
                         child: Text(phone_no,
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 19,fontFamily: 'GoogleSansBold'),
+                              fontSize: 19,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w700),
                         ),
                       ),
                     ),
@@ -117,7 +118,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                         margin: const EdgeInsets.only(
                             left: 20.0, top: 10.0, right: 20.0),
                         child: Text(phone_no_sub,
-                          style: TextStyle(fontSize: 15,fontFamily: 'GoogleSansRegular',fontWeight: FontWeight.w400),
+                          style: TextStyle(fontSize: 15,fontFamily: 'GoogleSansFamily'),
                         ),
                       ),
                     ),
@@ -126,24 +127,37 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                 Row(
                   children: <Widget>[
                     Container(
-
                       decoration: new BoxDecoration(
-                        color: greyColor2,
+                          border: Border.all(color: focused_border_color,width: 0.5),
                       ),
+                     /* decoration: new BoxDecoration(
+                        color: greyColor2,
+                      ),*/
                       padding: EdgeInsets.all(5.0),
                       margin: const EdgeInsets.only(
                           left: 20.0, top: 20.0, right: 5.0),
-                      child: new CountryCodePicker(
-                        onChanged: (prints) {
-                          print('COUNTRY CODE ${prints.dialCode}');
-                          _userCountryCode = prints.dialCode;
-                        },
-                        // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-                        initialSelection: 'IN',
-                        favorite: ['+91', 'IN'],
-                        // optional. Shows only country name and flag
-                        showCountryOnly: true,
-                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment
+                            .spaceBetween,
+                        children: <Widget>[
+                          new CountryCodePicker(
+                            onChanged: (prints) {
+                              print('COUNTRY CODE ${prints.dialCode}');
+                              _userCountryCode = prints.dialCode;
+                            },
+                            // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
+                            initialSelection: 'IN',
+                            favorite: ['+91', 'IN'],
+                            // optional. Shows only country name and flag
+                            showCountryOnly: true,
+                            showFlagDialog: true,
+//                            showFlag: false,
+                          ),
+                          new Icon(
+                              Icons.keyboard_arrow_down, color: Colors.black),
+                        ],
+                      )
                     ),
 
                     Expanded(child: Container(
@@ -165,8 +179,9 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                             borderSide: BorderSide(
                                 color: greyColor2, width:0.5),
                           ),
-                          hintText: 'Phone number',
-                        ),
+                          hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
+                          hintText:'Phone number',
+                          ),
                         keyboardType: TextInputType.phone,
                       ),
                     ),
@@ -184,23 +199,25 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                       height: 45, // specific value
                       child: RaisedButton(
                         onPressed: () {
-                          if (_userPhoneNumber != '') {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) =>
-                                new OTPScreen(
-                                    mobileNumber: _userCountryCode + _userPhoneNumber,
-                                    mobileNumWithoutCountryCode: _userPhoneNumber,)));
-                          } else {
+                         if(_userPhoneNumber == ''){
                             Fluttertoast.showToast(msg: enter_phone_number);
-                          }
+                          }else if(_userPhoneNumber.length != MOBILE_NUMBER_LENGTH) {
+                            Fluttertoast.showToast(msg: enter_valid_phone_number);
+                          }else{
+                             Navigator.push(context,
+                                 MaterialPageRoute(builder: (context) =>
+                                 new OTPScreen(
+                                   mobileNumber: _userCountryCode + _userPhoneNumber,
+                                   mobileNumWithoutCountryCode: _userPhoneNumber,)));
+                         }
                         },
-                        color: facebook_color,
+                        color: button_fill_color,
                         textColor: text_color,
                         shape: RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(30.0),
                         ),
                         child: Text(continue_txt,
-                          style: TextStyle(fontSize: 17),),
+                          style: TextStyle(fontSize: BUTTON_TEXT_SIZE,fontFamily: 'GoogleSansFamily')),
                       ),
                     ),
                   ),

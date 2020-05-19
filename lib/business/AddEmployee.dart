@@ -20,7 +20,7 @@ import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/business/flutter_sms.dart';
 import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/utils/colors.dart';
-import 'package:virus_chat_app/utils/const.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 class AddEmployee extends StatefulWidget {
@@ -624,7 +624,7 @@ class AddEmployeeState extends State<AddEmployee> {
       alreadyUserInBusiness = 'SAME';
       try {
 
-        Firestore.instance.runTransaction((
+        /*Firestore.instance.runTransaction((
             transaction) async {
           await transaction.set(
             reference,
@@ -649,8 +649,8 @@ class AddEmployeeState extends State<AddEmployee> {
                   .microsecondsSinceEpoch) / 1000).toInt()
             },
           );
-        })
-        /*reference.setData({
+        })*/
+        reference.setData({
           'name': contacts.displayName,
 //      'photoUrl': _mUserPhotoUrl,
           'email': _mContactEmail,
@@ -663,12 +663,13 @@ class AddEmployeeState extends State<AddEmployee> {
           'businessId': _mBusinessId,
           'businessType' : BUSINESS_TYPE_EMPLOYEE,
           'businessName' : _mBusinessName,
+          'businessChatPeriority' : 0,
           'photoUrl' : '',
           'createdAt':
           ((new DateTime.now()
               .toUtc()
               .microsecondsSinceEpoch) / 1000).toInt()
-        })*/.whenComplete(() async {
+        }).whenComplete(() async {
           UserLocation currentLocation = await LocationService('').getLocation();
           print('NANDHU AddEmployeeState AddNewEmployee Reference LOCATIon UPDATE${currentLocation}');
           Firestore.instance.collection('users').document(reference.documentID).collection(
@@ -795,8 +796,6 @@ class AddEmployeeState extends State<AddEmployee> {
         Navigator.pop(context);
         _sendSMS(message, recipents);
       });
-
-
     }
   }
 

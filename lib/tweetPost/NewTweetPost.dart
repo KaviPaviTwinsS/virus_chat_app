@@ -12,18 +12,16 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
 import 'package:virus_chat_app/tweetPost/CategorySelection.dart';
-import 'package:virus_chat_app/userListCopy.dart';
-import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
-import 'package:intl/intl.dart';
-import 'package:virus_chat_app/utils/const.dart';
+import 'package:virus_chat_app/utils/colors.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
-import 'package:http/http.dart' as http;
 
 
 class NewTweetPost extends StatefulWidget {
@@ -80,7 +78,6 @@ class NewTweetPostState extends State<NewTweetPost> {
     focusNode.addListener(onFocusChange);
     initialise();
     setState(() {
-
     });
 
     _controller.addListener(() {
@@ -91,6 +88,7 @@ class NewTweetPostState extends State<NewTweetPost> {
         composing: TextRange.empty,
       );
     });
+
     super.initState();
   }
 
@@ -132,7 +130,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                 Column(
                     children: <Widget>[
                       Container(
-                        color: facebook_color,
+                        color: button_fill_color,
                         width: MediaQuery
                             .of(context)
                             .size
@@ -157,8 +155,8 @@ class NewTweetPostState extends State<NewTweetPost> {
                                     top: 20.0, right: 10.0, bottom: 40.0),
                                 child: Text('Post Message', style: TextStyle(
                                     color: text_color,
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold),)
+                                    fontSize: TOOL_BAR_TITLE_SIZE,
+                                    fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),)
                             ),
                           ],
                         ),
@@ -204,7 +202,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                   ? Container(
                 child: Center(
                   child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+                      valueColor: AlwaysStoppedAnimation<Color>(progress_color)),
                 ),
                 color: Colors.white.withOpacity(0.8),
               )
@@ -226,7 +224,7 @@ class NewTweetPostState extends State<NewTweetPost> {
           if (!snapshot.hasData) {
             return Center(
                 child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+                    valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
           } else {
             listMessage = snapshot.data.documents;
 
@@ -319,8 +317,8 @@ class NewTweetPostState extends State<NewTweetPost> {
                 margin: EdgeInsets.only(top: 5.0),
                 child: Text(document['categoryName'], style: TextStyle(
                     color: mCategorySelect[index].isCategorySelected
-                        ? facebook_color
-                        : greyColor2),),
+                        ? button_fill_color
+                        : greyColor,fontSize: TWEET_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),),
               ),
             )
           ],
@@ -391,7 +389,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                         },*/
                         decoration: InputDecoration.collapsed(
                           hintText: 'What\'s happening?',
-                          hintStyle: TextStyle(color: greyColor),
+                          hintStyle: TextStyle(color: greyColor,fontSize: TWEET_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
                         ),
                         focusNode: focusNode,
                         autofocus: true,
@@ -427,10 +425,15 @@ class NewTweetPostState extends State<NewTweetPost> {
                           ),
                       errorWidget: (context, url, error) =>
                           Material(
-                            child: Image.asset(
+                            child:/* Image.asset(
                               'images/img_not_available.jpeg',
                               width: 250.0,
                               height: 250.0,
+                              fit: BoxFit.cover,
+                            ),*/
+                            new SvgPicture.asset(
+                              'images/user_unavailable.svg', height: 250.0,
+                              width: 250.0,
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.all(
@@ -510,8 +513,8 @@ class NewTweetPostState extends State<NewTweetPost> {
               child: new Container(
                 child: new IconButton(
                   icon: new SvgPicture.asset(
-                    'images/camera.svg', height: 30.0,
-                    width: 30.0,
+                    'images/camera.svg', height: 20.0,
+                    width: 20.0,
                   ),
                   onPressed: getCamera,
                   color: primaryColor,
@@ -525,8 +528,8 @@ class NewTweetPostState extends State<NewTweetPost> {
               child: new Container(
                 child: new IconButton(
                   icon: new SvgPicture.asset(
-                    'images/pic.svg', height: 30.0,
-                    width: 30.0,
+                    'images/pic.svg', height: 20.0,
+                    width: 20.0,
                   ),
                   onPressed: getImage,
                   color: primaryColor,
@@ -645,7 +648,7 @@ class NewTweetPostState extends State<NewTweetPost> {
           .collection('messages')
           .document(groupChatId);
 */
-        Firestore.instance.runTransaction((transaction) async {
+      /*  Firestore.instance.runTransaction((transaction) async {
           await transaction.set(
             documentReference,
             {
@@ -663,6 +666,21 @@ class NewTweetPostState extends State<NewTweetPost> {
               'createdAt': DateFormat.yMd().add_jms().format(DateTime.now())
             },
           );
+        });*/
+
+        documentReference.setData({
+          'idFrom': currentUserId,
+          'timestamp': DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString(),
+          'content': content,
+          'tweetPostImage': tweetPostUrl,
+          'userPhoto': mCurrentPhotoUrl,
+          'userName': currentUserName,
+          'categoryName': tappedCategoryName,
+          'categoryImage': tappedCategoryImage,
+          'createdAt': DateFormat.yMd().add_jms().format(DateTime.now())
         });
 //      listScrollController.animateTo(
 //          0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);

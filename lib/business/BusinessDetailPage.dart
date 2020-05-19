@@ -87,7 +87,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
           body: Stack(
             children: <Widget>[
               Container(
-                  color: facebook_color,
+                  color: button_fill_color,
                   width: MediaQuery
                       .of(context)
                       .size
@@ -179,7 +179,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                             errorWidget: (context, url,
                                                 error) =>
                                                 Material(
-                                                  child: Image.asset(
+                                                  child:/* Image.asset(
                                                     'images/img_not_available.jpeg',
                                                     width: MediaQuery
                                                         .of(context)
@@ -187,7 +187,15 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                                         .width - 30,
                                                     height: 200.0,
                                                     fit: BoxFit.cover,
-                                                  ),
+                                                  ),*/
+    new SvgPicture.asset(
+    'images/user_unavailable.svg', height: 200.0,
+    width: MediaQuery
+        .of(context)
+        .size
+        .width - 30,
+    fit: BoxFit.cover,
+    ),
                                                   borderRadius: BorderRadius
                                                       .all(
                                                     Radius.circular(5.0),

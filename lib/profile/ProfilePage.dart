@@ -24,7 +24,7 @@ import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
 import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
-import '../utils/const.dart';
+import '../utils/constants.dart';
 
 class ProfilePageSetup extends StatelessWidget {
   final String currentUserId;
@@ -99,13 +99,14 @@ class ProfilePageState extends State<ProfilePage> {
   String _mBusinessType = '';
   String businessCreatedTime = '';
   int _noOfEmployees = 0;
-  TextEditingController controllerName;
-  TextEditingController controllerNickName;
-  TextEditingController controllerEmail;
-  TextEditingController controllerNewPassword;
-  TextEditingController controllerConfirmPassword;
-  TextEditingController controllerMobileNumber;
+  TextEditingController controllerName = new TextEditingController();
+  TextEditingController controllerNickName = new TextEditingController();
+  TextEditingController controllerEmail = new TextEditingController();
+  TextEditingController controllerNewPassword = new TextEditingController();
+  TextEditingController controllerConfirmPassword = new TextEditingController();
+  TextEditingController controllerMobileNumber = new TextEditingController();
 
+  FocusNode myFocusNode;
 
   LoginSelectionOption loginSelectionOption;
   var facebookSignup;
@@ -120,7 +121,20 @@ class ProfilePageState extends State<ProfilePage> {
     readLocal();
     loginSelectionOption = LoginSelectionOption();
     facebookSignup = new FacebookSignup();
+    myFocusNode = new FocusNode();
+    myFocusNode.addListener(onFocusChange);
+
     super.initState();
+  }
+
+
+  void onFocusChange() {
+    if (myFocusNode.hasFocus) {
+      // Hide sticker when keyboard appear
+      setState(() {
+//        isShowSticker = false;
+      });
+    }
   }
 
   void readLocal() async {
@@ -134,7 +148,7 @@ class ProfilePageState extends State<ProfilePage> {
     mobileNumber = prefs.getString('phoneNo');
 //    name = prefs.getString('name');
 //    print('profile name $name');
-    controllerName = new TextEditingController(text: name);
+//    controllerName = new TextEditingController(text: name);
     controllerNickName = new TextEditingController(text: nickName);
     controllerEmail = new TextEditingController(text: userEmail);
     controllerMobileNumber = new TextEditingController(text: mobileNumber);
@@ -219,7 +233,7 @@ class ProfilePageState extends State<ProfilePage> {
                 Column(
                     children: <Widget>[
                       Container(
-                        color: facebook_color,
+                        color: button_fill_color,
                         width: MediaQuery
                             .of(context)
                             .size
@@ -245,8 +259,8 @@ class ProfilePageState extends State<ProfilePage> {
                                     top: 20.0, right: 10.0, bottom: 40.0),
                                 child: Text(profile_header, style: TextStyle(
                                     color: text_color,
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold),)
+                                    fontSize: TOOL_BAR_TITLE_SIZE,
+                                    fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),)
                             ),
                             Spacer(),
                             Align(
@@ -377,7 +391,7 @@ class ProfilePageState extends State<ProfilePage> {
                                           top: signinType != 'MobileNumber'
                                               ? 20.0
                                               : 0.0),
-                                      child: Text('First name'.toUpperCase()),
+                                      child: Text('First name'.toUpperCase(),style: TextStyle(fontFamily: 'GoogleSansFamily'),),
                                     ),
                                     Container(
                                       child: TextField(
@@ -394,11 +408,14 @@ class ProfilePageState extends State<ProfilePage> {
                                                 color: greyColor, width: 0.5),
                                           ),
                                           hintText: 'Enter your name',
+                                          hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
                                         ),
                                         controller: controllerName,
-                                        onChanged: (value) {
+                                        textInputAction: TextInputAction.next,
+                                        focusNode: myFocusNode,
+                                       /* onChanged: (value) {
                                           name = value;
-                                        },
+                                        },*/
                                       ),
                                       margin: EdgeInsets.only(
                                           left: 10.0, right: 10.0, top: 5.0),
@@ -412,7 +429,7 @@ class ProfilePageState extends State<ProfilePage> {
                                       Container(
                                         margin: EdgeInsets.only(
                                             left: 10.0, right: 10.0, top: 20.0),
-                                        child: Text('Last name'.toUpperCase()),
+                                        child: Text('Last name'.toUpperCase(),style: TextStyle(fontFamily: 'GoogleSansFamily'),),
                                       ),
                                       Container(
                                         child: TextField(
@@ -429,8 +446,10 @@ class ProfilePageState extends State<ProfilePage> {
                                                   color: greyColor, width: 0.5),
                                             ),
                                             hintText: 'Enter your LastName',
+                                            hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
                                           ),
                                           controller: controllerNickName,
+                                          textInputAction: TextInputAction.next,
                                           onChanged: (value) {
                                             nickName = value;
                                           },
@@ -447,7 +466,7 @@ class ProfilePageState extends State<ProfilePage> {
                                       Container(
                                         margin: EdgeInsets.only(
                                             left: 10.0, right: 10.0, top: 20.0),
-                                        child: Text('Email'.toUpperCase()),
+                                        child: Text('Email'.toUpperCase(),style: TextStyle(fontFamily: 'GoogleSansFamily'),),
                                       ),
                                       Container(
                                         decoration: new BoxDecoration(
@@ -477,8 +496,10 @@ class ProfilePageState extends State<ProfilePage> {
                                                   color: greyColor, width: 0.5),
                                             ),
                                             hintText: 'Enter your Email',
+                                            hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
                                           ),
                                           controller: controllerEmail,
+                                          textInputAction: TextInputAction.done,
                                           onChanged: (value) {
                                             userEmail = value;
                                           },
@@ -499,7 +520,7 @@ class ProfilePageState extends State<ProfilePage> {
                                         margin: EdgeInsets.only(
                                             left: 10.0, right: 10.0, top: 20.0),
                                         child: Text(
-                                            'Mobile number'.toUpperCase()),
+                                            'Mobile number'.toUpperCase(),style: TextStyle(fontFamily: 'GoogleSansFamily'),),
                                       ),
                                       Container(
                                         decoration: new BoxDecoration(
@@ -522,6 +543,7 @@ class ProfilePageState extends State<ProfilePage> {
                                                   color: greyColor, width: 0.5),
                                             ),
                                             hintText: 'Enter Mobile number',
+                                            hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
                                           ),
                                         ),
                                         margin: EdgeInsets.only(
@@ -537,8 +559,8 @@ class ProfilePageState extends State<ProfilePage> {
                                     margin: EdgeInsets.only(top: 15.0,),
                                     child: RaisedButton(
                                       color: white_color,
-                                      textColor: facebook_color,
-                                      hoverColor: facebook_color,
+                                      textColor: button_fill_color,
+                                      hoverColor: button_fill_color,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: new BorderRadius.circular(
                                             18.0),
@@ -563,7 +585,7 @@ class ProfilePageState extends State<ProfilePage> {
                                         child: SizedBox(
                                           height: 45, // specific value
                                           child: RaisedButton(
-                                            color: facebook_color,
+                                            color: button_fill_color,
                                             textColor: text_color,
                                             shape: RoundedRectangleBorder(
                                               borderRadius: new BorderRadius
@@ -572,6 +594,7 @@ class ProfilePageState extends State<ProfilePage> {
                                             ),
                                             child: Text('Update Profile'),
                                             onPressed: () {
+                                              name = controllerName.text;
                                               if (name != '' ||
                                                   nickName != '' ||
                                                   photoUrl != '' ||
@@ -653,7 +676,7 @@ class ProfilePageState extends State<ProfilePage> {
                                       margin: EdgeInsets.only(
                                           left: 10.0, top: 10.0, bottom: 15.0),
                                       child: Text(business, style: TextStyle(
-                                          fontWeight: FontWeight.bold),),
+                                          fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),),
                                     ),
                                     businessImage != null && businessImage != ''
                                         ? Center(
@@ -681,13 +704,21 @@ class ProfilePageState extends State<ProfilePage> {
                                               errorWidget: (context, url,
                                                   error) =>
                                                   Material(
-                                                    child: Image.asset(
+                                                    child:/* Image.asset(
                                                       'images/img_not_available.jpeg',
                                                       width: MediaQuery
                                                           .of(context)
                                                           .size
                                                           .width - 30,
                                                       height: 200.0,
+                                                      fit: BoxFit.cover,
+                                                    ),*/
+                                                    new SvgPicture.asset(
+                                                      'images/user_unavailable.svg', height: 200.0,
+                                                      width: MediaQuery
+                                                          .of(context)
+                                                          .size
+                                                          .width - 30,
                                                       fit: BoxFit.cover,
                                                     ),
                                                     borderRadius: BorderRadius
@@ -715,16 +746,16 @@ class ProfilePageState extends State<ProfilePage> {
                                         ? Container(
                                       margin: EdgeInsets.only(
                                           left: 10.0, bottom: 10.0),
-                                      child: Text(businessName,
+                                      child: Text(capitalize(businessName),
                                         style: TextStyle(
-                                            fontWeight: FontWeight.bold),),
+                                            fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),),
                                     )
                                         : Text(''),
                                     businessAddress != null &&
                                         businessAddress != '' ? Container(
                                       margin: EdgeInsets.only(
                                           left: 10.0, bottom: 15.0),
-                                      child: Text(businessAddress,),
+                                      child: Text(businessAddress,style: TextStyle(fontFamily: 'GoogleSansFamily'),),
                                     ) : Text(''),
                                     businessCreatedTime != null &&
                                         businessCreatedTime != '' ? Container(
@@ -735,7 +766,7 @@ class ProfilePageState extends State<ProfilePage> {
                                               .format(
                                             DateTime.fromMillisecondsSinceEpoch(
                                                 int.parse(
-                                                    businessCreatedTime)),)),
+                                                    businessCreatedTime)),),style: TextStyle(fontFamily: 'GoogleSansFamily'),),
                                     ) : Text(''),
                                     Row(
                                       crossAxisAlignment: CrossAxisAlignment
@@ -750,7 +781,7 @@ class ProfilePageState extends State<ProfilePage> {
                                               left: 10.0,),
                                             child: Text(
                                                 _noOfEmployees.toString() +
-                                                    '\t' + employees),
+                                                    '\t' + employees,style: TextStyle(fontFamily: 'GoogleSansFamily'),),
                                           ),
                                         ) : Text(''),
                                         GestureDetector(
@@ -784,8 +815,8 @@ class ProfilePageState extends State<ProfilePage> {
                                                       bottom: 20.0),
                                                   child: Text(add_employee,
                                                     style: TextStyle(
-                                                        color: facebook_color,
-                                                        fontSize: 15.0),),
+                                                        color: button_fill_color,
+                                                        fontSize: 15.0,fontFamily: 'GoogleSansFamily'),),
                                                 )
                                               ],
                                             ),
@@ -842,8 +873,8 @@ class ProfilePageState extends State<ProfilePage> {
                                     : 10.0),
                             child: Text(upgrade_business,
                               style: TextStyle(
-                                  color: facebook_color,
-                                  fontSize: 15.0),),
+                                  color: button_fill_color,
+                                  fontSize: 15.0,fontFamily: 'GoogleSansFamily'),),
                           )
 
                         ],
@@ -895,7 +926,7 @@ class ProfilePageState extends State<ProfilePage> {
             child: SingleChildScrollView(
                 child: Column(
                     children: <Widget>[
-                      Text('Are you sure want to logout?'),
+                      Text('Are you sure want to logout?',style: TextStyle(fontFamily: 'GoogleSansFamily'),),
                       Container(
                         margin: const EdgeInsets.only(
                             top: 20.0),
@@ -905,14 +936,14 @@ class ProfilePageState extends State<ProfilePage> {
 
                             RaisedButton(
                               color: white_color,
-                              child: Text("No"),
+                              child: Text("No",style: TextStyle(fontFamily: 'GoogleSansFamily')),
                               onPressed: () {
                                 Navigator.of(context, rootNavigator: true).pop(
                                     'dialog');
                               },
                             ),
                             RaisedButton(
-                              child: Text("Yes"),
+                              child: Text("Yes",style: TextStyle(fontFamily: 'GoogleSansFamily')),
                               color: white_color,
                               onPressed: () {
                                 if (signinType == 'google') {
@@ -980,7 +1011,7 @@ class ProfilePageState extends State<ProfilePage> {
                           margin: EdgeInsets.only(
                               left: 20.0, right: 30.0, top: 20.0),
                           child: Text('Update Password?', style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20.0),),
+                              fontWeight: FontWeight.w700, fontSize: 20.0,fontFamily: 'GoogleSansFamily'),),
                         ),
                         Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -988,7 +1019,7 @@ class ProfilePageState extends State<ProfilePage> {
                               Container(
                                 margin: EdgeInsets.only(
                                     left: 20.0, right: 30.0, top: 20.0),
-                                child: Text('New password'.toUpperCase()),
+                                child: Text('New password'.toUpperCase(),style: TextStyle(fontFamily: 'GoogleSansFamily')),
                               ),
                               Container(
                                 child: TextField(
@@ -1005,8 +1036,7 @@ class ProfilePageState extends State<ProfilePage> {
                                             color: greyColor2, width: 0.5),
                                       ),
                                       hintText: 'Enter new password',
-                                      hintStyle: TextStyle(
-                                          color: primaryColor, fontSize: 10.0)
+                                      hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
                                   ),
                                   controller: controllerNewPassword,
                                   obscureText: true,
@@ -1025,7 +1055,7 @@ class ProfilePageState extends State<ProfilePage> {
                               Container(
                                 margin: EdgeInsets.only(
                                     left: 20.0, right: 30.0, top: 20.0),
-                                child: Text('Confirm password'.toUpperCase()),
+                                child: Text('Confirm password'.toUpperCase(),style: TextStyle(fontFamily: 'GoogleSansFamily')),
                               ),
                               Container(
                                 child: TextField(
@@ -1042,8 +1072,7 @@ class ProfilePageState extends State<ProfilePage> {
                                             color: greyColor2, width: 0.5),
                                       ),
                                       hintText: 'Enter confirm password',
-                                      hintStyle: TextStyle(
-                                          color: primaryColor, fontSize: 10.0)
+                                    hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
                                   ),
                                   controller: controllerConfirmPassword,
                                   obscureText: true,
@@ -1064,13 +1093,13 @@ class ProfilePageState extends State<ProfilePage> {
                               margin: EdgeInsets.only(top: 15.0,),
                               child: RaisedButton(
                                 color: white_color,
-                                textColor: facebook_color,
-                                hoverColor: facebook_color,
+                                textColor: button_fill_color,
+                                hoverColor: button_fill_color,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: new BorderRadius.circular(
                                       18.0),
                                 ),
-                                child: Text('Cancel'),
+                                child: Text('Cancel',style: TextStyle(fontFamily: 'GoogleSansFamily')),
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
@@ -1079,13 +1108,13 @@ class ProfilePageState extends State<ProfilePage> {
                             Container(
                               margin: EdgeInsets.only(top: 15.0,),
                               child: RaisedButton(
-                                color: facebook_color,
+                                color: button_fill_color,
                                 textColor: text_color,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: new BorderRadius.circular(
                                       18.0),
                                 ),
-                                child: Text('Save'),
+                                child: Text('Save',style: TextStyle(fontFamily: 'GoogleSansFamily')),
                                 onPressed: () {
                                   if (newPassword == '' ||
                                       newPassword == null) {
@@ -1141,7 +1170,7 @@ class ProfilePageState extends State<ProfilePage> {
   showAlertDialog(BuildContext context) {
     // set up the button
     Widget okButton = RaisedButton(
-      child: Text("Update"),
+      child: Text("Update",style: TextStyle(fontFamily: 'GoogleSansFamily')),
       color: white_color,
       onPressed: () {
         if (newPassword == '' || newPassword == null) {
@@ -1173,7 +1202,7 @@ class ProfilePageState extends State<ProfilePage> {
 
     Widget cancelButton = RaisedButton(
       color: white_color,
-      child: Text("Cancel"),
+      child: Text("Cancel",style: TextStyle(fontFamily: 'GoogleSansFamily')),
       onPressed: () {
         Navigator.of(context, rootNavigator: true).pop('dialog');
       },
@@ -1181,7 +1210,7 @@ class ProfilePageState extends State<ProfilePage> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Change Password"),
+      title: Text("Change Password",style: TextStyle(fontFamily: 'GoogleSansFamily')),
       content: Container(
           width: 200.0,
           height: 220.0,
@@ -1197,7 +1226,7 @@ class ProfilePageState extends State<ProfilePage> {
                     decoration: InputDecoration(
                       hintText: 'New Password',
                       contentPadding: new EdgeInsets.all(5.0),
-                      hintStyle: TextStyle(color: greyColor),
+                      hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
                     ),
                     controller: controllerNewPassword,
                     onChanged: (value) {
@@ -1218,6 +1247,7 @@ class ProfilePageState extends State<ProfilePage> {
                     decoration: new InputDecoration(
                       contentPadding: new EdgeInsets.all(5.0),
                       hintText: 'Confirm Password',
+                      hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
                     ),
                     keyboardType: TextInputType.phone,
                   ),
@@ -1229,7 +1259,7 @@ class ProfilePageState extends State<ProfilePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
                       RaisedButton(
-                        child: Text("Update"),
+                        child: Text("Update",style: TextStyle(fontFamily: 'GoogleSansFamily')),
                         color: white_color,
                         onPressed: () {
                           if (newPassword == '' || newPassword == null) {
@@ -1263,7 +1293,7 @@ class ProfilePageState extends State<ProfilePage> {
                       ),
                       RaisedButton(
                         color: white_color,
-                        child: Text("Cancel"),
+                        child: Text("Cancel",style: TextStyle(fontFamily: 'GoogleSansFamily')),
                         onPressed: () {
                           Navigator.of(context, rootNavigator: true).pop(
                               'dialog');
@@ -1378,6 +1408,7 @@ class ProfilePageState extends State<ProfilePage> {
   }
 
   Future fetchAllUsersData() async {
+    name = controllerName.text;
     if (prefs.containsKey('userId') && prefs.getString('userId') != null) {
       if (prefs.getString('userId') == '' ||
           prefs.getString('BUSINESS_ID') == '') {
@@ -1479,6 +1510,7 @@ class ProfilePageState extends State<ProfilePage> {
 
   Future storeLocalDataInternal(String photoUrl, String name, String nickName,
       String email) async {
+    name = controllerName.text;
     await prefs.setString('userId', userId);
     await prefs.setString('email', email);
     await prefs.setString('name', name);
@@ -1494,6 +1526,7 @@ class ProfilePageState extends State<ProfilePage> {
   Future<Null> clearLocalData() async {
     await prefs.setString('email', '');
     await prefs.setString('name', '');
+    await prefs.setString('userId', '');
     await prefs.setString('nickname', '');
     await prefs.setString('status', '');
     await prefs.setString('photoUrl', '');
@@ -1507,6 +1540,6 @@ class ProfilePageState extends State<ProfilePage> {
     await prefs.setString('BUSINESS_IMAGE', '');
     await prefs.setString('BUSINESS_CREATED_AT', '');
     await prefs.setInt('BUSINESS_EMPLOYEES_COUNT', 0);
-    LocationService('').locationStream;
+//    LocationService('').locationStream;
   }
 }

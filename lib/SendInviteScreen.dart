@@ -13,7 +13,7 @@ import 'package:virus_chat_app/FriendRequestScreen.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
-import 'package:virus_chat_app/utils/const.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 
 
 class SendInviteToUser extends StatefulWidget {
@@ -131,7 +131,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                         Row(
                           children: <Widget>[
                             Container(
-                              color: facebook_color,
+                              color: button_fill_color,
                               width: MediaQuery
                                   .of(context)
                                   .size
@@ -187,7 +187,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                         ),
                                         Container(
                                           margin: EdgeInsets.only(
-                                              top: 30.0, right: 10.0,bottom: 10.0),
+                                              top: 40.0, right: 10.0,bottom: 10.0),
                                           child: Text(
                                             _mUserName, style: TextStyle(
                                               fontWeight: FontWeight.bold,
@@ -273,12 +273,30 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   Future sendInvite() async{
     print('sendInvite____________');
     try {
-      var documentReference = await Firestore.instance
+     /* var documentReference = Firestore.instance
           .collection('users')
           .document(_mCurrentUserId)
           .collection('FriendsList')
-          .document(_mPeerId);
-      Firestore.instance.runTransaction((transaction) async {
+          .document(_mPeerId);*/
+      // Update data to server if new user
+      Firestore.instance
+          .collection('users')
+          .document(_mCurrentUserId)
+          .collection('FriendsList')
+          .document(_mPeerId).setData({
+        'requestFrom': _mCurrentUserId,
+        'receiveId': _mPeerId,
+        'IsAcceptInvitation': false,
+        'isRequestSent': true,
+        'friendPhotoUrl': _userPhotoUrl,
+        'friendName': _userName,
+        'isAlreadyRequestSent': true,
+        'timestamp': DateTime
+            .now()
+            .millisecondsSinceEpoch
+            .toString(),
+      })
+      /*Firestore.instance.runTransaction((transaction) async {
         await transaction.set(
           documentReference,
           {
@@ -297,8 +315,8 @@ class SendInviteToUserState extends State<SendInviteToUser> {
         ).catchError((error){
           error.toString();
         });
-      }).whenComplete(() {
-        var documentReference1 = Firestore.instance
+      })*/.whenComplete(() {
+     /*   var documentReference1 = Firestore.instance
             .collection('users')
             .document(_mPeerId)
             .collection('FriendsList')
@@ -322,6 +340,25 @@ class SendInviteToUserState extends State<SendInviteToUser> {
           ).catchError((error){
             error.toString();
           });
+        });*/
+
+
+        Firestore.instance
+            .collection('users')
+            .document(_mCurrentUserId)
+            .collection('FriendsList')
+            .document(_mPeerId).setData({
+          'requestFrom': _mCurrentUserId,
+          'receiveId': _mPeerId,
+          'IsAcceptInvitation': false,
+          'isRequestSent': true,
+          'friendPhotoUrl': _userPhotoUrl,
+          'friendName': _userName,
+          'isAlreadyRequestSent': true,
+          'timestamp': DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString(),
         });
       }).whenComplete(() {
         sendAndRetrieveMessage();

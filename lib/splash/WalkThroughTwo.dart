@@ -40,6 +40,7 @@ class WalkThroughTwo extends StatelessWidget {
                   padding: EdgeInsets.all(10.0),
                   child:  Align(
                     alignment: Alignment.bottomRight,
+                    heightFactor:50.0,
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -47,7 +48,7 @@ class WalkThroughTwo extends StatelessWidget {
                             MaterialPageRoute(
                                 builder: (context) => new WalkThroughThree()));
                       },
-                      child: Text(skip, style: TextStyle(color: sky_blue,fontSize: 17.0,fontFamily: 'GoogleSansBold',),),
+                      child: Text(skip, style: TextStyle(color: sky_blue,fontSize: 17.0,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w700,),),
                     ),
                   ),
                 )

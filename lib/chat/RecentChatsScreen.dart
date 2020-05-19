@@ -115,7 +115,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
             Column(
                 children: <Widget>[
                   Container(
-                    color: facebook_color,
+                    color: button_fill_color,
                     width: MediaQuery
                         .of(context)
                         .size

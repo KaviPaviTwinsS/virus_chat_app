@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,29 +7,22 @@ import 'package:device_info/device_info.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-//import 'package:flutter_offline/flutter_offline.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart';
 import 'package:latlong/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FriendRequestScreen.dart';
-import 'package:virus_chat_app/LocationService.dart';
-import 'package:virus_chat_app/business/BusinessDetailPage.dart';
-import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/SendInviteScreen.dart';
-import 'package:virus_chat_app/audiop/MyAudioEx.dart';
+import 'package:virus_chat_app/business/BusinessDetailPage.dart';
 import 'package:virus_chat_app/business/BusinessPage.dart';
-import 'package:virus_chat_app/chat/AudioChatsss.dart';
 import 'package:virus_chat_app/chat/RecentChatsScreen.dart';
 import 'package:virus_chat_app/chat/chat.dart';
-import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
-import 'package:virus_chat_app/utils/colors.dart';
+import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/rangeSlider/RangeSliderPage.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
-import 'package:http/http.dart' as http;
-import 'package:virus_chat_app/utils/const.dart';
+import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
+import 'package:virus_chat_app/utils/colors.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 
@@ -48,7 +41,7 @@ class UsersList extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: app_name,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -96,6 +89,7 @@ class UsersListState extends State<UsersListPage>
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
 
   UsersListState(String currentUserId, String signInType, String mphotoUrl) {
+    print('Friend Request Build__________  UsersListState');
     currentUser = currentUserId;
     userSignInType = signInType;
     currentUserPhotoUrl = mphotoUrl;
@@ -103,7 +97,6 @@ class UsersListState extends State<UsersListPage>
 
   @override
   void initState() {
-//    test();
     initialise();
     super.initState();
   }
@@ -112,23 +105,25 @@ class UsersListState extends State<UsersListPage>
     prefs = await SharedPreferences.getInstance();
     await prefs.setString('USERSTATUS', 'LOGIN');
     currentUserName = await prefs.getString('name');
+    currentUser = await prefs.getString('userId');
     if (userSignInType == '') {
       userSignInType = await prefs.getString('signInType');
     }
     if (currentUserPhotoUrl == '') {
       currentUserPhotoUrl = await prefs.getString('photoUrl');
     }
-    print('USERLIST name_____ $currentUserName');
+//    print('USERLIST name_____ $currentUserName');
 
-    var query = await Firestore.instance.collection('users')
-        .document(currentUser).collection(
-        'userLocation').document(currentUser).get();
-    print('User Update status ___ ${currentUser} ___ ${query['UpdateTime']}');
-    int currentTime = ((new DateTime.now()
-        .toUtc()
-        .microsecondsSinceEpoch) / 1000).toInt();
+    if(currentUser != '' && currentUser !=  null) {
+      var query = await Firestore.instance.collection('users')
+          .document(currentUser).collection(
+          'userLocation').document(currentUser).get();
+//      print('User Update status ___ ${currentUser} ___ ${query['UpdateTime']}');
+      int currentTime = ((new DateTime.now()
+          .toUtc()
+          .microsecondsSinceEpoch) / 1000).toInt();
 
-    /*  if (currentUser != '') {
+      /*  if (currentUser != '') {
       print(
           'USER STATUS_______________ $currentTime _____ ${query['UpdateTime']}');
       if (currentTime > query['UpdateTime']) {
@@ -143,11 +138,11 @@ class UsersListState extends State<UsersListPage>
             .updateData({'status': 'ACTIVE'});
       }
     }*/
-    LocationService(currentUser).locationStream;
-    /*for(int i=5;i<250;i+5){
+//    LocationService(currentUser);
+      /*for(int i=5;i<250;i+5){
       spinnerItems.add('$i m');
     }*/
-
+    }
     setState(() {});
   }
 
@@ -218,7 +213,8 @@ class UsersListState extends State<UsersListPage>
 
   @override
   Widget build(BuildContext context) {
-    initialise();
+    print('Friend Request Build__________  MAINNNN');
+//    initialise();
     return WillPopScope(
       onWillPop: () async => false,
       child: new Scaffold(
@@ -342,7 +338,7 @@ class UsersListState extends State<UsersListPage>
             children: <Widget>[
               SingleChildScrollView(
                 child: Container(
-                    color: facebook_color,
+                    color: button_fill_color,
                     height: MediaQuery
                         .of(context)
                         .size
@@ -375,11 +371,23 @@ class UsersListState extends State<UsersListPage>
                                             child: CircularProgressIndicator(
                                               strokeWidth: 1.0,
                                               valueColor: AlwaysStoppedAnimation<
-                                                  Color>(themeColor),
+                                                  Color>(progress_color),
                                             ),
                                             width: 35.0,
                                             height: 35.0,
                                             padding: EdgeInsets.all(10.0),
+                                          ),
+                                      errorWidget: (context, url, error) =>
+                                          Material(
+                                            child: new SvgPicture.asset(
+                                              'images/user_unavailable.svg', height: 35.0,
+                                              width: 35.0,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(5.0),
+                                            ),
+                                            clipBehavior: Clip.hardEdge,
                                           ),
                                       imageUrl: currentUserPhotoUrl,
                                       width: 35.0,
@@ -402,7 +410,7 @@ class UsersListState extends State<UsersListPage>
                                 currentUserName, style: TextStyle(
                                   color: text_color,
                                   fontFamily: 'GoogleSansFamily',
-                                  fontWeight: FontWeight.bold),
+                                  fontWeight: FontWeight.w700),
                               ),
                             ),
                             Spacer(),
@@ -540,9 +548,27 @@ class UsersListState extends State<UsersListPage>
                           )
                       ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
+                         Container(
+                           width: 40.0,
+                           height: 5.0,
+                           margin: EdgeInsets.only(top: 5.0),
+                           decoration: BoxDecoration(
+                             color: greyColor2,
+                             borderRadius: BorderRadius.all(
+                               Radius.circular(5.0),
+                             ),
+                           ),
+                           child :new SizedBox(
+                             height: 10.0,
+                             child : Divider(
+                             color: greyColor2,
+                               thickness: 2.0,
+                             ),
+                           )
+                         ),
                           Align(
                             alignment: Alignment.bottomLeft,
                             child: Container(
@@ -551,7 +577,7 @@ class UsersListState extends State<UsersListPage>
                                 child: Text('People', style: TextStyle(
                                     fontSize: 19.0,
                                     fontFamily: 'GoogleSansFamily',
-                                    fontWeight: FontWeight.bold),)
+                                    fontWeight: FontWeight.w700),)
                             ),
                           ),
                           new LoginUsersList(
@@ -563,12 +589,12 @@ class UsersListState extends State<UsersListPage>
                                 child: Text('Active', style: TextStyle(
                                     fontSize: 19.0,
                                     fontFamily: 'GoogleSansFamily',
-                                    fontWeight: FontWeight.bold),)
+                                    fontWeight: FontWeight.w700),)
                             ),
                           ),
-                          new ActiveUserListRadius(
+                          currentUser != '' && currentUser != null ?new ActiveUserListRadius(
                               currentUser, currentUserPhotoUrl,
-                              _msliderData)
+                              _msliderData)  : Container(),
 
                         ],
                       )
@@ -700,27 +726,49 @@ class ActiveUserListRadius extends StatelessWidget {
   void initialise() async {
     _preferences = await SharedPreferences.getInstance();
     _businessType = await _preferences.getString('BUSINESS_TYPE');
-    print('ActiveUserListRadius initialise $_userStatus');
+    currentUserId = await _preferences.getString('userId');
+//    print('ActiveUserListRadius initialise $currentUserId');
     isLoading = true;
+    if(currentUserId != '' && currentUserId != null)
     getCurrentUserLocation(currentUserId, msliderData);
+
+    await updateUserStatus();
+
   }
+
+  Stream<int> timedCounter(Duration interval, [int maxCount]) async* {
+    while (true) {
+      await Future.delayed(interval);
+      currentUserId = _preferences.getString('userId');
+//      print('userDistanceISWITHINRADIUS ________________________${new DateTime.now()}________currentUserId __$currentUserId');
+      if(currentUserId != '' && currentUserId != null) {
+        Firestore.instance.collection('users').where(
+            'userDistanceISWITHINRADIUS', isEqualTo: 'YES').where(
+            'businessId', isEqualTo: '').where(
+            'status', isEqualTo: 'ACTIVE').snapshots();
+      }
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     print('userDistanceISWITHINRADIUS BUILDDDDDDDDDDD');
     return new StreamBuilder(
-        stream: Firestore.instance.collection('users').where(
+        stream : Firestore.instance.collection('users').where(
             'userDistanceISWITHINRADIUS', isEqualTo: 'YES').where(
             'businessId', isEqualTo: '').where(
             'status', isEqualTo: 'ACTIVE').snapshots(),
+//        stream: timedCounter(Duration(seconds: 3000)),
         builder:
             (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
 //              if(isLoading == true)   return Center(
-//                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(themeColor)));;
+//                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(progress_color)));;
           if (!snapshot.hasData)
             return new Container(
                 margin: EdgeInsets.only(left: 20.0, top: 20.0),
-                child: new Text('Loading...'));
+                child: new Text('Loading...',style: TextStyle(
+                  fontFamily: 'GoogleSansFamily',)));
           else
             return Expanded(
                 child: new ListView(
@@ -765,17 +813,18 @@ class ActiveUserListRadius extends StatelessWidget {
                                 new Container(
                                   margin: EdgeInsets.only(
                                       left: 20.0, top: 10.0),
-                                  child: Text(capitalize(document['name']),
-                                      textScaleFactor: 1.0),
+                                  child: Text(capitalize(document['name']),style: TextStyle(
+                      fontFamily: 'GoogleSansFamily',)
+                                      ,textScaleFactor: 1.0),
                                 )
                               ],
                             ));
                       } else {
                         return Container(
-                            margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                          /*  margin: EdgeInsets.only(left: 20.0, top: 20.0),
                             child: Center(
                               child: Text(''),
-                            )
+                            )*/
                         );
                       }
                       /*  return new ListTile(
@@ -827,11 +876,13 @@ class ActiveUserListRadius extends StatelessWidget {
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return new Text("Loading");
+            return new Text("Loading",style: TextStyle(
+            fontFamily: 'GoogleSansFamily',));
           }
           var userDocument = snapshot.data;
           print('FRIEND REQUEST ${userDocument['requestFrom']}');
-          return new Text(userDocument["requestFrom"]);
+          return new Text(userDocument["requestFrom"],style: TextStyle(
+            fontFamily: 'GoogleSansFamily',));
         }
     );
   }
@@ -913,7 +964,7 @@ class ActiveUserListRadius extends StatelessWidget {
                     Chat(
                       currentUserId: currentUserId,
                       peerId: friendId,
-                      peerAvatar: mphotoUrl,
+                      peerAvatar: documentSnapshot['photoUrl'],
                       isFriend: true,
                       isAlreadyRequestSent: isAlreadyRequestSent,
                       peerName: documentSnapshot['name'],
@@ -958,7 +1009,7 @@ class ActiveUserListRadius extends StatelessWidget {
       DocumentSnapshot map = doc;
       GeoPoint geopoint = map['userLocation'];
       getDocumentNearBy(geopoint.latitude, geopoint.longitude, sliderData);
-      print('USERCURRENT  GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
+//      print('USERCURRENT  GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
     }
   }
 
@@ -970,7 +1021,7 @@ class ActiveUserListRadius extends StatelessWidget {
         'userLocation').document(userId)
         .get();
     DocumentSnapshot map = doc;
-    print('map_______________________________________ ${_userStatus}');
+//    print('map_______________________________________ ${_userStatus}');
     isLoading = true;
 
     if (map['userLocation'] != null  && (_userStatus !='' && _userStatus == 'LOGIN') ) {
@@ -997,9 +1048,6 @@ class ActiveUserListRadius extends StatelessWidget {
           'NO'
         });
       }
-
-      await updateUserStatus();
-
     }
   }
 
@@ -1017,7 +1065,7 @@ class ActiveUserListRadius extends StatelessWidget {
       print(
           'USER STATUS_______________ $currentTime _____ ${query['UpdateTime']}______________${(currentTime >
               query['UpdateTime'])} ___________________________userStatus $_userStatus');
-    /*  if ((_userStatus != '' && _userStatus == 'LOGIN')) {
+      if ((_userStatus != '' && _userStatus == 'LOGIN')) {
         if (currentTime > (query['UpdateTime'] + INACTIVE_TIME )) {
           Firestore.instance
               .collection('users')
@@ -1029,7 +1077,7 @@ class ActiveUserListRadius extends StatelessWidget {
               .document(currentUserId)
               .updateData({'status': 'ACTIVE'});
         }
-      }*/
+      }
     }
   }
 
@@ -1038,12 +1086,13 @@ class ActiveUserListRadius extends StatelessWidget {
       double distance) async {
     var query = await Firestore.instance.collection('users').getDocuments();
     query.documents.forEach((doc) {
-      print('User DOCCCCCCCCC' + doc.documentID);
+//      print('User DOCCCCCCCCC' + doc.documentID);
       if (doc.documentID != currentUserId)
         getUserLocation(latitude, longitude, doc.documentID, distance);
     });
   }
 }
+
 
 class LoginUsersList extends StatelessWidget {
   String currentUserId = '';
@@ -1066,21 +1115,153 @@ class LoginUsersList extends StatelessWidget {
   }
 
 
+  Stream<int> timedCounter(Duration interval, [int maxCount]) async* {
+    while (true) {
+      await Future.delayed(interval);
+      currentUserId = _preferences.getString('userId');
+      print('LoginUsersList Stream ________________________${new DateTime.now()}________currentUserId __$currentUserId');
+      if(currentUserId != '' && currentUserId != null) {
+        Firestore.instance.collection('users').snapshots();
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    print('LoginUsersList _________________ ${new DateTime.now()}');
     return new StreamBuilder(
       stream: Firestore.instance.collection('users') /*.where(
           'status', isEqualTo: 'ACTIVE')*/.snapshots(),
+//      stream: timedCounter(Duration(seconds: 3000)),
       builder:
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+//      builder:
+//          (BuildContext context,snapshot) {
         if (!snapshot.hasData) return new Container(
             margin: EdgeInsets.only(left: 20.0, top: 20.0),
-            child: new Text('Loading...'));
+            child: new Text('Loading...',style: TextStyle(
+              fontFamily: 'GoogleSansFamily',)));
         return Flexible(
-            child: new ListView(
+            child:new ListView(
                 scrollDirection: Axis.horizontal,
+            /* GridView.builder(
+              itemCount: snapshot.data.documents.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4,mainAxisSpacing: 1,crossAxisSpacing:3),
+              itemBuilder: (BuildContext context, int index){
+                List<DocumentSnapshot> mList = snapshot.data.documents;
+                    if (mList[index].documentID != currentUserId) {
+//                    updateUserStatus();
+                  if (mList[index]['businessType'] == BUSINESS_TYPE_OWNER ||
+                      mList[index]['businessType'] == '') {
+                    return GestureDetector(
+                        onTap: () {
+                          print(
+                              'ON TAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP currentUserId $currentUserId');
+                          getFriendList(context, currentUserId, mList[index]);
+                        },
+                        child: new Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            Stack(
+                                children: <Widget>[
+                                  mList[index]['photoUrl'] != null &&
+                                      mList[index]['photoUrl'] != ''
+                                      ? new Container(
+                                      margin: EdgeInsets.only(
+                                          left: 20.0, top: 10.0),
+                                      width: 60.0,
+                                      height: 60.0,
+                                      decoration: new BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: new DecorationImage(
+                                              fit: BoxFit.fill,
+                                              image: new NetworkImage(
+                                                  mList[index]['photoUrl'])
+                                          )
+                                      ))
+                                      : mList[index]['photoUrl'] == ''
+                                      ? new Container(
+                                      margin: EdgeInsets.only(
+                                          left: 20.0, top: 10.0),
+                                      width: 60.0,
+                                      height: 60.0,
+                                      child: new SvgPicture.asset(
+                                        'images/user_unavailable.svg',
+                                        height: 10.0,
+                                        width: 10.0,
+//                                          color: primaryColor,
+                                      ),
+                                      decoration: new BoxDecoration(
+                                        shape: BoxShape.circle,
+                                      ))
+                                      : Text(''),
+                                  mList[index]['status'] == 'ACTIVE' ? Container(
+                                      child: new SvgPicture.asset(
+                                        'images/online_active.svg',
+                                        height: 10.0,
+                                        width: 10.0,
+//                                          color: primaryColor,
+                                      ),
+                                      margin: EdgeInsets.only(left: 70.0,
+                                          bottom: 30.0,
+                                          top: 10.0,
+                                          right: 5.0)) : mList[index]['status'] ==
+                                      'LoggedOut' ? Container(
+                                    child: new SvgPicture.asset(
+                                      'images/online_inactive.svg',
+                                      height: 10.0,
+                                      width: 10.0,
+//                                        color: primaryColor,
+                                    ),
+                                    margin: EdgeInsets.only(left: 70.0,
+                                        bottom: 30.0,
+                                        top: 10.0,
+                                        right: 5.0),
+                                  ) : Container(
+                                    child: new SvgPicture.asset(
+                                      'images/online_idle.svg', height: 10.0,
+                                      width: 10.0,
+//                                        color: primaryColor,
+                                    ),
+                                    margin: EdgeInsets.only(left: 70.0,
+                                        bottom: 30.0,
+                                        top: 10.0,
+                                        right: 5.0),
+                                  )
+                                ]
+                            ),
+                            new Container(
+                              margin: EdgeInsets.only(
+                                  left: 10.0, top: 10.0),
+                              child: Center(
+                                child: Text(capitalize(mList[index]['name']),
+                                    textScaleFactor: 1.0),
+                              ),
+                            )
+                          ],
+                        ));
+                  } else {
+                    return Container(
+                        margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                        child: Center(
+                          child: Text(''),
+                        )
+                    );
+                  }
+                } else {
+                  return Container(
+                      margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                      child: Center(
+                        child: Text(''),
+                      )
+                  );
+                }
+              },
+            ));*/
                 children: snapshot.data.documents.map((document) {
-                  print('Document idddd ${document.documentID}');
+//                  print('Document idddd ${document.documentID}');
                   if (document.documentID != currentUserId) {
 //                    updateUserStatus();
                     if (document['businessType'] == BUSINESS_TYPE_OWNER ||
@@ -1090,7 +1271,7 @@ class LoginUsersList extends StatelessWidget {
                             print(
                                 'ON TAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP currentUserId $currentUserId');
                             getFriendList(context, currentUserId, document);
-                            /*Navigator.push(
+                           /* Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
@@ -1175,29 +1356,30 @@ class LoginUsersList extends StatelessWidget {
                               new Container(
                                 margin: EdgeInsets.only(left: 20.0, top: 10.0),
                                 child: Text(capitalize(document['name']),
-                                    textScaleFactor: 1.0),
+                                    textScaleFactor: 1.0,style: TextStyle(
+                                      fontFamily: 'GoogleSansFamily',)),
                               )
                             ],
                           ));
                     } else {
                       return Container(
-                          margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                         /* margin: EdgeInsets.only(left: 20.0, top: 20.0),
                           child: Center(
                             child: Text(''),
-                          )
+                          )*/
                       );
                     }
                   } else {
                     return Container(
-                        margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                     /*   margin: EdgeInsets.only(left: 20.0, top: 20.0),
                         child: Center(
                           child: Text(''),
-                        )
+                        )*/
                     );
                   }
-                  /*  return new ListTile(
+                    return new ListTile(
                 title: new Text(document['name']),
-                subtitle: new Text(document['status']));*/
+                subtitle: new Text(document['status']));
                 }).toList()
             )
         );
@@ -1288,7 +1470,7 @@ class LoginUsersList extends StatelessWidget {
                     Chat(
                       currentUserId: currentUserId,
                       peerId: friendId,
-                      peerAvatar: mphotoUrl,
+                      peerAvatar: documentSnapshot['photoUrl'],
                       isFriend: true,
                       isAlreadyRequestSent: isAlreadyRequestSent,
                       peerName: documentSnapshot['name'],

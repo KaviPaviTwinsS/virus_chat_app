@@ -25,7 +25,7 @@ import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/audiop/MyAudioRecorder.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
 import 'package:virus_chat_app/utils/colors.dart';
-import 'package:virus_chat_app/utils/const.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 
@@ -235,7 +235,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       groupChatId = '$peerId-$id';
     }
     try {
-//      recorder.initializeExample(FlutterSound());
+      recorder.initializeExample(FlutterSound());
     }on Exception catch (e){
       e.toString();
     }
@@ -627,10 +627,15 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                             ),
                         errorWidget: (context, url, error) =>
                             Material(
-                              child: Image.asset(
+                              child:/* Image.asset(
                                 'images/img_not_available.jpeg',
                                 width: 200.0,
                                 height: 200.0,
+                                fit: BoxFit.cover,
+                              ),*/
+                              new SvgPicture.asset(
+                                'images/user_unavailable.svg', height: 200.0,
+                                width: 200.0,
                                 fit: BoxFit.cover,
                               ),
                               borderRadius: BorderRadius.all(
@@ -854,10 +859,15 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                                 ),
                             errorWidget: (context, url, error) =>
                                 Material(
-                                  child: Image.asset(
+                                  child: /*Image.asset(
                                     'images/img_not_available.jpeg',
                                     width: 200.0,
                                     height: 200.0,
+                                    fit: BoxFit.cover,
+                                  ),*/
+                                  new SvgPicture.asset(
+                                    'images/user_unavailable.svg', height: 200.0,
+                                    width: 200.0,
                                     fit: BoxFit.cover,
                                   ),
                                   borderRadius: BorderRadius.all(
@@ -1213,7 +1223,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Container(
-                    color: facebook_color,
+                    color: button_fill_color,
                     width: MediaQuery
                         .of(context)
                         .size
@@ -1264,7 +1274,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Container(
+                              peerName !='' && peerName != null ? Container(
                                 margin: EdgeInsets.only(
                                     top: 45.0, right: 10.0, bottom: 5.0),
                                 child: Text(
@@ -1272,7 +1282,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                                     fontWeight: FontWeight.bold,
                                     color: text_color),
                                 ),
-                              ),
+                              ) : Text(''),
                               mDifference != 'Active Now' ? Container(
                                 child: Text(
                                   'Active \t ' + mDifference + '\t ago',
@@ -1512,7 +1522,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           ? Container(
         child: Center(
           child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+              valueColor: AlwaysStoppedAnimation<Color>(progress_color)),
         ),
         color: Colors.white.withOpacity(0.8),
       )
@@ -1732,7 +1742,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     return Flexible(
       child: groupChatId == ''
           ? Center(child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(themeColor)))
+          valueColor: AlwaysStoppedAnimation<Color>(progress_color)))
           : StreamBuilder(
         stream: Firestore.instance
             .collection('messages')
@@ -1747,7 +1757,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
             return Center(
                 child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+                    valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
           } else {
             listMessage = snapshot.data.documents;
 //            len = snapshot.data.documents.length;
