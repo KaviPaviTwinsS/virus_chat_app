@@ -111,7 +111,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                         child: Container(
                           child: CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(
-                                themeColor),
+                                progress_color),
                           ),
                           width: 50.0,
                           height: 50.0,

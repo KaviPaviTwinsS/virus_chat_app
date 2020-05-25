@@ -41,7 +41,9 @@ String profile_header = 'Profile setup';
 String recent_chats = 'Recent Chats';
 String friend_request = 'Friend Requests';
 String no_Recent_chat ='No Recent Chats';
-
+String no_business = 'Business is empty';
+String no_users = 'No users';
+String no_tweet = 'Tweet is empty';
 String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
 String business ='Business';

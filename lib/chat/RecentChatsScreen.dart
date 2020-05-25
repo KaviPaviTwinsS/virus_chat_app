@@ -107,6 +107,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
     print('Recent Chats ___________TESTTTTTTTTTTTTTT_______');
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -165,8 +166,8 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                     decoration: BoxDecoration(
                         color: text_color,
                         borderRadius: new BorderRadius.only(
-                          topLeft: const Radius.circular(30.0),
-                          topRight: const Radius.circular(30.0),
+                          topLeft: const Radius.circular(20.0),
+                          topRight: const Radius.circular(20.0),
                         )
                     ),
                     child: buildListMessage(),
@@ -178,7 +179,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                     child: Center(
                       child: CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(
-                              themeColor)),
+                              progress_color)),
                     ),
                     color: Colors.white.withOpacity(0.8),
                   )
@@ -298,7 +299,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 1.0,
                                       valueColor: AlwaysStoppedAnimation<
-                                          Color>(themeColor),
+                                          Color>(progress_color),
                                     ),
                                     width: 35.0,
                                     height: 35.0,
@@ -367,14 +368,15 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                         .start,
                     children: <Widget>[
                       usersData != null && usersData.name != '' ? new Container(
+                        margin: EdgeInsets.only(top: 5.0),
                         child: Text(
                           capitalize(usersData.name),
                           style: TextStyle(fontWeight: FontWeight.bold),),
                       ) : Text(''),
-                      usersData != null && usersData.name != '' ? new Container(
+                     /* usersData != null && usersData.name != '' ? new Container(
                         child: Text(
                           capitalize(usersData.name),),
-                      ) : Text(''),
+                      ) : Text(''),*/
                     ],
                   )
                 ],

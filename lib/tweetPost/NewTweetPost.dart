@@ -178,8 +178,8 @@ class NewTweetPostState extends State<NewTweetPost> {
                         decoration: BoxDecoration(
                             color: text_color,
                             borderRadius: new BorderRadius.only(
-                              topLeft: const Radius.circular(30.0),
-                              topRight: const Radius.circular(30.0),
+                              topLeft: const Radius.circular(20.0),
+                              topRight: const Radius.circular(20.0),
                             )
                         ),
                         child: Container(
@@ -365,7 +365,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                             child: CircularProgressIndicator(
                               strokeWidth: 2.0,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                  themeColor),
+                                  progress_color),
                             ),
                             width: 50.0,
                             height: 50.0,
@@ -411,7 +411,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<
                                     Color>(
-                                    themeColor),
+                                    progress_color),
                               ),
                               width: 50.0,
                               height: 50.0,

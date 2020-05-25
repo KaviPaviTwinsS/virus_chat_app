@@ -38,7 +38,9 @@ dependencies:
   http: ^0.12.1
   firebase_core: ^0.4.4+3
   firebase_analytics: ^5.0.2
-#  firebase_auth: ^0.14.0+5
+  url_launcher: ^5.0.3
+
+  #  firebase_auth: ^0.14.0+5
 #  firebase_auth:
 #  http: 0.12.0
 #  dio: 2.0.22
@@ -173,6 +175,8 @@ flutter:
       - images/Search.svg
       - images/user_unavailable.svg
       - images/business_chat.svg
+      - images/user.svg
+      - images/phone_outline.svg
 
 fonts:
   - family: GoogleSansFamily

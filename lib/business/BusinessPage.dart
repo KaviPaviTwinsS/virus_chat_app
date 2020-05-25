@@ -20,7 +20,17 @@ class BusinessPageState extends State<BusinessPage> {
 
   final ScrollController listScrollController = new ScrollController();
   var listMessage;
+  bool isLoading = false;
 
+
+  @override
+  void initState() {
+//    isLoading = true;
+    setState(() {
+
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,37 +44,30 @@ class BusinessPageState extends State<BusinessPage> {
                 .size
                 .width,
             height: 150,
-           child :  Row(
-             crossAxisAlignment: CrossAxisAlignment
-                 .center,
-             children: <Widget>[
-               Container(
-                 margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
-                 child: new IconButton(
-                     icon: Icon(Icons.arrow_back_ios,
-                       color: white_color,),
-                     onPressed: () {
-                       Navigator.pop(context);
-                     }),
-               ),
-               new Container(
-                   margin: EdgeInsets.only(
-                       top: 20.0,bottom: 40.0),
-                   child: Text(business_header, style: TextStyle(
-                       color: text_color,
-                       fontSize: TOOL_BAR_TITLE_SIZE,
-                       fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),)
-               ),
-             ],
-           ),
-           /* child: new Container(
-                margin: EdgeInsets.only(
-                  top: 50.0, left: 20.0,),
-                child: Text(business_header, style: TextStyle(
-                    color: text_color,
-                    fontSize: TOOL_BAR_TITLE_SIZE,
-                    fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),)
-            ),*/
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment
+                  .center,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
+                  child: new IconButton(
+                      icon: Icon(Icons.arrow_back_ios,
+                        color: white_color,),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }),
+                ),
+                new Container(
+                    margin: EdgeInsets.only(
+                        top: 20.0, bottom: 40.0),
+                    child: Text(business_header, style: TextStyle(
+                        color: text_color,
+                        fontSize: TOOL_BAR_TITLE_SIZE,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'GoogleSansFamily'),)
+                ),
+              ],
+            ),
           ),
           Align(
               alignment: Alignment.bottomLeft,
@@ -80,18 +83,33 @@ class BusinessPageState extends State<BusinessPage> {
                 decoration: BoxDecoration(
                     color: text_color,
                     borderRadius: new BorderRadius.only(
-                      topLeft: const Radius.circular(30.0),
-                      topRight: const Radius.circular(30.0),
+                      topLeft: const Radius.circular(20.0),
+                      topRight: const Radius.circular(20.0),
                     )
                 ),
                 child: buildListBusinesses(),
               )
-          )
+          ),
+          buildLoading()
         ],
       ),
     );
   }
 
+
+  Widget buildLoading() {
+    return Positioned(
+      child: isLoading
+          ? Container(
+        child: Center(
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(progress_color)),
+        ),
+        color: Colors.white.withOpacity(0.8),
+      )
+          : Container(),
+    );
+  }
 
   Widget buildListBusinesses() {
     return StreamBuilder(
@@ -99,14 +117,21 @@ class BusinessPageState extends State<BusinessPage> {
           .collection('business')
           .snapshots(),
       builder: (context, snapshot) {
-        print('snapshot ____________${snapshot.hasData}');
-        if (!snapshot.hasData) {
-          return Center(
+        print('snapshot ____________${snapshot.hasData} ___isLoading $isLoading');
+        if (snapshot.data == null || !snapshot.hasData) {
+          isLoading = false;
+         /* return Center(
+              child: Text('sssssssssssss'));*/
+            return Center(
               child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
         } else {
+          isLoading = false;
           listMessage = snapshot.data.documents;
-          return ListView.builder(
+          print('snapshot ____________${listMessage.length}___isLoading $isLoading');
+          return (listMessage.length == 0) ? Center(
+            child: Text(no_business),
+          ) : ListView.builder(
             itemBuilder: (context, index) =>
                 buildItem(index, snapshot.data.documents[index]),
             itemCount: snapshot.data.documents.length,
@@ -122,38 +147,55 @@ class BusinessPageState extends State<BusinessPage> {
     return Column(
       children: <Widget>[
         GestureDetector(
-          onTap: (){
+          onTap: () {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) =>
-                BusinessDetailPage(document['businessId'], document['businessName'])));
+                BusinessDetailPage(
+                    document['businessId'], document['businessName'])));
           },
-          child:     Row(
-          children: <Widget>[
-            document['photoUrl'] != '' ? Container(
+          child: Row(
+            children: <Widget>[
+              document['photoUrl'] != '' ? Container(
                 margin: EdgeInsets.only(left: 10.0, bottom: 10.0),
-                child:  Stack(
+                child: Stack(
                     children: <Widget>[
                       document['photoUrl'] != null &&
                           document['photoUrl'] != ''
-                          ? new Container(
-                          margin: EdgeInsets.only(
-                              left: 20.0, top: 10.0),
-                          width: 50.0,
-                          height: 50.0,
-                          decoration: new BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: new DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: new NetworkImage(
-                                      document['photoUrl'])
-                              )
-                          ))
+                          ?new Container(
+                        margin: EdgeInsets.all(10.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Material(
+                            child: CachedNetworkImage(
+                              placeholder: (context, url) =>
+                                  Container(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.0,
+                                      valueColor: AlwaysStoppedAnimation<
+                                          Color>(progress_color),
+                                    ),
+                                    width: 30.0,
+                                    height: 30.0,
+                                    padding: EdgeInsets.all(10.0),
+                                  ),
+                              imageUrl: document['photoUrl'],
+                              width: 60.0,
+                              height: 60.0,
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(30.0),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                          ),
+                        ),
+                      )
                           : document['photoUrl'] == ''
                           ? new Container(
                           margin: EdgeInsets.only(
                               left: 20.0, top: 10.0),
-                          width: 50.0,
-                          height: 50.0,
+                          width: 60.0,
+                          height: 60.0,
                           child: new SvgPicture.asset(
                             'images/user_unavailable.svg',
                             height: 10.0,
@@ -171,7 +213,7 @@ class BusinessPageState extends State<BusinessPage> {
                             width: 10.0,
 //                                          color: primaryColor,
                           ),
-                          margin: EdgeInsets.only(left: 60.0,
+                          margin: EdgeInsets.only(left: 55.0,
                               bottom: 30.0,
                               top: 10.0,
                               right: 5.0)) : document['status'] ==
@@ -182,7 +224,7 @@ class BusinessPageState extends State<BusinessPage> {
                           width: 10.0,
 //                                        color: primaryColor,
                         ),
-                        margin: EdgeInsets.only(left: 60.0,
+                        margin: EdgeInsets.only(left: 55.0,
                             bottom: 30.0,
                             top: 10.0,
                             right: 5.0),
@@ -192,24 +234,26 @@ class BusinessPageState extends State<BusinessPage> {
                           width: 10.0,
 //                                        color: primaryColor,
                         ),
-                        margin: EdgeInsets.only(left: 60.0,
+                        margin: EdgeInsets.only(left: 55.0,
                             bottom: 30.0,
                             top: 10.0,
                             right: 5.0),
                       )
                     ]
                 ),
-            )
-                : Text(''),
-            document['businessName'] != ''
-                ? Container(
-                margin: EdgeInsets.only(left: 10.0, bottom: 5.0),
-                child : Text(capitalize(document['businessName']),
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18.0,fontFamily: 'GoogleSansFamily'),)
-            )
-                : Text('')
-          ],
-        ),),
+              )
+                  : Text(''),
+              document['businessName'] != ''
+                  ? Container(
+                  margin: EdgeInsets.only(left: 10.0, bottom: 5.0),
+                  child: Text(capitalize(document['businessName']),
+                    style: TextStyle(fontWeight: FontWeight.w700,
+                        fontSize: 18.0,
+                        fontFamily: 'GoogleSansFamily'),)
+              )
+                  : Text('')
+            ],
+          ),),
         Divider()
       ],
     );

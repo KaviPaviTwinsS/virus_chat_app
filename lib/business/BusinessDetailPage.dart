@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
+import 'package:virus_chat_app/utils/strings.dart';
 
 class BusinessDetailPage extends StatefulWidget {
 
@@ -65,6 +68,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
             .documentID} _______${documentReference
             .data['photoUrl']} __________$_businessId');
         _businessAddress = documentReference.data['businessAddress'];
+        _businessOwnerName = documentReference.data['ownerName'];
         _businessNumber = documentReference.data['businessNumber'];
         _businessImage = documentReference.data['photoUrl'];
         _businessName = documentReference.data['businessName'];
@@ -108,7 +112,8 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                       new Container(
                           margin: EdgeInsets.only(
                               left: 0.0, bottom: 25.0),
-                          child: Text(_businessName, style: TextStyle(
+                          child: Text(
+                            capitalize(_businessName), style: TextStyle(
                               color: text_color,
                               fontSize: 20.0,
                               fontWeight: FontWeight.bold),)
@@ -130,8 +135,8 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                       decoration: BoxDecoration(
                           color: text_color,
                           borderRadius: new BorderRadius.only(
-                            topLeft: const Radius.circular(30.0),
-                            topRight: const Radius.circular(30.0),
+                            topLeft: const Radius.circular(20.0),
+                            topRight: const Radius.circular(20.0),
                           )
                       ),
                       child: Stack(
@@ -142,7 +147,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                 child: Center(
                                   child: CircularProgressIndicator(
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                          themeColor)),
+                                          progress_color)),
                                 ),
                                 color: Colors.white.withOpacity(0.8),
                               ) : Container()
@@ -164,7 +169,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                                   child: CircularProgressIndicator(
                                                     valueColor: AlwaysStoppedAnimation<
                                                         Color>(
-                                                        themeColor),
+                                                        progress_color),
                                                   ),
                                                   width: 50,
                                                   height: 50,
@@ -179,7 +184,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                             errorWidget: (context, url,
                                                 error) =>
                                                 Material(
-                                                  child:/* Image.asset(
+                                                  child: /* Image.asset(
                                                     'images/img_not_available.jpeg',
                                                     width: MediaQuery
                                                         .of(context)
@@ -188,14 +193,15 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                                     height: 200.0,
                                                     fit: BoxFit.cover,
                                                   ),*/
-    new SvgPicture.asset(
-    'images/user_unavailable.svg', height: 200.0,
-    width: MediaQuery
-        .of(context)
-        .size
-        .width - 30,
-    fit: BoxFit.cover,
-    ),
+                                                  new SvgPicture.asset(
+                                                    'images/user_unavailable.svg',
+                                                    height: 200.0,
+                                                    width: MediaQuery
+                                                        .of(context)
+                                                        .size
+                                                        .width - 30,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                   borderRadius: BorderRadius
                                                       .all(
                                                     Radius.circular(5.0),
@@ -220,8 +226,9 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                       ? Container(
                                     margin: EdgeInsets.only(
                                         left: 15.0, bottom: 10.0),
-                                    child: Text(_businessName, style: TextStyle(
-                                        fontWeight: FontWeight.bold),),
+                                    child: Text(capitalize(_businessName),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),),
                                   )
                                       : Text(''),
                                   _businessAddress != null &&
@@ -230,6 +237,52 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                         left: 15.0, bottom: 15.0),
                                     child: Text(_businessAddress,),
                                   ) : Text(''),
+                                 Row(
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                   children: <Widget>[
+                                     _businessOwnerName != null && _businessOwnerName != '' ?
+                                     Row(
+                                       children: <Widget>[
+    Container(
+    margin: EdgeInsets.only(
+    left: 15.0, bottom: 15.0),
+    child:
+    new SvgPicture.asset(
+                                           'images/user.svg', height: 20.0,
+                                           width: 20.0,
+                                           fit: BoxFit.cover,
+                                         ),
+    ),
+                                         Container(
+                                           margin: EdgeInsets.only(
+                                               left: 5.0, bottom: 15.0),
+                                           child: Text(capitalize(_businessOwnerName),),
+                                         )
+                                       ],
+                                     ): Text(''),
+                                     _businessNumber != null && _businessNumber != '' ?
+                                     Row(
+                                       children: <Widget>[
+                                         Container(
+                                           margin: EdgeInsets.only(
+                                               left: 15.0, bottom: 15.0),
+                                           child:
+                                           new SvgPicture.asset(
+                                             'images/phone_outline.svg', height: 20.0,
+                                             width: 20.0,
+                                             fit: BoxFit.cover,
+                                           ),
+                                         ),
+                                         Container(
+                                           margin: EdgeInsets.only(
+                                               right: 15.0, bottom: 15.0,left: 5.0),
+                                           child: Text(capitalize(_businessNumber),),
+                                         )
+                                       ],
+                                     ) : Text('')
+                                   ],
+                                 )
                                 ],
                               ),
                               Align(
@@ -250,7 +303,6 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                               )
                             ],
                           ),
-
                         ],
                       )
                   )
@@ -265,12 +317,17 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
     print('Business Detail document list');
 
     try {
-      isLoading = true;
+      setState(() {
+        isLoading = true;
+      });
       QuerySnapshot result = await Firestore.instance
           .collection('users')
           .where('businessId', isEqualTo: _businessId)
+          .where('businessType', isEqualTo: 'employee')
           .getDocuments().whenComplete(() {
-        isLoading = false;
+        setState(() {
+          isLoading = false;
+        });
       }).catchError((error) {
         Fluttertoast.showToast(msg: '${error.toString()}');
       });
@@ -288,7 +345,8 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
           } else {
             _businessChatPeriority = 0;
           }
-          print('Business Detail document ____________ ${_businessChatPeriority}');
+          print(
+              'Business Detail document ____________ ${_businessChatPeriority} _________mCheck $_mCheck ____mStatus $_mStatus');
           if (!_mCheck && _businessChatPeriority == 0) {
             if (_mStatus != '' && _mStatus != 'LoggedOut') {
               Firestore.instance.collection('users')
@@ -314,6 +372,9 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
               _mCheck = false;
               Fluttertoast.showToast(
                   msg: 'Business user is in LoggedOut state');
+            } else if (_mStatus == '') {
+              Fluttertoast.showToast(
+                  msg: 'Business user not yet logged in');
             }
           } else if (_businessChatPeriority == 1) {
             if (_mStatus != '' && _mStatus != 'LoggedOut') {

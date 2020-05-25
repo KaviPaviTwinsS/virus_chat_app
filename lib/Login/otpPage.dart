@@ -11,6 +11,7 @@ import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/CustomTextSpan.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 
 import './otp_input.dart';
 
@@ -324,11 +325,11 @@ class _OTPScreenState extends State<OTPScreen> {
 
 
   void navigationToUser(FirebaseUser firebaseUser) async {
-    print('OTPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP ___ ');
+    print('OTPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP ___ ${widget.mobileNumber} _____${firebaseUser.uid}');
     final QuerySnapshot result = await Firestore.instance
         .collection('users')
-        .where('id', isEqualTo: firebaseUser.uid)
-        .where('phoneNo',isEqualTo: widget.mobileNumber)
+//        .where('id', isEqualTo: firebaseUser.uid)
+        .where('phoneNo',isEqualTo: '+91'+"\t"+widget.mobileNumWithoutCountryCode)
         .getDocuments();
     final List<DocumentSnapshot> documents = result.documents;
     print('OTPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP ${documents.length} ___ ');
@@ -380,6 +381,14 @@ class _OTPScreenState extends State<OTPScreen> {
         .collection('users')
         .document(documents[0]['id'])
         .updateData({'status': 'ACTIVE'});
+
+    if(documents[0]['businessId'] != null && documents[0]['businessId'] != '') {
+      await Firestore.instance
+          .collection('business')
+          .document(documents[0]['businessId'])
+          .updateData({'status': 'ACTIVE'});
+    }
+
     setState(() {
       isLoading = false;
     });

@@ -24,6 +24,7 @@ import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
+import 'package:async/async.dart';
 
 
 class UsersList extends StatelessWidget {
@@ -543,8 +544,8 @@ class UsersListState extends State<UsersListPage>
                       decoration: BoxDecoration(
                           color: text_color,
                           borderRadius: new BorderRadius.only(
-                            topLeft: const Radius.circular(30.0),
-                            topRight: const Radius.circular(30.0),
+                            topLeft: const Radius.circular(20.0),
+                            topRight: const Radius.circular(20.0),
                           )
                       ),
                       child: Column(
@@ -714,6 +715,7 @@ class ActiveUserListRadius extends StatelessWidget {
 
   SharedPreferences _preferences;
   String _businessType = '';
+  String _businessId = '';
   String _userStatus = '';
 
   ActiveUserListRadius(String currentUser, String photoUrl, double data) {
@@ -726,6 +728,7 @@ class ActiveUserListRadius extends StatelessWidget {
   void initialise() async {
     _preferences = await SharedPreferences.getInstance();
     _businessType = await _preferences.getString('BUSINESS_TYPE');
+    _businessId =  await _preferences.getString('BUSINESS_ID');
     currentUserId = await _preferences.getString('userId');
 //    print('ActiveUserListRadius initialise $currentUserId');
     isLoading = true;
@@ -771,7 +774,9 @@ class ActiveUserListRadius extends StatelessWidget {
                   fontFamily: 'GoogleSansFamily',)));
           else
             return Expanded(
-                child: new ListView(
+                child: snapshot.data.documents.length == 0 ? Center(
+                  child: Text(no_users),
+                ) :new ListView(
                     scrollDirection: Axis.horizontal,
                     children: snapshot.data.documents.map((document) {
                       print(
@@ -918,9 +923,9 @@ class ActiveUserListRadius extends StatelessWidget {
 //        .documentID} _______ $friendId __________________ ${businessData['id']}');
     print(
         'Friend Listttttt queryyyy _____businessUserId ${businessUserId} _____businessType $businessUserType _______ friendId ${friendId}');
-
+/*
     if ((businessUserId == null || businessUserId == '') &&
-        (businessUserType == '' || businessUserType == null)) {
+        (businessUserType == '' || businessUserType == null)) {*/
 
       var query = await Firestore.instance.collection('users')
           .document(currentUserId).collection(
@@ -989,12 +994,12 @@ class ActiveUserListRadius extends StatelessWidget {
                       isAlreadyRequestSent: isAlreadyRequestSent
                   )));*/
       }
-    } else {
+   /* } else {
       var businessUserName = documentSnapshot['businessName'];
       Navigator.push(
           context, MaterialPageRoute(builder: (context) =>
           BusinessDetailPage(businessUserId, businessUserName)));
-    }
+    }*/
   }
 
   final Distance distance = new Distance();
@@ -1071,11 +1076,23 @@ class ActiveUserListRadius extends StatelessWidget {
               .collection('users')
               .document(currentUserId)
               .updateData({'status': 'INACTIVE'});
+          if(_businessId!= null && _businessId != '') {
+            await Firestore.instance
+                .collection('business')
+                .document(_businessId)
+                .updateData({'status': 'INACTIVE'});
+          }
         } else {
           Firestore.instance
               .collection('users')
               .document(currentUserId)
               .updateData({'status': 'ACTIVE'});
+          if(_businessId!= null && _businessId != '') {
+            await Firestore.instance
+                .collection('business')
+                .document(_businessId)
+                .updateData({'status': 'ACTIVE'});
+          }
         }
       }
     }
@@ -1115,6 +1132,15 @@ class LoginUsersList extends StatelessWidget {
   }
 
 
+  Stream<List<QuerySnapshot>> getData() {
+    Stream<List<QuerySnapshot>> addList = null;
+    Stream<QuerySnapshot> stream1 = Firestore.instance.collection('users').snapshots();
+    Stream<QuerySnapshot> stream2 = Firestore.instance.collection('business').snapshots();
+
+    return StreamZip([stream1, stream2]).asBroadcastStream();
+  }
+
+
   Stream<int> timedCounter(Duration interval, [int maxCount]) async* {
     while (true) {
       await Future.delayed(interval);
@@ -1131,9 +1157,11 @@ class LoginUsersList extends StatelessWidget {
   Widget build(BuildContext context) {
     print('LoginUsersList _________________ ${new DateTime.now()}');
     return new StreamBuilder(
-      stream: Firestore.instance.collection('users') /*.where(
-          'status', isEqualTo: 'ACTIVE')*/.snapshots(),
-//      stream: timedCounter(Duration(seconds: 3000)),
+//      stream: getData(),
+      stream: Firestore.instance.collection('users') .snapshots(),
+      /*.where(
+          'status', isEqualTo: 'ACTIVE')*//*.snapshots(),
+//      stream: timedCounter(Duration(seconds: 3000)),*/
       builder:
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
 //      builder:
@@ -1142,6 +1170,7 @@ class LoginUsersList extends StatelessWidget {
             margin: EdgeInsets.only(left: 20.0, top: 20.0),
             child: new Text('Loading...',style: TextStyle(
               fontFamily: 'GoogleSansFamily',)));
+//        var documents = snapshot.data.length;
         return Flexible(
             child:new ListView(
                 scrollDirection: Axis.horizontal,
@@ -1264,8 +1293,8 @@ class LoginUsersList extends StatelessWidget {
 //                  print('Document idddd ${document.documentID}');
                   if (document.documentID != currentUserId) {
 //                    updateUserStatus();
-                    if (document['businessType'] == BUSINESS_TYPE_OWNER ||
-                        document['businessType'] == '') {
+//                    if (document['businessType'] == BUSINESS_TYPE_OWNER ||
+//                        document['businessType'] == '') {
                       return GestureDetector(
                           onTap: () {
                             print(
@@ -1361,14 +1390,14 @@ class LoginUsersList extends StatelessWidget {
                               )
                             ],
                           ));
-                    } else {
+                   /* } else {
                       return Container(
-                         /* margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                         *//* margin: EdgeInsets.only(left: 20.0, top: 20.0),
                           child: Center(
                             child: Text(''),
-                          )*/
+                          )*//*
                       );
-                    }
+                    }*/
                   } else {
                     return Container(
                      /*   margin: EdgeInsets.only(left: 20.0, top: 20.0),
@@ -1390,44 +1419,16 @@ class LoginUsersList extends StatelessWidget {
   Future getFriendList(BuildContext context, String currentUserId,
       DocumentSnapshot documentSnapshot) async {
     print('Login getFriendList');
-/*
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                Chat(
-                  currentUserId: currentUserId,
-                  peerId: friendId,
-                  peerAvatar: documentSnapshot['photoUrl'],
-                )));*/
     bool isFriend = false;
     bool isAlreadyRequestSent = false;
     String friendId = documentSnapshot.documentID;
     bool isRequestSent;
-    /* var businessUser = await Firestore.instance.collection('users')
-        .document(friendId).get().whenComplete((){
-
-    });*/
-
     print(
         'documentSnapshot _____getFriendList __ ${documentSnapshot['businessType']} ___businessId ${documentSnapshot['businessId']}');
-//    var businessData = businessUser.data;
-
     var businessUserId = documentSnapshot['businessId'];
     var businessUserType = documentSnapshot['businessType'];
-
-//    print('Friend Listttttt queryyyy   ${businessUser
-//        .data}__________user ${businessUser
-//        .documentID} _______ $friendId __________________ ${businessData['businessId']}______businessType$_businessType');
     print(
         'Friend Listttttt queryyyy _____businessUserId ${businessUserId} _____businessType $businessUserType _______ friendId ${friendId}');
-    if ((businessUserId == null || businessUserId == '') &&
-        (businessUserType == '' || businessUserType == null)) {
-
-      print(
-          'Friend Listttttt queryyyy _____');
-
-
       var query = await Firestore.instance.collection('users')
           .document(currentUserId).collection(
           'FriendsList').getDocuments();
@@ -1449,15 +1450,6 @@ class LoginUsersList extends StatelessWidget {
         });
       } else {
         isAlreadyRequestSent = false;
-        /*Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  Chat(
-                    currentUserId: currentUserId,
-                    peerId: friendId,
-                    peerAvatar: documentSnapshot['photoUrl'],
-                  )));*/
       }
       print(
           'Friend Listttttt isFriend_______________________________________________${isRequestSent}');
@@ -1483,83 +1475,167 @@ class LoginUsersList extends StatelessWidget {
                 friendId, currentUserId, documentSnapshot['photoUrl'],
                 isAlreadyRequestSent,
                 isRequestSent, documentSnapshot['name'])));
-        /*   Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  Chat(
-                      currentUserId: currentUserId,
-                      peerId: friendId,
-                      peerAvatar: mphotoUrl,
-                      isFriend: false,
-                      isAlreadyRequestSent: isAlreadyRequestSent
-                  )));*/
       }
-/*
-     Firestore.instance.collection('users')
-          .document(currentUserId).collection(
-          'FriendsList').snapshots().listen((data) =>
-          data.documents.forEach((doc) =>
-          {
-            if (doc.documentID == friendId && doc.data['IsAcceptInvitation']) {
-              isFriend = true
-            } else
-              {
-              },
-            if (doc.documentID == friendId) {
-              isAlreadyRequestSent = doc.data['isAlreadyRequestSent'],
-              isRequestSent = doc.data['isRequestSent']
-            } else
-              {
-              },
-//    print('Friend Listttttt queryyyy${isRequestSent}');
-            _preferences.setString(
-                'FRIEND_USER_TOKEN', documentSnapshot.data['user_token']),
-            print(
-                'Friend Listttttt isFriend_______________________________________________${isRequestSent}'),
+  }
+}
 
-          })).onDone((){
-        if (isFriend) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      Chat(
-                        currentUserId: currentUserId,
-                        peerId: friendId,
-                        peerAvatar: documentSnapshot['photoUrl'],
-                        isFriend: true,
-                        isAlreadyRequestSent: isAlreadyRequestSent,
-                        peerName: documentSnapshot['name'],
-                      )));
-        } else {
-          *//*Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  Chat(
-                      currentUserId: currentUserId,
-                      peerId: friendId,
-                      peerAvatar: mphotoUrl,
-                      isFriend: false,
-                      isAlreadyRequestSent: isAlreadyRequestSent
-                  )));*//*
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) =>
-              SendInviteToUser(
-                  friendId, currentUserId, documentSnapshot['photoUrl'],
-                  isAlreadyRequestSent, isRequestSent,
-                  documentSnapshot['name'])));
-        }
-      });*/
+class BusinessListPage extends StatelessWidget{
+  String currentUserId = '';
+  String mphotoUrl = '';
+
+  SharedPreferences _preferences;
 
 
+  BusinessListPage(String currentUser, String photoUrl) {
+    currentUserId = currentUser;
+    mphotoUrl = photoUrl;
+    initialise();
+  }
 
-    } else {
-      var businessUserName = documentSnapshot['businessName'];
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) =>
-          BusinessDetailPage(businessUserId, businessUserName)));
-    }
+  void initialise() async {
+    _preferences = await SharedPreferences.getInstance();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    print('LoginUsersList _________________ ${new DateTime.now()}');
+    return new StreamBuilder(
+      stream: Firestore.instance.collection('business') /*.where(
+          'status', isEqualTo: 'ACTIVE')*/.snapshots(),
+      builder:
+          (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) return new Container(
+            margin: EdgeInsets.only(left: 20.0, top: 20.0),
+            child: new Text('Loading...',style: TextStyle(
+              fontFamily: 'GoogleSansFamily',)));
+        return Flexible(
+            child:  snapshot.data.documents.length == 0 ? Center(
+              child: Text(no_users),
+            ) :new ListView(
+                scrollDirection: Axis.horizontal,
+                children: snapshot.data.documents.map((document) {
+//                  print('Document idddd ${document.documentID}');
+                  if (document.documentID != currentUserId) {
+//                    updateUserStatus();
+//                    if (document['businessType'] == BUSINESS_TYPE_OWNER ||
+//                        document['businessType'] == '') {
+                    return GestureDetector(
+                        onTap: () {
+                          print(
+                              'ON TAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP currentUserId $currentUserId');
+                          getFriendList(context, currentUserId, document);
+                        },
+                        child: new Column(
+                          children: <Widget>[
+                            Stack(
+                                children: <Widget>[
+                                  document['photoUrl'] != null &&
+                                      document['photoUrl'] != ''
+                                      ? new Container(
+                                      margin: EdgeInsets.only(
+                                          left: 20.0, top: 10.0),
+                                      width: 60.0,
+                                      height: 60.0,
+                                      decoration: new BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: new DecorationImage(
+                                              fit: BoxFit.fill,
+                                              image: new NetworkImage(
+                                                  document['photoUrl'])
+                                          )
+                                      ))
+                                      : document['photoUrl'] == ''
+                                      ? new Container(
+                                      margin: EdgeInsets.only(
+                                          left: 20.0, top: 10.0),
+                                      width: 60.0,
+                                      height: 60.0,
+                                      child: new SvgPicture.asset(
+                                        'images/user_unavailable.svg',
+                                        height: 10.0,
+                                        width: 10.0,
+//                                          color: primaryColor,
+                                      ),
+                                      decoration: new BoxDecoration(
+                                        shape: BoxShape.circle,
+                                      ))
+                                      : Text(''),
+                                  document['status'] == 'ACTIVE' ? Container(
+                                      child: new SvgPicture.asset(
+                                        'images/online_active.svg',
+                                        height: 10.0,
+                                        width: 10.0,
+//                                          color: primaryColor,
+                                      ),
+                                      margin: EdgeInsets.only(left: 70.0,
+                                          bottom: 30.0,
+                                          top: 10.0,
+                                          right: 5.0)) : document['status'] ==
+                                      'LoggedOut' ? Container(
+                                    child: new SvgPicture.asset(
+                                      'images/online_inactive.svg',
+                                      height: 10.0,
+                                      width: 10.0,
+//                                        color: primaryColor,
+                                    ),
+                                    margin: EdgeInsets.only(left: 70.0,
+                                        bottom: 30.0,
+                                        top: 10.0,
+                                        right: 5.0),
+                                  ) : Container(
+                                    child: new SvgPicture.asset(
+                                      'images/online_idle.svg', height: 10.0,
+                                      width: 10.0,
+//                                        color: primaryColor,
+                                    ),
+                                    margin: EdgeInsets.only(left: 70.0,
+                                        bottom: 30.0,
+                                        top: 10.0,
+                                        right: 5.0),
+                                  )
+                                ]
+                            ),
+                            new Container(
+                              margin: EdgeInsets.only(left: 20.0, top: 10.0),
+                              child: Text(capitalize(document['businessName']),
+                                  textScaleFactor: 1.0,style: TextStyle(
+                                    fontFamily: 'GoogleSansFamily',)),
+                            )
+                          ],
+                        ));
+                    /* } else {
+                      return Container(
+                         *//* margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                          child: Center(
+                            child: Text(''),
+                          )*//*
+                      );
+                    }*/
+                  } else {
+                    return Container(
+                      /*   margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                        child: Center(
+                          child: Text(''),
+                        )*/
+                    );
+                  }
+                  return new ListTile(
+                      title: new Text(document['name']),
+                      subtitle: new Text(document['status']));
+                }).toList()
+            )
+        );
+      },
+    );
+  }
+
+
+  Future getFriendList(BuildContext context, String currentUserId,
+      DocumentSnapshot documentSnapshot) async {
+    var businessUserName = documentSnapshot['businessName'];
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) =>
+        BusinessDetailPage(documentSnapshot['businessId'], businessUserName)));
   }
 }

@@ -151,8 +151,8 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                       decoration: BoxDecoration(
                           color: text_color,
                           borderRadius: new BorderRadius.only(
-                            topLeft: const Radius.circular(30.0),
-                            topRight: const Radius.circular(30.0),
+                            topLeft: const Radius.circular(20.0),
+                            topRight: const Radius.circular(20.0),
                           )
                       ),
                       child: Stack(
@@ -209,7 +209,9 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                     valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
           } else {
             listMessage = snapshot.data.documents;
-            return ListView.builder(
+            return  (listMessage.length == 0) ?   Center(
+              child: Text(no_tweet),
+            ) :ListView.builder(
               scrollDirection: Axis.vertical,
               itemBuilder: (context, index) =>
                   buildItem(index, snapshot.data.documents[index]),

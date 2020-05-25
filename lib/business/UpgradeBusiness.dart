@@ -4,12 +4,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 //import 'package:flutter_google_places/flutter_google_places.dart';
 //import 'package:google_maps_webservice/places.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:virus_chat_app/LocationService.dart';
+import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -117,8 +120,8 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                   decoration: BoxDecoration(
                       color: text_color,
                       borderRadius: new BorderRadius.only(
-                        topLeft: const Radius.circular(30.0),
-                        topRight: const Radius.circular(30.0),
+                        topLeft: const Radius.circular(20.0),
+                        topRight: const Radius.circular(20.0),
                       )
                   ),
                   child: SingleChildScrollView(
@@ -144,7 +147,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                                   strokeWidth: 2.0,
                                                   valueColor: AlwaysStoppedAnimation<
                                                       Color>(
-                                                      themeColor),
+                                                      progress_color),
                                                 ),
                                                 width: 70.0,
                                                 height: 70.0,
@@ -162,10 +165,11 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                       ),
                                     )
                                         : IconButton(
-                                      icon: Icon(
-                                        Icons.account_circle,
-                                        size: 70.0,
-                                        color: greyColor,
+                                      icon:  new SvgPicture.asset(
+                                        'images/user_unavailable.svg',
+                                        height: 70.0,
+                                        width: 70.0,
+                                        fit: BoxFit.cover,
                                       ),
                                       onPressed: () {
                                         getImage();
@@ -451,6 +455,14 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
       Firestore.instance.collection('users').document(userId).updateData({
         'businessId': reference.documentID,
         'businessType': BUSINESS_TYPE_OWNER
+      });
+      UserLocation currentLocation = await LocationService(reference.documentID)
+          .getLocation();
+      Firestore.instance.collection('users').document(reference.documentID)
+          .collection('userLocation').document(reference.documentID)
+          .setData({
+        'userLocation': new GeoPoint(
+            currentLocation.latitude, currentLocation.longitude),
       });
       await preferences.setString('BUSINESS_ID', reference.documentID);
       await preferences.setString('BUSINESS_NAME', businessName);

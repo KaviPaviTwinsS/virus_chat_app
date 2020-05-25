@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -195,8 +196,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                   decoration: BoxDecoration(
                       color: text_color,
                       borderRadius: new BorderRadius.only(
-                        topLeft: const Radius.circular(30.0),
-                        topRight: const Radius.circular(30.0),
+                        topLeft: const Radius.circular(20.0),
+                        topRight: const Radius.circular(20.0),
                       )
                   ),
                   child: SingleChildScrollView(
@@ -219,7 +220,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                               child: CircularProgressIndicator(
                                                 strokeWidth: 2.0,
                                                 valueColor: AlwaysStoppedAnimation<
-                                                    Color>(themeColor),
+                                                    Color>(progress_color),
                                               ),
                                               width: 90.0,
                                               height: 90.0,
@@ -235,16 +236,26 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                       clipBehavior: Clip.hardEdge,
                                     )
                                 )
-                                    : IconButton(
-                                  icon: Icon(
-                                    Icons.account_circle,
-                                    size: 70.0,
-                                    color: greyColor,
-                                  ),
-                                  onPressed: () {
-                                    getImage();
-                                  },))
-                                    : Material(
+                                    : Container(
+                                  width: 100.0,
+                                  height: 100.0,
+                                  child: IconButton(
+                                    icon: new SvgPicture.asset(
+                                      'images/user_unavailable.svg',
+                                      height: 70.0,
+                                      width: 70.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    onPressed: () {
+                                      getImage();
+                                    },),
+                                ))
+                                    : GestureDetector(
+                              onTap: (){
+                                print('getImage');
+                                getImage();
+                              },
+                              child :Material(
                                   child: Image.file(
                                     avatarImageFile,
                                     width: 90.0,
@@ -255,16 +266,19 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                       Radius.circular(45.0)),
                                   clipBehavior: Clip.hardEdge,
                                 ),
+                                ),
                                 photoUrl == '' ? IconButton(
-                                  icon: Icon(
-                                    Icons.camera_alt,
-                                    color: primaryColor.withOpacity(0.5),
+                                  icon:new SvgPicture.asset(
+                                    'images/camera.svg',
+                                    height: 35.0,
+                                    width: 35.0,
+                                    fit: BoxFit.cover,
                                   ),
                                   onPressed: getImage,
-                                  padding: EdgeInsets.all(30.0),
+                                  padding: EdgeInsets.all(40.0),
                                   splashColor: Colors.transparent,
                                   highlightColor: greyColor,
-                                  iconSize: 30.0,
+                                  iconSize: 20.0,
                                 ) : Text(''),
                               ],
                             ),
@@ -279,7 +293,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                             // Username
                             Container(
                               margin: const EdgeInsets.only(
-                                  left: 20.0, top: 20.0, right: 20.0),
+                                  left: 5.0, top: 20.0, right: 5.0),
                               child: TextField(
                                 obscureText: false,
                                 controller: userNameController,
@@ -306,7 +320,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
 
                             Container(
                               margin: const EdgeInsets.only(
-                                  left: 20.0, top: 5.0, right: 20.0),
+                                  left: 5.0, top: 5.0, right: 5.0),
                               child: TextField(
                                 obscureText: false,
                                 controller: userNockNameController,
@@ -332,7 +346,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                             ),
                             Container(
                               margin: const EdgeInsets.only(
-                                  left: 20.0, top: 5.0, right: 20.0),
+                                  left: 5.0, top: 5.0, right: 5.0),
                               child: TextField(
                                 obscureText: false,
                                 controller: userEmailController,
@@ -364,9 +378,9 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                           alignment: Alignment.bottomCenter,
                           child: Container(
                             margin: EdgeInsets.only(
-                                top: 30.0, left: 10.0, right: 10.0),
-                            padding: EdgeInsets.all(30.0),
-                            width: double.infinity,
+                                top: 30.0, left: 5.0, right: 5.0),
+//                            padding: EdgeInsets.all(30.0),
+                            width: MediaQuery.of(context).size.width - 10,
                             child: SizedBox(
                               height: 45, // specific value
                               child: RaisedButton(
@@ -394,7 +408,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                         )
                       ],
                     ),
-                    padding: EdgeInsets.only(left: 15.0, right: 15.0),
+//                    padding: EdgeInsets.only(left: 15.0, right: 15.0),
                   ),
                 )
             )
@@ -520,7 +534,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     await prefs.setString('BUSINESS_ID', '');
     await prefs.setString('BUSINESS_TYPE', '');
     await prefs.setString('signInType', signInType);
-    Navigator.push(
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) =>

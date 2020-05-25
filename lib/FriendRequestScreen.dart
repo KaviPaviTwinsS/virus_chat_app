@@ -8,6 +8,8 @@ import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:intl/intl.dart';
+import 'package:virus_chat_app/utils/constants.dart';
+
 
 class FriendRequestScreen extends StatelessWidget {
 
@@ -128,8 +130,8 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                                 top: 10.0, right: 10.0, bottom: 35.0),
                             child: Text(friend_request, style: TextStyle(
                                 color: text_color,
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold),)
+                                fontSize: TOOL_BAR_TITLE_SIZE,
+                                fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),)
                         ),
                       ],
                     ),
@@ -150,8 +152,8 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                   decoration: BoxDecoration(
                       color: text_color,
                       borderRadius: new BorderRadius.only(
-                        topLeft: const Radius.circular(30.0),
-                        topRight: const Radius.circular(30.0),
+                        topLeft: const Radius.circular(20.0),
+                        topRight: const Radius.circular(20.0),
                       )
                   ),
                   child: Container(
@@ -200,11 +202,11 @@ class friendlist extends StatelessWidget {
                     child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(progress_color)));*/
             return Center(
-              child: Text(pending_request),
+              child: Text(pending_request,style: TextStyle(fontFamily: 'GoogleSansFamily'),),
             );
           } else {
             return (snapshot.data.documents.length == 0) ? Center(
-              child: Text(pending_request),
+              child: Text(pending_request,style: TextStyle(fontFamily: 'GoogleSansFamily'),),
             ) : new ListView(
                 scrollDirection: Axis.vertical,
                 children: snapshot.data.documents.map((document) {
@@ -226,21 +228,21 @@ class friendlist extends StatelessWidget {
                         if(differenceMins == 0){
                           if(differenceSecs == 0){
                           }else{
-                            mDifference = differenceSecs.toString() +'\t secs';
+                            mDifference = differenceSecs.toString() +'\tsecs';
                           }
                         }else{
-                          mDifference = differenceMins.toString() +'\t mins';
+                          mDifference = differenceMins.toString() +'\tmins';
                         }
                       }else{
-                        mDifference = differenceHours.toString() +'\t hours';
+                        mDifference = differenceHours.toString() +'\thours';
                       }
                     }else{
                       if(differenceDays == 1){
-                        mDifference = differenceDays.toString() +'\t day';
+                        mDifference = differenceDays.toString() +'\tday';
                       }else if(differenceDays == 30){
                         differenceDays = 1;
                       }else{
-                        mDifference = differenceDays.toString() +'\t days';
+                        mDifference = differenceDays.toString() +'\tdays';
                       }
                     }
                     return GestureDetector(
@@ -263,7 +265,7 @@ class friendlist extends StatelessWidget {
                                             strokeWidth: 2.0,
                                             valueColor: AlwaysStoppedAnimation<
                                                 Color>(
-                                                themeColor),
+                                                progress_color),
                                           ),
                                           width: 70.0,
                                           height: 70.0,
@@ -288,11 +290,11 @@ class friendlist extends StatelessWidget {
                                   child: Text(
                                     capitalize(document['friendName']),
                                     style: TextStyle(
-                                        fontWeight: FontWeight.bold),),
+                                        fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),),
                                 ),
                                 new Container(
-                                  margin: EdgeInsets.only(left : 10.0,top: 5.0),
-                                  child:Text('Requested '+mDifference+'\t ago'),
+                                  margin: EdgeInsets.only(left : 13.0,top: 5.0),
+                                  child:Text('Requested '+mDifference+'\tago',style: TextStyle(fontFamily: 'GoogleSansFamily'),),
                                 )
                               ],
                             ),

@@ -239,6 +239,13 @@ class LoginSelectionOption extends State<LoginSelection> {
         .collection('users')
         .document(documents[0]['id'])
         .updateData({'status': 'ACTIVE'});
+    if (documents[0]['businessId'] != '' &&
+        documents[0]['businessId'] != null) {
+      await Firestore.instance
+          .collection('business')
+          .document(documents[0]['businessId'])
+          .updateData({'status': 'ACTIVE'});
+    }
     print(
         'updateLocalListData___________ ${documents[0]['name']} _________ ${documents[0]['businessId']} ______${documents[0]['id']}');
 //    setState(() {
@@ -357,7 +364,6 @@ class LoginSelectionOption extends State<LoginSelection> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return
@@ -397,48 +403,50 @@ class LoginSelectionOption extends State<LoginSelection> {
                               child: Column(
                                 children: <Widget>[
                                   Container(
-                                    width: MediaQuery
-                                        .of(context)
-                                        .size
-                                        .width,
-                                    margin: EdgeInsets.only(
-                                        left: 20.0, right: 20.0),
-                                    height: 45.0,
-                                    child:RaisedButton(
-                                    color: white_color,
-    shape: RoundedRectangleBorder(
-    borderRadius: new BorderRadius.circular(
-    30.0),
-    ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                                  return PhoneNumberSelectionPage();
-                                                }
-                                            ));
-                                      },
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment
-                                            .center,
-                                        mainAxisAlignment: MainAxisAlignment
-                                            .spaceAround,
-                                        children: <Widget>[
-                                          new SvgPicture.asset(
-                                            'images/phone.svg',
-                                            width: 20.0,
-                                            height: 20.0,
-                                            color: icon_color,
-                                          ),
-                                          Text('Continue with phone number',
-                                            style: TextStyle(
-                                                fontFamily: 'GoogleSansFamily',
-                                                fontWeight: FontWeight.w400),),
-                                        ],
-                                      ),
-                                    )
-                                   /* RaisedButton.icon(
+                                      width: MediaQuery
+                                          .of(context)
+                                          .size
+                                          .width,
+                                      margin: EdgeInsets.only(
+                                          left: 20.0, right: 20.0),
+                                      height: 45.0,
+                                      child: RaisedButton(
+                                        color: white_color,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: new BorderRadius
+                                              .circular(
+                                              30.0),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) {
+                                                    return PhoneNumberSelectionPage();
+                                                  }
+                                              ));
+                                        },
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment
+                                              .center,
+                                          mainAxisAlignment: MainAxisAlignment
+                                              .spaceAround,
+                                          children: <Widget>[
+                                            new SvgPicture.asset(
+                                              'images/phone.svg',
+                                              width: 20.0,
+                                              height: 20.0,
+                                              color: icon_color,
+                                            ),
+                                            Text('Continue with phone number',
+                                              style: TextStyle(
+                                                  fontFamily: 'GoogleSansFamily',
+                                                  fontWeight: FontWeight
+                                                      .w400),),
+                                          ],
+                                        ),
+                                      )
+                                    /* RaisedButton.icon(
                                       icon: new SvgPicture.asset(
                                         'images/phone.svg',
                                         width: 20.0,
@@ -501,26 +509,26 @@ class LoginSelectionOption extends State<LoginSelection> {
                                               .width) / 2) - 30,
                                           height: 45.0,
                                           child: RaisedButton(
-                                            onPressed: (){
+                                            onPressed: () {
                                               HandleGoogleSignIn();
                                             },
-                                            child : Row(
+                                            child: Row(
                                               crossAxisAlignment: CrossAxisAlignment
                                                   .center,
                                               mainAxisAlignment: MainAxisAlignment
                                                   .spaceAround,
-                                            children: <Widget>[
-                                              new SvgPicture.asset(
-                                                'images/gmail.svg',
-                                                width: 20.0,
-                                                height: 20.0,
-                                              ),
-                                              Text('Google',
-                                                style: TextStyle(
-                                                    fontFamily: 'GoogleSansFamily',
-                                                    fontWeight: FontWeight
-                                                        .w400),),
-                                            ],
+                                              children: <Widget>[
+                                                new SvgPicture.asset(
+                                                  'images/gmail.svg',
+                                                  width: 20.0,
+                                                  height: 20.0,
+                                                ),
+                                                Text('Google',
+                                                  style: TextStyle(
+                                                      fontFamily: 'GoogleSansFamily',
+                                                      fontWeight: FontWeight
+                                                          .w400),),
+                                              ],
                                             ),
                                             color: white_color,
                                             shape: RoundedRectangleBorder(
@@ -537,24 +545,24 @@ class LoginSelectionOption extends State<LoginSelection> {
                                                 .size
                                                 .width) / 2) - 30,
                                             child: RaisedButton(
-                                              child : Row(
+                                              child: Row(
                                                 crossAxisAlignment: CrossAxisAlignment
                                                     .center,
                                                 mainAxisAlignment: MainAxisAlignment
                                                     .spaceAround,
-    children: <Widget>[
-      new SvgPicture.asset(
-        'images/fb.svg',
-        width: 20.0,
-        height: 20.0,
-      ),
-      Text('Facebook',
-        style: TextStyle(
-            fontFamily: 'GoogleSansFamily',
-            fontWeight: FontWeight
-                .w400),),
-    ],
-    ),
+                                                children: <Widget>[
+                                                  new SvgPicture.asset(
+                                                    'images/fb.svg',
+                                                    width: 20.0,
+                                                    height: 20.0,
+                                                  ),
+                                                  Text('Facebook',
+                                                    style: TextStyle(
+                                                        fontFamily: 'GoogleSansFamily',
+                                                        fontWeight: FontWeight
+                                                            .w400),),
+                                                ],
+                                              ),
 
                                               onPressed: () {
                                                 this.setState(() {
@@ -587,7 +595,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                         child: Center(
                           child: CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                  themeColor)),
+                                  progress_color)),
                         ),
                         color: Colors.white.withOpacity(0.8),
                       )

@@ -168,7 +168,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                                     child: CircularProgressIndicator(
                                                       strokeWidth: 1.0,
                                                       valueColor: AlwaysStoppedAnimation<
-                                                          Color>(themeColor),
+                                                          Color>(progress_color),
                                                     ),
                                                     width: 35.0,
                                                     height: 35.0,
@@ -218,8 +218,8 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                         decoration: BoxDecoration(
                             color: text_color,
                             borderRadius: new BorderRadius.only(
-                              topLeft: const Radius.circular(30.0),
-                              topRight: const Radius.circular(30.0),
+                              topLeft: const Radius.circular(20.0),
+                              topRight: const Radius.circular(20.0),
                             )
                         ),
                         child: Container(
@@ -279,23 +279,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
           .collection('FriendsList')
           .document(_mPeerId);*/
       // Update data to server if new user
-      Firestore.instance
-          .collection('users')
-          .document(_mCurrentUserId)
-          .collection('FriendsList')
-          .document(_mPeerId).setData({
-        'requestFrom': _mCurrentUserId,
-        'receiveId': _mPeerId,
-        'IsAcceptInvitation': false,
-        'isRequestSent': true,
-        'friendPhotoUrl': _userPhotoUrl,
-        'friendName': _userName,
-        'isAlreadyRequestSent': true,
-        'timestamp': DateTime
-            .now()
-            .millisecondsSinceEpoch
-            .toString(),
-      })
+
       /*Firestore.instance.runTransaction((transaction) async {
         await transaction.set(
           documentReference,
@@ -315,7 +299,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
         ).catchError((error){
           error.toString();
         });
-      })*/.whenComplete(() {
+      })*/
      /*   var documentReference1 = Firestore.instance
             .collection('users')
             .document(_mPeerId)
@@ -342,16 +326,32 @@ class SendInviteToUserState extends State<SendInviteToUser> {
           });
         });*/
 
-
+      Firestore.instance
+          .collection('users')
+          .document(_mCurrentUserId)
+          .collection('FriendsList')
+          .document(_mPeerId).setData({
+        'requestFrom': _mCurrentUserId,
+        'receiveId': _mPeerId,
+        'IsAcceptInvitation': false,
+        'isRequestSent': true,
+        'friendPhotoUrl': _userPhotoUrl,
+        'friendName': _userName,
+        'isAlreadyRequestSent': true,
+        'timestamp': DateTime
+            .now()
+            .millisecondsSinceEpoch
+            .toString(),
+      }).whenComplete(() {
         Firestore.instance
             .collection('users')
-            .document(_mCurrentUserId)
+            .document(_mPeerId)
             .collection('FriendsList')
-            .document(_mPeerId).setData({
+            .document(_mCurrentUserId).setData({
           'requestFrom': _mCurrentUserId,
           'receiveId': _mPeerId,
           'IsAcceptInvitation': false,
-          'isRequestSent': true,
+          'isRequestSent': false,
           'friendPhotoUrl': _userPhotoUrl,
           'friendName': _userName,
           'isAlreadyRequestSent': true,

@@ -133,6 +133,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   double sliderCurrentPosition = 0.0;
   double maxDuration = 1.0;
   bool isPlaying = false;
+  var mIndex = -1;
   final _controller = TextEditingController();
 
 
@@ -144,6 +145,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
   @override
   void initState() {
+    super.initState();
+
     focusNode.addListener(onFocusChange);
     groupChatId = '';
 
@@ -162,7 +165,6 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
         composing: TextRange.empty,
       );
     });
-    super.initState();
   }
 
   String mDifference = '';
@@ -227,7 +229,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
   readLocal() async {
     prefs = await SharedPreferences.getInstance();
-    id = prefs.getString('id') ?? currentUserId;
+    id = prefs.getString('userId') ?? '';
     print('RECENT CHAT $id ___________peer $peerId');
     if (id.hashCode <= peerId.hashCode) {
       groupChatId = '$id-$peerId';
@@ -613,7 +615,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                             Container(
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                    themeColor),
+                                    progress_color),
                               ),
                               width: 200.0,
                               height: 200.0,
@@ -694,19 +696,31 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                         IconButton(
                           icon: Icon(Icons.play_circle_filled),
                           onPressed: () {
+                            mIndex = index;
                             isPlaying
                                 ? flutterStopPlayer(
-                                document['content'], document['audioTime'])
+                                listMessage[index]['content'], document['audioTime'])
                                 : flutterPlaySound(
-                                document['content'], document['audioTime']);
+                                listMessage[index]['content'], document['audioTime']);
                           },
                         ),
-                        new Slider(
+                        (index == mIndex) ? new Slider(
                           label: index.toString(),
                           value: sliderCurrentPosition,
                           min: 0.0,
                           max: maxDuration,
                           divisions: maxDuration == 0.0 ? 1 : maxDuration
+                              .toInt(),
+                          onChanged: (double value) {
+
+                          },) : new Slider(
+                          label: index.toString(),
+                          value: 0.0,
+                          min: 0.0,
+                          max: 0.0,
+                          divisions: 0.0 == 0.0
+                              ? 1
+                              : 0.0
                               .toInt(),
                           onChanged: (double value) {},),
                       ],
@@ -744,17 +758,26 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                     onPressed: () {
                       isPlaying
                           ? flutterStopPlayer(
-                          document['content'], document['audioTime'])
+                          listMessage[index]['content'], document['audioTime'])
                           : flutterPlaySound(
-                          document['content'], document['audioTime']);
+                          listMessage[index]['content'], document['audioTime']);
                     },
                   ),
-                  new Slider(
+                  (index == mIndex) ? new Slider(
                     label: index.toString(),
                     value: sliderCurrentPosition,
                     min: 0.0,
                     max: maxDuration,
                     divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt(),
+                    onChanged: (double value) {},) :  new Slider(
+                    label: index.toString(),
+                    value: 0.0,
+                    min: 0.0,
+                    max: 0.0,
+                    divisions: 0.0 == 0.0
+                        ? 1
+                        : 0.0
+                        .toInt(),
                     onChanged: (double value) {},),
                 ],
               ),
@@ -782,7 +805,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                               child: CircularProgressIndicator(
                                 strokeWidth: 1.0,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                    themeColor),
+                                    progress_color),
                               ),
                               width: 35.0,
                               height: 35.0,
@@ -845,7 +868,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                                 Container(
                                   child: CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                        themeColor),
+                                        progress_color),
                                   ),
                                   width: 200.0,
                                   height: 200.0,
@@ -922,14 +945,12 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                                     onPressed: () {
                                       isPlaying
                                           ? flutterStopPlayer(
-                                          document['content'],
-                                          document['audioTime'])
+                                          listMessage[index]['content'], document['audioTime'])
                                           : flutterPlaySound(
-                                          document['content'],
-                                          document['audioTime']);
+                                          listMessage[index]['content'], document['audioTime']);
                                     },
                                   ),
-                                  new Slider(
+                                  (index == mIndex) ? new Slider(
                                     label: index.toString(),
                                     value: sliderCurrentPosition,
                                     min: 0.0,
@@ -938,7 +959,16 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                                         ? 1
                                         : maxDuration
                                         .toInt(),
-                                    onChanged: (double value) {},),
+                                    onChanged: (double value) {},) : new Slider(
+                                    label: index.toString(),
+                                    value: 0.0,
+                                    min: 0.0,
+                                    max: 0.0,
+                                    divisions: 0.0 == 0.0
+                                        ? 1
+                                        : 0.0
+                                        .toInt(),
+                                    onChanged: (double value) {},) ,
                                 ],
                               ),
                             ),
@@ -1052,6 +1082,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     flutterSound.onPlayerStateChanged.listen((e) {
       if (flutterSound.isPlaying) {
         setState(() {
+          print('My  e.currentPosition ${e.currentPosition}');
           this.sliderCurrentPosition = e.currentPosition;
           this.maxDuration = e.duration;
         });
@@ -1091,8 +1122,15 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
   bool isLastMessageLeft(int index) {
-    if ((index > 0 && listMessage != null &&
-        listMessage[index - 1]['idFrom'] == id) || index == 0) {
+    if ((index > 0 && listMessage != null && listMessage[index - 1]['idFrom'] == id) || index == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool isLastMessageRight(int index) {
+    if ((index > 0 && listMessage != null && listMessage[index - 1]['idFrom'] != id) || index == 0) {
       return true;
     } else {
       return false;
@@ -1173,14 +1211,6 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
   }
 
-  bool isLastMessageRight(int index) {
-    if ((index > 0 && listMessage != null &&
-        listMessage[index - 1]['idFrom'] != id) || index == 0) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   Future<bool> onBackPress() {
     /* if (isShowSticker) {
@@ -1253,7 +1283,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 1.0,
                                       valueColor: AlwaysStoppedAnimation<
-                                          Color>(themeColor),
+                                          Color>(progress_color),
                                     ),
                                     width: 35.0,
                                     height: 35.0,
@@ -1344,8 +1374,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 decoration: BoxDecoration(
                     color: text_color,
                     borderRadius: new BorderRadius.only(
-                      topLeft: const Radius.circular(30.0),
-                      topRight: const Radius.circular(30.0),
+                      topLeft: const Radius.circular(20.0),
+                      topRight: const Radius.circular(20.0),
                     )
                 ),
                 child: Column(
@@ -1364,7 +1394,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                               Container(
                                 child: CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                      themeColor),
+                                      progress_color),
                                 ),
                                 width: 200.0,
                                 height: 200.0,
@@ -1555,12 +1585,12 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
               ),*/
               Material(
                 child: new Container(
-                  margin: EdgeInsets.only(left: 10.0),
+                  margin: EdgeInsets.only(left: 10.0,top: 10.0),
 //                  margin: new EdgeInsets.symmetric(horizontal: 1.0),
                   child: new IconButton(
                     icon: new SvgPicture.asset(
-                      'images/camera.svg', height: 30.0,
-                      width: 30.0,
+                      'images/camera.svg', height: 20.0,
+                      width: 20.0,
                     ),
                     onPressed: getCamera,
                     color: primaryColor,
@@ -1571,11 +1601,11 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
               // Button send image
               Material(
                 child: new Container(
-                  margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                  margin: EdgeInsets.only(top: 10.0),
                   child: new IconButton(
                     icon: new SvgPicture.asset(
-                      'images/pic.svg', height: 30.0,
-                      width: 30.0,
+                      'images/pic.svg', height: 20.0,
+                      width: 20.0,
                     ),
                     onPressed: getImage,
                     color: primaryColor,
@@ -1612,7 +1642,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                       child: Stack(
                         children: <Widget>[
                           Center(child: new Container(
-                            margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                            margin: EdgeInsets.only(top: 10.0),
                             child: audioClicked ? new IconButton(
                               icon: new SvgPicture.asset(
                                 'images/voice_highlight.svg', height: 20.0,
@@ -1641,12 +1671,13 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                           ),
                           ),
                           audioClicked ? Container(
-                              margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                              margin: EdgeInsets.only(top: 10.0),
                               child: CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                      themeColor)))
+                                      progress_color)))
                               : Center(child: new Container(
-                            margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                            margin: EdgeInsets.only(top: 10.0),
+//                            margin: new EdgeInsets.symmetric(horizontal: 1.0),
                             child: audioClicked ? new IconButton(
                               icon: new SvgPicture.asset(
                                 'images/voice_highlight.svg', height: 20.0,
@@ -1687,7 +1718,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             children: <Widget>[
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(left: 20.0, bottom: 5.0, top: 5.0),
+                  margin: EdgeInsets.only(left: 20.0, bottom: 5.0),
                   child: TextField(
                     style: TextStyle(color: black_color, fontSize: 15.0),
                     controller: _controller,
@@ -1728,7 +1759,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
         ],
       ),
       width: double.infinity,
-      height: 140.0,
+      height: 150.0,
       decoration: new BoxDecoration(
           border: new Border(
               top: new BorderSide(color: greyColor2, width: 0.5)),
@@ -1738,7 +1769,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
 
   Widget buildListMessage() {
-    groupChatId = '$peerId-$id';
+//    groupChatId = '$peerId-$id';
     return Flexible(
       child: groupChatId == ''
           ? Center(child: CircularProgressIndicator(
@@ -1778,8 +1809,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             return ListView.builder(
 //              padding: EdgeInsets.all(10.0),
               itemBuilder: (context, index) =>
-                  buildItem(index, snapshot.data.documents[index]),
-              itemCount: snapshot.data.documents.length,
+                  buildItem(index, listMessage[index]),
+              itemCount: listMessage.length,
               reverse: true,
               controller: listScrollController,
             );

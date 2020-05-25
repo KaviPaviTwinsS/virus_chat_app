@@ -1,24 +1,17 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-//import 'package:flutter_sms/flutter_sms.dart';
-//import 'package:flutter_sms/flutter_sms.dart';
-
-//import 'package:intl/intl_browser.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/business/flutter_sms.dart';
-import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -198,8 +191,8 @@ class AddEmployeeState extends State<AddEmployee> {
                   decoration: BoxDecoration(
                       color: greyColor2,
                       borderRadius: new BorderRadius.only(
-                        topLeft: const Radius.circular(30.0),
-                        topRight: const Radius.circular(30.0),
+                        topLeft: const Radius.circular(20.0),
+                        topRight: const Radius.circular(20.0),
                       )
                   ),
                   child: Align(
@@ -229,6 +222,8 @@ class AddEmployeeState extends State<AddEmployee> {
                                 onChanged: (value) {
                                   print('searchController $value');
                                   _mSearchContact = value;
+                                  if(_mSearchContact.length > 10)
+                                    refreshContacts('');
                                   refreshContacts('');
                                 },
                                 keyboardType: TextInputType.phone,
@@ -244,7 +239,7 @@ class AddEmployeeState extends State<AddEmployee> {
                                 } else {
                                   return buildItem(_contacts.elementAt(index));
                               }*/
-                                return buildItem(_contacts.elementAt(index));
+                                return buildItem(_contacts.elementAt(index),index);
                               },
                               itemCount: _contacts.length,
                               controller: listScrollController,
@@ -398,6 +393,32 @@ class AddEmployeeState extends State<AddEmployee> {
       _tempPhone = mPhone.substring(5,mPhone.length);
     }else if(mPhone.length == 16){
       _tempPhone = mPhone.substring(6,mPhone.length);
+    }else{
+    }
+    return _tempPhone;
+  }
+
+
+
+  String getPhoneValidationNewEmployee(String mPhone){
+    print('NANDHU AddEmployeeState getPhoneValidation mPhone length ${mPhone.length} ___________________________$mPhone');
+    var _tempPhone = '';
+    if(mPhone.length == 10){
+      _tempPhone = mPhone;
+    }else if(mPhone.length == 11){
+      _tempPhone = mPhone.substring(1,mPhone.length);
+    }else if(mPhone.length == 12){
+      _tempPhone = mPhone.substring(2,mPhone.length);
+    }else if(mPhone.length == 13){
+      _tempPhone = mPhone.substring(3,mPhone.length);
+    }else if(mPhone.length == 14){
+      _tempPhone = mPhone.substring(4,mPhone.length);
+    }else if(mPhone.length == 15){
+      _tempPhone = mPhone.substring(5,mPhone.length);
+    }else if(mPhone.length == 16){
+      _tempPhone = mPhone.substring(6,mPhone.length);
+    }else{
+      _tempPhone = '-101';
     }
     return _tempPhone;
   }
@@ -442,7 +463,7 @@ class AddEmployeeState extends State<AddEmployee> {
     }
   }
 
-  Widget buildItem(Contact contacts) {
+  Widget buildItem(Contact contacts, int index) {
     _mContacts = contacts;
     alreadyUserInBusiness = '';
     Iterable<Item> mPhone = contacts.phones;
@@ -480,7 +501,6 @@ class AddEmployeeState extends State<AddEmployee> {
     }
     return GestureDetector(
       onTap: (){
-
       },
       child: Container(
 //        margin: EdgeInsets.all(10.0),
@@ -503,10 +523,11 @@ class AddEmployeeState extends State<AddEmployee> {
                    ),
                    clipBehavior: Clip.hardEdge,
                  ) : Material(
-                   child: Icon(
-                     Icons.account_circle,
-                     size: 70.0,
-                     color: greyColor,
+                   child: new SvgPicture.asset(
+                     'images/user_unavailable.svg',
+                     height: 70.0,
+                     width: 70.0,
+                     fit: BoxFit.cover,
                    ),
                    borderRadius: BorderRadius.all(
                      Radius.circular(40.0),
@@ -518,7 +539,7 @@ class AddEmployeeState extends State<AddEmployee> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      margin: EdgeInsets.only(left: 10.0,top: 20.0),
+                      margin: EdgeInsets.only(left: 10.0,top: 30.0),
                       child: Text(mContactName,
                         style: TextStyle(fontWeight: FontWeight.bold),),
                     ),
@@ -531,12 +552,11 @@ class AddEmployeeState extends State<AddEmployee> {
                 Spacer(),
                 !alreadyUser && _contacts.length !=0 ? GestureDetector(
                   onTap: (){
-                    print('ADD Employeee $contacts');
-                    AddNewEmployee(contacts);
-
+                    print('ADD Employeee $contacts _____________ index $index ______${_contacts.elementAt(index)}');
+                    AddNewEmployee(_contacts.elementAt(index));
                   },
                   child:Container(
-                    margin: EdgeInsets.only(right: 10.0,left : 0.0,top: 0.0, bottom: 0.0),
+                    margin: EdgeInsets.only(right: 10.0,left : 0.0,top: 10.0, bottom: 0.0),
                     child:  Align(
                       alignment: Alignment.topRight,
                       child:
@@ -549,10 +569,10 @@ class AddEmployeeState extends State<AddEmployee> {
                 ): alreadyUser && _mSearchContact.length == MOBILE_NUMBER_LENGTH ? GestureDetector(
                     onTap: (){
                       print('ADD AddUserAsEmployee $alreadyUserId');
-                      AddUserAsEmployee(contacts);
+                      AddUserAsEmployee(_contacts.elementAt(index));
                     },
                     child:Container(
-                  margin: EdgeInsets.only(right: 10.0, top: 0.0, bottom: 5.0),
+                  margin: EdgeInsets.only(right: 10.0, top: 10.0, bottom: 5.0),
                   child: Align(
                     alignment: Alignment.topRight,
                     child:new SvgPicture.asset(
@@ -561,7 +581,23 @@ class AddEmployeeState extends State<AddEmployee> {
                       ),
                   ),
                     )
-                ):Text('')
+                ): GestureDetector(
+                    onTap: (){
+                      print('ADD Employeee $contacts _____________ index $index ______${_contacts.elementAt(index)}');
+                      AddNewEmployee(_contacts.elementAt(index));
+                    },
+                    child:Container(
+                      margin: EdgeInsets.only(right: 10.0,left : 0.0,top: 10.0, bottom: 0.0),
+                      child:  Align(
+                        alignment: Alignment.topRight,
+                        child:
+                        new SvgPicture.asset(
+                          'images/employee_invite.svg', height: 60.0,
+                          width: 60.0,
+                        ),
+                      ),
+                    )
+                )
               ],
             ),
             Divider()
@@ -584,41 +620,67 @@ class AddEmployeeState extends State<AddEmployee> {
     alreadyUserInBusiness = '';
     for (final phone in mPhone) {
       _mContactPhone = phone.value;
+      print('naga______________phone $_mContactPhone ');
       mContactPhone = phone.value;
-      mContactPhone = getPhoneValidation(mContactPhone.trim());
+      mContactPhone = getPhoneValidationNewEmployee(_mContactPhone.trim());
     }
     mContactName = contacts.displayName;
     if(documents.length !=0) {
-      alreadyUser = false;
-      for (int i = 0; i < documents.length; i++) {
-        print('NANDHU AddEmployeeState AddNewEmployee ___documents phoneNo____${documents[i]['phoneNo']} _____mContactPhone$mContactPhone');
-        if(documents[i]['phoneNo'] != '' && documents[i]['phoneNo'] != null) {
-          var _mPhone = getPhoneValidation(documents[i]['phoneNo'].toString().replaceAll(' ', ''));
-          print('____________________________ $mContactPhone _____________$_mPhone');
-          if (mContactPhone == _mPhone) {
-            print('NANDHU AddEmployeeState AddNewEmployee ___documents mContactPhone____EQUAL}');
-            alreadyUser = true;
-            alreadyUserId = documents[i]['id'];
-            alreadyUserbusinessId = documents[i]['businessId'];
-            print('NANDHU AddEmployeeState AddNewEmployee ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}');
-            if(alreadyUserbusinessId != null && alreadyUserbusinessId == _mBusinessId)
-              alreadyUserInBusiness = 'SAME';
-            else if(alreadyUserbusinessId != null && alreadyUserbusinessId != '')
-              alreadyUserInBusiness = 'DIFF';
-            else
-              alreadyUserInBusiness ='';
-          } else {
-            print('NANDHU AddEmployeeState AddNewEmployee___documents mContactPhone____NOT___EQUAL');
+      if( mContactPhone == '-101')
+      Fluttertoast.showToast(msg: 'Please add a valid phone number');
+      else {
+        alreadyUser = false;
+        for (int i = 0; i < documents.length; i++) {
+          print(
+              'NANDHU AddEmployeeState AddNewEmployee ___documents phoneNo____${documents[i]['phoneNo']} _____mContactPhone$mContactPhone');
+          if (documents[i]['phoneNo'] != '' &&
+              documents[i]['phoneNo'] != null) {
+            var _mPhone = getPhoneValidation(
+                documents[i]['phoneNo'].toString().replaceAll(' ', ''));
+            print(
+                '____________________________ $mContactPhone _____________$_mPhone');
+            if (mContactPhone == _mPhone) {
+              print(
+                  'NANDHU AddEmployeeState AddNewEmployee ___documents mContactPhone____EQUAL}');
+              alreadyUser = true;
+              alreadyUserId = documents[i]['id'];
+              alreadyUserbusinessId = documents[i]['businessId'];
+              print(
+                  'NANDHU AddEmployeeState AddNewEmployee ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}');
+              if (alreadyUserbusinessId != null &&
+                  alreadyUserbusinessId == _mBusinessId)
+                alreadyUserInBusiness = 'SAME';
+              else
+              if (alreadyUserbusinessId != null && alreadyUserbusinessId != '')
+                alreadyUserInBusiness = 'DIFF';
+              else
+                alreadyUserInBusiness = '';
+            } else {
+              print(
+                  'NANDHU AddEmployeeState AddNewEmployee___documents mContactPhone____NOT___EQUAL');
+            }
           }
         }
       }
     }
     DocumentReference reference = Firestore.instance.collection('users').document();
     print('NANDHU AddEmployeeState AddNewEmployee Reference check ___alreadyUserInBusiness_${alreadyUserInBusiness}');
+    setState(() {
+      isLoading = true;
+    });
     if(alreadyUserInBusiness == 'SAME'){
-      Fluttertoast.showToast(msg: 'Already user in this business');
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(msg: 'Already employee in this business');
+      Navigator.pop(context);
+
     } else if( alreadyUserInBusiness == 'DIFF'){
-      Fluttertoast.showToast(msg: 'Already user in this  some other business');
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(msg:'Already employee in this  some other business');
+      Navigator.pop(context);
     }else {
       print('NANDHU AddEmployeeState AddNewEmployee Reference check ___alreadyUserInBusiness_ELSEEEEEEEEEEEEEEEEE___${reference.documentID}');
       alreadyUserInBusiness = 'SAME';
@@ -684,16 +746,34 @@ class AddEmployeeState extends State<AddEmployee> {
             loadUsers();
           }).whenComplete((){
             print('NANDHU AddEmployeeState AddNewEmployee Reference Employee count');
+            if(_noOfEmployee == null)
+              _noOfEmployee = 0;
             _noOfEmployee = _noOfEmployee + 1;
             Firestore.instance.collection('business')
                 .document(_mBusinessId)
                 .updateData({
               'employeeCount': _noOfEmployee,
             });
+            setState(() {
+              isLoading = false;
+            });
             prefs.setInt('BUSINESS_EMPLOYEES_COUNT', _noOfEmployee);
+            Navigator.pop(context);
+
+            String message = "You are added in the "+"business";
+            print('NAndhini Ndot addemployee ${COUNTRY_CODE + "\t" + _mContactPhone} _______');
+            List<String> recipents = [COUNTRY_CODE + "\t" + _mContactPhone,];
+            _sendSMS(message, recipents);
+
+
+            Fluttertoast.showToast(msg: 'Business employee added successfully');
+
           });
         });
       } on Exception catch (e) {
+        setState(() {
+          isLoading = false;
+        });
         print('NANDHU AddEmployeeState AddNewEmployee Reference Could not add employee:  ${e.toString()}');
       }
       /* Firestore.instance.runTransaction((
@@ -777,6 +857,8 @@ class AddEmployeeState extends State<AddEmployee> {
         'businessName' : _mBusinessName
       }).whenComplete((){
         print('NANDHU AddEmployeeState AddUserAsEmployee ___employeeCount');
+        if(_noOfEmployee == null )
+          _noOfEmployee = 0;
         _noOfEmployee = _noOfEmployee + 1;
         alreadyUserInBusiness = 'SAME';
         Firestore.instance.collection('business')
@@ -792,15 +874,17 @@ class AddEmployeeState extends State<AddEmployee> {
         }
 
         String message = "You are added in the "+"business";
+        print('NAndhini Ndot addemployee ${_mUserPhone} _______');
         List<String> recipents = [_mUserPhone,];
-        Navigator.pop(context);
         _sendSMS(message, recipents);
+        Navigator.pop(context);
       });
     }
   }
 
 
   void _sendSMS(String message, List<String> recipents) async {
+    print('SEND SMSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS');
     String _result = await FlutterSms
         .sendSMS(message: message, recipients: recipents)
         .catchError((onError) {
