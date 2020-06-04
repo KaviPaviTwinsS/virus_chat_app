@@ -134,6 +134,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.2+4"
+  draggable_floating_button:
+    dependency: "direct main"
+    description:
+      name: draggable_floating_button
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1"
   expandable:
     dependency: "direct main"
     description:
@@ -300,6 +307,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.4+1"
+  flutter_speed_dial:
+    dependency: "direct main"
+    description:
+      name: flutter_speed_dial
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.5"
   flutter_svg:
     dependency: "direct main"
     description:

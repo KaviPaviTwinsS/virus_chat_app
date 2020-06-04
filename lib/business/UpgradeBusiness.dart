@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/UserLocation.dart';
+import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -36,6 +37,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
   String photoUrl = '';
   bool isLoading = false;
   String userId = '';
+  String _signInType = '';
   TextEditingController controllerName;
   TextEditingController controllerAddress;
   TextEditingController controllerNumber;
@@ -59,6 +61,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
   Future initialise() async {
     preferences = await SharedPreferences.getInstance();
     _ownerName = await preferences.getString('name');
+    _signInType = await preferences.getString('signInType');
     controllerName = new TextEditingController(text: businessName);
     controllerAddress = new TextEditingController(text: businessAddress);
     controllerNumber = new TextEditingController(text: businessNumber);
@@ -136,9 +139,9 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                         ? (photoUrl != null &&
                                         photoUrl != ''
                                         ? GestureDetector(
-                                      onTap: (){
+                                      onTap: () {
                                         print('getImage');
-                                            },
+                                      },
                                       child: Material(
                                         child: CachedNetworkImage(
                                           placeholder: (context, url) =>
@@ -164,45 +167,50 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                         clipBehavior: Clip.hardEdge,
                                       ),
                                     )
-                                        : IconButton(
-                                      icon:  new SvgPicture.asset(
-                                        'images/user_unavailable.svg',
-                                        height: 70.0,
-                                        width: 70.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      onPressed: () {
+                                        : Container(
+                                        width: 100.0,
+                                        height: 100.0,
+                                        child: IconButton(
+                                          icon: new SvgPicture.asset(
+                                            'images/user_unavailable.svg',
+                                            height: 70.0,
+                                            width: 70.0,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          onPressed: () {
+                                            getImage();
+                                          },))
+
+                                    ) : GestureDetector(
+                                      onTap: () {
+                                        print('getImage');
                                         getImage();
-                                      },))
-                                        :  GestureDetector(
-                                  onTap: (){
-                                    print('getImage');
-                                    getImage();
-                                  },
-                                  child : Material(
-                                      child: Image.file(
-                                        avatarImageFile,
-                                        width: 70.0,
-                                        height: 70.0,
-                                        fit: BoxFit.cover,
+                                      },
+                                      child: Material(
+                                        child: Image.file(
+                                          avatarImageFile,
+                                          width: 70.0,
+                                          height: 70.0,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(
+                                                45.0)),
+                                        clipBehavior: Clip.hardEdge,
                                       ),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(
-                                              45.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                    ),
                                     ),
                                     photoUrl == '' ? IconButton(
-                                      icon: Icon(
-                                        Icons.camera_alt,
-                                        color: primaryColor.withOpacity(
-                                            0.5),
+                                      icon: new SvgPicture.asset(
+                                        'images/camera.svg',
+                                        height: 35.0,
+                                        width: 35.0,
+                                        fit: BoxFit.cover,
                                       ),
                                       onPressed: getImage,
-                                      padding: EdgeInsets.all(30.0),
+                                      padding: EdgeInsets.all(40.0),
                                       splashColor: Colors.transparent,
                                       highlightColor: greyColor,
-                                      iconSize: 30.0,
+                                      iconSize: 20.0,
                                     ) : Text('')
                                   ],
                                 ),
@@ -220,7 +228,9 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                   ),
                                   child: Text(business_name.toUpperCase(),
                                     style: TextStyle(
-                                        fontFamily: 'GoogleSansFamily'),),
+                                        fontFamily: 'GoogleSansFamily',
+                                        color: text_color_grey,
+                                        fontSize: 12.0),),
                                 ),
                                 Container(
                                   child: TextField(
@@ -230,16 +240,17 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color: focused_border_color,
-                                            width: 1.0),
+                                            width: 0.5),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: greyColor, width: 1.0),
+                                            color: greyColor, width: 0.5),
                                       ),
                                       hintText: 'Enter business name',
                                       hintStyle: TextStyle(
                                           fontSize: HINT_TEXT_SIZE,
-                                          fontFamily: 'GoogleSansFamily'),
+                                          fontFamily: 'GoogleSansFamily',
+                                          color: text_color_grey),
                                     ),
                                     controller: controllerName,
                                     onChanged: (value) {
@@ -253,10 +264,12 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                   margin: EdgeInsets.only(
                                       left: 10.0,
                                       right: 10.0,
-                                      top: 20.0),
+                                      top: 30.0),
                                   child: Text(business_address.toUpperCase(),
                                     style: TextStyle(
-                                        fontFamily: 'GoogleSansFamily'),),
+                                        fontFamily: 'GoogleSansFamily',
+                                        color: text_color_grey,
+                                        fontSize: 12.0),),
                                 ),
                                 GestureDetector(
                                   onTap: () {
@@ -270,16 +283,17 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                         focusedBorder: OutlineInputBorder(
                                           borderSide: BorderSide(
                                               color: focused_border_color,
-                                              width: 1.0),
+                                              width: 0.5),
                                         ),
                                         enabledBorder: OutlineInputBorder(
                                           borderSide: BorderSide(
-                                              color: greyColor, width: 1.0),
+                                              color: greyColor, width: 0.5),
                                         ),
                                         hintText: 'Enter business address',
                                         hintStyle: TextStyle(
                                             fontSize: HINT_TEXT_SIZE,
-                                            fontFamily: 'GoogleSansFamily'),
+                                            fontFamily: 'GoogleSansFamily',
+                                            color: text_color_grey),
                                       ),
                                       controller: controllerAddress,
                                       onChanged: (value) {
@@ -294,10 +308,12 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                   margin: EdgeInsets.only(
                                       left: 10.0,
                                       right: 10.0,
-                                      top: 20.0),
+                                      top: 30.0),
                                   child: Text(business_number.toUpperCase(),
                                     style: TextStyle(
-                                        fontFamily: 'GoogleSansFamily'),),
+                                        fontFamily: 'GoogleSansFamily',
+                                        color: text_color_grey,
+                                        fontSize: 12.0),),
                                 ),
                                 Container(
                                   child: TextField(
@@ -307,16 +323,17 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color: focused_border_color,
-                                            width: 1.0),
+                                            width: 0.5),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: greyColor, width: 1.0),
+                                            color: greyColor, width: 0.5),
                                       ),
                                       hintText: 'Enter business Number',
                                       hintStyle: TextStyle(
                                           fontSize: HINT_TEXT_SIZE,
-                                          fontFamily: 'GoogleSansFamily'),
+                                          fontFamily: 'GoogleSansFamily',
+                                          color: text_color_grey),
                                     ),
                                     controller: controllerNumber,
                                     onChanged: (value) {
@@ -341,7 +358,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                     width: MediaQuery
                                         .of(context)
                                         .size
-                                        .width / 2 - 25,
+                                        .width / 2 - 20,
                                     child: RaisedButton(
                                         color: white_color,
                                         textColor: button_fill_color,
@@ -363,7 +380,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                       width: MediaQuery
                                           .of(context)
                                           .size
-                                          .width / 2 - 25,
+                                          .width / 2 - 20,
                                       child: RaisedButton(
                                           color: button_fill_color,
                                           textColor: text_color,
@@ -407,6 +424,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
 
 
   Future addBusiness() async {
+    isLoading = true;
     if ((businessNumber != '') ||
         (businessName != '' && businessAddress != '' && photoUrl != '')) {
       int currTime = ((new DateTime.now()
@@ -440,8 +458,18 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
           'businessId': reference.documentID,
           'ownerName': _ownerName,
           'createdAt': currTime
+        }).whenComplete(() =>
+        {
+          Firestore.instance.collection('users').document(userId).updateData({
+            'businessId': reference.documentID,
+            'businessType': BUSINESS_TYPE_OWNER
+          })
+        }).whenComplete(() => {
+            isLoading = false,
+//            Navigator.pop(context, true)
         });
       } on Exception catch (e) {
+        isLoading = false;
         print('Could not get Add businesss: ${e.toString()}');
       }
       /*reference.setData({
@@ -452,18 +480,15 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
         'businessId': reference.documentID,
         'createdAt':currTime
       });*/
-      Firestore.instance.collection('users').document(userId).updateData({
-        'businessId': reference.documentID,
-        'businessType': BUSINESS_TYPE_OWNER
-      });
-      UserLocation currentLocation = await LocationService(reference.documentID)
-          .getLocation();
-      Firestore.instance.collection('users').document(reference.documentID)
+
+    /*  UserLocation currentLocation = await LocationService(reference.documentID)
+          .getLocation();*/
+     /* Firestore.instance.collection('users').document(reference.documentID)
           .collection('userLocation').document(reference.documentID)
           .setData({
         'userLocation': new GeoPoint(
             currentLocation.latitude, currentLocation.longitude),
-      });
+      });*/
       await preferences.setString('BUSINESS_ID', reference.documentID);
       await preferences.setString('BUSINESS_NAME', businessName);
       await preferences.setString('BUSINESS_ADDRESS', businessAddress);
@@ -474,7 +499,11 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
       await preferences.setInt('BUSINESS_EMPLOYEES_COUNT', 0);
       await preferences.setString('BUSINESS_CREATED_AT', currTime.toString());
 
-      Navigator.of(context).pop(context);
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  ProfilePageSetup(_signInType,currentUserId: userId,)));
     }
   }
 

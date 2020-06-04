@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
+import 'package:draggable_floating_button/draggable_floating_button.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong/latlong.dart';
@@ -26,7 +28,7 @@ import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:async/async.dart';
 
-
+/*
 class UsersList extends StatelessWidget {
   String currentUser = '';
   String userSignInType = '';
@@ -58,14 +60,14 @@ class UsersList extends StatelessWidget {
       home: UsersListPage(currentUser, userSignInType, mphotoUrl),
     );
   }
-}
+}*/
 
-class UsersListPage extends StatefulWidget {
+class UsersList extends StatefulWidget {
   String currentUserId = '';
   String signInType = '';
   String mphotoUrl = '';
 
-  UsersListPage(String currentUser, String userSignInType, String photoUrl) {
+  UsersList(String currentUser, String userSignInType, String photoUrl) {
     currentUserId = currentUser;
     signInType = userSignInType;
     mphotoUrl = photoUrl;
@@ -77,7 +79,7 @@ class UsersListPage extends StatefulWidget {
   }
 }
 
-class UsersListState extends State<UsersListPage>
+class UsersListState extends State<UsersList>
     implements SliderListenerUpdate {
   String currentUserPhotoUrl = '';
   String currentUserName = '';
@@ -107,6 +109,7 @@ class UsersListState extends State<UsersListPage>
     await prefs.setString('USERSTATUS', 'LOGIN');
     currentUserName = await prefs.getString('name');
     currentUser = await prefs.getString('userId');
+    currentUserPhotoUrl = await prefs.getString('photoUrl');
     if (userSignInType == '') {
       userSignInType = await prefs.getString('signInType');
     }
@@ -219,6 +222,48 @@ class UsersListState extends State<UsersListPage>
     return WillPopScope(
       onWillPop: () async => false,
       child: new Scaffold(
+
+          floatingActionButton: SpeedDial(
+            animatedIcon: AnimatedIcons.menu_close,
+            animatedIconTheme: IconThemeData(size: 22.0),
+            // this is ignored if animatedIcon is non null
+//             child: Icon(Icons.add),
+            visible: true,
+            curve: Curves.easeInCirc,
+            overlayColor: Colors.black,
+            overlayOpacity: 0.5,
+            onOpen: () => print('OPENING DIAL'),
+            onClose: () => print('DIAL CLOSED'),
+            tooltip: 'Speed Dial',
+            heroTag: 'speed-dial-hero-tag',
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            elevation: 8.0,
+            shape: CircleBorder(),
+            children: [
+              SpeedDialChild(
+                  child: Icon(Icons.accessibility),
+                  backgroundColor: Colors.red,
+                  label: 'First',
+                  labelStyle: TextStyle(fontSize: 18.0),
+                  onTap: () => print('FIRST CHILD')
+              ),
+              SpeedDialChild(
+                child: Icon(Icons.brush),
+                backgroundColor: Colors.blue,
+                label: 'Second',
+                labelStyle: TextStyle(fontSize: 18.0),
+                onTap: () => print('SECOND CHILD'),
+              ),
+              SpeedDialChild(
+                child: Icon(Icons.keyboard_voice),
+                backgroundColor: Colors.green,
+                label: 'Third',
+                labelStyle: TextStyle(fontSize: 18.0),
+                onTap: () => print('THIRD CHILD'),
+              ),
+            ],
+          ),
           bottomNavigationBar: SizedBox(
             height: 70,
             child: BottomNavigationBar(
@@ -337,6 +382,7 @@ class UsersListState extends State<UsersListPage>
                     ),*/
           Stack(
             children: <Widget>[
+
               SingleChildScrollView(
                 child: Container(
                     color: button_fill_color,
@@ -356,7 +402,7 @@ class UsersListState extends State<UsersListPage>
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                        new ProfilePage(
+                                        new ProfilePageSetup(
                                           userSignInType,
                                           currentUserId: currentUser,)));
                               },
@@ -370,13 +416,13 @@ class UsersListState extends State<UsersListPage>
                                       placeholder: (context, url) =>
                                           Container(
                                             child: CircularProgressIndicator(
-                                              strokeWidth: 1.0,
+                                              strokeWidth: 2.0,
                                               valueColor: AlwaysStoppedAnimation<
                                                   Color>(progress_color),
                                             ),
                                             width: 35.0,
                                             height: 35.0,
-                                            padding: EdgeInsets.all(10.0),
+                                            padding: EdgeInsets.all(20.0),
                                           ),
                                       errorWidget: (context, url, error) =>
                                           Material(
@@ -601,6 +647,58 @@ class UsersListState extends State<UsersListPage>
                       )
                   )
               ),
+
+              DraggableFloatingActionButton(
+                data: 'dfab_demo',
+                offset: new Offset(100, 100),
+                backgroundColor: Theme.of(context).accentColor,
+                child: new Icon(
+                  Icons.wb_incandescent,
+                  color: Colors.yellow,
+                ),
+                onPressed: () =>  SpeedDial(
+                  animatedIcon: AnimatedIcons.menu_close,
+                  animatedIconTheme: IconThemeData(size: 22.0),
+                  visible: true,
+                  curve: Curves.easeInCirc,
+                  overlayColor: Colors.black,
+                  overlayOpacity: 0.5,
+                  onOpen: () => print('OPENING DIAL'),
+                  onClose: () => print('DIAL CLOSED'),
+                  tooltip: 'Speed Dial',
+                  heroTag: 'speed-dial-hero-tag',
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  elevation: 8.0,
+                  shape: CircleBorder(),
+                  children: [
+                    SpeedDialChild(
+                        child: Icon(Icons.accessibility),
+                        backgroundColor: Colors.red,
+                        label: 'First',
+                        labelStyle: TextStyle(fontSize: 18.0),
+                        onTap: () => print('FIRST CHILD')
+                    ),
+                    SpeedDialChild(
+                      child: Icon(Icons.brush),
+                      backgroundColor: Colors.blue,
+                      label: 'Second',
+                      labelStyle: TextStyle(fontSize: 18.0),
+                      onTap: () => print('SECOND CHILD'),
+                    ),
+                    SpeedDialChild(
+                      child: Icon(Icons.keyboard_voice),
+                      backgroundColor: Colors.green,
+                      label: 'Third',
+                      labelStyle: TextStyle(fontSize: 18.0),
+                      onTap: () => print('THIRD CHILD'),
+                    ),
+                  ],
+                ),
+                appContext: context,
+              ),
+
+
             ],
           )
 //                  ],

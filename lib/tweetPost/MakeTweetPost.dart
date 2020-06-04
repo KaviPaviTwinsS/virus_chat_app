@@ -240,7 +240,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
               Stack(
                 children: <Widget>[
                   document['userPhoto'] != '' ? Container(
-                      margin: EdgeInsets.only(left : 10.0,bottom: document['tweetPostImage'] != '' ? 210.0 : 100.0),
+                      margin: EdgeInsets.only(left : 10.0,bottom: document['tweetPostImage'] != '' ? 210.0 : 100.0,top: 10.0),
                       child: Material(
                         child: CachedNetworkImage(
                           placeholder: (context, url) =>
@@ -250,12 +250,12 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                       progress_color),
                                 ),
-                                width: 35.0,
-                                height: 35.0,
+                                width: 45.0,
+                                height: 45.0,
                               ),
                           imageUrl: document['userPhoto'],
-                          width: 35.0,
-                          height: 35.0,
+                          width: 45.0,
+                          height: 45.0,
                           fit: BoxFit.cover,
                         ),
                         borderRadius: BorderRadius.all(Radius.circular(45.0)),
@@ -270,7 +270,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[document['userName'] != '' ? Container(
-                              margin: EdgeInsets.only(left: 60.0,bottom: 5.0),
+                              margin: EdgeInsets.only(left: 70.0,bottom: 5.0),
                               child: Text(
                                   capitalize(document['userName']),
                                   style: TextStyle(color: button_fill_color,fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily')
@@ -285,9 +285,9 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                             ) : Text(''),
                             Spacer(),
                             Align(
-                              alignment: Alignment.topRight,
+                              alignment: Alignment.bottomRight,
                               child: Container(
-                                margin: EdgeInsets.only(right: 10.0,bottom: 5.0),
+                                margin: EdgeInsets.only(right: 10.0,top: 15.0),
                                 child: getIconWidget(document),
                               ),
                             )
@@ -295,14 +295,14 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                         ),
                       ),
                       document['content'] != '' ? Container(
-                          margin: EdgeInsets.only(left: 60.0,bottom: 15.0),
+                          margin: EdgeInsets.only(left: 70.0,bottom: 15.0),
                           width: MediaQuery.of(context).size.width - 100,
                           child: Text(
                               document['content'],style: TextStyle(fontFamily: 'GoogleSansFamily'),)
                       )
                           : Text(''),
                       document['tweetPostImage'] != '' ? Container(
-                        margin: EdgeInsets.only(left: 45.0,bottom: 15.0),
+                        margin: EdgeInsets.only(left: 55.0,bottom: 15.0),
                         child: FlatButton(
                           child: Material(
                             child: CachedNetworkImage(
@@ -331,7 +331,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                                     ),*/
                                     new SvgPicture.asset(
                                       'images/user_unavailable.svg', height: 250.0,
-                                      width: 150.0,
+                                      width: MediaQuery.of(context).size.width - 80,
                                       fit: BoxFit.cover,
                                     ),
                                     borderRadius: BorderRadius.all(
@@ -340,7 +340,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                                     clipBehavior: Clip.hardEdge,
                                   ),
                               imageUrl: document['tweetPostImage'],
-                              width: 150.0,
+                              width: MediaQuery.of(context).size.width - 60,
                               height: 200.0,
                               fit: BoxFit.cover,
                             ),
@@ -358,8 +358,6 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                 ],
               ),
               Divider(),
-
-
             ],
           ),
         )

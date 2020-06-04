@@ -48,7 +48,7 @@ class WalkThroughTwo extends StatelessWidget {
                             MaterialPageRoute(
                                 builder: (context) => new WalkThroughThree()));
                       },
-                      child: Text(skip, style: TextStyle(color: sky_blue,fontSize: 17.0,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w700,),),
+                      child: Text(skip, style: TextStyle(color: sky_blue,fontSize: 17.0,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w600,),),
                     ),
                   ),
                 )

@@ -111,7 +111,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     isLoggedIn = await googleSignIn.isSignedIn();
     isFacebookLoggedIn = await facebookSignup.facebookLogin.isLoggedIn;
     print('lodinnnn ${await prefs.getString('PUSH_TOKEN')}');
-    if (prefs.getString('signInType') == 'google') {
+   /* if (prefs.getString('signInType') == 'google') {
 //      navigateToUsersPage("google");
       navigateToProfilePageExistingUser(context, 'google', prefs);
     } else if (prefs.getString('signInType') == 'facebook') {
@@ -123,7 +123,7 @@ class LoginSelectionOption extends State<LoginSelection> {
       print(
           'NANDHUUUUUUUUUUUUUUU____________________________99999999999999999  ${prefs
               .getString('userId')}');
-    }
+    }*/
     this.setState(() {
       isLoading = false;
     });
@@ -253,7 +253,7 @@ class LoginSelectionOption extends State<LoginSelection> {
 //    });
     LocationService(documents[0]['id']);
     if (signInType == 'facebook') {
-      Navigator.push(
+      Navigator.pushReplacement(
           _mContext,
           MaterialPageRoute(
               builder: (context) =>
@@ -348,7 +348,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     isLoading = false;
 //    });
     if (loginType == 'facebook') {
-      Navigator.push(
+      Navigator.pushReplacement(
           _mContext,
           MaterialPageRoute(
               builder: (context) =>
@@ -432,17 +432,23 @@ class LoginSelectionOption extends State<LoginSelection> {
                                           mainAxisAlignment: MainAxisAlignment
                                               .spaceAround,
                                           children: <Widget>[
-                                            new SvgPicture.asset(
+    Container(
+    margin: EdgeInsets.only(right: 10.0),
+    child:new SvgPicture.asset(
                                               'images/phone.svg',
                                               width: 20.0,
                                               height: 20.0,
                                               color: icon_color,
                                             ),
-                                            Text('Continue with phone number',
-                                              style: TextStyle(
-                                                  fontFamily: 'GoogleSansFamily',
-                                                  fontWeight: FontWeight
-                                                      .w400),),
+    ),
+                                           Container(
+                                             margin: EdgeInsets.only(right: 40.0,left: 10.0),
+                                             child:  Text(continue_phone_number,
+                                               style: TextStyle(
+                                                   fontFamily: 'GoogleSansFamily',
+                                                   fontWeight: FontWeight
+                                                       .w600),),
+                                           )
                                           ],
                                         ),
                                       )
@@ -483,9 +489,10 @@ class LoginSelectionOption extends State<LoginSelection> {
                                         bottom: 10.0,
                                         top: 10.0),
                                     child: Text(
-                                      'Or connect using social account',
+                                      or_connect,
                                       style: TextStyle(
                                           fontFamily: 'GoogleSansFamily',
+                                          color: black_color,
                                           fontWeight: FontWeight.w400),),
                                   ),
                                   Container(
@@ -523,11 +530,15 @@ class LoginSelectionOption extends State<LoginSelection> {
                                                   width: 20.0,
                                                   height: 20.0,
                                                 ),
-                                                Text('Google',
+                                            Container(
+                                              margin: EdgeInsets.only(right: 30.0),
+                                              child: Text(google_txt,
                                                   style: TextStyle(
                                                       fontFamily: 'GoogleSansFamily',
+                                                      color: black_color,
                                                       fontWeight: FontWeight
                                                           .w400),),
+                                            )
                                               ],
                                             ),
                                             color: white_color,
@@ -556,11 +567,14 @@ class LoginSelectionOption extends State<LoginSelection> {
                                                     width: 20.0,
                                                     height: 20.0,
                                                   ),
-                                                  Text('Facebook',
-                                                    style: TextStyle(
-                                                        fontFamily: 'GoogleSansFamily',
-                                                        fontWeight: FontWeight
-                                                            .w400),),
+                                                 Container(
+                                                   margin: EdgeInsets.only(right: 10.0),
+                                                   child:  Text(facebook_txt,
+                                                     style: TextStyle(
+                                                         fontFamily: 'GoogleSansFamily',
+                                                         fontWeight: FontWeight
+                                                             .w400),),
+                                                 )
                                                 ],
                                               ),
 
@@ -804,7 +818,7 @@ class LoginSelectionOption extends State<LoginSelection> {
             builder: (context) => ProfilePageSetup(signinType,
                 currentUserId: prefs.getString('userId'))));
 */
-    Navigator.push(
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) =>

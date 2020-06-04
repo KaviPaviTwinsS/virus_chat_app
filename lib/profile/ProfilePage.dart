@@ -25,7 +25,7 @@ import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import '../utils/constants.dart';
-
+/*
 class ProfilePageSetup extends StatelessWidget {
   final String currentUserId;
   String signinType;
@@ -59,13 +59,13 @@ class ProfilePageSetup extends StatelessWidget {
       ),
     );
   }
-}
+}*/
 
-class ProfilePage extends StatefulWidget {
+class ProfilePageSetup extends StatefulWidget {
   final String currentUserId;
   String userSigninType;
 
-  ProfilePage(String signinType, {Key key, @required this.currentUserId})
+  ProfilePageSetup(String signinType, {Key key, @required this.currentUserId})
       : super(key: key) {
     userSigninType = signinType;
   }
@@ -76,7 +76,7 @@ class ProfilePage extends StatefulWidget {
   }
 }
 
-class ProfilePageState extends State<ProfilePage> {
+class ProfilePageState extends State<ProfilePageSetup> {
   SharedPreferences prefs;
 
   String name = '';
@@ -84,6 +84,7 @@ class ProfilePageState extends State<ProfilePage> {
   String signinType = '';
   String userId = '';
   String photoUrl = '';
+  String mNewPhotoUrl = '';
   File avatarImageFile;
   bool isLoading = false;
   String userEmail = '';
@@ -143,18 +144,18 @@ class ProfilePageState extends State<ProfilePage> {
     userId = prefs.getString('userId');
     signinType = prefs.getString('signInType');
     userEmail = prefs.getString('email');
+    photoUrl = prefs.getString('photoUrl');
     businessId = prefs.getString('BUSINESS_ID');
     print('businessId $businessId');
     mobileNumber = prefs.getString('phoneNo');
 //    name = prefs.getString('name');
 //    print('profile name $name');
-//    controllerName = new TextEditingController(text: name);
+    controllerName = new TextEditingController(text: name);
     controllerNickName = new TextEditingController(text: nickName);
     controllerEmail = new TextEditingController(text: userEmail);
     controllerMobileNumber = new TextEditingController(text: mobileNumber);
     controllerNewPassword = new TextEditingController(text: newPassword);
-    controllerConfirmPassword =
-    new TextEditingController(text: confirmPassword);
+    controllerConfirmPassword = new TextEditingController(text: confirmPassword);
 
     // Force refresh input
     setState(() {});
@@ -402,7 +403,7 @@ class ProfilePageState extends State<ProfilePage> {
                                               : 0.0),
                                       child: Text('First name'.toUpperCase(),
                                         style: TextStyle(
-                                            fontFamily: 'GoogleSansFamily'),),
+                                            fontFamily: 'GoogleSansFamily',color: text_color_grey,fontSize: 12.0),),
                                     ),
                                     Container(
                                       child: TextField(
@@ -424,6 +425,9 @@ class ProfilePageState extends State<ProfilePage> {
                                               fontFamily: 'GoogleSansFamily'),
                                         ),
                                         controller: controllerName,
+                                        onChanged: (value) {
+                                          name = value;
+                                        },
                                         textInputAction: TextInputAction.next,
                                         focusNode: myFocusNode,
                                         /* onChanged: (value) {
@@ -441,10 +445,10 @@ class ProfilePageState extends State<ProfilePage> {
                                     children: <Widget>[
                                       Container(
                                         margin: EdgeInsets.only(
-                                            left: 10.0, right: 10.0, top: 20.0),
+                                            left: 10.0, right: 10.0, top: 25.0),
                                         child: Text('Last name'.toUpperCase(),
                                           style: TextStyle(
-                                              fontFamily: 'GoogleSansFamily'),),
+                                              fontFamily: 'GoogleSansFamily',color: text_color_grey,fontSize: 12.0),),
                                       ),
                                       Container(
                                         child: TextField(
@@ -482,10 +486,10 @@ class ProfilePageState extends State<ProfilePage> {
                                     children: <Widget>[
                                       Container(
                                         margin: EdgeInsets.only(
-                                            left: 10.0, right: 10.0, top: 20.0),
+                                            left: 10.0, right: 10.0, top: 25.0),
                                         child: Text('Email'.toUpperCase(),
                                           style: TextStyle(
-                                              fontFamily: 'GoogleSansFamily'),),
+                                              fontFamily: 'GoogleSansFamily',color: text_color_grey,fontSize: 12.0),),
                                       ),
                                       Container(
                                         decoration: new BoxDecoration(
@@ -539,11 +543,11 @@ class ProfilePageState extends State<ProfilePage> {
                                     children: <Widget>[
                                       Container(
                                         margin: EdgeInsets.only(
-                                            left: 10.0, right: 10.0, top: 20.0),
+                                            left: 10.0, right: 10.0, top: 25.0),
                                         child: Text(
                                           'Mobile number'.toUpperCase(),
                                           style: TextStyle(
-                                              fontFamily: 'GoogleSansFamily'),),
+                                              fontFamily: 'GoogleSansFamily',color: text_color_grey,fontSize: 12.0),),
                                       ),
                                       Container(
                                         decoration: new BoxDecoration(
@@ -619,18 +623,30 @@ class ProfilePageState extends State<ProfilePage> {
                                             ),
                                             child: Text('Update Profile'),
                                             onPressed: () {
+                                              setState(() {
+                                                isLoading = true;
+                                              });
                                               name = controllerName.text;
                                               if (name != '' ||
                                                   nickName != '' ||
                                                   photoUrl != '' ||
-                                                  userEmail != '') {
+                                                  userEmail != '' || photoUrl != mNewPhotoUrl) {
                                                 if (name == '') {
+                                                  setState(() {
+                                                    isLoading = false;
+                                                  });
                                                   Fluttertoast.showToast(
                                                       msg: enter_names);
                                                 } else if (nickName == '') {
+                                                  setState(() {
+                                                    isLoading = false;
+                                                  });
                                                   Fluttertoast.showToast(
                                                       msg: enter_nickname);
                                                 } else if (userEmail == '') {
+                                                  setState(() {
+                                                    isLoading = false;
+                                                  });
                                                   Fluttertoast.showToast(
                                                       msg: enter_Email);
                                                 }
@@ -641,19 +657,19 @@ class ProfilePageState extends State<ProfilePage> {
                                                         prefs.getString(
                                                             'nickname') !=
                                                             nickName) ||
-                                                    (prefs.getString(
-                                                        'photoUrl') !=
+                                                    (mNewPhotoUrl !=
                                                         photoUrl &&
                                                         photoUrl != '') ||
                                                     (prefs.getString('email') !=
                                                         userEmail &&
-                                                        userEmail != '')) {
-                                                  isLoading = true;
+                                                        userEmail != '') || photoUrl != mNewPhotoUrl) {
                                                   bool emailValid = RegExp(
                                                       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                                                       .hasMatch(userEmail);
                                                   if (!emailValid) {
-                                                    isLoading = false;
+                                                    setState(() {
+                                                      isLoading = false;
+                                                    });
                                                     Fluttertoast.showToast(
                                                         msg: enter_valid_email);
                                                   } else {
@@ -662,24 +678,34 @@ class ProfilePageState extends State<ProfilePage> {
                                                         'users')
                                                         .document(userId)
                                                         .updateData({
-                                                      'photoUrl': photoUrl,
+                                                      'photoUrl': mNewPhotoUrl,
                                                       'name': name,
                                                       'nickName': nickName,
                                                       'email': userEmail
-                                                    });
+                                                    }).whenComplete(() => {
                                                     storeLocalDataInternal(
-                                                        photoUrl, name,
-                                                        nickName,
-                                                        userEmail);
-                                                    Fluttertoast.showToast(
-                                                        msg: update_success);
+                                                    mNewPhotoUrl, name,
+                                                    nickName,
+                                                    userEmail),
+                                                        Fluttertoast.showToast(
+                                                        msg: update_success),
+                                                    setState(() {
                                                     isLoading = false;
+                                                    })
+                                                    });
+
                                                   }
                                                 } else {
+                                                  setState(() {
+                                                    isLoading = false;
+                                                  });
                                                   Fluttertoast.showToast(
                                                       msg: no_data_change);
                                                 }
                                               } else {
+                                                setState(() {
+                                                  isLoading = false;
+                                                });
                                                 Fluttertoast.showToast(
                                                     msg: no_data_change);
                                               }
@@ -741,7 +767,7 @@ class ProfilePageState extends State<ProfilePage> {
                                                     ),*/
                                                     new SvgPicture.asset(
                                                       'images/user_unavailable.svg',
-                                                      height: 200.0,
+                                                      height: 250.0,
                                                       width: MediaQuery
                                                           .of(context)
                                                           .size
@@ -759,7 +785,7 @@ class ProfilePageState extends State<ProfilePage> {
                                                   .of(context)
                                                   .size
                                                   .width - 30,
-                                              height: 200.0,
+                                              height: 250.0,
                                               fit: BoxFit.cover,
                                             ),
                                             borderRadius: BorderRadius.all(
@@ -785,7 +811,7 @@ class ProfilePageState extends State<ProfilePage> {
                                           left: 10.0, bottom: 15.0),
                                       child: Text(businessAddress,
                                         style: TextStyle(
-                                            fontFamily: 'GoogleSansFamily'),),
+                                            fontFamily: 'GoogleSansFamily',color: text_color_grey),),
                                     ) : Text(''),
                                     businessCreatedTime != null &&
                                         businessCreatedTime != '' ? Container(
@@ -798,7 +824,7 @@ class ProfilePageState extends State<ProfilePage> {
                                                 int.parse(
                                                     businessCreatedTime)),),
                                         style: TextStyle(
-                                            fontFamily: 'GoogleSansFamily'),),
+                                            fontFamily: 'GoogleSansFamily',color: text_color_grey),),
                                     ) : Text(''),
                                     Row(
                                       crossAxisAlignment: CrossAxisAlignment
@@ -878,7 +904,7 @@ class ProfilePageState extends State<ProfilePage> {
                     child: GestureDetector(
                       onTap: () {
                         print('Business click');
-                        Navigator.push(
+                        Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
@@ -910,7 +936,7 @@ class ProfilePageState extends State<ProfilePage> {
                               style: TextStyle(
                                   color: button_fill_color,
                                   fontSize: 15.0,
-                                  fontFamily: 'GoogleSansFamily'),),
+                                  fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w700),),
                           )
 
                         ],
@@ -926,7 +952,7 @@ class ProfilePageState extends State<ProfilePage> {
                           valueColor: AlwaysStoppedAnimation<Color>(
                               progress_color)),
                     ),
-                    color: Colors.white.withOpacity(0.8),
+//                    color: Colors.white.withOpacity(0.8),
                   )
                       : Container(),
                 ),
@@ -1435,11 +1461,15 @@ class ProfilePageState extends State<ProfilePage> {
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
     StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
     StorageTaskSnapshot storageTaskSnapshot;
+    setState(() {
+      isLoading = true;
+    });
     uploadTask.onComplete.then((value) {
       if (value.error == null) {
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-          photoUrl = downloadUrl;
+//          photoUrl = downloadUrl;
+          mNewPhotoUrl = downloadUrl;
           print('DOWNLOAD URL PROFILE $photoUrl');
           Fluttertoast.showToast(msg: "Profile picture updated successfully");
           setState(() {
@@ -1575,7 +1605,6 @@ class ProfilePageState extends State<ProfilePage> {
 
   Future storeLocalDataInternal(String photoUrl, String name, String nickName,
       String email) async {
-    name = controllerName.text;
     await prefs.setString('userId', userId);
     await prefs.setString('email', email);
     await prefs.setString('name', name);
@@ -1586,6 +1615,16 @@ class ProfilePageState extends State<ProfilePage> {
         .toUtc()
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('signInType', signinType);
+
+    setState(() {
+      this.name = name;
+      this.photoUrl = photoUrl;
+      this.userEmail = email;
+      this.nickName = nickName;
+      this.controllerName = new TextEditingController(text: name);
+      this.controllerNickName = new TextEditingController(text: nickName);
+      this.controllerEmail = new TextEditingController(text: userEmail);
+    });
   }
 
   Future<Null> clearLocalData() async {

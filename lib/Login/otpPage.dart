@@ -90,7 +90,7 @@ class _OTPScreenState extends State<OTPScreen> {
                   alignment: Alignment.topLeft,
                   child: Container(
                     margin: const EdgeInsets.only(
-                        left: 20.0, top: 30.0, right: 20.0),
+                        left: 20.0, top: 10.0, right: 20.0),
                     child: Text(verify_phone,
                       style: TextStyle(fontWeight: FontWeight.w700, fontSize: 19,fontFamily: 'GoogleSansFamily'),
                     ),
@@ -98,7 +98,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 ),
                 Container(
                     margin: const EdgeInsets.only(
-                        left: 20.0, top: 30.0, right: 20.0),
+                        left: 20.0, top: 50.0, right: 20.0),
                     child: customTextSpan(
                         otp_page, widget.mobileNumber)
                 ),
@@ -167,11 +167,12 @@ class _OTPScreenState extends State<OTPScreen> {
                 ),
 
                 Container(
-                  margin: EdgeInsets.only(top: 40.0, left: 10.0, right: 10.0),
-                  padding: EdgeInsets.all(30.0),
+                  margin: EdgeInsets.only(top: 40.0, left: 15.0, right: 15.0),
+//                  padding: EdgeInsets.all(30.0),
                   width: double.infinity,
                   child: SizedBox(
                     height: 45, // specific value
+                    width: double.infinity,
                     child: RaisedButton(
                       onPressed: () {
                         if (_pinEditingController.text.length == 6) {
@@ -189,7 +190,7 @@ class _OTPScreenState extends State<OTPScreen> {
                         borderRadius: new BorderRadius.circular(30.0),
                       ),
                       child: Text(btn_otp_verify,
-                        style: TextStyle(fontSize: 17,fontFamily: 'GoogleSansFamily'),),
+                        style: TextStyle(fontSize: 17,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),),
                     ),
                   ),
                 )
@@ -219,14 +220,16 @@ class _OTPScreenState extends State<OTPScreen> {
 
   void showToast(message, Color color) {
     print(message);
+    Fluttertoast.showToast(msg: message);
+/*
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.CENTER,
         timeInSecForIos: 2,
-        backgroundColor: color,
-        textColor: Colors.black,
-        fontSize: 16.0);
+//        backgroundColor: white_color,
+       *//* textColor: Colors.black,
+        fontSize: 16.0*//*);*/
   }
 
   void _onVerifyCode() async {
@@ -392,7 +395,7 @@ class _OTPScreenState extends State<OTPScreen> {
     setState(() {
       isLoading = false;
     });
-    Navigator.push(
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) =>

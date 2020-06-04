@@ -60,3 +60,11 @@ String search = 'Search';
 String employees = 'Employees';
 
 
+//Login selection
+String continue_phone_number = 'Continue with Phone number';
+String or_connect = 'Or connect using social account';
+String google_txt = 'Google';
+String facebook_txt = 'Facebook';
+
+//phone number selection
+String country_code = 'COUNTRY CODE';

@@ -684,9 +684,10 @@ class NewTweetPostState extends State<NewTweetPost> {
         });
 //      listScrollController.animateTo(
 //          0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
-        Navigator.push(context, MaterialPageRoute(
+       /* Navigator.pushReplacement(context, MaterialPageRoute(
             builder: (context) =>
-                MakeTweetPost(currentUserId, mCurrentPhotoUrl)));
+                MakeTweetPost(currentUserId, mCurrentPhotoUrl)));*/
+       Navigator.pop(context);
         imageUrl ='';
         _controller.clear();
         sendMsg();

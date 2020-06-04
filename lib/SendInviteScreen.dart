@@ -174,6 +174,29 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                                     height: 35.0,
                                                     padding: EdgeInsets.all(10.0),
                                                   ),
+                                              errorWidget: (context, url,
+                                                  error) =>
+                                                  Material(
+                                                    child: /* Image.asset(
+                                                      'images/img_not_available.jpeg',
+                                                      width: MediaQuery
+                                                          .of(context)
+                                                          .size
+                                                          .width - 30,
+                                                      height: 200.0,
+                                                      fit: BoxFit.cover,
+                                                    ),*/
+                                                    new SvgPicture.asset(
+                                                      'images/user_unavailable.svg',
+                                                      width: 35.0,
+                                                      height: 35.0,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                    borderRadius: BorderRadius.all(
+                                                      Radius.circular(18.0),
+                                                    ),
+                                                    clipBehavior: Clip.hardEdge,
+                                                  ),
                                               imageUrl: _mPhotoUrl,
                                               width: 35.0,
                                               height: 35.0,
@@ -251,11 +274,13 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                 style: TextStyle(fontWeight: FontWeight.bold,
                                     fontSize: 20.0),),
                               Align(
-                                alignment: Alignment.center,
+                                alignment: Alignment.bottomCenter,
                                 child:  Container(
-                                  padding: EdgeInsets.all(20.0),
-                                  child: Text(
-                                      'You\'ll be able to chat with VALENTINE once your invitation has been accepted.'),
+                                  padding: EdgeInsets.all(55.0),
+                                  child:Center(
+                                    child:  Text(
+                                        'You\'ll be able to chat with VALENTINE once your invitation has been accepted.'),
+                                  )
                                 ),
                               )
                             ],
