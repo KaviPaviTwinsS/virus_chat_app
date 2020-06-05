@@ -1076,6 +1076,13 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                 /*  else if (signinType == 'MobileNumber')
                                   clearLocalData();*/
                                 prefs.setString('signInType', '');
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (
+                                            context) => new LoginSelection()));
+                                Navigator.of(context, rootNavigator: true).pop(
+                                    'dialog');
                                 _updatestatus();
                                 clearLocalData();
                                 /* Navigator.pushAndRemoveUntil(
@@ -1085,13 +1092,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     ),
                                     ModalRoute.withName("/HomeScreen")
                                 );*/
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (
-                                            context) => new LoginSelection()));
-                                Navigator.of(context, rootNavigator: true).pop(
-                                    'dialog');
+
                               },
                             ),
                           ],

@@ -189,7 +189,7 @@ class AddEmployeeState extends State<AddEmployee> {
                       .size
                       .height - 100,
                   decoration: BoxDecoration(
-                      color: greyColor2,
+//                      color: greyColor2,
                       borderRadius: new BorderRadius.only(
                         topLeft: const Radius.circular(20.0),
                         topRight: const Radius.circular(20.0),
@@ -470,7 +470,7 @@ class AddEmployeeState extends State<AddEmployee> {
     avatar = contacts.avatar;
     for (final phone in mPhone) {
       mContactPhone = phone.value;
-      mContactPhone = getPhoneValidation(mContactPhone.trim());
+      mContactPhone = getPhoneValidation(mContactPhone.toString().replaceAll(' ', ''));
     }
     mContactName = contacts.displayName;
     if(documents.length !=0) {
@@ -486,7 +486,7 @@ class AddEmployeeState extends State<AddEmployee> {
             alreadyUser = true;
             alreadyUserId = documents[i]['id'];
             alreadyUserbusinessId = documents[i]['businessId'];
-            print('NANDHU AddEmployeeState buildItem ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}');
+            print('NANDHU AddEmployeeState buildItem ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}_______mBusinessId __$_mBusinessId');
             if(alreadyUserbusinessId != null && alreadyUserbusinessId == _mBusinessId)
               alreadyUserInBusiness = 'SAME';
             else if(alreadyUserbusinessId != null && alreadyUserbusinessId != '')
@@ -607,7 +607,7 @@ class AddEmployeeState extends State<AddEmployee> {
     );
   }
 
-  Future AddNewEmployee(Contact contacts) async{
+  Future AddNewEmployee(Contact contacts) async {
     Iterable<Item> mPhone = contacts.phones;
     Iterable<Item> mEmail = contacts.emails;
     String _mContactEmail = '';
@@ -622,12 +622,13 @@ class AddEmployeeState extends State<AddEmployee> {
       _mContactPhone = phone.value;
       print('naga______________phone $_mContactPhone ');
       mContactPhone = phone.value;
-      mContactPhone = getPhoneValidationNewEmployee(_mContactPhone.trim());
+      mContactPhone = getPhoneValidationNewEmployee(
+          _mContactPhone.toString().replaceAll(' ', ''));
     }
     mContactName = contacts.displayName;
-    if(documents.length !=0) {
-      if( mContactPhone == '-101')
-      Fluttertoast.showToast(msg: 'Please add a valid phone number');
+    if (documents.length != 0) {
+      if (mContactPhone == '-101')
+        Fluttertoast.showToast(msg: 'Please add a valid phone number');
       else {
         alreadyUser = false;
         for (int i = 0; i < documents.length; i++) {
@@ -646,7 +647,7 @@ class AddEmployeeState extends State<AddEmployee> {
               alreadyUserId = documents[i]['id'];
               alreadyUserbusinessId = documents[i]['businessId'];
               print(
-                  'NANDHU AddEmployeeState AddNewEmployee ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}');
+                  'NANDHU AddEmployeeState AddNewEmployee ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}_________mBusinessId__$_mBusinessId');
               if (alreadyUserbusinessId != null &&
                   alreadyUserbusinessId == _mBusinessId)
                 alreadyUserInBusiness = 'SAME';
@@ -663,30 +664,35 @@ class AddEmployeeState extends State<AddEmployee> {
         }
       }
     }
-    DocumentReference reference = Firestore.instance.collection('users').document();
-    print('NANDHU AddEmployeeState AddNewEmployee Reference check ___alreadyUserInBusiness_${alreadyUserInBusiness}');
-    setState(() {
-      isLoading = true;
-    });
-    if(alreadyUserInBusiness == 'SAME'){
+    if (mContactPhone != '-101') {
+      DocumentReference reference = Firestore.instance.collection('users')
+          .document();
+      print(
+          'NANDHU AddEmployeeState AddNewEmployee Reference check ___alreadyUserInBusiness_${alreadyUserInBusiness}');
       setState(() {
-        isLoading = false;
+        isLoading = true;
       });
-      Fluttertoast.showToast(msg: 'Already employee in this business');
-      Navigator.pop(context);
+      if (alreadyUserInBusiness == 'SAME') {
+        setState(() {
+          isLoading = false;
+        });
+        Fluttertoast.showToast(msg: 'Already employee in this business');
+        Navigator.pop(context);
+      } else if (alreadyUserInBusiness == 'DIFF') {
+        setState(() {
+          isLoading = false;
+        });
+        Fluttertoast.showToast(
+            msg: 'Already employee in this  some other business');
+        Navigator.pop(context);
+      } else {
+        print(
+            'NANDHU AddEmployeeState AddNewEmployee Reference check ___alreadyUserInBusiness_ELSEEEEEEEEEEEEEEEEE___${reference
+                .documentID}');
+        alreadyUserInBusiness = 'SAME';
+        try {
 
-    } else if( alreadyUserInBusiness == 'DIFF'){
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(msg:'Already employee in this  some other business');
-      Navigator.pop(context);
-    }else {
-      print('NANDHU AddEmployeeState AddNewEmployee Reference check ___alreadyUserInBusiness_ELSEEEEEEEEEEEEEEEEE___${reference.documentID}');
-      alreadyUserInBusiness = 'SAME';
-      try {
-
-        /*Firestore.instance.runTransaction((
+          /*Firestore.instance.runTransaction((
             transaction) async {
           await transaction.set(
             reference,
@@ -712,71 +718,79 @@ class AddEmployeeState extends State<AddEmployee> {
             },
           );
         })*/
-        reference.setData({
-          'name': contacts.displayName,
+          reference.setData({
+            'name': contacts.displayName,
 //      'photoUrl': _mUserPhotoUrl,
-          'email': _mContactEmail,
-          'nickName': contacts.middleName,
-          'phoneNo': COUNTRY_CODE + "\t" + _mContactPhone,
-          'status': '',
-          'id': reference.documentID,
-          'MobileNumber': reference.documentID,
-          'user_token': '',
-          'businessId': _mBusinessId,
-          'businessType' : BUSINESS_TYPE_EMPLOYEE,
-          'businessName' : _mBusinessName,
-          'businessChatPeriority' : 0,
-          'photoUrl' : '',
-          'createdAt':
-          ((new DateTime.now()
-              .toUtc()
-              .microsecondsSinceEpoch) / 1000).toInt()
-        }).whenComplete(() async {
-          UserLocation currentLocation = await LocationService('').getLocation();
-          print('NANDHU AddEmployeeState AddNewEmployee Reference LOCATIon UPDATE${currentLocation}');
-          Firestore.instance.collection('users').document(reference.documentID).collection(
-              'userLocation').document(reference.documentID).setData({
-            'userLocation':
-            new GeoPoint(currentLocation.latitude, currentLocation.longitude),
-            'UpdateTime': ((new DateTime.now()
+            'email': _mContactEmail,
+            'nickName': contacts.middleName,
+            'phoneNo': COUNTRY_CODE + "\t" + _mContactPhone,
+            'status': '',
+            'id': reference.documentID,
+            'MobileNumber': reference.documentID,
+            'user_token': '',
+            'businessId': _mBusinessId,
+            'businessType': BUSINESS_TYPE_EMPLOYEE,
+            'businessName': _mBusinessName,
+            'businessChatPeriority': 0,
+            'photoUrl': '',
+            'createdAt':
+            ((new DateTime.now()
                 .toUtc()
-                .microsecondsSinceEpoch) / 1000).toInt(),
-          }).whenComplete((){
-            print('NANDHU AddEmployeeState AddNewEmployee Reference load users');
-            loadUsers();
-          }).whenComplete((){
-            print('NANDHU AddEmployeeState AddNewEmployee Reference Employee count');
-            if(_noOfEmployee == null)
-              _noOfEmployee = 0;
-            _noOfEmployee = _noOfEmployee + 1;
-            Firestore.instance.collection('business')
-                .document(_mBusinessId)
-                .updateData({
-              'employeeCount': _noOfEmployee,
+                .microsecondsSinceEpoch) / 1000).toInt()
+          }).whenComplete(() async {
+            UserLocation currentLocation = await LocationService('')
+                .getLocation();
+            print(
+                'NANDHU AddEmployeeState AddNewEmployee Reference LOCATIon UPDATE${currentLocation}');
+            Firestore.instance.collection('users').document(
+                reference.documentID).collection(
+                'userLocation').document(reference.documentID).setData({
+              'userLocation':
+              new GeoPoint(currentLocation.latitude, currentLocation.longitude),
+              'UpdateTime': ((new DateTime.now()
+                  .toUtc()
+                  .microsecondsSinceEpoch) / 1000).toInt(),
+            }).whenComplete(() {
+              print(
+                  'NANDHU AddEmployeeState AddNewEmployee Reference load users');
+              loadUsers();
+            }).whenComplete(() {
+              print(
+                  'NANDHU AddEmployeeState AddNewEmployee Reference Employee count');
+              if (_noOfEmployee == null)
+                _noOfEmployee = 0;
+              _noOfEmployee = _noOfEmployee + 1;
+              Firestore.instance.collection('business')
+                  .document(_mBusinessId)
+                  .updateData({
+                'employeeCount': _noOfEmployee,
+              });
+              setState(() {
+                isLoading = false;
+              });
+              prefs.setInt('BUSINESS_EMPLOYEES_COUNT', _noOfEmployee);
+              Navigator.pop(context);
+
+              String message = "You are added in the " + "business";
+              print('NAndhini Ndot addemployee ${COUNTRY_CODE + "\t" +
+                  _mContactPhone} _______');
+              List<String> recipents = [COUNTRY_CODE + "\t" + _mContactPhone,];
+              _sendSMS(message, recipents);
+
+
+              Fluttertoast.showToast(
+                  msg: 'Business employee added successfully');
             });
-            setState(() {
-              isLoading = false;
-            });
-            prefs.setInt('BUSINESS_EMPLOYEES_COUNT', _noOfEmployee);
-            Navigator.pop(context);
-
-            String message = "You are added in the "+"business";
-            print('NAndhini Ndot addemployee ${COUNTRY_CODE + "\t" + _mContactPhone} _______');
-            List<String> recipents = [COUNTRY_CODE + "\t" + _mContactPhone,];
-            _sendSMS(message, recipents);
-
-
-            Fluttertoast.showToast(msg: 'Business employee added successfully');
-
           });
-        });
-      } on Exception catch (e) {
-        setState(() {
-          isLoading = false;
-        });
-        print('NANDHU AddEmployeeState AddNewEmployee Reference Could not add employee:  ${e.toString()}');
-      }
-      /* Firestore.instance.runTransaction((
+        } on Exception catch (e) {
+          setState(() {
+            isLoading = false;
+          });
+          print(
+              'NANDHU AddEmployeeState AddNewEmployee Reference Could not add employee:  ${e
+                  .toString()}');
+        }
+        /* Firestore.instance.runTransaction((
         transaction) async {
       await transaction.set(
         reference,
@@ -799,10 +813,11 @@ class AddEmployeeState extends State<AddEmployee> {
       );
     });*/
 
+      }
+    }else{
+      Navigator.pop(context);
     }
-
   }
-
 
   Future AddUserAsEmployee(Contact contacts) async{
     _mContacts = contacts;
@@ -811,7 +826,7 @@ class AddEmployeeState extends State<AddEmployee> {
     avatar = contacts.avatar;
     for (final phone in mPhone) {
       mContactPhone = phone.value;
-      mContactPhone = getPhoneValidation(mContactPhone.trim());
+      mContactPhone = getPhoneValidation(mContactPhone.toString().replaceAll(' ', ''));
     }
     mContactName = contacts.displayName;
       if(documents.length !=0) {
@@ -826,7 +841,7 @@ class AddEmployeeState extends State<AddEmployee> {
               alreadyUser = true;
               alreadyUserId = documents[i]['id'];
               alreadyUserbusinessId = documents[i]['businessId'];
-              print('NANDHU AddEmployeeState AddUserAsEmployee ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId}');
+              print('NANDHU AddEmployeeState AddUserAsEmployee ___documents IDDDDDDDDDDDD ___alreadyUserId___ ${alreadyUserId} ___alreadyUserbusinessId ___ ${alreadyUserbusinessId} ____mBusinessId $_mBusinessId');
               if(alreadyUserbusinessId != null && alreadyUserbusinessId == _mBusinessId)
                 alreadyUserInBusiness = 'SAME';
               else if(alreadyUserbusinessId != null && alreadyUserbusinessId != '')

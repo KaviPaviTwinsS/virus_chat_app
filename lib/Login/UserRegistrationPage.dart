@@ -22,9 +22,10 @@ class UserRegistrationPage extends StatelessWidget {
   String userPhoneNumber = '';
   String userPhoneNumberWithoutCountryCode = '';
   FirebaseUser mFirebaseUser;
+  String mCurrentLoginType;
 
   UserRegistrationPage(
-      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.mFirebaseUser})
+      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.mFirebaseUser,@required this.mCurrentLoginType})
       : super(key: key);
 
 
@@ -46,7 +47,7 @@ class UserRegistrationPage extends StatelessWidget {
         ),*/
       body: UserRegistrationState(userPhoneNumber: userPhoneNumber,
           userPhoneNumberWithoutCountryCode: userPhoneNumberWithoutCountryCode,
-          myFirebaseUser: mFirebaseUser),
+          myFirebaseUser: mFirebaseUser,mCurrentLoginType:mCurrentLoginType),
     );
   }
 }
@@ -57,16 +58,17 @@ class UserRegistrationState extends StatefulWidget {
   String userPhoneNumberWithoutCountryCode = '';
 
   FirebaseUser myFirebaseUser;
+  String mCurrentLoginType = '';
 
   UserRegistrationState(
-      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.myFirebaseUser})
+      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.myFirebaseUser,@required this.mCurrentLoginType})
       : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
     return UserRegistrationScreen(userPhoneNumber: userPhoneNumber,
         userPhoneNumberWithoutCountryCode: userPhoneNumberWithoutCountryCode,
-        firebaseUser: myFirebaseUser);
+        firebaseUser: myFirebaseUser,mCurrentLoginType:mCurrentLoginType);
   }
 
 }
@@ -87,10 +89,11 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
 
   SharedPreferences prefs;
   String userToken = '';
+  String mCurrentLoginType = '';
 
 
   UserRegistrationScreen(
-      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.firebaseUser});
+      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.firebaseUser,@required this.mCurrentLoginType});
 
   @override
   void initState() {
@@ -170,7 +173,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                         new Container(
                             margin: EdgeInsets.only(
                                 top: 20.0, right: 10.0, bottom: 40.0),
-                            child: Text(user_registration, style: TextStyle(
+                            child: Text(mCurrentLoginType == 'phone' ? business_profile_setup:user_registration, style: TextStyle(
                                 color: text_color,
                                 fontSize: 20.0,
                                 fontWeight: FontWeight.w700,

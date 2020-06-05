@@ -111,7 +111,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     isLoggedIn = await googleSignIn.isSignedIn();
     isFacebookLoggedIn = await facebookSignup.facebookLogin.isLoggedIn;
     print('lodinnnn ${await prefs.getString('PUSH_TOKEN')}');
-   /* if (prefs.getString('signInType') == 'google') {
+    /* if (prefs.getString('signInType') == 'google') {
 //      navigateToUsersPage("google");
       navigateToProfilePageExistingUser(context, 'google', prefs);
     } else if (prefs.getString('signInType') == 'facebook') {
@@ -408,7 +408,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                                           .size
                                           .width,
                                       margin: EdgeInsets.only(
-                                          left: 20.0, right: 20.0),
+                                          left: 15.0, right: 15.0),
                                       height: 45.0,
                                       child: RaisedButton(
                                         color: white_color,
@@ -422,7 +422,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) {
-                                                    return PhoneNumberSelectionPage();
+                                                    return PhoneNumberSelectionPage('phone');
                                                   }
                                               ));
                                         },
@@ -432,23 +432,25 @@ class LoginSelectionOption extends State<LoginSelection> {
                                           mainAxisAlignment: MainAxisAlignment
                                               .spaceAround,
                                           children: <Widget>[
-    Container(
-    margin: EdgeInsets.only(right: 10.0),
-    child:new SvgPicture.asset(
-                                              'images/phone.svg',
-                                              width: 20.0,
-                                              height: 20.0,
-                                              color: icon_color,
+                                            Container(
+                                              margin: EdgeInsets.only(
+                                                  right: 10.0),
+                                              child: new SvgPicture.asset(
+                                                'images/phone.svg',
+                                                width: 20.0,
+                                                height: 20.0,
+                                                color: icon_color,
+                                              ),
                                             ),
-    ),
-                                           Container(
-                                             margin: EdgeInsets.only(right: 40.0,left: 10.0),
-                                             child:  Text(continue_phone_number,
-                                               style: TextStyle(
-                                                   fontFamily: 'GoogleSansFamily',
-                                                   fontWeight: FontWeight
-                                                       .w600),),
-                                           )
+                                            Container(
+                                              margin: EdgeInsets.only(
+                                                  right: 40.0, left: 10.0),
+                                              child: Text(continue_phone_number,
+                                                style: TextStyle(
+                                                    fontFamily: 'GoogleSansFamily',
+                                                    fontWeight: FontWeight
+                                                        .w600),),
+                                            )
                                           ],
                                         ),
                                       )
@@ -484,10 +486,10 @@ class LoginSelectionOption extends State<LoginSelection> {
                                         .of(context)
                                         .size
                                         .width,
-                                    margin: EdgeInsets.only(left: 20.0,
+                                    margin: EdgeInsets.only(left: 15.0,
                                         right: 20.0,
                                         bottom: 10.0,
-                                        top: 10.0),
+                                        top: 30.0),
                                     child: Text(
                                       or_connect,
                                       style: TextStyle(
@@ -501,7 +503,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                                         .size
                                         .width,
                                     margin: EdgeInsets.only(
-                                        left: 20.0, right: 20.0),
+                                        left: 15.0, right: 15.0,top: 10.0),
                                     child:
                                     Row(
                                       crossAxisAlignment: CrossAxisAlignment
@@ -513,7 +515,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                                           width: ((MediaQuery
                                               .of(context)
                                               .size
-                                              .width) / 2) - 30,
+                                              .width) / 2) - 20,
                                           height: 45.0,
                                           child: RaisedButton(
                                             onPressed: () {
@@ -530,15 +532,16 @@ class LoginSelectionOption extends State<LoginSelection> {
                                                   width: 20.0,
                                                   height: 20.0,
                                                 ),
-                                            Container(
-                                              margin: EdgeInsets.only(right: 30.0),
-                                              child: Text(google_txt,
-                                                  style: TextStyle(
-                                                      fontFamily: 'GoogleSansFamily',
-                                                      color: black_color,
-                                                      fontWeight: FontWeight
-                                                          .w400),),
-                                            )
+                                                Container(
+                                                  margin: EdgeInsets.only(
+                                                      left: 30.0),
+                                                  child: Text(google_txt,
+                                                    style: TextStyle(
+                                                        fontFamily: 'GoogleSansFamily',
+                                                        color: black_color,
+                                                        fontWeight: FontWeight
+                                                            .w400),),
+                                                )
                                               ],
                                             ),
                                             color: white_color,
@@ -554,7 +557,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                                             width: ((MediaQuery
                                                 .of(context)
                                                 .size
-                                                .width) / 2) - 30,
+                                                .width) / 2) - 20,
                                             child: RaisedButton(
                                               child: Row(
                                                 crossAxisAlignment: CrossAxisAlignment
@@ -567,14 +570,15 @@ class LoginSelectionOption extends State<LoginSelection> {
                                                     width: 20.0,
                                                     height: 20.0,
                                                   ),
-                                                 Container(
-                                                   margin: EdgeInsets.only(right: 10.0),
-                                                   child:  Text(facebook_txt,
-                                                     style: TextStyle(
-                                                         fontFamily: 'GoogleSansFamily',
-                                                         fontWeight: FontWeight
-                                                             .w400),),
-                                                 )
+                                                  Container(
+                                                    margin: EdgeInsets.only(
+                                                        right: 10.0),
+                                                    child: Text(facebook_txt,
+                                                      style: TextStyle(
+                                                          fontFamily: 'GoogleSansFamily',
+                                                          fontWeight: FontWeight
+                                                              .w400),),
+                                                  )
                                                 ],
                                               ),
 
@@ -593,9 +597,66 @@ class LoginSelectionOption extends State<LoginSelection> {
                                                     30.0),
                                               ),
                                             )
-                                        )
+                                        ),
+
                                       ],
                                     ),
+                                  ),
+                                  Container(
+                                      width: MediaQuery
+                                          .of(context)
+                                          .size
+                                          .width,
+                                      margin: EdgeInsets.only(
+                                          left: 15.0, right: 15.0,top: 25.0),
+                                      height: 45.0,
+                                      child: RaisedButton(
+                                        color: rounded_border_color,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: new BorderRadius
+                                              .circular(
+                                              30.0),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) {
+                                                    return PhoneNumberSelectionPage('business');
+                                                  }
+                                              ));
+                                        },
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment
+                                              .center,
+                                          mainAxisAlignment: MainAxisAlignment
+                                              .spaceAround,
+                                          children: <Widget>[
+                                            Container(
+                                              margin: EdgeInsets.only(
+                                                  right: 10.0),
+                                              child: new SvgPicture.asset(
+                                                'images/business.svg',
+                                                width: 20.0,
+                                                height: 20.0,
+                                                color: white_color,
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(
+                                                  right: 40.0,
+                                                  left: 10.0),
+                                              child: Text(
+                                                signup_business,
+                                                style: TextStyle(
+                                                    fontFamily: 'GoogleSansFamily',
+                                                    color: white_color,
+                                                    fontWeight: FontWeight
+                                                        .w600),),
+                                            )
+                                          ],
+                                        ),
+                                      )
                                   )
                                 ],
                               ),
@@ -620,7 +681,6 @@ class LoginSelectionOption extends State<LoginSelection> {
           )
       );
   }
-
 
 /*
   @override

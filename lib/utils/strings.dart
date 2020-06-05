@@ -65,6 +65,8 @@ String continue_phone_number = 'Continue with Phone number';
 String or_connect = 'Or connect using social account';
 String google_txt = 'Google';
 String facebook_txt = 'Facebook';
-
+String signup_business= 'Sign Up for Business';
+String phone_number_business = 'Signup for Business';
+String business_profile_setup = 'Business Profile setup';
 //phone number selection
 String country_code = 'COUNTRY CODE';

@@ -12,6 +12,11 @@ import 'package:virus_chat_app/utils/strings.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 
 class PhoneNumberSelectionPage extends StatelessWidget {
+
+  String _mCurrentLoginType = '';
+  PhoneNumberSelectionPage(String loginType){
+    _mCurrentLoginType = loginType;
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -39,17 +44,22 @@ class PhoneNumberSelectionPage extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: PhoneNumberSelection(),
+      home: PhoneNumberSelection(_mCurrentLoginType),
     );
   }
 }
 
 
 class PhoneNumberSelection extends StatefulWidget {
+  String _mCurrentLoginType = '';
+  PhoneNumberSelection(String mCurrentLoginType){
+    _mCurrentLoginType = mCurrentLoginType;
+  }
+
 
   @override
   State<StatefulWidget> createState() {
-    return PhoneNumberSelectionState();
+    return PhoneNumberSelectionState(_mCurrentLoginType);
   }
 
 }
@@ -65,6 +75,10 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
   String phoneNo = '+91 7540011847';
   String smsOTP;
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+String _mCurrentLoginType= '';
+  PhoneNumberSelectionState(String mCurrentLoginType){
+    _mCurrentLoginType = mCurrentLoginType;
+  }
 
 
   @override
@@ -106,7 +120,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                         child: Container(
                           margin: const EdgeInsets.only(
                               left: 20.0, top: 10.0, right: 20.0),
-                          child: Text(phone_no,
+                          child: Text(_mCurrentLoginType== 'phone' ? phone_no : phone_number_business,
                             style: TextStyle(
                                 fontSize: 19,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w700),
                           ),
@@ -219,7 +233,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
                                   MaterialPageRoute(builder: (context) =>
                                   new OTPScreen(
                                     mobileNumber: _userCountryCode + _userPhoneNumber,
-                                    mobileNumWithoutCountryCode: _userPhoneNumber,)));
+                                    mobileNumWithoutCountryCode: _userPhoneNumber,mCurrentLoginType: _mCurrentLoginType,)));
                             }
                           },
                           color: button_fill_color,

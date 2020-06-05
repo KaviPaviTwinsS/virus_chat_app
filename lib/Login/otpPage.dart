@@ -19,16 +19,18 @@ class OTPScreen extends StatefulWidget {
   final String mobileNumber;
   String mobileNumWithoutCountryCode;
 
-  OTPScreen({
+  String mCurrentLoginType;
+  OTPScreen( {
     Key key,
     @required this.mobileNumber,
-    @required this.mobileNumWithoutCountryCode
+    @required this.mobileNumWithoutCountryCode,
+    @required this.mCurrentLoginType
   })
       : assert(mobileNumber != null),
         super(key: key);
 
   @override
-  _OTPScreenState createState() => _OTPScreenState();
+  _OTPScreenState createState() => _OTPScreenState(mCurrentLoginType);
 }
 
 class _OTPScreenState extends State<OTPScreen> {
@@ -45,6 +47,11 @@ class _OTPScreenState extends State<OTPScreen> {
   bool isCodeSent = false;
   String _verificationId;
   bool isLoading = false;
+  String _mCurrentLoginType = '';
+
+  _OTPScreenState(String mCurrentLoginType){
+    _mCurrentLoginType = mCurrentLoginType;
+  }
 
 
   @override
@@ -81,7 +88,7 @@ class _OTPScreenState extends State<OTPScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (
-                                      context) => new PhoneNumberSelectionPage()));
+                                      context) => new PhoneNumberSelectionPage(_mCurrentLoginType)));
                         },
                       ),
                     )
@@ -356,7 +363,7 @@ class _OTPScreenState extends State<OTPScreen> {
                   userPhoneNumber: widget.mobileNumber,
                   userPhoneNumberWithoutCountryCode: widget
                       .mobileNumWithoutCountryCode,
-                  mFirebaseUser: firebaseUser)));
+                  mFirebaseUser: firebaseUser,mCurrentLoginType : _mCurrentLoginType)));
     }
 
 //    firebaseUser.unlinkFromProvider(firebaseUser.providerId);

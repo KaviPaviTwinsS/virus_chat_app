@@ -118,6 +118,11 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   }
   @override
   Widget build(BuildContext context) {
+
+    if(!isButtonPressed){
+      print('_________________________isButtonPressed __$isButtonPressed');
+      sendInvite();
+    }
     return WillPopScope(
       onWillPop: (){
         onBackPress();
@@ -255,15 +260,19 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                 width: 80.0,
                                 height: 80.0,
                               ),
-                              !isButtonPressed  ? RaisedButton(
+                              !isButtonPressed  ? /*RaisedButton(
                                   color: white_color,
                                   child: Text('Sent Invite',),
                                   onPressed: () {
 //                                    if (!_misAlreadyRequestSent) {
-                                    sendInvite();
                                     }
 //                                  }
-                              ) :_misRequestSent == null ?  Container(
+                              )*/
+                              Container(
+                                child: Text('Invite Sent', style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20.0),),
+                              )
+                              :_misRequestSent == null ?  Container(
                                 child: Text('Invitation Sent successfully', style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 20.0),),
                               ) :( !_misAlreadyRequestSent != null && !_misAlreadyRequestSent) ? Text('Invitation Received', style: TextStyle(
