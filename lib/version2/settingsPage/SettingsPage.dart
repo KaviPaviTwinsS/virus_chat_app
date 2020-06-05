@@ -48,21 +48,21 @@ class SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-             Container(
-               margin: EdgeInsets.only(top: 15.0),
-               child:  Text(notification_txt),
-             ),
-              new Switch(
-                value: isNotificationSwitched,
-                onChanged: (value) {
-                  setState(() {
-                    isNotificationSwitched = value;
-                  });
-                },
-                activeTrackColor: Colors.lightGreenAccent,
-                activeColor: Colors.green,
-              ),
-            ],),
+                Container(
+                  margin: EdgeInsets.only(top: 15.0),
+                  child: Text(notification_txt),
+                ),
+                new Switch(
+                  value: isNotificationSwitched,
+                  onChanged: (value) {
+                    setState(() {
+                      isNotificationSwitched = value;
+                    });
+                  },
+                  activeTrackColor: Colors.lightGreenAccent,
+                  activeColor: Colors.green,
+                ),
+              ],),
           ),
           Container(
             margin: EdgeInsets.only(left: 20.0, right: 15.0),
@@ -74,21 +74,21 @@ class SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-    Container(
-    margin: EdgeInsets.only(top: 15.0),
-    child: Text(do_not_disturb),
-    ),
-              new Switch(
-                value: isDNDSwitched,
-                onChanged: (value) {
-                  setState(() {
-                    isDNDSwitched = value;
-                  });
-                },
-                activeTrackColor: Colors.lightGreenAccent,
-                activeColor: Colors.green,
-              ),
-            ],),
+                Container(
+                  margin: EdgeInsets.only(top: 15.0),
+                  child: Text(do_not_disturb),
+                ),
+                new Switch(
+                  value: isDNDSwitched,
+                  onChanged: (value) {
+                    setState(() {
+                      isDNDSwitched = value;
+                    });
+                  },
+                  activeTrackColor: Colors.lightGreenAccent,
+                  activeColor: Colors.green,
+                ),
+              ],),
           ),
           Container(
             margin: EdgeInsets.only(left: 20.0, right: 15.0),
