@@ -222,13 +222,12 @@ class UsersListState extends State<UsersList>
     return WillPopScope(
       onWillPop: () async => false,
       child: new Scaffold(
-
-          floatingActionButton: SpeedDial(
+         /* floatingActionButton: SpeedDial(
             animatedIcon: AnimatedIcons.menu_close,
             animatedIconTheme: IconThemeData(size: 22.0),
             // this is ignored if animatedIcon is non null
 //             child: Icon(Icons.add),
-            visible: true,
+            visible: false,
             curve: Curves.easeInCirc,
             overlayColor: Colors.black,
             overlayOpacity: 0.5,
@@ -263,7 +262,7 @@ class UsersListState extends State<UsersList>
                 onTap: () => print('THIRD CHILD'),
               ),
             ],
-          ),
+          ),*/
           bottomNavigationBar: SizedBox(
             height: 70,
             child: BottomNavigationBar(
@@ -648,7 +647,7 @@ class UsersListState extends State<UsersList>
                   )
               ),
 
-              DraggableFloatingActionButton(
+              /*DraggableFloatingActionButton(
                 data: 'dfab_demo',
                 offset: new Offset(100, 100),
                 backgroundColor: Theme.of(context).accentColor,
@@ -659,7 +658,7 @@ class UsersListState extends State<UsersList>
                 onPressed: () =>  SpeedDial(
                   animatedIcon: AnimatedIcons.menu_close,
                   animatedIconTheme: IconThemeData(size: 22.0),
-                  visible: true,
+                  visible: false,
                   curve: Curves.easeInCirc,
                   overlayColor: Colors.black,
                   overlayOpacity: 0.5,
@@ -697,7 +696,7 @@ class UsersListState extends State<UsersList>
                 ),
                 appContext: context,
               ),
-
+*/
 
             ],
           )

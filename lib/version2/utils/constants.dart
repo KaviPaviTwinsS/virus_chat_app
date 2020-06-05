@@ -1,0 +1,1 @@
+int title_text_size = 20;

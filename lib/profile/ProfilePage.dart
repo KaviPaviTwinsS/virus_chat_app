@@ -25,6 +25,8 @@ import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import '../utils/constants.dart';
+import 'package:virus_chat_app/version2/settingsPage/SettingsPage.dart';
+
 /*
 class ProfilePageSetup extends StatelessWidget {
   final String currentUserId;
@@ -111,6 +113,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
 
   LoginSelectionOption loginSelectionOption;
   var facebookSignup;
+
+  bool isUploadInProgress = false;
 
   ProfilePageState(String userSigninType, String currentUserId) {
     signinType = userSigninType;
@@ -205,7 +209,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
   }
 
   void onBackpress() {
-    Navigator.pop(context);
+//    Navigator.pop(context);
+  navigationPage();
   }
 
   @override
@@ -251,8 +256,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                   icon: Icon(Icons.arrow_back_ios,
                                     color: white_color,),
                                   onPressed: () {
-                                    Navigator.pop(context);
-//                                  navigationPage();
+//                                    Navigator.pop(context);
+                                  navigationPage();
                                   }),
                             ),
                             new Container(
@@ -276,6 +281,11 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     width: 20.0,
                                   ),
                                   onPressed: () {
+                                   /* Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (
+                                                context) => new SettingsPage()));*/
                                     showLogoutAlertDialog(context);
                                   },
                                 ),
@@ -314,8 +324,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     child: Stack(
                                       children: <Widget>[
                                         (avatarImageFile == null)
-                                            ? (photoUrl != null &&
-                                            photoUrl != ''
+                                            ? ((photoUrl != null &&
+                                            photoUrl != '') || photoUrl != mNewPhotoUrl
                                             ? GestureDetector(
                                           onTap: getImage,
                                           child: Material(
@@ -383,7 +393,33 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                           splashColor: Colors.transparent,
                                           highlightColor: greyColor,
                                           iconSize: 20.0,
-                                        ) : Text('')
+                                        ) : ((photoUrl != '' && mNewPhotoUrl != '') && photoUrl != mNewPhotoUrl) ? GestureDetector(
+                                          onTap: getImage,
+                                          child: Material(
+                                            child: CachedNetworkImage(
+                                              placeholder: (context, url) =>
+                                                  Container(
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2.0,
+                                                      valueColor: AlwaysStoppedAnimation<
+                                                          Color>(
+                                                          progress_color),
+                                                    ),
+                                                    width: 70.0,
+                                                    height: 70.0,
+                                                    padding: EdgeInsets.all(
+                                                        20.0),
+                                                  ),
+                                              imageUrl: mNewPhotoUrl,
+                                              width: 70.0,
+                                              height: 70.0,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(45.0)),
+                                            clipBehavior: Clip.hardEdge,
+                                          ),
+                                        )  :Text('')
                                       ],
                                     ),
                                   ),
@@ -623,77 +659,93 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             ),
                                             child: Text('Update Profile'),
                                             onPressed: () {
-                                              setState(() {
-                                                isLoading = true;
-                                              });
-                                              name = controllerName.text;
-                                              if (name != '' ||
-                                                  nickName != '' ||
-                                                  photoUrl != '' ||
-                                                  userEmail != '' || photoUrl != mNewPhotoUrl) {
-                                                if (name == '') {
-                                                  setState(() {
-                                                    isLoading = false;
-                                                  });
-                                                  Fluttertoast.showToast(
-                                                      msg: enter_names);
-                                                } else if (nickName == '') {
-                                                  setState(() {
-                                                    isLoading = false;
-                                                  });
-                                                  Fluttertoast.showToast(
-                                                      msg: enter_nickname);
-                                                } else if (userEmail == '') {
-                                                  setState(() {
-                                                    isLoading = false;
-                                                  });
-                                                  Fluttertoast.showToast(
-                                                      msg: enter_Email);
-                                                }
-                                                else
-                                                if ((prefs.getString('name') !=
-                                                    name && name != '') ||
-                                                    (nickName != '' &&
-                                                        prefs.getString(
-                                                            'nickname') !=
-                                                            nickName) ||
-                                                    (mNewPhotoUrl !=
-                                                        photoUrl &&
-                                                        photoUrl != '') ||
-                                                    (prefs.getString('email') !=
-                                                        userEmail &&
-                                                        userEmail != '') || photoUrl != mNewPhotoUrl) {
-                                                  bool emailValid = RegExp(
-                                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                                      .hasMatch(userEmail);
-                                                  if (!emailValid) {
+
+                                              if(!isUploadInProgress) {
+                                                setState(() {
+                                                  isLoading = true;
+                                                });
+                                                name = controllerName.text;
+                                                if (name != '' ||
+                                                    nickName != '' ||
+                                                    photoUrl != '' ||
+                                                    userEmail != '' ||
+                                                    photoUrl != mNewPhotoUrl) {
+                                                  if (name == '') {
                                                     setState(() {
                                                       isLoading = false;
                                                     });
                                                     Fluttertoast.showToast(
-                                                        msg: enter_valid_email);
-                                                  } else {
-                                                    Firestore.instance
-                                                        .collection(
-                                                        'users')
-                                                        .document(userId)
-                                                        .updateData({
-                                                      'photoUrl': mNewPhotoUrl,
-                                                      'name': name,
-                                                      'nickName': nickName,
-                                                      'email': userEmail
-                                                    }).whenComplete(() => {
-                                                    storeLocalDataInternal(
-                                                    mNewPhotoUrl, name,
-                                                    nickName,
-                                                    userEmail),
-                                                        Fluttertoast.showToast(
-                                                        msg: update_success),
+                                                        msg: enter_names);
+                                                  } else if (nickName == '') {
                                                     setState(() {
-                                                    isLoading = false;
-                                                    })
+                                                      isLoading = false;
                                                     });
+                                                    Fluttertoast.showToast(
+                                                        msg: enter_nickname);
+                                                  } else if (userEmail == '') {
+                                                    setState(() {
+                                                      isLoading = false;
+                                                    });
+                                                    Fluttertoast.showToast(
+                                                        msg: enter_Email);
+                                                  }
+                                                  else if ((prefs.getString(
+                                                      'name') !=
+                                                      name && name != '') ||
+                                                      (nickName != '' &&
+                                                          prefs.getString(
+                                                              'nickname') !=
+                                                              nickName) ||
+                                                      (mNewPhotoUrl !=
+                                                          photoUrl &&
+                                                          photoUrl != '') ||
+                                                      (prefs.getString(
+                                                          'email') !=
+                                                          userEmail &&
+                                                          userEmail != '') ||
+                                                      photoUrl !=
+                                                          mNewPhotoUrl) {
+                                                    bool emailValid = RegExp(
+                                                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                                        .hasMatch(userEmail);
+                                                    if (!emailValid) {
+                                                      setState(() {
+                                                        isLoading = false;
+                                                      });
+                                                      Fluttertoast.showToast(
+                                                          msg: enter_valid_email);
+                                                    } else {
+                                                      Firestore.instance
+                                                          .collection(
+                                                          'users')
+                                                          .document(userId)
+                                                          .updateData({
+                                                        'photoUrl': mNewPhotoUrl,
+                                                        'name': name,
+                                                        'nickName': nickName,
+                                                        'email': userEmail
+                                                      }).whenComplete(() =>
+                                                      {
+                                                        storeLocalDataInternal(
+                                                            mNewPhotoUrl, name,
+                                                            nickName,
+                                                            userEmail),
+                                                        Fluttertoast.showToast(
+                                                            msg: update_success),
+                                                      isLoading = false,
 
+                                                      // Force refresh input
+                                                      setState(() {}),
+
+                                                      });
+
+                                                    }
+                                                  } else {
+                                                    setState(() {
+                                                      isLoading = false;
+                                                    });
+                                                    Fluttertoast.showToast(
+                                                        msg: no_data_change);
                                                   }
                                                 } else {
                                                   setState(() {
@@ -702,12 +754,12 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                   Fluttertoast.showToast(
                                                       msg: no_data_change);
                                                 }
-                                              } else {
+                                              }else{
                                                 setState(() {
-                                                  isLoading = false;
+                                                  isLoading = true;
                                                 });
                                                 Fluttertoast.showToast(
-                                                    msg: no_data_change);
+                                                    msg: 'Profile picture upload in progress');
                                               }
                                             },
                                           ),
@@ -944,7 +996,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                     )
                 ) : Text(''),
                 // Loading
-                Positioned(
+              /*  Positioned(
                   child: isLoading
                       ? Container(
                     child: Center(
@@ -955,7 +1007,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
 //                    color: Colors.white.withOpacity(0.8),
                   )
                       : Container(),
-                ),
+                ),*/
               ],
             )
         )
@@ -1444,6 +1496,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
   }
 
   Future getImage() async {
+    print('get IMAGE');
     File image = await ImagePicker.pickImage(
         source: ImageSource.gallery, imageQuality: 30);
 
@@ -1464,6 +1517,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
     setState(() {
       isLoading = true;
     });
+    isUploadInProgress = true;
     uploadTask.onComplete.then((value) {
       if (value.error == null) {
         storageTaskSnapshot = value;
@@ -1471,7 +1525,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
 //          photoUrl = downloadUrl;
           mNewPhotoUrl = downloadUrl;
           print('DOWNLOAD URL PROFILE $photoUrl');
-          Fluttertoast.showToast(msg: "Profile picture updated successfully");
+          isUploadInProgress = false;
+          Fluttertoast.showToast(msg: "Profile picture Upload successfully");
           setState(() {
             isLoading = false;
           });
@@ -1491,12 +1546,14 @@ class ProfilePageState extends State<ProfilePageSetup> {
       setState(() {
         isLoading = false;
       });
+      isUploadInProgress = false;
       Fluttertoast.showToast(msg: err.toString());
     });
+
   }
 
   void navigationPage() {
-    Navigator.push(
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => new UsersList(signinType, userId, photoUrl)));
@@ -1615,7 +1672,9 @@ class ProfilePageState extends State<ProfilePageSetup> {
         .toUtc()
         .microsecondsSinceEpoch) / 1000).toInt());
     await prefs.setString('signInType', signinType);
-
+    setState(() {
+      isLoading = false;
+    });
     setState(() {
       this.name = name;
       this.photoUrl = photoUrl;
