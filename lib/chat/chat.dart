@@ -580,7 +580,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
               children: <Widget>[
                 Text(
                   document['content'],
-                  style: TextStyle(color: primaryColor),
+                  style: TextStyle(color: hint_color_grey_dark),
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
@@ -588,7 +588,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                     DateFormat('kk:mm')
                         .format(DateTime.fromMillisecondsSinceEpoch(
                         int.parse(document['timestamp']))),
-                    style: TextStyle(color: timestamp_color,
+                    style: TextStyle(color: hint_color_grey_light,
                         fontSize: 12.0,
                         fontStyle: FontStyle.italic),
                   ),
@@ -666,7 +666,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                       DateFormat('kk:mm')
                           .format(DateTime.fromMillisecondsSinceEpoch(
                           int.parse(document['timestamp']))),
-                      style: TextStyle(color: timestamp_color,
+                      style: TextStyle(color: hint_color_grey_light,
                           fontSize: 12.0,
                           fontStyle: FontStyle.italic),
                     ),
@@ -733,7 +733,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                     DateFormat('kk:mm')
                         .format(DateTime.fromMillisecondsSinceEpoch(
                         int.parse(document['timestamp']))),
-                    style: TextStyle(color: timestamp_color,
+                    style: TextStyle(color: hint_color_grey_light,
                         fontSize: 12.0,
                         fontStyle: FontStyle.italic),
                   ),
@@ -835,7 +835,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                           margin: EdgeInsets.only(top: 5.0),
                           child: Text(
                             document['content'],
-                            style: TextStyle(color: primaryColor),
+                            style: TextStyle(color: hint_color_grey_dark),
                           ),
                         ),
                         Align(
@@ -844,7 +844,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                             DateFormat('kk:mm')
                                 .format(DateTime.fromMillisecondsSinceEpoch(
                                 int.parse(document['timestamp']))),
-                            style: TextStyle(color: timestamp_color,
+                            style: TextStyle(color: hint_color_grey_light,
                                 fontSize: 12.0,
                                 fontStyle: FontStyle.italic),
                           ),
@@ -923,7 +923,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                             DateFormat('kk:mm')
                                 .format(DateTime.fromMillisecondsSinceEpoch(
                                 int.parse(document['timestamp']))),
-                            style: TextStyle(color: timestamp_color,
+                            style: TextStyle(color: hint_color_grey_light,
                                 fontSize: 12.0,
                                 fontStyle: FontStyle.italic),
                           ),
@@ -1253,29 +1253,32 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Container(
-                    color: button_fill_color,
+//                    color: white_color,
                     width: MediaQuery
                         .of(context)
                         .size
                         .width,
-                    height: 150,
+//                    height: 150,
                     child:
                     Row(
                       crossAxisAlignment: CrossAxisAlignment
                           .center,
                       children: <Widget>[
                         Container(
-                          margin: EdgeInsets.only(top: 10.0, bottom: 30.0),
+                          margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
                           child: new IconButton(
-                              icon: Icon(Icons.arrow_back_ios,
-                                color: white_color,),
+                              icon: new SvgPicture.asset(
+                                'images/back_icon.svg',
+                                width: 20.0,
+                                height: 20.0,
+                              ),
                               onPressed: () {
                                 Navigator.pop(context);
                               }),
                         ),
                         new Container(
                           margin: EdgeInsets.only(
-                              top: 10.0, right: 10.0, bottom: 30.0),
+                              top: 40.0, right: 10.0, bottom: 10.0),
                           child: Material(
                             child: CachedNetworkImage(
                               placeholder: (context, url) =>
@@ -1306,25 +1309,25 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                             children: <Widget>[
                               peerName !='' && peerName != null ? Container(
                                 margin: EdgeInsets.only(
-                                    top: 45.0, right: 10.0, bottom: 5.0),
+                                    top: 30.0, right: 10.0, bottom: 5.0),
                                 child: Text(
                                   peerName, style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: text_color),
+                                    fontWeight: FontWeight.w500,
+                                    color: black_color,fontFamily: 'GoogleSansFamily'),
                                 ),
                               ) : Text(''),
                               mDifference != 'Active Now' ? Container(
                                 child: Text(
                                   'Active \t ' + mDifference + '\t ago',
                                   style: TextStyle(
-                                      fontWeight: FontWeight.normal,
-                                      color: text_color),
+                                      fontWeight: FontWeight.w400,
+                                      color: hint_color_grey_dark,fontFamily: 'GoogleSansFamily'),
                                 ),
                               ) : Container(
                                 child: Text(
                                   mDifference, style: TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    color: text_color),
+                                    fontWeight: FontWeight.w400,
+                                    color: hint_color_grey_dark,fontFamily: 'GoogleSansFamily'),
                                 ),
                               ),
                             ],
@@ -1335,13 +1338,13 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                             alignment: Alignment.topRight,
                             child: Container(
                               margin: EdgeInsets.only(
-                                  top: 45.0, right: 20.0, bottom: 5.0),
+                                  top: 40.0, right: 20.0, bottom: 5.0),
                               child: IconButton(
                                 icon: new SvgPicture.asset(
                                   'images/home.svg',
                                   height: 20.0,
                                   width: 20.0,
-                                  color: white_color,
+                                  color: black_color,
                                 ),
                                 onPressed: () {
                                   Navigator.push(
@@ -1358,16 +1361,59 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                     ),
 
                   ),
+                  Divider(color: divider_color,thickness: 1.0,),
+                  // List of messages
+                  buildListMessage(),
+/*
+                    // Sticker
+                    (isShowSticker ? buildSticker() : Container()),
+*/
+                  imageUrl != '' ? FlatButton(
+                    child: Material(
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) =>
+                            Container(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    progress_color),
+                              ),
+                              width: 200.0,
+                              height: 200.0,
+                              padding: EdgeInsets.all(70.0),
+                              decoration: BoxDecoration(
+                                color: greyColor2,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8.0),
+                                ),
+                              ),
+                            ),
+                        imageUrl: imageUrl,
+                        width: 200.0,
+                        height: 200.0,
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      clipBehavior: Clip.hardEdge,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                          context, MaterialPageRoute(builder: (context) =>
+                          FullPhoto(url: imageUrl)));
+                    },
+                    padding: EdgeInsets.all(0),
+                  ) : Text(''),
+                  // Input content
+                  buildInput(),
                 ]
             ),
-            Align(
+            /*Align(
               alignment: Alignment.bottomLeft,
               child: Container(
                 width: MediaQuery
                     .of(context)
                     .size
                     .width,
-                height: MediaQuery
+               *//* height: MediaQuery
                     .of(context)
                     .size
                     .height - 100,
@@ -1377,16 +1423,16 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                       topLeft: const Radius.circular(20.0),
                       topRight: const Radius.circular(20.0),
                     )
-                ),
+                ),*//*
                 child: Column(
                   children: <Widget>[
 
                     // List of messages
                     buildListMessage(),
-/*
+*//*
                     // Sticker
                     (isShowSticker ? buildSticker() : Container()),
-*/
+*//*
                     imageUrl != '' ? FlatButton(
                       child: Material(
                         child: CachedNetworkImage(
@@ -1426,7 +1472,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                   ],
                 ),
               ),
-            ),
+            ),*/
             // Loading
             buildLoading()
           ],
@@ -1724,12 +1770,21 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                     controller: _controller,
                     decoration: InputDecoration(
                       hintText: chat_hint,
-                      hintStyle: TextStyle(color: greyColor),
-                      border: new OutlineInputBorder(
+                      hintStyle: TextStyle(color: hint_color_grey_dark,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: focused_border_color,
+                            width: 0.5),
                         borderRadius: const BorderRadius.all(
                           const Radius.circular(30.0),
                         ),
-                        borderSide: BorderSide(color: greyColor2, width: 0.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: greyColor, width: 0.5),
+                        borderRadius: const BorderRadius.all(
+                          const Radius.circular(30.0),
+                        ),
                       ),
                     ),
                     focusNode: focusNode,
@@ -1745,6 +1800,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                       icon: new SvgPicture.asset(
                         'images/Send.svg', height: 90.0,
                         width: 90.0,
+                        allowDrawingOutsideViewBox: true,
                       ),
                       onPressed: () =>
                           onSendMessage(imageUrl, 1, ''),

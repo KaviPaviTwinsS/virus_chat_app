@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -67,7 +68,8 @@ class SendInviteToUserState extends State<SendInviteToUser> {
     _misAlreadyRequestSent = isAlreadyRequestSent;
     _misRequestSent = isRequestSent;
     _mUserName = mName;
-    print('PERRRR IDD $_misAlreadyRequestSent _____________misRequestSent $_misRequestSent');
+    print(
+        'PERRRR IDD $_misAlreadyRequestSent _____________misRequestSent $_misRequestSent');
   }
 
   bool isButtonPressed = false;
@@ -90,6 +92,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
         isButtonPressed = !isButtonPressed;
       });
     }
+    await getUserActiveTime();
     _userName = await prefs.getString('name');
     _userPhotoUrl = await prefs.getString('photoUrl');
     _friendToken = await prefs.getString('FRIEND_USER_TOKEN');
@@ -108,81 +111,126 @@ class SendInviteToUserState extends State<SendInviteToUser> {
 
 
   Future onSelectNotification(String payload) async {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    FriendRequestScreenState(
-                        _mCurrentUserId,
-                        _mcurrentPhotoUrl)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                FriendRequestScreenState(
+                    _mCurrentUserId,
+                    _mcurrentPhotoUrl)));
   }
+
+  String mDifference = '';
+
+  Future getUserActiveTime() async {
+    print('_mPeerId________________$_mPeerId');
+    var document = await Firestore.instance.collection('users').document(
+        _mPeerId).collection('userLocation').document(_mPeerId).get();
+    var chatData = document.data;
+    var date = new DateTime.fromMillisecondsSinceEpoch(
+        chatData['UpdateTime']);
+    var currDate = ((new DateTime.now()
+        .toUtc()
+        .microsecondsSinceEpoch) / 1000).toInt();
+    var currTime = new DateTime.fromMillisecondsSinceEpoch(
+        currDate);
+    var differenceDays = currTime
+        .difference(date)
+        .inDays;
+    var differenceHours = currTime
+        .difference(date)
+        .inHours;
+    var differenceMins = currTime
+        .difference(date)
+        .inMinutes;
+    var differenceSecs = currTime
+        .difference(date)
+        .inSeconds;
+    if (differenceDays == 0) {
+      if (differenceHours == 0) {
+        if (differenceMins == 0) {
+          if (differenceSecs == 0) {
+            mDifference = 'Active Now';
+          } else {
+            mDifference = differenceSecs.toString() + '\t secs';
+          }
+        } else {
+          mDifference = differenceMins.toString() + '\t mins';
+        }
+      } else {
+        mDifference = differenceHours.toString() + '\t hours';
+      }
+    } else {
+      if (differenceDays == 1) {
+        mDifference = differenceDays.toString() + '\t day';
+      } else if (differenceDays == 30) {
+        differenceDays = 1;
+      } else {
+        mDifference = differenceDays.toString() + '\t days';
+      }
+    }
+    setState(() {
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    if(!isButtonPressed){
+    if (!isButtonPressed) {
       print('_________________________isButtonPressed __$isButtonPressed');
       sendInvite();
     }
     return WillPopScope(
-      onWillPop: (){
+      onWillPop: () {
         onBackPress();
       },
       child: Scaffold(
           body: Stack(
               children: <Widget>[
-                SingleChildScrollView(
-                    child: Column(
+                Column(
+                  children: <Widget>[
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center,
                       children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Container(
-                              color: button_fill_color,
-                              width: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width,
-                              height:150,
-                              child: Column(
-                                  children: <Widget>[
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment
-                                          .center,
-                                      children: <Widget>[
-                                        Container(
-                                          margin: EdgeInsets.only(top: 40.0,bottom: 10.0),
-                                          child: new IconButton(
-                                              icon: Icon(Icons.arrow_back_ios,
-                                                color: white_color,),
-                                              onPressed: () {
-                                                Navigator.pop(context);
+                        Container(
+                          margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
+                          child: new IconButton(
+                              icon: new SvgPicture.asset(
+                                'images/back_icon.svg',
+                                width: 20.0,
+                                height: 20.0,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
 //                                                Navigator.push(
 //                                                    context, MaterialPageRoute(
 //                                                    builder: (context) =>
 //                                                        UsersList(userSignInType,
 //                                                            _mCurrentUserId,
 //                                                            _userPhotoUrl)));
-                                              }),
-                                        ),
-                                        new Container(
-                                          margin: EdgeInsets.only(
-                                              top: 40.0, right: 10.0,bottom: 10.0),
-                                          child: Material(
-                                            child: CachedNetworkImage(
-                                              placeholder: (context, url) =>
-                                                  Container(
-                                                    child: CircularProgressIndicator(
-                                                      strokeWidth: 1.0,
-                                                      valueColor: AlwaysStoppedAnimation<
-                                                          Color>(progress_color),
-                                                    ),
-                                                    width: 35.0,
-                                                    height: 35.0,
-                                                    padding: EdgeInsets.all(10.0),
-                                                  ),
-                                              errorWidget: (context, url,
-                                                  error) =>
-                                                  Material(
-                                                    child: /* Image.asset(
+                              }),
+                        ),
+                        new Container(
+                          margin: EdgeInsets.only(
+                              top: 40.0, right: 10.0, bottom: 10.0),
+                          child: Material(
+                            child: CachedNetworkImage(
+                              placeholder: (context, url) =>
+                                  Container(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.0,
+                                      valueColor: AlwaysStoppedAnimation<
+                                          Color>(progress_color),
+                                    ),
+                                    width: 35.0,
+                                    height: 35.0,
+                                    padding: EdgeInsets.all(10.0),
+                                  ),
+                              errorWidget: (context, url,
+                                  error) =>
+                                  Material(
+                                    child: /* Image.asset(
                                                       'images/img_not_available.jpeg',
                                                       width: MediaQuery
                                                           .of(context)
@@ -191,47 +239,66 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                                       height: 200.0,
                                                       fit: BoxFit.cover,
                                                     ),*/
-                                                    new SvgPicture.asset(
-                                                      'images/user_unavailable.svg',
-                                                      width: 35.0,
-                                                      height: 35.0,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                    borderRadius: BorderRadius.all(
-                                                      Radius.circular(18.0),
-                                                    ),
-                                                    clipBehavior: Clip.hardEdge,
-                                                  ),
-                                              imageUrl: _mPhotoUrl,
-                                              width: 35.0,
-                                              height: 35.0,
-                                              fit: BoxFit.cover,
-                                            ),
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(18.0),
-                                            ),
-                                            clipBehavior: Clip.hardEdge,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                              top: 40.0, right: 10.0,bottom: 10.0),
-                                          child: Text(
-                                            _mUserName, style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: text_color),
-                                          ),
-                                        ),
-                                      ],
+                                    new SvgPicture.asset(
+                                      'images/user_unavailable.svg',
+                                      width: 35.0,
+                                      height: 35.0,
+                                      fit: BoxFit.cover,
                                     ),
-                                  ]
-                              ),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(18.0),
+                                    ),
+                                    clipBehavior: Clip.hardEdge,
+                                  ),
+                              imageUrl: _mPhotoUrl,
+                              width: 35.0,
+                              height: 35.0,
+                              fit: BoxFit.cover,
                             ),
-                          ],
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(18.0),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                          ),
                         ),
+                       Column(
+                         mainAxisAlignment: MainAxisAlignment.start,
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: <Widget>[
+                           Container(
+                             margin: EdgeInsets.only(
+                                 top: 30.0, right: 10.0, bottom: 5.0),
+                             child: Text(
+                               _mUserName, style: TextStyle(
+                                 fontWeight: FontWeight.w500,
+                                 color: black_color,
+                                 fontFamily: 'GoogleSansFamily'),
+                             ),
+                           ),
+                           mDifference != 'Active Now' ? Container(
+                             child: Text(
+                               'Active \t ' + mDifference + '\t ago',
+                               style: TextStyle(
+                                   fontWeight: FontWeight.w400,
+                                   fontFamily: 'GoogleSansFamily',
+                                   color: black_color),
+                             ),
+                           ) : Container(
+                             child: Text(
+                               mDifference, style: TextStyle(
+                                 fontWeight: FontWeight.w400,
+                                 fontFamily: 'GoogleSansFamily',
+                                 color: black_color),
+                             ),
+                           ),
+                         ],
+                       )
                       ],
-                    )
+                    ),
+                    Divider(color: divider_color, thickness: 1.0,),
+                  ],
                 ),
+
                 Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
@@ -239,28 +306,19 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                             .of(context)
                             .size
                             .width,
-                        height:MediaQuery
-                            .of(context)
-                            .size
-                            .height -  100,
-                        decoration: BoxDecoration(
-                            color: text_color,
-                            borderRadius: new BorderRadius.only(
-                              topLeft: const Radius.circular(20.0),
-                              topRight: const Radius.circular(20.0),
-                            )
-                        ),
                         child: Container(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              new SvgPicture.asset(
-                                'images/invite_sent.svg',
-                                width: 80.0,
-                                height: 80.0,
+                              Container(
+                                margin: EdgeInsets.only(top: 15.0),
+                                child: new SvgPicture.asset(
+                                  'images/invite_sent.svg',
+                                  width: 80.0,
+                                  height: 80.0,
+                                ),
                               ),
-                              !isButtonPressed  ? /*RaisedButton(
+                              !isButtonPressed ? /*RaisedButton(
                                   color: white_color,
                                   child: Text('Sent Invite',),
                                   onPressed: () {
@@ -269,27 +327,51 @@ class SendInviteToUserState extends State<SendInviteToUser> {
 //                                  }
                               )*/
                               Container(
-                                child: Text('Invite Sent', style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20.0),),
+                                margin: EdgeInsets.only(top: 15.0),
+                                child: Text('Invite Sent!', style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 20.0,
+                                    fontFamily: 'GoogleSansFamily'),),
                               )
-                              :_misRequestSent == null ?  Container(
-                                child: Text('Invitation Sent successfully', style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20.0),),
-                              ) :( !_misAlreadyRequestSent != null && !_misAlreadyRequestSent) ? Text('Invitation Received', style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20.0),) : !_misRequestSent
-                                  ? Text('Invitation Received', style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20.0),)
-                                  : Text('Already invitation sent',
-                                style: TextStyle(fontWeight: FontWeight.bold,
-                                    fontSize: 20.0),),
-                              Align(
-                                alignment: Alignment.bottomCenter,
-                                child:  Container(
-                                  padding: EdgeInsets.all(55.0),
-                                  child:Center(
-                                    child:  Text(
-                                        'You\'ll be able to chat with VALENTINE once your invitation has been accepted.'),
-                                  )
+                                  : _misRequestSent == null ? Container(
+                                margin: EdgeInsets.only(top: 15.0),
+                                child: Text('Invite Sent!',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 20.0,
+                                      fontFamily: 'GoogleSansFamily'),),
+                              ) : (!_misAlreadyRequestSent != null &&
+                                  !_misAlreadyRequestSent)
+                                  ? Container(
+                                  margin: EdgeInsets.only(top: 15.0),
+                                  child: Text(
+                                    'Invitation Received', style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 20.0,
+                                      fontFamily: 'GoogleSansFamily'),))
+                                  : !_misRequestSent
+                                  ? Container(
+                                  margin: EdgeInsets.only(top: 15.0),
+                                  child: Text(
+                                    'Invitation Received', style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 20.0,
+                                      fontFamily: 'GoogleSansFamily'),))
+                                  : Container(
+                                margin: EdgeInsets.only(top: 15.0),
+                                child: Text('Already invitation sent',
+                                  style: TextStyle(fontWeight: FontWeight.w500,
+                                      fontSize: 20.0),),
+                              ),
+                              Container(
+                                    padding: EdgeInsets.all(30.0),
+                                margin: EdgeInsets.only(
+                                    left: 20.0, right: 20.0),
+                                child: Text(
+                                  'You\'ll be able to chat with VALENTINE once your invitation has been accepted.',
+                                  style: TextStyle(fontWeight: FontWeight.w400,
+                                      fontFamily: 'GoogleSansFamily',
+                                      color: hint_color_grey_dark,),textAlign: TextAlign.center,
                                 ),
                               )
                             ],
@@ -304,10 +386,10 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   }
 
 
-  Future sendInvite() async{
+  Future sendInvite() async {
     print('sendInvite____________');
     try {
-     /* var documentReference = Firestore.instance
+      /* var documentReference = Firestore.instance
           .collection('users')
           .document(_mCurrentUserId)
           .collection('FriendsList')
@@ -334,7 +416,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
           error.toString();
         });
       })*/
-     /*   var documentReference1 = Firestore.instance
+      /*   var documentReference1 = Firestore.instance
             .collection('users')
             .document(_mPeerId)
             .collection('FriendsList')
@@ -397,7 +479,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
       }).whenComplete(() {
         sendAndRetrieveMessage();
       });
-    }on Exception catch(e){
+    } on Exception catch (e) {
       e.toString();
     }
     setState(() {

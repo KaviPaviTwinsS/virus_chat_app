@@ -12,6 +12,7 @@ import 'package:virus_chat_app/utils/CustomTextSpan.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:virus_chat_app/utils/constants.dart';
+import 'package:virus_chat_app/business/UpgradeBusiness.dart';
 
 import './otp_input.dart';
 
@@ -42,7 +43,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
   /// Decorate the outside of the Pin.
   PinDecoration _pinDecoration =
-  BoxLooseDecoration(strokeColor: Colors.grey, hintText: '______');
+  BoxLooseDecoration(strokeColor: greyColor2, hintText: '______');
 
   bool isCodeSent = false;
   String _verificationId;
@@ -99,7 +100,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     margin: const EdgeInsets.only(
                         left: 20.0, top: 10.0, right: 20.0),
                     child: Text(verify_phone,
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 19,fontFamily: 'GoogleSansFamily'),
+                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 27,fontFamily: 'GoogleSansFamily'),
                     ),
                   ),
                 ),
@@ -108,6 +109,9 @@ class _OTPScreenState extends State<OTPScreen> {
                         left: 20.0, top: 50.0, right: 20.0),
                     child: customTextSpan(
                         otp_page, widget.mobileNumber)
+                ),
+                SizedBox(
+                  height: 20.0,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -154,16 +158,16 @@ class _OTPScreenState extends State<OTPScreen> {
                     Container(
                       margin: const EdgeInsets.only(
                           left: 20.0, top: 10.0, right: 10.0),
-                      child: Text(resend_otp),
+                      child: Text(resend_otp,style: TextStyle(fontWeight: FontWeight.w400,fontFamily: 'GoogleSansFamily',color: hint_color_grey_light),),
                     ),
                     new GestureDetector(
                       child: Container(
                         margin: const EdgeInsets.only(
                             top: 10.0, right: 10.0),
                         child: Text(resend_code, style: TextStyle(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w400,
                           fontSize: 15,
-                          color: Colors.blue,fontFamily: 'GoogleSansFamily')
+                          color: text_color_blue,fontFamily: 'GoogleSansFamily')
                         ),
                       ),
                       onTap: () {
@@ -307,6 +311,8 @@ class _OTPScreenState extends State<OTPScreen> {
     _firebaseAuth
         .signInWithCredential(_authCredential)
         .then((AuthResult value) {
+
+
       if (value.user != null) {
         // Handle loogged in state
         print(value.user.phoneNumber +"___________" + _pinEditingController.text);
@@ -338,8 +344,8 @@ class _OTPScreenState extends State<OTPScreen> {
     print('OTPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP ___ ${widget.mobileNumber} _____${firebaseUser.uid}');
     final QuerySnapshot result = await Firestore.instance
         .collection('users')
-//        .where('id', isEqualTo: firebaseUser.uid)
-        .where('phoneNo',isEqualTo: '+91'+"\t"+widget.mobileNumWithoutCountryCode)
+        .where('id', isEqualTo: firebaseUser.uid)
+        .where('phoneNo',isEqualTo:widget.mobileNumber)
         .getDocuments();
     final List<DocumentSnapshot> documents = result.documents;
     print('OTPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP ${documents.length} ___ ');
@@ -402,13 +408,33 @@ class _OTPScreenState extends State<OTPScreen> {
     setState(() {
       isLoading = false;
     });
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                UsersList('MobileNumber',
-                    uid, documents[0]['photoUrl'])));
-    print('updateLocalListData NANDHU');
+
+
+
+    if(_mCurrentLoginType == 'phone') {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  UsersList('MobileNumber',
+                      uid, documents[0]['photoUrl'])));
+      print('updateLocalListData NANDHU');
+    }else{
+      if((documents[0]['businessId'] != null && documents[0]['businessId'] == '') || (documents[0]['businessType'] != null && documents[0]['businessType'] != BUSINESS_TYPE_OWNER)) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    UpgradeBusiness(uid, _mCurrentLoginType)));
+      }else{
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    UsersList('MobileNumber',
+                        uid, documents[0]['photoUrl'])));
+      }
+    }
 
     /* Navigator.push(
         context,

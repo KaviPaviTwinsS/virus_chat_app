@@ -143,6 +143,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     prefs = preferences;
     isFacebookLoggedIn = isLoggedIn;
 //    Fluttertoast.showToast(msg: "Faccebook login success ${profileData['picture']['data']['url']} ___ ${profileData['email']}");
+    if(profileData != null)
     facebookProfileData = profileData;
     if (isFacebookLoggedIn) {
       print(
@@ -156,7 +157,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     } else {
 //      Fluttertoast.showToast(msg: "Sign in fail");
       isLoading = false;
-      _updatestatus();
+//      _updatestatus();
       await clearLocalData(prefs);
     }
   }
@@ -198,7 +199,7 @@ class LoginSelectionOption extends State<LoginSelection> {
       await googleSignIn.disconnect();
       await googleSignIn.signOut();
     }
-    _updatestatus();
+//    _updatestatus();
     await FirebaseAuth.instance.signOut();
     isLoading = false;
     await clearLocalData(prefs);
@@ -251,7 +252,7 @@ class LoginSelectionOption extends State<LoginSelection> {
 //    setState(() {
     isLoading = false;
 //    });
-    LocationService(documents[0]['id']);
+    LocationService(documents[0]['id'],documents[0]['businessType'],documents[0]['businessId']);
     if (signInType == 'facebook') {
       Navigator.pushReplacement(
           _mContext,
@@ -335,7 +336,7 @@ class LoginSelectionOption extends State<LoginSelection> {
           .toUtc()
           .microsecondsSinceEpoch) / 1000).toInt()
     });
-    UserLocation currentLocation = await LocationService(firebaseUser.uid,)
+    UserLocation currentLocation = await LocationService(firebaseUser.uid,'','')
         .getLocation();
     Firestore.instance.collection('users').document(firebaseUser.uid)
         .collection('userLocation').document(firebaseUser.uid)
@@ -348,7 +349,7 @@ class LoginSelectionOption extends State<LoginSelection> {
     isLoading = false;
 //    });
     if (loginType == 'facebook') {
-      Navigator.pushReplacement(
+      Navigator.push(
           _mContext,
           MaterialPageRoute(
               builder: (context) =>
@@ -515,7 +516,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                                           width: ((MediaQuery
                                               .of(context)
                                               .size
-                                              .width) / 2) - 20,
+                                              .width) / 2) - 30,
                                           height: 45.0,
                                           child: RaisedButton(
                                             onPressed: () {
@@ -534,7 +535,7 @@ class LoginSelectionOption extends State<LoginSelection> {
                                                 ),
                                                 Container(
                                                   margin: EdgeInsets.only(
-                                                      left: 30.0),
+                                                      right: 30.0),
                                                   child: Text(google_txt,
                                                     style: TextStyle(
                                                         fontFamily: 'GoogleSansFamily',

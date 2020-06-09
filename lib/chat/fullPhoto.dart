@@ -65,8 +65,11 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                       Container(
                         margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
                         child: new IconButton(
-                            icon: Icon(Icons.arrow_back_ios,
-                              color: white_color,),
+                            icon:new SvgPicture.asset(
+                              'images/back_icon.svg',
+                              width: 20.0,
+                              height: 20.0,
+                            ),
                             onPressed: () {
                               Navigator.pop(context);
                             }),

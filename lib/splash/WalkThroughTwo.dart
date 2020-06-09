@@ -13,7 +13,7 @@ class WalkThroughTwo extends StatelessWidget {
 
         body: Column(
           children: <Widget>[
-            SizedBox(
+            Container(
                 width: MediaQuery
                     .of(context)
                     .size
@@ -22,6 +22,7 @@ class WalkThroughTwo extends StatelessWidget {
                     .of(context)
                     .size
                     .height - 50,
+                color: background_white_color,
                 child: Image(
                   image: AssetImage(
                     'images/walkthrough_step2_new.png',
@@ -29,12 +30,13 @@ class WalkThroughTwo extends StatelessWidget {
                   fit: BoxFit.cover,
                 )
             ),
-            SizedBox(
+            Container(
                 width: MediaQuery
                     .of(context)
                     .size
                     .width,
                 height: 50.0,
+                color: background_white_color,
                 child:Container(
                   margin: EdgeInsets.only(right: 20.0,bottom: 10.0),
                   padding: EdgeInsets.all(10.0),
@@ -48,7 +50,7 @@ class WalkThroughTwo extends StatelessWidget {
                             MaterialPageRoute(
                                 builder: (context) => new WalkThroughThree()));
                       },
-                      child: Text(skip, style: TextStyle(color: sky_blue,fontSize: 17.0,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w600,),),
+                      child: Text(skip, style: TextStyle(color: text_color_blue,fontSize: 17.0,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w600,),),
                     ),
                   ),
                 )

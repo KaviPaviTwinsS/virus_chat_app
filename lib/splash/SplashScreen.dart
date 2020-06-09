@@ -7,7 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/LocationService.dart';
-import 'package:virus_chat_app/Login/LoginSelection.dart';
+import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:http/http.dart' as http;
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
@@ -210,7 +210,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => new LoginSelection()));
+                builder: (context) => new PhoneNumberSelectionPage('phone')));
       }else {
         final controller = PageController(
           initialPage: 0
@@ -254,7 +254,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
 */
     print('SPLASHHHHHHHHHHHHHHHHHH _____$user _____$userUrl');
 //    UserLocation currentLocation = await LocationService(user,).getLocation();
-    LocationService(user);
+    LocationService(user,'','');
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(

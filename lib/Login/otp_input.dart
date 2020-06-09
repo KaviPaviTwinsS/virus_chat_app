@@ -2,6 +2,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:virus_chat_app/utils/colors.dart';
 
 enum PinEntryType { underline, boxTight, boxLoose }
 
@@ -17,7 +18,6 @@ abstract class PinDecoration {
 
   /// The style of error text.
   final TextStyle errorTextStyle;
-
   final String hintText;
 
   final TextStyle hintTextStyle;
@@ -91,8 +91,8 @@ class UnderlineDecoration extends PinDecoration {
     TextStyle errorTextStyle,
     String hintText,
     TextStyle hintTextStyle,
-    this.enteredColor,
-    this.gapSpace: 16.0,
+    this.enteredColor : Colors.grey,
+    this.gapSpace: 20.0,
     this.gapSpaces,
     this.color: Colors.cyan,
     this.lineHeight: 2.0,
@@ -222,13 +222,13 @@ class BoxLooseDecoration extends PinDecoration {
     ObscureStyle obscureStyle,
     String errorText,
     TextStyle errorTextStyle,
-    String hintText,
+    String hintText = '',
     TextStyle hintTextStyle,
     this.enteredColor,
     this.solidColor,
-    this.radius: const Radius.circular(8.0),
-    this.strokeWidth: 1.0,
-    this.gapSpace: 16.0,
+    this.radius: const Radius.circular(5.0),
+    this.strokeWidth: 0.5,
+    this.gapSpace: 8.0,
     this.gapSpaces,
     this.strokeColor: Colors.cyan,
   }) : super(
@@ -306,7 +306,7 @@ class PinInputTextField extends StatefulWidget {
 
   PinInputTextField({
     Key key,
-    this.pinLength: 6,
+    this.pinLength,
     this.onSubmit,
     this.decoration: const BoxLooseDecoration(),
     List<TextInputFormatter> inputFormatter,

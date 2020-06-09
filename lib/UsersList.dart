@@ -387,10 +387,7 @@ class UsersListState extends State<UsersList>
               SingleChildScrollView(
                 child: Container(
                     color: button_fill_color,
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .height - 280,
+                    height: 180,
                     child: Column(
                       children: <Widget>[
                         Row(
@@ -515,7 +512,7 @@ class UsersListState extends State<UsersList>
                         ),
                         Column(
                           children: <Widget>[
-                            Container(
+                           /* Container(
                               margin: EdgeInsets.only(top: 5.0),
                               child: Align(
                                 alignment: Alignment.topCenter,
@@ -544,7 +541,7 @@ class UsersListState extends State<UsersList>
                                   currentUser, currentUserPhotoUrl, this),
                             )
 
-
+*/
                             /*Container(
                               margin: EdgeInsets.only(right: 50.0),
                               child:Align(
@@ -588,7 +585,10 @@ class UsersListState extends State<UsersList>
                           .of(context)
                           .size
                           .width,
-                      height: 280,
+                      height:  MediaQuery
+                          .of(context)
+                          .size
+                          .height - 180,
                       decoration: BoxDecoration(
                           color: text_color,
                           borderRadius: new BorderRadius.only(
@@ -619,26 +619,26 @@ class UsersListState extends State<UsersList>
                               )
                           ),
                           Align(
-                            alignment: Alignment.bottomLeft,
+                            alignment: Alignment.topLeft,
                             child: Container(
                                 margin: EdgeInsets.only(left: 20.0,
                                     top: 5.0),
-                                child: Text('People', style: TextStyle(
+                                child: Text('Closest to you', style: TextStyle(
                                     fontSize: 19.0,
                                     fontFamily: 'GoogleSansFamily',
-                                    fontWeight: FontWeight.w700),)
+                                    fontWeight: FontWeight.w500),)
                             ),
                           ),
                           new LoginUsersList(
                               currentUser, currentUserPhotoUrl),
                           Align(
-                            alignment: Alignment.topLeft,
+                            alignment: Alignment.bottomLeft,
                             child: Container(
                                 margin: EdgeInsets.only(left: 20.0,),
-                                child: Text('Active', style: TextStyle(
+                                child: Text('Near by users', style: TextStyle(
                                     fontSize: 19.0,
                                     fontFamily: 'GoogleSansFamily',
-                                    fontWeight: FontWeight.w700),)
+                                    fontWeight: FontWeight.w500),)
                             ),
                           ),
                           currentUser != '' && currentUser != null
@@ -646,7 +646,18 @@ class UsersListState extends State<UsersList>
                               currentUser, currentUserPhotoUrl,
                               _msliderData)
                               : Container(),
-
+                          Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Container(
+                                margin: EdgeInsets.only(left: 20.0,top: 20.0),
+                                child: Text('Businesses', style: TextStyle(
+                                    fontSize: 19.0,
+                                    fontFamily: 'GoogleSansFamily',
+                                    fontWeight: FontWeight.w500),),
+                            ),
+                          ),
+                      new BusinessListPage(
+                          currentUser, currentUserPhotoUrl),
                         ],
                       )
                   )
@@ -857,25 +868,28 @@ class ActiveUserListRadius extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('userDistanceISWITHINRADIUS BUILDDDDDDDDDDD');
     return new StreamBuilder(
         stream: Firestore.instance.collection('users').where(
-            'userDistanceISWITHINRADIUS', isEqualTo: 'YES').where(
-            'businessId', isEqualTo: '').where(
-            'status', isEqualTo: 'ACTIVE').snapshots(),
+            'userDistanceISWITHINRADIUS', isEqualTo: 'YES')/*.where(
+            'businessId', isEqualTo: '').*/.where(
+            'status', isEqualTo: 'ACTIVE').orderBy('userDistance',descending: true).snapshots(),
 //        stream: timedCounter(Duration(seconds: 3000)),
         builder:
             (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+//              print('userDistanceISWITHINRADIUS BUILDDDDDDDDDDD  ${snapshot.data.documents.length}');
+
 //              if(isLoading == true)   return Center(
 //                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(progress_color)));;
           if (!snapshot.hasData)
             return new Container(
                 margin: EdgeInsets.only(left: 20.0, top: 20.0),
-                child: new Text('Loading...', style: TextStyle(
-                  fontFamily: 'GoogleSansFamily',)));
-          else
-            return Expanded(
-                child: snapshot.data.documents.length == 0 ? Center(
+                child : Center(
+                  child: Text(no_users,style: TextStyle(fontFamily: 'GoogleSansFamily',)),),
+                );
+//                child: new Text('Loading...', style: TextStyle(
+//                  fontFamily: 'GoogleSansFamily',)));
+          else return Flexible(
+                child: snapshot.data.documents.length == null || snapshot.data.documents.length == 0  ? Center(
                   child: Text(no_users),
                 ) : new ListView(
                     scrollDirection: Axis.horizontal,
@@ -923,16 +937,29 @@ class ActiveUserListRadius extends StatelessWidget {
                                       style: TextStyle(
                                         fontFamily: 'GoogleSansFamily',)
                                       , textScaleFactor: 1.0),
+                                ),
+                                new Container(
+                                  margin: EdgeInsets.only(
+                                      left: 20.0, top: 5.0),
+                                  child: Text(capitalize(document['userDistance'])+'\t m',
+                                      style: TextStyle(
+                                        fontFamily: 'GoogleSansFamily',)
+                                      , textScaleFactor: 1.0),
                                 )
                               ],
                             ));
                       } else {
+                        if(snapshot.data.documents.length == 1)
                         return Container(
-                          /*  margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                            margin: EdgeInsets.only(left: 20.0, top: 20.0),
                             child: Center(
-                              child: Text(''),
-                            )*/
+                              child: Text(no_users),
+                            )
                         );
+                        else
+                          return Container(
+
+                          );
                       }
                       /*  return new ListTile(
                 title: new Text(document['name']),
@@ -1319,7 +1346,7 @@ class ActiveUserListRadius extends StatelessWidget {
           new LatLng(geopoint.latitude, geopoint.longitude));
       print('USER DISTANCE $km');
       print('USER GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
-      if ((km == 0.0 || /*sliderData >= km*/ km < sliderData) &&
+      if ((km == 0.0 || /*sliderData >= km*/ km < 1000) &&
           userId != currentUserId) {
         DocumentSnapshot userDocs = await Firestore.instance.collection('users')
             .document(userId).get();
@@ -1327,12 +1354,14 @@ class ActiveUserListRadius extends StatelessWidget {
         print('USER DETAILSSS ${userDocs.data.values} ____userId $userId');
         Firestore.instance.collection('users').document(userId).updateData({
           'userDistanceISWITHINRADIUS':
-          'YES'
+          'YES',
+          'userDistance' : km.toInt().toString()
         });
       } else {
         Firestore.instance.collection('users').document(userId).updateData({
           'userDistanceISWITHINRADIUS':
-          'NO'
+          'NO',
+          'userDistance' : km.toInt().toString()
         });
       }
     }
@@ -1614,7 +1643,6 @@ class LoginUsersList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('LoginUsersList _________________ ${new DateTime.now()}');
     return new StreamBuilder(
 //      stream: getData(),
       stream: Firestore.instance.collection('users').snapshots(),
@@ -1623,6 +1651,8 @@ class LoginUsersList extends StatelessWidget {
 //      stream: timedCounter(Duration(seconds: 3000)),*/
       builder:
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+//            print('LoginUsersList _________________ ${snapshot.data.documents.length}');
+
 //      builder:
 //          (BuildContext context,snapshot) {
         if (!snapshot.hasData) return new Container(
@@ -1631,7 +1661,9 @@ class LoginUsersList extends StatelessWidget {
               fontFamily: 'GoogleSansFamily',)));
 //        var documents = snapshot.data.length;
         return Flexible(
-            child: new ListView(
+            child:  snapshot.data.documents.length == null || snapshot.data.documents.length == 0  || snapshot.data.documents.length == 1 ? Center(
+              child: Text(no_users),
+            ) : new ListView(
                 scrollDirection: Axis.horizontal,
                 /* GridView.builder(
               itemCount: snapshot.data.documents.length,
@@ -1779,7 +1811,7 @@ class LoginUsersList extends StatelessWidget {
                                       document['photoUrl'] != ''
                                       ? new Container(
                                       margin: EdgeInsets.only(
-                                          left: 20.0, top: 10.0),
+                                          left: 30.0, top: 20.0),
                                       width: 60.0,
                                       height: 60.0,
                                       decoration: new BoxDecoration(
@@ -1793,7 +1825,7 @@ class LoginUsersList extends StatelessWidget {
                                       : document['photoUrl'] == ''
                                       ? new Container(
                                       margin: EdgeInsets.only(
-                                          left: 20.0, top: 10.0),
+                                          left: 30.0, top: 20.0),
                                       width: 60.0,
                                       height: 60.0,
                                       child: new SvgPicture.asset(
@@ -1809,34 +1841,34 @@ class LoginUsersList extends StatelessWidget {
                                   document['status'] == 'ACTIVE' ? Container(
                                       child: new SvgPicture.asset(
                                         'images/online_active.svg',
-                                        height: 10.0,
-                                        width: 10.0,
+                                        height: 15.0,
+                                        width: 15.0,
 //                                          color: primaryColor,
                                       ),
                                       margin: EdgeInsets.only(left: 70.0,
                                           bottom: 30.0,
-                                          top: 10.0,
+                                          top: 20.0,
                                           right: 5.0)) : document['status'] ==
                                       'LoggedOut' ? Container(
                                     child: new SvgPicture.asset(
                                       'images/online_inactive.svg',
-                                      height: 10.0,
-                                      width: 10.0,
+                                      height: 15.0,
+                                      width: 15.0,
 //                                        color: primaryColor,
                                     ),
                                     margin: EdgeInsets.only(left: 70.0,
                                         bottom: 30.0,
-                                        top: 10.0,
+                                        top: 20.0,
                                         right: 5.0),
                                   ) : Container(
                                     child: new SvgPicture.asset(
-                                      'images/online_idle.svg', height: 10.0,
-                                      width: 10.0,
+                                      'images/online_idle.svg', height: 15.0,
+                                      width: 15.0,
 //                                        color: primaryColor,
                                     ),
                                     margin: EdgeInsets.only(left: 70.0,
                                         bottom: 30.0,
-                                        top: 10.0,
+                                        top: 20.0,
                                         right: 5.0),
                                   )
                                 ]
@@ -1865,9 +1897,9 @@ class LoginUsersList extends StatelessWidget {
                         )*/
                     );
                   }
-                  return new ListTile(
-                      title: new Text(document['name']),
-                      subtitle: new Text(document['status']));
+//                  return new ListTile(
+//                      title: new Text(document['name']),
+//                      subtitle: new Text(document['status']));
                 }).toList()
             )
         );
@@ -1976,8 +2008,8 @@ class BusinessListPage extends StatelessWidget {
             child: new Text('Loading...', style: TextStyle(
               fontFamily: 'GoogleSansFamily',)));
         return Flexible(
-            child: snapshot.data.documents.length == 0 ? Center(
-              child: Text(no_users),
+            child: snapshot.data.documents.length == null || snapshot.data.documents.length == 0 ? Center(
+              child: Text(noBusiness),
             ) : new ListView(
                 scrollDirection: Axis.horizontal,
                 children: snapshot.data.documents.map((document) {
@@ -2030,35 +2062,35 @@ class BusinessListPage extends StatelessWidget {
                                   document['status'] == 'ACTIVE' ? Container(
                                       child: new SvgPicture.asset(
                                         'images/online_active.svg',
-                                        height: 10.0,
-                                        width: 10.0,
+                                        height: 15.0,
+                                        width: 15.0,
 //                                          color: primaryColor,
                                       ),
-                                      margin: EdgeInsets.only(left: 70.0,
+                                      margin: EdgeInsets.only(left: 60.0,
                                           bottom: 30.0,
                                           top: 10.0,
-                                          right: 5.0)) : document['status'] ==
+                                          right: 10.0)) : document['status'] ==
                                       'LoggedOut' ? Container(
                                     child: new SvgPicture.asset(
                                       'images/online_inactive.svg',
-                                      height: 10.0,
-                                      width: 10.0,
+                                      height: 15.0,
+                                      width: 15.0,
 //                                        color: primaryColor,
                                     ),
-                                    margin: EdgeInsets.only(left: 70.0,
+                                    margin: EdgeInsets.only(left: 60.0,
                                         bottom: 30.0,
                                         top: 10.0,
-                                        right: 5.0),
+                                        right: 10.0),
                                   ) : Container(
                                     child: new SvgPicture.asset(
-                                      'images/online_idle.svg', height: 10.0,
-                                      width: 10.0,
+                                      'images/online_idle.svg', height: 15.0,
+                                      width: 15.0,
 //                                        color: primaryColor,
                                     ),
-                                    margin: EdgeInsets.only(left: 70.0,
+                                    margin: EdgeInsets.only(left: 60.0,
                                         bottom: 30.0,
                                         top: 10.0,
-                                        right: 5.0),
+                                        right: 10.0),
                                   )
                                 ]
                             ),
@@ -2080,10 +2112,10 @@ class BusinessListPage extends StatelessWidget {
                     }*/
                   } else {
                     return Container(
-                      /*   margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                        margin: EdgeInsets.only(left: 20.0, top: 20.0),
                         child: Center(
-                          child: Text(''),
-                        )*/
+                          child: Text(noBusiness),
+                        )
                     );
                   }
                   return new ListTile(

@@ -469,7 +469,7 @@ class PasswordSetupState extends State<PasswordSetup> {
           .toUtc()
           .microsecondsSinceEpoch) / 1000).toInt()
     });
-    UserLocation currentLocation = await LocationService(firebaseUser.uid,)
+    UserLocation currentLocation = await LocationService(firebaseUser.uid,'','')
         .getLocation();
     Firestore.instance.collection('users').document(firebaseUser.uid)
         .collection('userLocation').document(firebaseUser.uid)

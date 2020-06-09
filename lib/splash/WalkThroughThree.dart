@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:virus_chat_app/Login/LoginSelection.dart';
+import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/splash/WalkThroughThree.dart';
 import 'package:virus_chat_app/splash/WalkThroughTwo.dart';
 import 'package:virus_chat_app/utils/colors.dart';
@@ -13,7 +13,7 @@ class WalkThroughThree extends StatelessWidget {
     return new Scaffold(
         body: Column(
           children: <Widget>[
-            SizedBox(
+            Container(
                 width: MediaQuery
                     .of(context)
                     .size
@@ -22,6 +22,7 @@ class WalkThroughThree extends StatelessWidget {
                     .of(context)
                     .size
                     .height - 50,
+                color: background_white_color,
                 child: Image(
                   image: AssetImage(
                     'images/walkthrough_step3_new.png',
@@ -29,12 +30,13 @@ class WalkThroughThree extends StatelessWidget {
                   fit: BoxFit.cover,
                 )
             ),
-            SizedBox(
+            Container(
                 width: MediaQuery
                     .of(context)
                     .size
                     .width,
                 height: 50.0,
+                color: background_white_color,
                 child:Container(
                   margin: EdgeInsets.only(right: 20.0,bottom: 10.0),
                   padding: EdgeInsets.all(10.0),
@@ -46,9 +48,9 @@ class WalkThroughThree extends StatelessWidget {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => new LoginSelection()));
+                                builder: (context) => new PhoneNumberSelectionPage('phone')));
                       },
-                      child: Text(skip, style: TextStyle(color: sky_blue,fontSize: 17.0,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w600,),),
+                      child: Text(skip, style: TextStyle(color: text_color_blue,fontSize: 17.0,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w600,),),
                     ),
                   ),
                 )

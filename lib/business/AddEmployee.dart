@@ -738,7 +738,7 @@ class AddEmployeeState extends State<AddEmployee> {
                 .toUtc()
                 .microsecondsSinceEpoch) / 1000).toInt()
           }).whenComplete(() async {
-            UserLocation currentLocation = await LocationService('')
+            UserLocation currentLocation = await LocationService('','','')
                 .getLocation();
             print(
                 'NANDHU AddEmployeeState AddNewEmployee Reference LOCATIon UPDATE${currentLocation}');

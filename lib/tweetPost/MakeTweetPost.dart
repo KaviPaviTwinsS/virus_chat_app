@@ -82,61 +82,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
         body: WillPopScope(
           child: Stack(
             children: <Widget>[
-              Column(
-                  children: <Widget>[
-                    Container(
-                      color: button_fill_color,
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width,
-                      height: 130,
-                      child:
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment
-                            .center,
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.only(top: 40.0, bottom: 40.0),
-                            child: new IconButton(
-                                icon: Icon(Icons.arrow_back_ios,
-                                  color: white_color,),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                }),
-                          ),
-                          new Container(
-                              margin: EdgeInsets.only(
-                                  top: 40.0,bottom: 40.0),
-                              child: Text('My Community', style: TextStyle(
-                                  color: text_color,
-                                  fontSize: TOOL_BAR_TITLE_SIZE,
-                                  fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),)
-                          ),
 
-                          Spacer(),
-                          Align(
-                              alignment: Alignment.topRight,
-                              child: Container(
-                                margin: EdgeInsets.only(
-                                    top: 45.0, right: 20.0, bottom: 5.0),
-                                child: IconButton(
-                                  icon: new SvgPicture.asset(
-                                    'images/community.svg',
-                                    height: 20.0,
-                                    width: 20.0,
-                                    color: white_color,
-                                  ),
-                                  onPressed: () {
-                                  },
-                                ),
-                              )
-                          )
-                        ],
-                      ),
-                    ),
-                  ]
-              ),
               Align(
                   alignment: Alignment.bottomLeft,
                   child: Container(
@@ -144,7 +90,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                           .of(context)
                           .size
                           .width,
-                      height: MediaQuery
+                     /* height: MediaQuery
                           .of(context)
                           .size
                           .height - 105,
@@ -154,7 +100,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                             topLeft: const Radius.circular(20.0),
                             topRight: const Radius.circular(20.0),
                           )
-                      ),
+                      ),*/
                       child: Stack(
                         children: <Widget>[
                           Column(
@@ -187,7 +133,58 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                         ],
                       )
                   )
-              )
+              ),
+              Column(
+                  children: <Widget>[
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
+                          child: new IconButton(
+                              icon: new SvgPicture.asset(
+                                'images/back_icon.svg',
+                                width: 20.0,
+                                height: 20.0,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              }),
+                        ),
+                        new Container(
+                            margin: EdgeInsets.only(
+                                top: 40.0,bottom: 10.0),
+                            child: Text('My Community', style: TextStyle(
+                                color: black_color,
+                                fontSize: TOOL_BAR_TITLE_SIZE,
+                                fontWeight: FontWeight.w500,fontFamily: 'GoogleSansFamily'),)
+                        ),
+
+                        Spacer(),
+                        Align(
+                            alignment: Alignment.topRight,
+                            child: Container(
+                              margin: EdgeInsets.only(
+                                  top: 40.0, right: 20.0, bottom: 5.0),
+                              child: IconButton(
+                                icon: new SvgPicture.asset(
+                                  'images/community.svg',
+                                  height: 20.0,
+                                  width: 20.0,
+                                  color: black_color,
+                                ),
+                                onPressed: () {
+                                },
+                              ),
+                            )
+                        )
+                      ],
+                    ),
+                    Divider(color: divider_color,thickness: 1.0,),
+                  ]
+              ),
             ],
           ),
         )
@@ -231,16 +228,17 @@ class MakeTweetPostState extends State<MakeTweetPost> {
     storeFile(document['tweetPostImage'],url);
     return Container(
         padding: EdgeInsets.all(5.0),
+        margin: EdgeInsets.only(top: 110.0),
         width: double.infinity,
-        child: SingleChildScrollView(
-          child: Column(
+        child:/* SingleChildScrollView(
+          child: */Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
 
               Stack(
                 children: <Widget>[
                   document['userPhoto'] != '' ? Container(
-                      margin: EdgeInsets.only(left : 10.0,bottom: document['tweetPostImage'] != '' ? 210.0 : 100.0,top: 10.0),
+                      margin: EdgeInsets.only(left : 10.0,bottom: document['tweetPostImage'] != '' ? 170.0 : 100.0,top: 10.0),
                       child: Material(
                         child: CachedNetworkImage(
                           placeholder: (context, url) =>
@@ -267,30 +265,34 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Container(
+                        margin: EdgeInsets.only(top: 10.0),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[document['userName'] != '' ? Container(
                               margin: EdgeInsets.only(left: 70.0,bottom: 5.0),
                               child: Text(
                                   capitalize(document['userName']),
-                                  style: TextStyle(color: button_fill_color,fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily')
+                                  style: TextStyle(color: button_fill_color,fontWeight: FontWeight.w400,fontFamily: 'GoogleSansFamily')
                               )
                           ) : Text(''),
-                            document['createdAt'] != '' ? Container(
-                                margin: EdgeInsets.only(left : 10.0,right: 5.0),
+                            Spacer(),
+                            document['createdAt'] != '' ?  Align(
+                                alignment: Alignment.bottomRight,
+                                child: Container(
+                                margin: EdgeInsets.only(left : 10.0,right: 15.0),
                                 child: Text(
                                     document['createdAt'],
-                                    style: TextStyle(color: greyColor,fontSize: 10.0,fontFamily: 'GoogleSansFamily')
+                                    style: TextStyle(color: hint_color_grey_dark,fontSize: 10.0,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400)
                                 )
-                            ) : Text(''),
-                            Spacer(),
-                            Align(
+                            )) : Text(''),
+//                            Spacer(),
+                         /*   Align(
                               alignment: Alignment.bottomRight,
                               child: Container(
                                 margin: EdgeInsets.only(right: 10.0,top: 15.0),
                                 child: getIconWidget(document),
                               ),
-                            )
+                            )*/
                           ],
                         ),
                       ),
@@ -298,7 +300,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                           margin: EdgeInsets.only(left: 70.0,bottom: 15.0),
                           width: MediaQuery.of(context).size.width - 100,
                           child: Text(
-                              document['content'],style: TextStyle(fontFamily: 'GoogleSansFamily'),)
+                              document['content'],style: TextStyle(fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),)
                       )
                           : Text(''),
                       document['tweetPostImage'] != '' ? Container(
@@ -360,7 +362,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
               Divider(),
             ],
           ),
-        )
+//        )
     );
 
   }

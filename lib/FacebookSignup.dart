@@ -59,17 +59,18 @@ class FacebookSignup {
         AuthCredential credential =
         FacebookAuthProvider.getCredential(accessToken: myToken.token);
 // this line do auth in firebase with your facebook credential.
-        FirebaseUser firebaseUser =
-            (await FirebaseAuth.instance.signInWithCredential(credential)).user;
-
-        var graphResponse = await http.get(
-            'https://graph.facebook.com/v2.12/me?fields=id,name,first_name,last_name,email,picture,gender&access_token=${
-                result
-                .accessToken.token}');
-        var profile = JSON.jsonDecode(graphResponse.body);
-        _loginPageState.isFacebookLoggedInUpdate(context,prefs,true,profile['email'],profile['id'], profileData: firebaseUser);
-        final FacebookAccessToken accessToken = result.accessToken;
-        _showMessage('''
+        try {
+          FirebaseUser firebaseUser =
+              (await FirebaseAuth.instance.signInWithCredential(credential))
+                  .user;
+          var graphResponse = await http.get(
+              'https://graph.facebook.com/v2.12/me?fields=id,name,first_name,last_name,email,picture,gender&access_token=${
+                  result
+                      .accessToken.token}');
+          var profile = JSON.jsonDecode(graphResponse.body);
+          _loginPageState.isFacebookLoggedInUpdate(context,prefs,true,profile['email'],profile['id'], profileData: firebaseUser);
+          final FacebookAccessToken accessToken = result.accessToken;
+          _showMessage('''
          Logged in!
          
          Token: ${accessToken.token}
@@ -78,6 +79,11 @@ class FacebookSignup {
          Permissions: ${accessToken.permissions}
          Declined permissions: ${accessToken.declinedPermissions}
          ''');
+        } on Exception catch (e) {
+          _loginPageState.isFacebookLoggedInUpdate(context,prefs,false,'','', profileData: null);
+          e.toString();
+        }
+
         break;
       case FacebookLoginStatus.cancelledByUser:
         _loginPageState.isFacebookLoggedInUpdate(context,prefs,false,'','');

@@ -94,49 +94,44 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
     return Scaffold(
         body: Stack(
           children: <Widget>[
+
             Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    color: button_fill_color,
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                    height: 150,
-                    child:
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment
-                          .center,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(top: 10.0, bottom: 35.0),
-                          child: new IconButton(
-                              icon: Icon(Icons.arrow_back_ios,
-                                color: white_color,),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              /*  Navigator.push(
+              children: <Widget>[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment
+                      .center,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
+                      child: new IconButton(
+                          icon:new SvgPicture.asset(
+                            'images/back_icon.svg',
+                            width: 20.0,
+                            height: 20.0,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            /*  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
                                         new UsersList(
                                             userSignInType, _mcurrentUserId,
                                             photoUrl)));*/
-                              }),
-                        ),
-                        new Container(
-                            margin: EdgeInsets.only(
-                                top: 10.0, right: 10.0, bottom: 35.0),
-                            child: Text(friend_request, style: TextStyle(
-                                color: text_color,
-                                fontSize: TOOL_BAR_TITLE_SIZE,
-                                fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),)
-                        ),
-                      ],
+                          }),
                     ),
-                  ),
-                ]
+                    new Container(
+                        margin: EdgeInsets.only(
+                            top: 40.0, right: 10.0, bottom: 10.0),
+                        child: Text(friend_request, style: TextStyle(
+                            color: black_color,
+                            fontSize: TOOL_BAR_TITLE_SIZE,
+                            fontWeight: FontWeight.w500,fontFamily: 'GoogleSansFamily'),)
+                    ),
+                  ],
+                ),
+                Divider(color: divider_color,thickness: 1.0,),
+              ],
             ),
             Align(
               alignment: Alignment.bottomLeft,
@@ -145,18 +140,8 @@ class FriendRequestScreenPage extends State<FriendRequestScreenState> {
                       .of(context)
                       .size
                       .width,
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height - 100,
-                  decoration: BoxDecoration(
-                      color: text_color,
-                      borderRadius: new BorderRadius.only(
-                        topLeft: const Radius.circular(20.0),
-                        topRight: const Radius.circular(20.0),
-                      )
-                  ),
                   child: Container(
+                    margin: EdgeInsets.only(top: 80.0),
                       child: friendlist(_mcurrentUserId)
                   )
               ),
@@ -202,11 +187,11 @@ class friendlist extends StatelessWidget {
                     child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(progress_color)));*/
             return Center(
-              child: Text(pending_request,style: TextStyle(fontFamily: 'GoogleSansFamily'),),
+              child: Text(pending_request,style: TextStyle(fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),),
             );
           } else {
             return (snapshot.data.documents.length == 0) ? Center(
-              child: Text(pending_request,style: TextStyle(fontFamily: 'GoogleSansFamily'),),
+              child: Text(pending_request,style: TextStyle(fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),),
             ) : new ListView(
                 scrollDirection: Axis.vertical,
                 children: snapshot.data.documents.map((document) {
@@ -290,11 +275,11 @@ class friendlist extends StatelessWidget {
                                   child: Text(
                                     capitalize(document['friendName']),
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),),
+                                        fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w500),),
                                 ),
                                 new Container(
                                   margin: EdgeInsets.only(left : 13.0,top: 5.0),
-                                  child:Text('Requested '+mDifference+'\tago',style: TextStyle(fontFamily: 'GoogleSansFamily'),),
+                                  child:Text('Requested '+mDifference+'\tago',style: TextStyle(fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400,color: hint_color_grey_dark),),
                                 )
                               ],
                             ),

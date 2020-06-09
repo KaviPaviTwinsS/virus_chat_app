@@ -24,6 +24,7 @@ import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
 import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
+import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import '../utils/constants.dart';
 import 'package:virus_chat_app/version2/settingsPage/SettingsPage.dart';
 
@@ -80,7 +81,6 @@ class ProfilePageSetup extends StatefulWidget {
 
 class ProfilePageState extends State<ProfilePageSetup> {
   SharedPreferences prefs;
-
   String name = '';
   String nickName = '';
   String signinType = '';
@@ -149,6 +149,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
     signinType = prefs.getString('signInType');
     userEmail = prefs.getString('email');
     photoUrl = prefs.getString('photoUrl');
+    mNewPhotoUrl = prefs.getString('photoUrl');
     businessId = prefs.getString('BUSINESS_ID');
     print('businessId $businessId');
     mobileNumber = prefs.getString('phoneNo');
@@ -159,7 +160,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
     controllerEmail = new TextEditingController(text: userEmail);
     controllerMobileNumber = new TextEditingController(text: mobileNumber);
     controllerNewPassword = new TextEditingController(text: newPassword);
-    controllerConfirmPassword = new TextEditingController(text: confirmPassword);
+    controllerConfirmPassword =
+    new TextEditingController(text: confirmPassword);
 
     // Force refresh input
     setState(() {});
@@ -210,7 +212,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
 
   void onBackpress() {
 //    Navigator.pop(context);
-  navigationPage();
+    navigationPage();
   }
 
   @override
@@ -235,88 +237,65 @@ class ProfilePageState extends State<ProfilePageSetup> {
           title: Text('Profile Page setup'),
         ),*/
             body: Stack(
-              children: <Widget>[
-                Column(
-                    children: <Widget>[
-                      Container(
-                        color: button_fill_color,
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width,
-                        height: 150,
-                        child:
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment
-                              .center,
-                          children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
-                              child: new IconButton(
-                                  icon: Icon(Icons.arrow_back_ios,
-                                    color: white_color,),
-                                  onPressed: () {
+                children: <Widget>[
+                  SingleChildScrollView(
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment
+                                .center,
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.only(
+                                    top: 40.0, bottom: 10.0),
+                                child: new IconButton(
+                                    icon: new SvgPicture.asset(
+                                      'images/back_icon.svg',
+                                      width: 20.0,
+                                      height: 20.0,
+                                    ),
+                                    onPressed: () {
 //                                    Navigator.pop(context);
-                                  navigationPage();
-                                  }),
-                            ),
-                            new Container(
-                                margin: EdgeInsets.only(
-                                    top: 20.0, right: 10.0, bottom: 40.0),
-                                child: Text(profile_header, style: TextStyle(
-                                    color: text_color,
-                                    fontSize: TOOL_BAR_TITLE_SIZE,
-                                    fontWeight: FontWeight.w700,
-                                    fontFamily: 'GoogleSansFamily'),)
-                            ),
-                            Spacer(),
-                            Align(
-                              alignment: Alignment.topRight,
-                              child: Container(
-                                margin: EdgeInsets.only(
-                                    top: 40, bottom: 20.0, right: 10.0),
-                                child: IconButton(
-                                  icon: new SvgPicture.asset(
-                                    'images/logout.svg', height: 20.0,
-                                    width: 20.0,
-                                  ),
-                                  onPressed: () {
-                                   /* Navigator.pushReplacement(
+                                      navigationPage();
+                                    }),
+                              ),
+                              new Container(
+                                  margin: EdgeInsets.only(
+                                      top: 40.0, right: 10.0, bottom: 10.0),
+                                  child: Text(profile_header, style: TextStyle(
+                                      color: black_color,
+                                      fontSize: TOOL_BAR_TITLE_SIZE,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: 'GoogleSansFamily'),)
+                              ),
+
+                              Spacer(),
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: Container(
+                                  margin: EdgeInsets.only(
+                                      top: 40, bottom: 10.0, right: 10.0),
+                                  child: IconButton(
+                                    icon: new SvgPicture.asset(
+                                      'images/logout.svg', height: 20.0,
+                                      width: 20.0,
+                                      color: black_color,
+                                    ),
+                                    onPressed: () {
+                                      /* Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                             builder: (
                                                 context) => new SettingsPage()));*/
-                                    showLogoutAlertDialog(context);
-                                  },
+                                      showLogoutAlertDialog(context);
+                                    },
+                                  ),
                                 ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ]
-                ),
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Container(
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width,
-                      height: MediaQuery
-                          .of(context)
-                          .size
-                          .height - 100,
-                      decoration: BoxDecoration(
-                          color: text_color,
-                          borderRadius: new BorderRadius.only(
-                            topLeft: const Radius.circular(20.0),
-                            topRight: const Radius.circular(20.0),
-                          )
-                      ),
-                      child: SingleChildScrollView(
-                        child: Container(
-                          child: Column(
+                              )
+                            ],
+                          ),
+                          Divider(color: divider_color,thickness: 1.0,),
+                          Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Container(
@@ -325,7 +304,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                       children: <Widget>[
                                         (avatarImageFile == null)
                                             ? ((photoUrl != null &&
-                                            photoUrl != '') || photoUrl != mNewPhotoUrl
+                                            photoUrl != '') ||
+                                            photoUrl != mNewPhotoUrl
                                             ? GestureDetector(
                                           onTap: getImage,
                                           child: Material(
@@ -353,7 +333,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             clipBehavior: Clip.hardEdge,
                                           ),
                                         )
-                                         : Container(
+                                            : Container(
                                           width: 100.0,
                                           height: 100.0,
                                           child: IconButton(
@@ -393,7 +373,10 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                           splashColor: Colors.transparent,
                                           highlightColor: greyColor,
                                           iconSize: 20.0,
-                                        ) : ((photoUrl != '' && mNewPhotoUrl != '') && photoUrl != mNewPhotoUrl) ? GestureDetector(
+                                        ) : ((photoUrl != '' &&
+                                            mNewPhotoUrl != '') &&
+                                            photoUrl != mNewPhotoUrl)
+                                            ? GestureDetector(
                                           onTap: getImage,
                                           child: Material(
                                             child: CachedNetworkImage(
@@ -419,7 +402,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                 Radius.circular(45.0)),
                                             clipBehavior: Clip.hardEdge,
                                           ),
-                                        )  :Text('')
+                                        )
+                                            : Text('')
                                       ],
                                     ),
                                   ),
@@ -430,7 +414,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Container(
+/*                                    Container(
                                       margin: EdgeInsets.only(
                                           left: 10.0,
                                           right: 10.0,
@@ -440,7 +424,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                       child: Text('First name'.toUpperCase(),
                                         style: TextStyle(
                                             fontFamily: 'GoogleSansFamily',color: text_color_grey,fontSize: 12.0),),
-                                    ),
+                                    ),*/
                                     Container(
                                       child: TextField(
                                         decoration: new InputDecoration(
@@ -455,7 +439,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             borderSide: BorderSide(
                                                 color: greyColor, width: 0.5),
                                           ),
-                                          hintText: 'Enter your name',
+                                          labelText: capitalize('First name'),
                                           hintStyle: TextStyle(
                                               fontSize: HINT_TEXT_SIZE,
                                               fontFamily: 'GoogleSansFamily'),
@@ -471,7 +455,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                         },*/
                                       ),
                                       margin: EdgeInsets.only(
-                                          left: 10.0, right: 10.0, top: 5.0),
+                                          left: 20.0, right: 20.0, top: 10.0),
                                     ),
                                   ],
                                 ),
@@ -479,13 +463,13 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     crossAxisAlignment: CrossAxisAlignment
                                         .start,
                                     children: <Widget>[
-                                      Container(
+                                      /*Container(
                                         margin: EdgeInsets.only(
                                             left: 10.0, right: 10.0, top: 25.0),
                                         child: Text('Last name'.toUpperCase(),
                                           style: TextStyle(
                                               fontFamily: 'GoogleSansFamily',color: text_color_grey,fontSize: 12.0),),
-                                      ),
+                                      ),*/
                                       Container(
                                         child: TextField(
                                           decoration: new InputDecoration(
@@ -500,7 +484,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                               borderSide: BorderSide(
                                                   color: greyColor, width: 0.5),
                                             ),
-                                            hintText: 'Enter your LastName',
+                                            labelText: capitalize('LastName'),
                                             hintStyle: TextStyle(
                                                 fontSize: HINT_TEXT_SIZE,
                                                 fontFamily: 'GoogleSansFamily'),
@@ -512,7 +496,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                           },
                                         ),
                                         margin: EdgeInsets.only(
-                                            left: 10.0, right: 10.0, top: 5.0),
+                                            left: 20.0, right: 20.0, top: 30.0),
                                       ),
                                     ]
                                 ),
@@ -520,13 +504,13 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     crossAxisAlignment: CrossAxisAlignment
                                         .start,
                                     children: <Widget>[
-                                      Container(
+                                      /*Container(
                                         margin: EdgeInsets.only(
                                             left: 10.0, right: 10.0, top: 25.0),
                                         child: Text('Email'.toUpperCase(),
                                           style: TextStyle(
                                               fontFamily: 'GoogleSansFamily',color: text_color_grey,fontSize: 12.0),),
-                                      ),
+                                      ),*/
                                       Container(
                                         decoration: new BoxDecoration(
                                             shape: BoxShape.rectangle,
@@ -554,7 +538,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                               borderSide: BorderSide(
                                                   color: greyColor, width: 0.5),
                                             ),
-                                            hintText: 'Enter your Email',
+                                            labelText: capitalize('Email'),
                                             hintStyle: TextStyle(
                                                 fontSize: HINT_TEXT_SIZE,
                                                 fontFamily: 'GoogleSansFamily'),
@@ -568,7 +552,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                               .emailAddress,
                                         ),
                                         margin: EdgeInsets.only(
-                                            left: 10.0, right: 10.0, top: 5.0),
+                                            left: 20.0, right: 20.0, top: 30.0),
                                       ),
                                     ]
                                 ),
@@ -579,16 +563,20 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     children: <Widget>[
                                       Container(
                                         margin: EdgeInsets.only(
-                                            left: 10.0, right: 10.0, top: 25.0),
+                                            left: 20.0, right: 20.0, top: 25.0),
                                         child: Text(
                                           'Mobile number'.toUpperCase(),
                                           style: TextStyle(
-                                              fontFamily: 'GoogleSansFamily',color: text_color_grey,fontSize: 12.0),),
+                                            fontFamily: 'GoogleSansFamily',
+                                            color: text_color_grey,
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.w400,),
+                                        ),
                                       ),
                                       Container(
                                         decoration: new BoxDecoration(
                                             shape: BoxShape.rectangle,
-                                            color: greyColor2
+                                            color: unfocused_field_color
                                         ),
                                         child: TextField(
                                           enabled: false,
@@ -605,14 +593,15 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                               borderSide: BorderSide(
                                                   color: greyColor, width: 0.5),
                                             ),
-                                            hintText: 'Enter Mobile number',
+                                            hintText: capitalize(
+                                                'Mobile number'),
                                             hintStyle: TextStyle(
                                                 fontSize: HINT_TEXT_SIZE,
                                                 fontFamily: 'GoogleSansFamily'),
                                           ),
                                         ),
                                         margin: EdgeInsets.only(
-                                            left: 10.0, right: 10.0, top: 5.0),
+                                            left: 20.0, right: 20.0, top: 5.0),
                                       ),
                                     ]
                                 ) : Text(''),
@@ -642,10 +631,10 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     child: Container(
                                         margin: EdgeInsets.only(
                                             top: signinType == 'MobileNumber'
-                                                ? 10.0
-                                                : 5.0,
-                                            left: 10.0,
-                                            right: 10.0),
+                                                ? 30.0
+                                                : 30.0,
+                                            left: 15.0,
+                                            right: 15.0),
                                         width: double.infinity,
                                         child: SizedBox(
                                           height: 45, // specific value
@@ -657,10 +646,12 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                   .circular(
                                                   30.0),
                                             ),
-                                            child: Text('Update Profile'),
+                                            child: Text('Update Profile',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontFamily: 'GoogleSansFamily'),),
                                             onPressed: () {
-
-                                              if(!isUploadInProgress) {
+                                              if (!isUploadInProgress) {
                                                 setState(() {
                                                   isLoading = true;
                                                 });
@@ -732,13 +723,12 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                             userEmail),
                                                         Fluttertoast.showToast(
                                                             msg: update_success),
-                                                      isLoading = false,
+                                                        isLoading = false,
 
-                                                      // Force refresh input
-                                                      setState(() {}),
+                                                        // Force refresh input
+                                                        setState(() {}),
 
                                                       });
-
                                                     }
                                                   } else {
                                                     setState(() {
@@ -754,7 +744,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                   Fluttertoast.showToast(
                                                       msg: no_data_change);
                                                 }
-                                              }else{
+                                              } else {
                                                 setState(() {
                                                   isLoading = true;
                                                 });
@@ -777,15 +767,17 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     ),
                                     Container(
                                       margin: EdgeInsets.only(
-                                          left: 10.0, top: 10.0, bottom: 15.0),
+                                          left: 20.0, top: 10.0, bottom: 15.0),
                                       child: Text(business, style: TextStyle(
-                                          fontWeight: FontWeight.w700,
+                                          fontWeight: FontWeight.w500,
                                           fontFamily: 'GoogleSansFamily'),),
                                     ),
                                     businessImage != null && businessImage != ''
                                         ? Center(
                                         child: Container(
-                                          margin: EdgeInsets.only(bottom: 15.0),
+                                          margin: EdgeInsets.only(bottom: 15.0,
+                                              left: 20.0,
+                                              right: 20.0),
                                           child: Material(
                                             child: CachedNetworkImage(
                                               placeholder: (context, url) =>
@@ -850,25 +842,27 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     businessName != null && businessName != ''
                                         ? Container(
                                       margin: EdgeInsets.only(
-                                          left: 10.0, bottom: 10.0),
+                                          left: 20.0, bottom: 10.0),
                                       child: Text(capitalize(businessName),
                                         style: TextStyle(
-                                            fontWeight: FontWeight.w700,
+                                            fontWeight: FontWeight.w500,
                                             fontFamily: 'GoogleSansFamily'),),
                                     )
                                         : Text(''),
                                     businessAddress != null &&
                                         businessAddress != '' ? Container(
                                       margin: EdgeInsets.only(
-                                          left: 10.0, bottom: 15.0),
+                                          left: 20.0, bottom: 15.0),
                                       child: Text(businessAddress,
                                         style: TextStyle(
-                                            fontFamily: 'GoogleSansFamily',color: text_color_grey),),
+                                            fontWeight: FontWeight.w400,
+                                            fontFamily: 'GoogleSansFamily',
+                                            color: hint_color_grey_dark),),
                                     ) : Text(''),
                                     businessCreatedTime != null &&
                                         businessCreatedTime != '' ? Container(
                                       margin: EdgeInsets.only(
-                                          left: 10.0, bottom: 15.0),
+                                          left: 20.0, bottom: 15.0),
                                       child: Text(created_at + '\t' +
                                           DateFormat('dd-MM-yyyy')
                                               .format(
@@ -876,7 +870,9 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                 int.parse(
                                                     businessCreatedTime)),),
                                         style: TextStyle(
-                                            fontFamily: 'GoogleSansFamily',color: text_color_grey),),
+                                            fontWeight: FontWeight.w400,
+                                            fontFamily: 'GoogleSansFamily',
+                                            color: hint_color_grey_light),),
                                     ) : Text(''),
                                     Row(
                                       crossAxisAlignment: CrossAxisAlignment
@@ -888,7 +884,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             _noOfEmployees != 0 ? Align(
                                           child: Container(
                                             margin: EdgeInsets.only(
-                                              left: 10.0,),
+                                              left: 20.0,),
                                             child: Text(
                                               _noOfEmployees.toString() +
                                                   '\t' + employees,
@@ -923,7 +919,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                 ),
                                                 Container(
                                                   margin: EdgeInsets.only(
-                                                      right: 10.0,
+                                                      right: 20.0,
                                                       bottom: 20.0),
                                                   child: Text(add_employee,
                                                     style: TextStyle(
@@ -942,61 +938,67 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                 )
                                     : Text(''),
 
-//                              )
+                                businessId == '' || businessId == null ? Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        print('Business click');
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    UpgradeBusiness(
+                                                        userId, '')));
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .end,
+                                        crossAxisAlignment: CrossAxisAlignment
+                                            .end,
+                                        children: <Widget>[
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                right: 10.0,
+                                                top: signinType !=
+                                                    'MobileNumber' ? 5.0 : 0.0,
+                                                bottom: signinType !=
+                                                    'MobileNumber'
+                                                    ? 15.0
+                                                    : 15.0),
+                                            child: new SvgPicture.asset(
+                                              'images/business_highlight.svg',
+                                              height: 20.0,
+
+
+                                              width: 20.0,
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                right: 20.0,
+                                                top: signinType !=
+                                                    'MobileNumber' ? 5.0 : 0.0,
+                                                bottom: signinType !=
+                                                    'MobileNumber'
+                                                    ? 15.0
+                                                    : 15.0),
+                                            child: Text(upgrade_business,
+                                              style: TextStyle(
+                                                  color: button_fill_color,
+                                                  fontSize: 15.0,
+                                                  fontFamily: 'GoogleSansFamily',
+                                                  fontWeight: FontWeight
+                                                      .w500),),
+                                          )
+
+                                        ],
+                                      ),
+                                    )
+                                ) : Text(''),
                               ]
                           ),
-                        ),
-
-                      )
-                  ),
-                ),
-
-                businessId == '' || businessId == null ? Align(
-                    alignment: Alignment.bottomRight,
-                    child: GestureDetector(
-                      onTap: () {
-                        print('Business click');
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    UpgradeBusiness(userId)));
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.only(
-                                right: 10.0,
-                                bottom: signinType != 'MobileNumber'
-                                    ? 20.0
-                                    : 10.0),
-                            child: new SvgPicture.asset(
-                              'images/business_highlight.svg',
-                              height: 20.0,
-                              width: 20.0,
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(
-                                right: 10.0,
-                                bottom: signinType != 'MobileNumber'
-                                    ? 20.0
-                                    : 10.0),
-                            child: Text(upgrade_business,
-                              style: TextStyle(
-                                  color: button_fill_color,
-                                  fontSize: 15.0,
-                                  fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w700),),
-                          )
-
-                        ],
-                      ),
-                    )
-                ) : Text(''),
-                // Loading
-              /*  Positioned(
+                          // Loading
+                          /*  Positioned(
                   child: isLoading
                       ? Container(
                     child: Center(
@@ -1008,12 +1010,14 @@ class ProfilePageState extends State<ProfilePageSetup> {
                   )
                       : Container(),
                 ),*/
-              ],
+                        ],
+                      )
+                  )
+                ]
             )
         )
     );
   }
-
 
   void uploadProfile() async {
     StorageReference reference = FirebaseStorage.instance.ref().child('HELP');
@@ -1039,7 +1043,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
             height: 90.0,
             child: SingleChildScrollView(
                 child: Column(
-                    children: <Widget>[
+                    children:
+                    <Widget>[
                       Text('Are you sure want to logout?',
                         style: TextStyle(fontFamily: 'GoogleSansFamily'),),
                       Container(
@@ -1072,19 +1077,21 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                   facebookSignup.facebookLogout(context, prefs);
                                 else {
 
+
                                 }
                                 /*  else if (signinType == 'MobileNumber')
                                   clearLocalData();*/
                                 prefs.setString('signInType', '');
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (
-                                            context) => new LoginSelection()));
+
                                 Navigator.of(context, rootNavigator: true).pop(
                                     'dialog');
                                 _updatestatus();
                                 clearLocalData();
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (
+                                            context) => new PhoneNumberSelectionPage('')));
                                 /* Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
@@ -1550,7 +1557,6 @@ class ProfilePageState extends State<ProfilePageSetup> {
       isUploadInProgress = false;
       Fluttertoast.showToast(msg: err.toString());
     });
-
   }
 
   void navigationPage() {

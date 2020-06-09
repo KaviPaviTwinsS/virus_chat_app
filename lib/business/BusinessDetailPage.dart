@@ -81,7 +81,6 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     print('BUSINESS IMAGE ___build${_businessImage != null &&
@@ -91,19 +90,22 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
           body: Stack(
             children: <Widget>[
               Container(
-                  color: button_fill_color,
+//                  color: button_fill_color,
                   width: MediaQuery
                       .of(context)
                       .size
                       .width,
-                  height: 150,
+//                  height: 150,
                   child: Row(
                     children: <Widget>[
                       Container(
                         margin: EdgeInsets.only(left: 0.0, bottom: 25.0),
                         child: new IconButton(
-                            icon: Icon(Icons.arrow_back_ios,
-                              color: white_color,),
+                            icon: new SvgPicture.asset(
+                              'images/back_icon.svg',
+                              width: 20.0,
+                              height: 20.0,
+                            ),
                             onPressed: () {
                               Navigator.pop(context);
 //                                  navigationPage();
@@ -128,7 +130,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                           .of(context)
                           .size
                           .width,
-                      height: MediaQuery
+                     /* height: MediaQuery
                           .of(context)
                           .size
                           .height - 100,
@@ -138,7 +140,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                             topLeft: const Radius.circular(20.0),
                             topRight: const Radius.circular(20.0),
                           )
-                      ),
+                      ),*/
                       child: Stack(
                         children: <Widget>[
                           Positioned(
@@ -237,52 +239,61 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                         left: 15.0, bottom: 15.0),
                                     child: Text(_businessAddress,),
                                   ) : Text(''),
-                                 Row(
-                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                   children: <Widget>[
-                                     _businessOwnerName != null && _businessOwnerName != '' ?
-                                     Row(
-                                       children: <Widget>[
-    Container(
-    margin: EdgeInsets.only(
-    left: 15.0, bottom: 15.0),
-    child:
-    new SvgPicture.asset(
-                                           'images/user.svg', height: 20.0,
-                                           width: 20.0,
-                                           fit: BoxFit.cover,
-                                         ),
-    ),
-                                         Container(
-                                           margin: EdgeInsets.only(
-                                               left: 5.0, bottom: 15.0),
-                                           child: Text(capitalize(_businessOwnerName),),
-                                         )
-                                       ],
-                                     ): Text(''),
-                                     _businessNumber != null && _businessNumber != '' ?
-                                     Row(
-                                       children: <Widget>[
-                                         Container(
-                                           margin: EdgeInsets.only(
-                                               left: 15.0, bottom: 15.0),
-                                           child:
-                                           new SvgPicture.asset(
-                                             'images/phone_outline.svg', height: 20.0,
-                                             width: 20.0,
-                                             fit: BoxFit.cover,
-                                           ),
-                                         ),
-                                         Container(
-                                           margin: EdgeInsets.only(
-                                               right: 15.0, bottom: 15.0,left: 5.0),
-                                           child: Text(capitalize(_businessNumber),),
-                                         )
-                                       ],
-                                     ) : Text('')
-                                   ],
-                                 )
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .start,
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .spaceBetween,
+                                    children: <Widget>[
+                                      _businessOwnerName != null &&
+                                          _businessOwnerName != '' ?
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: 15.0, bottom: 15.0),
+                                            child:
+                                            new SvgPicture.asset(
+                                              'images/user.svg', height: 20.0,
+                                              width: 20.0,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: 5.0, bottom: 15.0),
+                                            child: Text(
+                                              capitalize(_businessOwnerName),),
+                                          )
+                                        ],
+                                      ) : Text(''),
+                                      _businessNumber != null &&
+                                          _businessNumber != '' ?
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: 15.0, bottom: 15.0),
+                                            child:
+                                            new SvgPicture.asset(
+                                              'images/phone_outline.svg',
+                                              height: 20.0,
+                                              width: 20.0,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                right: 15.0,
+                                                bottom: 15.0,
+                                                left: 5.0),
+                                            child: Text(
+                                              capitalize(_businessNumber),),
+                                          )
+                                        ],
+                                      ) : Text('')
+                                    ],
+                                  )
                                 ],
                               ),
                               Align(

@@ -14,20 +14,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/profile/ProfilePage.dart';
+import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 class UpgradeBusiness extends StatefulWidget {
   String _mUserId = '';
+  String _mCurrentLoginType = '';
 
   @override
   State<StatefulWidget> createState() {
-    return UpgradeBusinessState(_mUserId);
+    return UpgradeBusinessState(_mUserId, _mCurrentLoginType);
   }
 
-  UpgradeBusiness(String userId) {
+  UpgradeBusiness(String userId, String mCurrentLoginType) {
     _mUserId = userId;
+    _mCurrentLoginType = mCurrentLoginType;
   }
 
 }
@@ -41,15 +44,19 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
   TextEditingController controllerName;
   TextEditingController controllerAddress;
   TextEditingController controllerNumber;
+  TextEditingController controllerInfo;
   String businessName = '';
   String businessAddress = '';
+  String businessInfo = '';
   String businessNumber = '';
   String _ownerName = '';
 
   SharedPreferences preferences;
+  String _mCurrentLoginType;
 
-  UpgradeBusinessState(String mUserId) {
+  UpgradeBusinessState(String mUserId, String mCurrentLoginType) {
     userId = mUserId;
+    _mCurrentLoginType = mCurrentLoginType;
   }
 
   @override
@@ -63,165 +70,153 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
     _ownerName = await preferences.getString('name');
     _signInType = await preferences.getString('signInType');
     controllerName = new TextEditingController(text: businessName);
+    controllerInfo = new TextEditingController(text: businessInfo);
     controllerAddress = new TextEditingController(text: businessAddress);
     controllerNumber = new TextEditingController(text: businessNumber);
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          Column(
-              children: <Widget>[
-                Container(
-                  color: button_fill_color,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
-                  height: 150,
-                  child:
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment
-                        .center,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
-                        child: new IconButton(
-                            icon: Icon(Icons.arrow_back_ios,
-                              color: white_color,),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            }),
-                      ),
-                      new Container(
-                          margin: EdgeInsets.only(
-                              top: 20.0, right: 10.0, bottom: 40.0),
-                          child: Text(upgrade_business, style: TextStyle(
-                              color: text_color,
-                              fontSize: TOOL_BAR_TITLE_SIZE,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'GoogleSansFamily'),)
-                      ),
-                    ],
-                  ),
-                ),
-              ]
-          ),
-          Align(
-              alignment: Alignment.bottomLeft,
-              child: Container(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height - 100,
-                  decoration: BoxDecoration(
+          /*    decoration: BoxDecoration(
                       color: text_color,
                       borderRadius: new BorderRadius.only(
                         topLeft: const Radius.circular(20.0),
                         topRight: const Radius.circular(20.0),
                       )
-                  ),
-                  child: SingleChildScrollView(
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              child: Center(
-                                child: Stack(
-                                  children: <Widget>[
-                                    (avatarImageFile == null)
-                                        ? (photoUrl != null &&
-                                        photoUrl != ''
-                                        ? GestureDetector(
-                                      onTap: () {
-                                        print('getImage');
-                                      },
-                                      child: Material(
-                                        child: CachedNetworkImage(
-                                          placeholder: (context, url) =>
-                                              Container(
-                                                child: CircularProgressIndicator(
-                                                  strokeWidth: 2.0,
-                                                  valueColor: AlwaysStoppedAnimation<
-                                                      Color>(
-                                                      progress_color),
-                                                ),
-                                                width: 70.0,
-                                                height: 70.0,
-                                                padding: EdgeInsets.all(
-                                                    20.0),
-                                              ),
-                                          imageUrl: photoUrl,
-                                          width: 70.0,
-                                          height: 70.0,
-                                          fit: BoxFit.cover,
-                                        ),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(45.0)),
-                                        clipBehavior: Clip.hardEdge,
-                                      ),
-                                    )
-                                        : Container(
-                                        width: 100.0,
-                                        height: 100.0,
-                                        child: IconButton(
-                                          icon: new SvgPicture.asset(
-                                            'images/user_unavailable.svg',
-                                            height: 70.0,
-                                            width: 70.0,
-                                            fit: BoxFit.cover,
-                                          ),
-                                          onPressed: () {
-                                            getImage();
-                                          },))
-
-                                    ) : GestureDetector(
-                                      onTap: () {
-                                        print('getImage');
-                                        getImage();
-                                      },
-                                      child: Material(
-                                        child: Image.file(
-                                          avatarImageFile,
-                                          width: 70.0,
-                                          height: 70.0,
-                                          fit: BoxFit.cover,
-                                        ),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(
-                                                45.0)),
-                                        clipBehavior: Clip.hardEdge,
-                                      ),
+                  ),*/
+          SingleChildScrollView(
+              child: Container(
+                  child: Column(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment
+                                .start,
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.only(top: 42.0,
+                                    bottom: 10.0),
+                                child: new IconButton(
+                                    icon: new SvgPicture.asset(
+                                      'images/back_icon.svg',
+                                      width: 20.0,
+                                      height: 20.0,
                                     ),
-                                    photoUrl == '' ? IconButton(
-                                      icon: new SvgPicture.asset(
-                                        'images/camera.svg',
-                                        height: 35.0,
-                                        width: 35.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      onPressed: getImage,
-                                      padding: EdgeInsets.all(40.0),
-                                      splashColor: Colors.transparent,
-                                      highlightColor: greyColor,
-                                      iconSize: 20.0,
-                                    ) : Text('')
-                                  ],
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    }),
+                              ),
+                              new Container(
+                                  margin: EdgeInsets.only(
+                                      top: 55.0, right: 10.0, bottom: 10.0),
+                                  child: Text(upgrade_business,
+                                    style: TextStyle(
+                                        color: black_color,
+                                        fontSize: TOOL_BAR_TITLE_SIZE,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: 'GoogleSansFamily'),)
+                              ),
+                            ],
+                          ),
+                          Divider(color: divider_color, thickness: 1.0,),
+                        ],
+                      ),
+                      Container(
+                        child: Center(
+                          child: Stack(
+                            children: <Widget>[
+                              (avatarImageFile == null)
+                                  ? (photoUrl != null &&
+                                  photoUrl != ''
+                                  ? GestureDetector(
+                                onTap: () {
+                                  print('getImage');
+                                },
+                                child: Material(
+                                  child: CachedNetworkImage(
+                                    placeholder: (context, url) =>
+                                        Container(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                            valueColor: AlwaysStoppedAnimation<
+                                                Color>(
+                                                progress_color),
+                                          ),
+                                          width: 70.0,
+                                          height: 70.0,
+                                          padding: EdgeInsets.all(
+                                              20.0),
+                                        ),
+                                    imageUrl: photoUrl,
+                                    width: 70.0,
+                                    height: 70.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(45.0)),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
+                              )
+                                  : Container(
+                                  width: 100.0,
+                                  height: 100.0,
+                                  child: IconButton(
+                                    icon: new SvgPicture.asset(
+                                      'images/user_unavailable.svg',
+                                      height: 70.0,
+                                      width: 70.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    onPressed: () {
+                                      getImage();
+                                    },))
+
+                              ) : GestureDetector(
+                                onTap: () {
+                                  print('getImage');
+                                  getImage();
+                                },
+                                child: Material(
+                                  child: Image.file(
+                                    avatarImageFile,
+                                    width: 70.0,
+                                    height: 70.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(
+                                          45.0)),
+                                  clipBehavior: Clip.hardEdge,
                                 ),
                               ),
-                              width: double.infinity,
-                              margin: EdgeInsets.all(20.0),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Container(
+                              photoUrl == '' ? IconButton(
+                                icon: new SvgPicture.asset(
+                                  'images/camera.svg',
+                                  height: 35.0,
+                                  width: 35.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                onPressed: getImage,
+                                padding: EdgeInsets.all(40.0),
+                                splashColor: Colors.transparent,
+                                highlightColor: greyColor,
+                                iconSize: 20.0,
+                              ) : Text('')
+                            ],
+                          ),
+                        ),
+                        width: double.infinity,
+                        margin: EdgeInsets.all(20.0),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          /*Container(
                                   margin: EdgeInsets.only(
                                     left: 10.0,
                                     right: 10.0,
@@ -231,36 +226,36 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                         fontFamily: 'GoogleSansFamily',
                                         color: text_color_grey,
                                         fontSize: 12.0),),
+                                ),*/
+                          Container(
+                            child: TextField(
+                              decoration: new InputDecoration(
+                                contentPadding: new EdgeInsets.all(
+                                    15.0),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: focused_border_color,
+                                      width: 0.5),
                                 ),
-                                Container(
-                                  child: TextField(
-                                    decoration: new InputDecoration(
-                                      contentPadding: new EdgeInsets.all(
-                                          15.0),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: focused_border_color,
-                                            width: 0.5),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: greyColor, width: 0.5),
-                                      ),
-                                      hintText: 'Enter business name',
-                                      hintStyle: TextStyle(
-                                          fontSize: HINT_TEXT_SIZE,
-                                          fontFamily: 'GoogleSansFamily',
-                                          color: text_color_grey),
-                                    ),
-                                    controller: controllerName,
-                                    onChanged: (value) {
-                                      businessName = value;
-                                    },
-                                  ),
-                                  margin: EdgeInsets.only(
-                                      left: 10.0, right: 10.0, top: 5.0),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: greyColor, width: 0.5),
                                 ),
-                                Container(
+                                labelText: 'Business name',
+                                hintStyle: TextStyle(
+                                    fontSize: HINT_TEXT_SIZE,
+                                    fontFamily: 'GoogleSansFamily',
+                                    color: text_color_grey),
+                              ),
+                              controller: controllerName,
+                              onChanged: (value) {
+                                businessName = value;
+                              },
+                            ),
+                            margin: EdgeInsets.only(
+                                left: 20.0, right: 20.0, top: 5.0),
+                          ),
+                          /* Container(
                                   margin: EdgeInsets.only(
                                       left: 10.0,
                                       right: 10.0,
@@ -270,41 +265,41 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                         fontFamily: 'GoogleSansFamily',
                                         color: text_color_grey,
                                         fontSize: 12.0),),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
+                                ),*/
+                          GestureDetector(
+                            onTap: () {
 
-                                  },
-                                  child: Container(
-                                    child: TextField(
-                                      decoration: new InputDecoration(
-                                        contentPadding: new EdgeInsets.all(
-                                            15.0),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: focused_border_color,
-                                              width: 0.5),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: greyColor, width: 0.5),
-                                        ),
-                                        hintText: 'Enter business address',
-                                        hintStyle: TextStyle(
-                                            fontSize: HINT_TEXT_SIZE,
-                                            fontFamily: 'GoogleSansFamily',
-                                            color: text_color_grey),
-                                      ),
-                                      controller: controllerAddress,
-                                      onChanged: (value) {
-                                        businessAddress = value;
-                                      },
-                                    ),
-                                    margin: EdgeInsets.only(
-                                        left: 10.0, right: 10.0, top: 5.0),
+                            },
+                            child: Container(
+                              child: TextField(
+                                decoration: new InputDecoration(
+                                  contentPadding: new EdgeInsets.all(
+                                      15.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: focused_border_color,
+                                        width: 0.5),
                                   ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: greyColor, width: 0.5),
+                                  ),
+                                  labelText: 'Business address',
+                                  hintStyle: TextStyle(
+                                      fontSize: HINT_TEXT_SIZE,
+                                      fontFamily: 'GoogleSansFamily',
+                                      color: text_color_grey),
                                 ),
-                                Container(
+                                controller: controllerAddress,
+                                onChanged: (value) {
+                                  businessAddress = value;
+                                },
+                              ),
+                              margin: EdgeInsets.only(
+                                  left: 20.0, right: 20.0, top: 30.0),
+                            ),
+                          ),
+                          /*Container(
                                   margin: EdgeInsets.only(
                                       left: 10.0,
                                       right: 10.0,
@@ -314,95 +309,122 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                         fontFamily: 'GoogleSansFamily',
                                         color: text_color_grey,
                                         fontSize: 12.0),),
+                                ),*/
+                          Container(
+                            child: TextField(
+                              decoration: new InputDecoration(
+                                contentPadding: new EdgeInsets.all(
+                                    15.0),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: focused_border_color,
+                                      width: 0.5),
                                 ),
-                                Container(
-                                  child: TextField(
-                                    decoration: new InputDecoration(
-                                      contentPadding: new EdgeInsets.all(
-                                          15.0),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: focused_border_color,
-                                            width: 0.5),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: greyColor, width: 0.5),
-                                      ),
-                                      hintText: 'Enter business Number',
-                                      hintStyle: TextStyle(
-                                          fontSize: HINT_TEXT_SIZE,
-                                          fontFamily: 'GoogleSansFamily',
-                                          color: text_color_grey),
-                                    ),
-                                    controller: controllerNumber,
-                                    onChanged: (value) {
-                                      businessNumber = value;
-                                    },
-                                    keyboardType: TextInputType.phone,
-                                  ),
-                                  margin: EdgeInsets.only(
-                                      left: 10.0, right: 10.0, top: 5.0),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: greyColor, width: 0.5),
                                 ),
-                              ],
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(top: 20.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment
-                                    .spaceEvenly,
-                                children: <Widget>[
-                                  SizedBox(
-                                    height: 45.0,
-                                    width: MediaQuery
-                                        .of(context)
-                                        .size
-                                        .width / 2 - 20,
-                                    child: RaisedButton(
-                                        color: white_color,
-                                        textColor: button_fill_color,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: new BorderRadius
-                                              .circular(
-                                              30.0),
-                                        ),
-                                        child: Text(business_cancel,
-                                          style: TextStyle(
-                                              fontFamily: 'GoogleSansFamily'),),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        }
-                                    ),
-                                  ),
-                                  SizedBox(
-                                      height: 45.0,
-                                      width: MediaQuery
-                                          .of(context)
-                                          .size
-                                          .width / 2 - 20,
-                                      child: RaisedButton(
-                                          color: button_fill_color,
-                                          textColor: text_color,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: new BorderRadius
-                                                .circular(
-                                                30.0),
-                                          ),
-                                          child: Text(business_upgrade,
-                                            style: TextStyle(
-                                                fontFamily: 'GoogleSansFamily'),),
-                                          onPressed: () {
-                                            businessValidation();
-                                          }
-                                      )
-                                  )
-                                ],
+                                labelText: 'Business number',
+                                hintStyle: TextStyle(
+                                    fontSize: HINT_TEXT_SIZE,
+                                    fontFamily: 'GoogleSansFamily',
+                                    color: text_color_grey),
                               ),
+                              controller: controllerNumber,
+                              onChanged: (value) {
+                                businessNumber = value;
+                              },
+                              keyboardType: TextInputType.phone,
+                            ),
+                            margin: EdgeInsets.only(
+                                left: 20.0, right: 20.0, top: 30.0),
+                          ),
+                          Container(
+                            child: TextField(
+                              decoration: new InputDecoration(
+                                contentPadding: new EdgeInsets.all(
+                                    15.0),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: focused_border_color,
+                                      width: 0.5),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: greyColor, width: 0.5),
+                                ),
+                                labelText: 'Business description',
+                                hintStyle: TextStyle(
+                                    fontSize: HINT_TEXT_SIZE,
+                                    fontFamily: 'GoogleSansFamily',
+                                    color: text_color_grey),
+                              ),
+                              controller: controllerInfo,
+                              onChanged: (value) {
+                                businessInfo = value;
+                              },
+                              keyboardType: TextInputType.phone,
+                            ),
+                            margin: EdgeInsets.only(
+                                left: 20.0, right: 20.0, top: 30.0),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 30.0, bottom: 20.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment
+                              .spaceEvenly,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 45.0,
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width / 2 - 20,
+                              child: RaisedButton(
+                                  color: white_color,
+                                  textColor: button_fill_color,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: new BorderRadius
+                                        .circular(
+                                        30.0),
+                                  ),
+                                  child: Text(business_cancel,
+                                    style: TextStyle(
+                                        fontFamily: 'GoogleSansFamily'),),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  }
+                              ),
+                            ),
+                            SizedBox(
+                                height: 45.0,
+                                width: MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width / 2 - 40,
+                                child: RaisedButton(
+                                    color: button_fill_color,
+                                    textColor: text_color,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: new BorderRadius
+                                          .circular(
+                                          30.0),
+                                    ),
+                                    child: Text(business_upgrade,
+                                      style: TextStyle(
+                                          fontFamily: 'GoogleSansFamily'),),
+                                    onPressed: () {
+                                      businessValidation();
+                                    }
+                                )
                             )
                           ],
                         ),
                       )
+                    ],
                   )
               )
           ),
@@ -456,6 +478,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
           'businessNumber': COUNTRY_CODE + businessNumber,
           'businessAddress': businessAddress,
           'businessId': reference.documentID,
+          'businessDescription': businessInfo,
           'ownerName': _ownerName,
           'createdAt': currTime
         }).whenComplete(() =>
@@ -464,15 +487,16 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
             'businessId': reference.documentID,
             'businessType': BUSINESS_TYPE_OWNER
           })
-        }).whenComplete(() => {
-            isLoading = false,
+        }).whenComplete(() =>
+        {
+          isLoading = false,
 //            Navigator.pop(context, true)
         });
       } on Exception catch (e) {
         isLoading = false;
         print('Could not get Add businesss: ${e.toString()}');
       }
-      /*reference.setData({
+    /*reference.setData({
         'businessName': businessName,
         'photoUrl': photoUrl,
         'businessNumber': businessNumber,
@@ -480,31 +504,41 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
         'businessId': reference.documentID,
         'createdAt':currTime
       });*/
+    UserLocation currentLocation = await LocationService(reference.documentID,BUSINESS_TYPE_OWNER,reference.documentID)
+        .getLocation();
+    Firestore.instance.collection('business').document(reference.documentID)
+        .collection('businessLocation').document(reference.documentID)
+        .setData({
+    'businessLocation': new GeoPoint(
+    currentLocation.latitude, currentLocation.longitude),
+    });
+    await preferences.setString('BUSINESS_ID', reference.documentID);
+    await preferences.setString('BUSINESS_NAME', businessName);
+    await preferences.setString('BUSINESS_ADDRESS', businessAddress);
+    await preferences.setString(
+    'BUSINESS_NUMBER', COUNTRY_CODE + businessNumber);
+    await preferences.setString(
+    'BUSINESS_INFO', businessInfo);
+    await preferences.setString('BUSINESS_IMAGE', photoUrl);
+    await preferences.setString('BUSINESS_TYPE', BUSINESS_TYPE_OWNER);
+    await preferences.setInt('BUSINESS_EMPLOYEES_COUNT', 0);
+    await preferences.setString('BUSINESS_CREATED_AT', currTime.toString());
 
-    /*  UserLocation currentLocation = await LocationService(reference.documentID)
-          .getLocation();*/
-     /* Firestore.instance.collection('users').document(reference.documentID)
-          .collection('userLocation').document(reference.documentID)
-          .setData({
-        'userLocation': new GeoPoint(
-            currentLocation.latitude, currentLocation.longitude),
-      });*/
-      await preferences.setString('BUSINESS_ID', reference.documentID);
-      await preferences.setString('BUSINESS_NAME', businessName);
-      await preferences.setString('BUSINESS_ADDRESS', businessAddress);
-      await preferences.setString(
-          'BUSINESS_NUMBER', COUNTRY_CODE + businessNumber);
-      await preferences.setString('BUSINESS_IMAGE', photoUrl);
-      await preferences.setString('BUSINESS_TYPE', BUSINESS_TYPE_OWNER);
-      await preferences.setInt('BUSINESS_EMPLOYEES_COUNT', 0);
-      await preferences.setString('BUSINESS_CREATED_AT', currTime.toString());
-
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  ProfilePageSetup(_signInType,currentUserId: userId,)));
+    if (_mCurrentLoginType == 'business') {
+    Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+    builder: (context) =>
+    UsersList(_signInType,
+    userId, photoUrl)));
+    } else {
+    Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+    builder: (context) =>
+    ProfilePageSetup(_signInType, currentUserId: userId,)));
     }
+  }
   }
 
   Future businessValidation() async {
@@ -514,6 +548,8 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
       Fluttertoast.showToast(msg: 'Enter business name');
     } else if (businessAddress == '') {
       Fluttertoast.showToast(msg: 'Enter business address');
+    } else if (businessInfo == '') {
+      Fluttertoast.showToast(msg: 'Enter business description');
     }
     /*else if(businessNumber == ''){
       Fluttertoast.showToast(msg: 'Enter business number');

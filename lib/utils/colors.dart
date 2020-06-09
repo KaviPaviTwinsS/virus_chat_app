@@ -13,7 +13,7 @@ final text_color = Color(0xFFFFFFFF);
 final focused_border_color = Color(0xFF1E88E5);
 final enabled_border_color = Color(0xFFBDBDBD);
 final rounded_border_color =Color(0xFF1E88E5);
-final button_fill_color =Color(0xFF4285F4);
+final icon_fill_Color =Color(0xFF4285F2);
 final white_color =Color(0xFFFFFFFF);
 final timestamp_color = Color(0xFF1E88E5);
 
@@ -23,6 +23,18 @@ final icon_color = Color(0xFF2962FF);
 final progress_color = Color(0xFF2962FF);
 final text_color_grey = Color(0xFFBDBDBD);
 
+
+
+
+
+//walk through
+final background_white_color = Color(0xFFFFFFFF);
+final hint_color_grey_dark = Color(0xFF666666);
+final hint_color_grey_light= Color(0xFF8992A3);
+final text_color_blue = Color(0xFF4285F4);
+final button_fill_color =Color(0xFF4285F4);
+final divider_color= Color(0xFFE4E9F2);
+final unfocused_field_color = Color(0xFFC8CDDC);
 /*
 100% - FF
 95% - F2

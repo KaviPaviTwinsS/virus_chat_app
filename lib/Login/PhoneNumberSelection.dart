@@ -75,7 +75,7 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
   String phoneNo = '+91 7540011847';
   String smsOTP;
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-String _mCurrentLoginType= '';
+String _mCurrentLoginType = 'phone';
   PhoneNumberSelectionState(String mCurrentLoginType){
     _mCurrentLoginType = mCurrentLoginType;
   }
@@ -95,7 +95,7 @@ String _mCurrentLoginType= '';
             child: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  Align(
+                 _mCurrentLoginType == 'business' ? Align(
                       alignment: Alignment.topLeft,
                       child: Container(
                         margin: const EdgeInsets.only(
@@ -108,21 +108,21 @@ String _mCurrentLoginType= '';
                                 context,
                                 MaterialPageRoute(
                                     builder: (
-                                        context) => new LoginSelection()));
+                                        context) => new PhoneNumberSelectionPage('phone')));
                           },
                         ),
                       )
-                  ),
+                  ) : Container(),
                   Column(
                     children: <Widget>[
                       Align(
                         alignment: Alignment.topLeft,
                         child: Container(
-                          margin: const EdgeInsets.only(
-                              left: 20.0, top: 10.0, right: 20.0),
-                          child: Text(_mCurrentLoginType== 'phone' ? phone_no : phone_number_business,
+                          margin: EdgeInsets.only(
+                              top: _mCurrentLoginType == 'business' ? 10.0 : 70.0,left: 20.0, right: 20.0),
+                          child: Text( _mCurrentLoginType== 'phone' ? phone_no : phone_number_business,
                             style: TextStyle(
-                                fontSize: 19,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w700),
+                                fontSize: 27,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w500),
                           ),
                         ),
                       ),
@@ -132,7 +132,7 @@ String _mCurrentLoginType= '';
                           margin: const EdgeInsets.only(
                               left: 20.0, top: 30.0, right: 20.0),
                           child: Text(phone_no_sub,
-                            style: TextStyle(fontSize: 15,fontFamily: 'GoogleSansFamily'),
+                            style: TextStyle(fontSize: 15,fontFamily: 'GoogleSansFamily',color : hint_color_grey_dark,fontWeight: FontWeight.w400),
                           ),
                         ),
                       ),
@@ -144,12 +144,12 @@ String _mCurrentLoginType= '';
                         children: <Widget>[
                           Container(
                             margin: const EdgeInsets.only(
-                                top: 60.0, right: 5.0),
-                            child: Text(country_code,style: TextStyle(color: text_color_grey),),
+                                top: 40.0, right: 5.0),
+                            child: Text(country_code,style: TextStyle(color: hint_color_grey_light,fontWeight: FontWeight.w400),),
                           ),
                           Container(
                               decoration: new BoxDecoration(
-                                border: Border.all(color: focused_border_color,width: 0.5),
+                                border: Border.all(color: greyColor2,width: 0.5),
                                 borderRadius: BorderRadius.all( Radius.circular(5.0),)
                               ),
                               /* decoration: new BoxDecoration(
@@ -170,7 +170,7 @@ String _mCurrentLoginType= '';
                                     },
                                     // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
                                     initialSelection: 'IN',
-                                    textStyle: TextStyle(color: text_color_grey),
+                                    textStyle: TextStyle(color: hint_color_grey_light,fontWeight: FontWeight.w400),
                                     favorite: ['+91', 'IN'],
                                     // optional. Shows only country name and flag
                                     showCountryOnly: true,
@@ -187,14 +187,14 @@ String _mCurrentLoginType= '';
                       ),
                       Expanded(child: Container(
                         margin: const EdgeInsets.only(
-                            left: 10.0, top: 85.0, right: 20.0),
+                            left: 10.0, top: 65.0, right: 20.0),
                         child: TextField(
                           obscureText: false,
                           controller: userPhoneNumberController,
                           onChanged: (userPhoneNumber) {
                             _userPhoneNumber = userPhoneNumber;
                           },
-                          autofocus: true,
+                          autofocus: false,
                           decoration: new InputDecoration(
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
@@ -204,7 +204,7 @@ String _mCurrentLoginType= '';
                               borderSide: BorderSide(
                                   color: greyColor2, width:0.5),
                             ),
-                            hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily',color: text_color_grey),
+                            hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,fontFamily: 'GoogleSansFamily',color: hint_color_grey_light,fontWeight: FontWeight.w400),
                             hintText:'Phone number',
                           ),
                           keyboardType: TextInputType.phone,
@@ -217,7 +217,7 @@ String _mCurrentLoginType= '';
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
-                      margin: EdgeInsets.only(top: 60.0, left: 20.0, right: 20.0),
+                      margin: EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0),
 //                    padding: EdgeInsets.all(30.0),
                       width: double.infinity,
                       child: SizedBox(
@@ -246,6 +246,61 @@ String _mCurrentLoginType= '';
                         ),
                       ),
                     ),
+                  ),
+                  _mCurrentLoginType == 'phone'|| _mCurrentLoginType == '' ?Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(top: 30.0),
+                      child: Text(are_busines,style: TextStyle(fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400,color: hint_color_grey_dark),),
+                    ),
+                   GestureDetector(
+                     onTap: (){
+                       Navigator.pushReplacement(
+                           context,
+                           MaterialPageRoute(
+                               builder: (context) {
+                                 return PhoneNumberSelectionPage('business');
+                               }
+                           ));
+                     },
+                     child:Container(
+                       margin: EdgeInsets.only(top: 30.0),
+                       child: Text('\t'+sign_up,style: TextStyle(fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400,color: button_fill_color),),
+                     ),
+                   )
+                  ],
+                )
+              ) : Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(top: 30.0),
+                            child: Text(are_user,style: TextStyle(fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400,color: hint_color_grey_dark),),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) {
+                                        return PhoneNumberSelectionPage('phone');
+                                      }
+                                  ));
+                            },
+                            child:Container(
+                              margin: EdgeInsets.only(top: 30.0),
+                              child: Text('\t'+login,style: TextStyle(fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400,color: button_fill_color),),
+                            ),
+                          )
+                        ],
+                      )
                   )
                 ],
               ),
@@ -258,10 +313,10 @@ String _mCurrentLoginType= '';
   Future<bool> onBackPress() async {
     print('onBackPress');
 //    Navigator.pop(context);
-    Navigator.push(
+  /*  Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => new LoginSelection()));
+            builder: (context) => new LoginSelection()));*/
     return Future.value(true);
   }
 }

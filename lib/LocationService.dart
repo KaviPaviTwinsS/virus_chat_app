@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:location/location.dart';
+import 'package:virus_chat_app/utils/constants.dart';
 
 class LocationService {
   UserLocation _currentLocation = null;
@@ -13,6 +14,7 @@ class LocationService {
 
   var location = Location();
   String currentUserId = '';
+  String businessType = '';
 
 //  Geoflutterfire geo = Geoflutterfire();
 
@@ -44,8 +46,8 @@ class LocationService {
     preferences = await SharedPreferences.getInstance();
   }
 
-  LocationService(String currentUser) {
-
+  LocationService(String currentUser,String businessUserType, String businessId) {
+    businessType = businessUserType;
 
     location.changeSettings(interval: 30000);
 
@@ -182,6 +184,17 @@ class LocationService {
             .toUtc()
             .microsecondsSinceEpoch) / 1000).toInt(),
       });
+
+      if(businessType != '' || businessType == BUSINESS_TYPE_OWNER){
+        databaseReference.collection('business').document(currentUserId).collection(
+            'businessLocation').document(currentUserId).updateData({
+          'businessLocation':
+          new GeoPoint(locationData.latitude, locationData.longitude),
+          'UpdateTime': ((new DateTime.now()
+              .toUtc()
+              .microsecondsSinceEpoch) / 1000).toInt(),
+        });
+      }
 //    });
 
 //    Timer(Duration(seconds: 5), () {

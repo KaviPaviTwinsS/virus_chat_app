@@ -179,6 +179,7 @@ flutter:
       - images/business_chat.svg
       - images/user.svg
       - images/phone_outline.svg
+      - images/back_icon.svg
 
 fonts:
   - family: GoogleSansFamily

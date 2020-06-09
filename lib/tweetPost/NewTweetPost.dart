@@ -129,38 +129,43 @@ class NewTweetPostState extends State<NewTweetPost> {
               children: <Widget>[
                 Column(
                     children: <Widget>[
-                      Container(
-                        color: button_fill_color,
+                    /*  Container(
+                        color: white_color,
                         width: MediaQuery
                             .of(context)
                             .size
                             .width,
                         height: 150,
-                        child:
+                        child:*/
                         Row(
                           crossAxisAlignment: CrossAxisAlignment
                               .center,
                           children: <Widget>[
                             Container(
-                              margin: EdgeInsets.only(top: 20.0, bottom: 40.0),
+                              margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
                               child: new IconButton(
-                                  icon: Icon(Icons.arrow_back_ios,
-                                    color: white_color,),
+                                  icon:new SvgPicture.asset(
+                                    'images/back_icon.svg',
+                                    width: 20.0,
+                                    height: 20.0,
+                                  ),
                                   onPressed: () {
                                     Navigator.pop(context);
                                   }),
                             ),
                             new Container(
                                 margin: EdgeInsets.only(
-                                    top: 20.0, right: 10.0, bottom: 40.0),
+                                    top: 40.0, right: 10.0, bottom: 10.0),
                                 child: Text('Post Message', style: TextStyle(
-                                    color: text_color,
+                                    color: black_color,
                                     fontSize: TOOL_BAR_TITLE_SIZE,
-                                    fontWeight: FontWeight.w700,fontFamily: 'GoogleSansFamily'),)
+                                    fontWeight: FontWeight.w500,fontFamily: 'GoogleSansFamily'),)
                             ),
                           ],
                         ),
-                      ),
+                      Divider(color: divider_color,thickness: 1.0,),
+
+//                      ),
                     ]
                 ),
 
@@ -171,7 +176,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                             .of(context)
                             .size
                             .width,
-                        height: MediaQuery
+                      /*  height: MediaQuery
                             .of(context)
                             .size
                             .height - 100,
@@ -181,11 +186,11 @@ class NewTweetPostState extends State<NewTweetPost> {
                               topLeft: const Radius.circular(20.0),
                               topRight: const Radius.circular(20.0),
                             )
-                        ),
+                        ),*/
                         child: Container(
                           child: Column(
                             children: <Widget>[
-                              buildListTweetCategory(),
+//                              buildListTweetCategory(),
                               // List of messages
                               buildTweetInput(),
                               // Input content
@@ -352,6 +357,7 @@ class NewTweetPostState extends State<NewTweetPost> {
     return Expanded(
       child: Container(
         padding: EdgeInsets.all(10.0),
+        margin: EdgeInsets.only(top: 110.0),
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
@@ -389,7 +395,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                         },*/
                         decoration: InputDecoration.collapsed(
                           hintText: 'What\'s happening?',
-                          hintStyle: TextStyle(color: greyColor,fontSize: TWEET_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
+                          hintStyle: TextStyle(color: hint_color_grey_dark,fontSize: TWEET_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
                         ),
                         focusNode: focusNode,
                         autofocus: true,
@@ -558,6 +564,7 @@ class NewTweetPostState extends State<NewTweetPost> {
               width: 100,
               height: 100,
               child: IconButton(
+                color: button_fill_color,
                   icon: new SvgPicture.asset(
                     'images/Send.svg', height: 500.0,
                     width: 500.0,

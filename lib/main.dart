@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FacebookSignup.dart';
 import 'package:virus_chat_app/LocationService.dart';
-import 'package:virus_chat_app/Login/LoginSelection.dart';
+import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/profile/ProfilePage.dart';
 import 'package:virus_chat_app/splash/SplashScreen.dart';
 import 'package:virus_chat_app/UserLocation.dart';
@@ -21,7 +21,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     home: new SplashScreenPage(),
     routes: <String, WidgetBuilder>{
-      '/HomeScreen': (BuildContext context) => new LoginSelection()
+      '/HomeScreen': (BuildContext context) => new PhoneNumberSelectionPage('phone')
     },
   ));
 }

@@ -16,6 +16,7 @@ import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:virus_chat_app/utils/constants.dart';
+import 'package:virus_chat_app/business/UpgradeBusiness.dart';
 
 class UserRegistrationPage extends StatelessWidget {
 
@@ -25,7 +26,7 @@ class UserRegistrationPage extends StatelessWidget {
   String mCurrentLoginType;
 
   UserRegistrationPage(
-      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.mFirebaseUser,@required this.mCurrentLoginType})
+      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.mFirebaseUser, @required this.mCurrentLoginType})
       : super(key: key);
 
 
@@ -47,7 +48,7 @@ class UserRegistrationPage extends StatelessWidget {
         ),*/
       body: UserRegistrationState(userPhoneNumber: userPhoneNumber,
           userPhoneNumberWithoutCountryCode: userPhoneNumberWithoutCountryCode,
-          myFirebaseUser: mFirebaseUser,mCurrentLoginType:mCurrentLoginType),
+          myFirebaseUser: mFirebaseUser, mCurrentLoginType: mCurrentLoginType),
     );
   }
 }
@@ -61,14 +62,14 @@ class UserRegistrationState extends StatefulWidget {
   String mCurrentLoginType = '';
 
   UserRegistrationState(
-      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.myFirebaseUser,@required this.mCurrentLoginType})
+      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.myFirebaseUser, @required this.mCurrentLoginType})
       : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
     return UserRegistrationScreen(userPhoneNumber: userPhoneNumber,
         userPhoneNumberWithoutCountryCode: userPhoneNumberWithoutCountryCode,
-        firebaseUser: myFirebaseUser,mCurrentLoginType:mCurrentLoginType);
+        firebaseUser: myFirebaseUser, mCurrentLoginType: mCurrentLoginType);
   }
 
 }
@@ -93,7 +94,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
 
 
   UserRegistrationScreen(
-      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.firebaseUser,@required this.mCurrentLoginType});
+      {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.firebaseUser, @required this.mCurrentLoginType});
 
   @override
   void initState() {
@@ -140,12 +141,241 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     userToken = await prefs.getString('PUSH_TOKEN');
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
 
         Stack(
+          children: <Widget>[
+            SingleChildScrollView(
+                child: Column(
+                    children: <Widget>[
+                      Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                                left: 5.0, top: 40.0, right: 20.0),
+                            child: new IconButton(
+                              icon: new Icon(
+                                  Icons.arrow_back_ios, color: Colors.black),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          )
+                      ),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                            margin: const EdgeInsets.only(
+                                left: 20.0, top: 10.0, right: 20.0),
+                            child: Text(mCurrentLoginType == 'business'
+                                ? business_profile_setup
+                                : profile_header, style: TextStyle(
+                                fontSize: 27.0,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'GoogleSansFamily'
+                            ),)
+                        ),
+                      ),
+                      // Avatar
+                      Container(
+                        child: Center(
+                          child: Stack(
+                            children: <Widget>[
+                              (avatarImageFile == null)
+                                  ? (photoUrl != null &&
+                                  photoUrl != ''
+                                  ? GestureDetector(
+                                  onTap: getImage,
+                                  child: Material(
+                                    child: CachedNetworkImage(
+                                      placeholder: (context, url) =>
+                                          Container(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                              valueColor: AlwaysStoppedAnimation<
+                                                  Color>(progress_color),
+                                            ),
+                                            width: 90.0,
+                                            height: 90.0,
+                                            padding: EdgeInsets.all(20.0),
+                                          ),
+                                      imageUrl: photoUrl,
+                                      width: 90.0,
+                                      height: 90.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(45.0)),
+                                    clipBehavior: Clip.hardEdge,
+                                  )
+                              )
+                                  : Container(
+                                width: 100.0,
+                                height: 100.0,
+                                child: IconButton(
+                                  icon: new SvgPicture.asset(
+                                    'images/user_unavailable.svg',
+                                    height: 70.0,
+                                    width: 70.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  onPressed: () {
+                                    getImage();
+                                  },),
+                              ))
+                                  : GestureDetector(
+                                onTap: () {
+                                  print('getImage');
+                                  getImage();
+                                },
+                                child: Material(
+                                  child: Image.file(
+                                    avatarImageFile,
+                                    width: 90.0,
+                                    height: 90.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(45.0)),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
+                              ),
+                              photoUrl == '' ? IconButton(
+                                icon: new SvgPicture.asset(
+                                  'images/camera.svg',
+                                  height: 35.0,
+                                  width: 35.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                onPressed: getImage,
+                                padding: EdgeInsets.all(40.0),
+                                splashColor: Colors.transparent,
+                                highlightColor: greyColor,
+                                iconSize: 20.0,
+                              ) : Text(''),
+                            ],
+                          ),
+                        ),
+                        width: double.infinity,
+                        margin: EdgeInsets.all(20.0),
+                      ),
+
+                      Container(
+                        margin: const EdgeInsets.only(
+                            left: 20.0, top: 5.0, right: 20.0),
+                        child: TextField(
+                          obscureText: false,
+                          controller: userNameController,
+                          decoration: new InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: focused_border_color,
+                                  width: 0.5),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: enabled_border_color,
+                                  width: 0.5),
+                            ),
+                            labelText: capitalize('First name'),
+                            hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,
+                                fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                      ),
+
+                      Container(
+                        margin: const EdgeInsets.only(
+                            left: 20.0, top: 20.0, right: 20.0),
+                        child: TextField(
+                          obscureText: false,
+                          controller: userNockNameController,
+                          decoration: new InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: focused_border_color,
+                                  width: 0.5),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: enabled_border_color,
+                                  width: 0.5),
+                            ),
+                            labelText: capitalize('Last name'),
+                            hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,
+                                fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(
+                            left: 20.0, top: 20.0, right: 20.0),
+                        child: TextField(
+                          obscureText: false,
+                          controller: userEmailController,
+                          decoration: new InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: focused_border_color,
+                                  width: 0.5),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: enabled_border_color,
+                                  width: 0.5),
+                            ),
+                            labelText: capitalize('Email'),
+                            hintStyle: TextStyle(fontSize: HINT_TEXT_SIZE,
+                                fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          margin: EdgeInsets.only(
+                              top: 30.0, left: 20.0, right: 20.0),
+//                            padding: EdgeInsets.all(30.0),
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .width - 10,
+                          child: SizedBox(
+                            height: 45, // specific value
+                            child: RaisedButton(
+                              onPressed: () {
+                                if (userNameController.text != '' &&
+                                    userEmailController.text != '' &&
+                                    photoUrl != '') {
+                                  _AddNewUser(firebaseUser);
+                                } else {
+                                  print('NAN registrationValidation');
+                                  registrationValidation();
+                                }
+                              },
+                              color: button_fill_color,
+                              textColor: text_color,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0),
+                              ),
+                              child: Text(update_profile,
+                                style: TextStyle(fontSize: BUTTON_TEXT_SIZE,
+                                    fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),),
+                            ),
+                          ),
+                        ),
+                      )
+                    ]
+                )
+            )
+          ],
+        ),
+        /*  Stack(
           children: <Widget>[
             Column(
                 children: <Widget>[
@@ -173,7 +403,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                         new Container(
                             margin: EdgeInsets.only(
                                 top: 20.0, right: 10.0, bottom: 40.0),
-                            child: Text(mCurrentLoginType == 'phone' ? business_profile_setup:user_registration, style: TextStyle(
+                            child: Text(mCurrentLoginType == 'business' ? business_profile_setup:user_registration, style: TextStyle(
                                 color: text_color,
                                 fontSize: 20.0,
                                 fontWeight: FontWeight.w700,
@@ -300,9 +530,9 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                               child: TextField(
                                 obscureText: false,
                                 controller: userNameController,
-                                /* onChanged: (userPhoneNumber) {
+                                */ /* onChanged: (userPhoneNumber) {
                                   _mUserName = userPhoneNumber;
-                                },*/
+                                },*/ /*
                                 decoration: new InputDecoration(
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -327,9 +557,9 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                               child: TextField(
                                 obscureText: false,
                                 controller: userNockNameController,
-                                /* onChanged: (userPhoneNumber) {
+                                */ /* onChanged: (userPhoneNumber) {
                                   _mUserNickName = userPhoneNumber;
-                                },*/
+                                },*/ /*
                                 decoration: new InputDecoration(
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -353,9 +583,9 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                               child: TextField(
                                 obscureText: false,
                                 controller: userEmailController,
-                                /*   onChanged: (userPhoneNumber) {
+                                */ /*   onChanged: (userPhoneNumber) {
                                   _mUserEmail = userPhoneNumber;
-                                },*/
+                                },*/ /*
                                 decoration: new InputDecoration(
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -416,7 +646,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                 )
             )
           ],
-        ),
+        ),*/
         // Loading
         Positioned(
           child: isLoading
@@ -484,7 +714,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     String loginType = 'Mobile';
     loginType += 'AccountId';
     await updateLocalListData(prefs, 'MobileNumber');
-    UserLocation currentLocation = await LocationService(firebaseUser.uid,)
+    UserLocation currentLocation = await LocationService(firebaseUser.uid,'','')
         .getLocation();
 
     // Update data to server if new user
@@ -537,12 +767,22 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     await prefs.setString('BUSINESS_ID', '');
     await prefs.setString('BUSINESS_TYPE', '');
     await prefs.setString('signInType', signInType);
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                UsersList(signInType,
-                    firebaseUser.uid, photoUrl)));
+
+
+    if (mCurrentLoginType == 'business') {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  UpgradeBusiness(firebaseUser.uid, mCurrentLoginType)));
+    } else {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  UsersList(signInType,
+                      firebaseUser.uid, photoUrl)));
+    }
     /*  Navigator.push(
         context,
         MaterialPageRoute(
@@ -570,7 +810,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     } else {
       emailValid = RegExp(
           r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-          .hasMatch(userEmailController.text);
+          .hasMatch(userEmailController.text.toString());
       if (!emailValid) {
         Fluttertoast.showToast(
             msg: enter_valid_email);

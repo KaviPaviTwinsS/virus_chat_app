@@ -53,7 +53,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
     print('Recent Chats ____________TEST INIT${_mChatIds
         .length} ________muserId $_muserId');
     isLoading = true;
-    await Firestore.instance
+    Firestore.instance
         .collection('users')
         .document(_muserId).get().then((DocumentSnapshot snapshot) {
 
@@ -62,42 +62,54 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
               List<String> _chatIds = List.from(snapshot.data['chattingWith']);
 
               List<UsersData> _usersData = new List<UsersData> ();
-              for (int i = 0; i < _chatIds.length; i++) {
-                Firestore.instance
-                    .collection('users')
-                    .document(_chatIds[i]).get().then((
-                    DocumentSnapshot snapshot) {
-                  setState(() {
-                    isLoading = false;
-                  });
-                  _usersData.add(
-                      UsersData(businessId: snapshot.data['businessId'],
-                          businessName: snapshot.data['businessName'],
-                          businessType: snapshot.data['businessType'],
-                          createdAt: snapshot.data['createdAt'],
-                          email: snapshot.data['email'],
-                          id: snapshot.data['id'],
-                          name: snapshot.data['name'],
-                          nickName: snapshot.data['nickName'],
-                          phoneNo: snapshot.data['phoneNo'],
-                          photoUrl: snapshot.data['photoUrl'],
-                          status: snapshot.data['status'],
-                          userDistanceISWITHINRADIUS: snapshot
-                              .data['userDistanceISWITHINRADIUS'],
-                          user_token: snapshot.data['user_token']));
-                  if (i + 1 == _chatIds.length) {
-                    print(
-                        'Recent Chats ___________chatting_${i}VALUEEEEEEEEE _______');
+              if(_chatIds.length != 0) {
+                for (int i = 0; i < _chatIds.length; i++) {
+                  Firestore.instance
+                      .collection('users')
+                      .document(_chatIds[i]).get().then((
+                      DocumentSnapshot snapshot) {
                     setState(() {
-                      this._mChatIds = _chatIds;
-                      this._mUsersData = _usersData;
+                      isLoading = false;
                     });
-                  }
+                    _usersData.add(
+                        UsersData(businessId: snapshot.data['businessId'],
+                            businessName: snapshot.data['businessName'],
+                            businessType: snapshot.data['businessType'],
+                            createdAt: snapshot.data['createdAt'],
+                            email: snapshot.data['email'],
+                            id: snapshot.data['id'],
+                            name: snapshot.data['name'],
+                            nickName: snapshot.data['nickName'],
+                            phoneNo: snapshot.data['phoneNo'],
+                            photoUrl: snapshot.data['photoUrl'],
+                            status: snapshot.data['status'],
+                            userDistanceISWITHINRADIUS: snapshot
+                                .data['userDistanceISWITHINRADIUS'],
+                            user_token: snapshot.data['user_token']));
+                    if (i + 1 == _chatIds.length) {
+                      print(
+                          'Recent Chats ___________chatting_${i}VALUEEEEEEEEE _______');
+                      setState(() {
+                        this._mChatIds = _chatIds;
+                        this._mUsersData = _usersData;
+                      });
+                    }
+                  });
+                }
+              }else{
+                setState(() {
+                  isLoading =false;
                 });
               }
+            }else{
+              setState(() {
+                isLoading =false;
+              });
             }
           }else{
-            isLoading =false;
+            setState(() {
+              isLoading =false;
+            });
           }
 
       print('Recent Chats ___________chatting_${_mChatIds.length} _______');
@@ -115,39 +127,35 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
           children: <Widget>[
             Column(
                 children: <Widget>[
-                  Container(
-                    color: button_fill_color,
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                    height: 150,
-                    child:
+
                     Row(
                       crossAxisAlignment: CrossAxisAlignment
                           .center,
                       children: <Widget>[
                         Container(
-                          margin: EdgeInsets.only(top: 0.0, bottom: 20.0),
+                          margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
                           child: new IconButton(
-                              icon: Icon(Icons.arrow_back_ios,
-                                color: white_color,),
+                              icon: new SvgPicture.asset(
+                                'images/back_icon.svg',
+                                width: 20.0,
+                                height: 20.0,
+                              ),
                               onPressed: () {
                                 Navigator.pop(context);
                               }),
                         ),
                         new Container(
                             margin: EdgeInsets.only(
-                                top: 0.0, right: 10.0, bottom: 20.0),
+                                top: 40.0, right: 10.0, bottom: 10.0),
                             child: Text(recent_chats, style: TextStyle(
-                                color: text_color,
+                                color: black_color,
                                 fontSize: 20.0,
                                 fontWeight: FontWeight.bold),)
                         ),
 
                       ],
-                    ),
                   ),
+                  Divider(color: divider_color,thickness: 1.0,),
                 ]
             ),
             Stack(
@@ -155,21 +163,11 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                 Align(
                   alignment: Alignment.bottomLeft,
                   child: Container(
+                    margin: EdgeInsets.only(top: 80.0),
                     width: MediaQuery
                         .of(context)
                         .size
                         .width,
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .height - 100,
-                    decoration: BoxDecoration(
-                        color: text_color,
-                        borderRadius: new BorderRadius.only(
-                          topLeft: const Radius.circular(20.0),
-                          topRight: const Radius.circular(20.0),
-                        )
-                    ),
                     child: buildListMessage(),
                   ),
                 ),
@@ -211,7 +209,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
           itemCount: _mChatIds.length,
           controller: listScrollController,
         ) : Center(
-          child: Text(''),
+          child: Text('No recent chats'),
         )
     );
   }
@@ -331,33 +329,33 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                       usersData != null &&
                           usersData.status == 'ACTIVE' ? Container(
                           child: new SvgPicture.asset(
-                            'images/online_active.svg', height: 10.0,
-                            width: 10.0,
+                            'images/online_active.svg', height: 15.0,
+                            width: 15.0,
                           ),
                           margin: EdgeInsets.only(left: 45.0,
                               bottom: 40.0,
                               top: 15.0,
-                              right: 5.0)) : usersData != null &&
+                              right: 15.0)) : usersData != null &&
                           usersData.status == 'LoggedOut'
                           ? Container(
                         child: new SvgPicture.asset(
-                          'images/online_inactive.svg', height: 10.0,
-                          width: 10.0,
+                          'images/online_inactive.svg', height: 15.0,
+                          width: 15.0,
                         ),
                         margin: EdgeInsets.only(left: 45.0,
                             bottom: 40.0,
                             top: 15.0,
-                            right: 5.0),
+                            right: 15.0),
                       )
                           : Container(
                         child: new SvgPicture.asset(
-                          'images/online_idle.svg', height: 10.0,
-                          width: 10.0,
+                          'images/online_idle.svg', height: 15.0,
+                          width: 15.0,
                         ),
                         margin: EdgeInsets.only(left: 45.0,
                             bottom: 40.0,
                             top: 15.0,
-                            right: 5.0),
+                            right: 15.0),
                       )
                     ],
                   ),

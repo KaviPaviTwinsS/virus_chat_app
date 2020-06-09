@@ -43,6 +43,7 @@ String friend_request = 'Friend Requests';
 String no_Recent_chat ='No Recent Chats';
 String no_business = 'Business is empty';
 String no_users = 'No users';
+String noBusiness = 'No businesses';
 String no_tweet = 'Tweet is empty';
 String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
@@ -66,7 +67,13 @@ String or_connect = 'Or connect using social account';
 String google_txt = 'Google';
 String facebook_txt = 'Facebook';
 String signup_business= 'Sign Up for Business';
-String phone_number_business = 'Signup for Business';
+String phone_number_business = 'What is your business phone number?';
 String business_profile_setup = 'Business Profile setup';
 //phone number selection
 String country_code = 'COUNTRY CODE';
+String are_busines = 'Are you a Business?';
+String are_user ='Are you a User?';
+String login = 'Login';
+String sign_up = 'Sign Up';
+//user registration
+String update_profile= 'Update Profile';
