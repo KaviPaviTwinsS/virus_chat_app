@@ -13,6 +13,7 @@ import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/business/UpgradeBusiness.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import './otp_input.dart';
 
@@ -50,6 +51,9 @@ class _OTPScreenState extends State<OTPScreen> {
   bool isLoading = false;
   String _mCurrentLoginType = '';
 
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  String userToken = '';
+
   _OTPScreenState(String mCurrentLoginType){
     _mCurrentLoginType = mCurrentLoginType;
   }
@@ -58,6 +62,10 @@ class _OTPScreenState extends State<OTPScreen> {
   @override
   void initState() {
     super.initState();
+    _firebaseMessaging.getToken().then((token) =>
+    {
+      userToken = token,
+    });
     isSignIn();
     _onVerifyCode();
   }
@@ -379,7 +387,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
   Future<Null> updateLocalListData(SharedPreferences prefs,
       String signInType, List<DocumentSnapshot> documents, String uid) async {
-
+    print('________________________________________________otp ___${userToken}');
     await prefs.setString('userId', documents[0]['id']);
     await prefs.setString('email', documents[0]['email']);
     await prefs.setString('name', documents[0]['name']);
@@ -396,7 +404,7 @@ class _OTPScreenState extends State<OTPScreen> {
     await Firestore.instance
         .collection('users')
         .document(documents[0]['id'])
-        .updateData({'status': 'ACTIVE'});
+        .updateData({'status': 'ACTIVE','user_token' : userToken});
 
     if(documents[0]['businessId'] != null && documents[0]['businessId'] != '') {
       await Firestore.instance

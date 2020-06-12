@@ -118,6 +118,7 @@ class AddEmployeeState extends State<AddEmployee> {
     _noOfEmployee = await prefs.getInt('BUSINESS_EMPLOYEES_COUNT');
     documents = await loadUsers();
     Timer(Duration(seconds: 2), ()  {
+      _mSearchContact = 'a';
       refreshContacts('a');
     });
 /* QuerySnapshot querySnapshot = await Firestore.instance.collection("users").getDocuments();
@@ -151,7 +152,7 @@ class AddEmployeeState extends State<AddEmployee> {
                               left: 5.0, top: 40.0, right: 20.0),
                           child: new IconButton(
                             icon: new Icon(
-                                Icons.arrow_back_ios, color: Colors.black),
+                                Icons.arrow_back_ios, color: black_color),
                             onPressed: () {
                              /* Navigator.push(
                                   context,
@@ -170,7 +171,7 @@ class AddEmployeeState extends State<AddEmployee> {
                           left: 5.0, top: 40.0, right: 20.0),
                       child: Text(
                         add_employee, style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 20.0),
+                          fontWeight: FontWeight.w500, fontSize: 20.0,fontFamily: 'GoogleSansFamily',color: black_color),
                       ),
                     )
                   ],
@@ -207,6 +208,7 @@ class AddEmployeeState extends State<AddEmployee> {
                               child: TextField(
                                 decoration: InputDecoration(
                                   contentPadding: new EdgeInsets.all(15.0),
+                                  border: InputBorder.none,
                                   suffixIcon: IconButton(
                                     icon: new SvgPicture.asset(
                                       'images/Search.svg', height: 20.0,
@@ -244,7 +246,7 @@ class AddEmployeeState extends State<AddEmployee> {
                               itemCount: _contacts.length,
                               controller: listScrollController,
                             ),
-                          ) : Text('Contacts Reading..................')
+                          ) : Text('Contacts Reading..................',style: TextStyle(fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400,color: hint_color_grey_light),)
                         ],
                       )
                   ),
@@ -309,6 +311,12 @@ class AddEmployeeState extends State<AddEmployee> {
               avatar = mavatar;
             });
           });
+          Iterable<Item> mPhone = contact.phones;
+          for (final phone in mPhone) {
+            mContactPhone = phone.value;
+            mContactPhone = getPhoneValidation(
+                mContactPhone.toString().replaceAll(' ', ''));
+          }
         }
         setState(() {
           isLoading = false;
@@ -394,6 +402,7 @@ class AddEmployeeState extends State<AddEmployee> {
     }else if(mPhone.length == 16){
       _tempPhone = mPhone.substring(6,mPhone.length);
     }else{
+      _tempPhone = mPhone;
     }
     return _tempPhone;
   }
@@ -503,7 +512,7 @@ class AddEmployeeState extends State<AddEmployee> {
       onTap: (){
       },
       child: Container(
-//        margin: EdgeInsets.all(10.0),
+        margin: EdgeInsets.all(5.0),
         child: Column(
           children: <Widget>[
             Row(
@@ -511,7 +520,7 @@ class AddEmployeeState extends State<AddEmployee> {
               children: <Widget>[
                Container(
                  margin: EdgeInsets.only(top: 10.0,left: 15.0),
-                 child:  avatar != null && avatar != '' ? Material(
+                 child: /* avatar != null && avatar != '' ? Material(
                    child: Image.memory(
                      avatar,
                      width: 70,
@@ -522,7 +531,7 @@ class AddEmployeeState extends State<AddEmployee> {
                      Radius.circular(40.0),
                    ),
                    clipBehavior: Clip.hardEdge,
-                 ) : Material(
+                 ) : */Material(
                    child: new SvgPicture.asset(
                      'images/user_unavailable.svg',
                      height: 70.0,
@@ -539,46 +548,55 @@ class AddEmployeeState extends State<AddEmployee> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      margin: EdgeInsets.only(left: 10.0,top: 30.0),
+                      margin: EdgeInsets.only(left: 20.0,top: 25.0),
                       child: Text(mContactName,
-                        style: TextStyle(fontWeight: FontWeight.bold),),
+                        style: TextStyle(fontWeight: FontWeight.w500,fontFamily: 'GoogleSansFamily',color: black_color),),
                     ),
                     Container(
-                      margin: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 5.0),
-                      child: Text(mContactPhone),
+                      margin: EdgeInsets.only(left: 20.0, top: 10.0, bottom: 5.0),
+                      child: Text(mContactPhone,style: TextStyle(fontWeight: FontWeight.w400,fontFamily: 'GoogleSansFamily',color: hint_color_grey_dark),),
                     ),
                   ],
                 ),
                 Spacer(),
-                !alreadyUser && _contacts.length !=0 ? GestureDetector(
+                !alreadyUser && _contacts.length !=0 && _mSearchContact != 'a' ? GestureDetector(
                   onTap: (){
                     print('ADD Employeee $contacts _____________ index $index ______${_contacts.elementAt(index)}');
                     AddNewEmployee(_contacts.elementAt(index));
                   },
                   child:Container(
-                    margin: EdgeInsets.only(right: 10.0,left : 0.0,top: 10.0, bottom: 0.0),
+                    margin: EdgeInsets.only(right: 10.0,left : 0.0,top: 20.0, bottom: 0.0),
                     child:  Align(
                       alignment: Alignment.topRight,
-                      child:
-                         new SvgPicture.asset(
-                          'images/employee_invite.svg', height: 60.0,
-                          width: 60.0,
-                        ),
+                      child: Card(
+                        elevation: 3.0,
+                        shape: CircleBorder(),
+                    child: new SvgPicture.asset(
+                          'images/employee_invite.svg', height: 40.0,
+                          width: 40.0,
+                           allowDrawingOutsideViewBox: true,
+                         ),
+                  )
                     ),
                   )
-                ): alreadyUser && _mSearchContact.length == MOBILE_NUMBER_LENGTH ? GestureDetector(
+                ): alreadyUser && _mSearchContact.length == MOBILE_NUMBER_LENGTH && _mSearchContact != 'a'? GestureDetector(
                     onTap: (){
                       print('ADD AddUserAsEmployee $alreadyUserId');
                       AddUserAsEmployee(_contacts.elementAt(index));
                     },
                     child:Container(
-                  margin: EdgeInsets.only(right: 10.0, top: 10.0, bottom: 5.0),
+                  margin: EdgeInsets.only(right: 10.0, top: 20.0, bottom: 5.0),
                   child: Align(
                     alignment: Alignment.topRight,
-                    child:new SvgPicture.asset(
-                        'images/employee_add.svg', height: 60.0,
-                        width: 60.0,
+                    child:Card(
+                      elevation: 3.0,
+                      shape: CircleBorder(),
+                      child: new SvgPicture.asset(
+                        'images/employee_add.svg', height: 40.0,
+                        width: 40.0,
+                        allowDrawingOutsideViewBox: true,
                       ),
+                    )
                   ),
                     )
                 ): GestureDetector(
@@ -587,20 +605,25 @@ class AddEmployeeState extends State<AddEmployee> {
                       AddNewEmployee(_contacts.elementAt(index));
                     },
                     child:Container(
-                      margin: EdgeInsets.only(right: 10.0,left : 0.0,top: 10.0, bottom: 0.0),
+                     /* margin: EdgeInsets.only(right: 10.0,left : 0.0,top: 20.0, bottom: 0.0),
                       child:  Align(
                         alignment: Alignment.topRight,
                         child:
-                        new SvgPicture.asset(
+                            Card(
+                              elevation: 13.0,
+                              shape: CircleBorder(),
+                      child:new SvgPicture.asset(
                           'images/employee_invite.svg', height: 60.0,
                           width: 60.0,
+                          allowDrawingOutsideViewBox: true,
                         ),
-                      ),
+                    )
+                      ),*/
                     )
                 )
               ],
             ),
-            Divider()
+//            Divider()
           ],
         ),
       ),

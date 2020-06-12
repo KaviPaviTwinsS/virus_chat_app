@@ -16,6 +16,7 @@ import 'package:latlong/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FriendRequestScreen.dart';
 import 'package:virus_chat_app/SendInviteScreen.dart';
+import 'package:virus_chat_app/business/BusinessData.dart';
 import 'package:virus_chat_app/business/BusinessDetailPage.dart';
 import 'package:virus_chat_app/business/BusinessPage.dart';
 import 'package:virus_chat_app/chat/RecentChatsScreen.dart';
@@ -222,7 +223,7 @@ class UsersListState extends State<UsersList>
     print('Friend Request Build__________  MAINNNN');
 //    initialise();
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => Future.value(false),
       child: new Scaffold(
         /* floatingActionButton: SpeedDial(
             animatedIcon: AnimatedIcons.menu_close,
@@ -270,6 +271,7 @@ class UsersListState extends State<UsersList>
             child: BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
               currentIndex: _curIndex,
+              backgroundColor: white_color,
               // this will be set when a new tab is tapped
               onTap: (index) {
                 setState(() {
@@ -456,7 +458,7 @@ class UsersListState extends State<UsersList>
                                 currentUserName, style: TextStyle(
                                   color: text_color,
                                   fontFamily: 'GoogleSansFamily',
-                                  fontWeight: FontWeight.w700),
+                                  fontWeight: FontWeight.w500),
                               ),
                             ),
                             Spacer(),
@@ -512,7 +514,7 @@ class UsersListState extends State<UsersList>
                         ),
                         Column(
                           children: <Widget>[
-                           /* Container(
+                            /* Container(
                               margin: EdgeInsets.only(top: 5.0),
                               child: Align(
                                 alignment: Alignment.topCenter,
@@ -585,7 +587,7 @@ class UsersListState extends State<UsersList>
                           .of(context)
                           .size
                           .width,
-                      height:  MediaQuery
+                      height: MediaQuery
                           .of(context)
                           .size
                           .height - 180,
@@ -622,21 +624,9 @@ class UsersListState extends State<UsersList>
                             alignment: Alignment.topLeft,
                             child: Container(
                                 margin: EdgeInsets.only(left: 20.0,
-                                    top: 5.0),
+                                    top: 25.0),
                                 child: Text('Closest to you', style: TextStyle(
-                                    fontSize: 19.0,
-                                    fontFamily: 'GoogleSansFamily',
-                                    fontWeight: FontWeight.w500),)
-                            ),
-                          ),
-                          new LoginUsersList(
-                              currentUser, currentUserPhotoUrl),
-                          Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Container(
-                                margin: EdgeInsets.only(left: 20.0,),
-                                child: Text('Near by users', style: TextStyle(
-                                    fontSize: 19.0,
+                                    fontSize: 16.0,
                                     fontFamily: 'GoogleSansFamily',
                                     fontWeight: FontWeight.w500),)
                             ),
@@ -646,6 +636,21 @@ class UsersListState extends State<UsersList>
                               currentUser, currentUserPhotoUrl,
                               _msliderData)
                               : Container(),
+                          /*  new LoginUsersList(
+                              currentUser, currentUserPhotoUrl),*/
+                          Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Container(
+                                margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                                child: Text('Near by stores', style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontFamily: 'GoogleSansFamily',
+                                    fontWeight: FontWeight.w500),)
+                            ),
+                          ),
+                          new BusinessListPage(
+                              currentUser, currentUserPhotoUrl),
+                          /*
                           Align(
                             alignment: Alignment.bottomLeft,
                             child: Container(
@@ -657,7 +662,7 @@ class UsersListState extends State<UsersList>
                             ),
                           ),
                       new BusinessListPage(
-                          currentUser, currentUserPhotoUrl),
+                          currentUser, currentUserPhotoUrl),*/
                         ],
                       )
                   )
@@ -848,7 +853,7 @@ class ActiveUserListRadius extends StatelessWidget {
     if (currentUserId != '' && currentUserId != null)
       getCurrentUserLocation(currentUserId, msliderData);
 
-    await updateUserStatus();
+//    await updateUserStatus();
   }
 
   Stream<int> timedCounter(Duration interval, [int maxCount]) async* {
@@ -869,10 +874,11 @@ class ActiveUserListRadius extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new StreamBuilder(
-        stream: Firestore.instance.collection('users').where(
-            'userDistanceISWITHINRADIUS', isEqualTo: 'YES')/*.where(
+        stream: Firestore.instance.collection('users') /*.where(
+            'userDistanceISWITHINRADIUS', isEqualTo: 'YES')*/ /*.where(
             'businessId', isEqualTo: '').*/.where(
-            'status', isEqualTo: 'ACTIVE').orderBy('userDistance',descending: true).snapshots(),
+            'status', isEqualTo: 'ACTIVE').orderBy(
+            'userDistance', descending: false).snapshots(),
 //        stream: timedCounter(Duration(seconds: 3000)),
         builder:
             (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -882,14 +888,17 @@ class ActiveUserListRadius extends StatelessWidget {
 //                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(progress_color)));;
           if (!snapshot.hasData)
             return new Container(
-                margin: EdgeInsets.only(left: 20.0, top: 20.0),
-                child : Center(
-                  child: Text(no_users,style: TextStyle(fontFamily: 'GoogleSansFamily',)),),
-                );
+              margin: EdgeInsets.only(left: 20.0, top: 20.0),
+              child: Center(
+                child: Text(no_users,
+                    style: TextStyle(fontFamily: 'GoogleSansFamily',)),),
+            );
 //                child: new Text('Loading...', style: TextStyle(
 //                  fontFamily: 'GoogleSansFamily',)));
-          else return Flexible(
-                child: snapshot.data.documents.length == null || snapshot.data.documents.length == 0  ? Center(
+          else
+            return Flexible(
+                child: snapshot.data.documents.length == null ||
+                    snapshot.data.documents.length == 0 ? Center(
                   child: Text(no_users),
                 ) : new ListView(
                     scrollDirection: Axis.horizontal,
@@ -919,7 +928,7 @@ class ActiveUserListRadius extends StatelessWidget {
                               children: <Widget>[
                                 new Container(
                                     margin: EdgeInsets.only(
-                                        left: 20.0, top: 10.0),
+                                        left: 20.0, top: 15.0),
                                     width: 60.0,
                                     height: 60.0,
                                     decoration: new BoxDecoration(
@@ -934,28 +943,34 @@ class ActiveUserListRadius extends StatelessWidget {
                                   margin: EdgeInsets.only(
                                       left: 20.0, top: 10.0),
                                   child: Text(capitalize(document['name']),
-                                      style: TextStyle(
-                                        fontFamily: 'GoogleSansFamily',)
-                                      , textScaleFactor: 1.0),
+                                    style: TextStyle(
+                                        fontFamily: 'GoogleSansFamily',
+                                        fontWeight: FontWeight.w400,
+                                        color: black_color)
+                                    , textScaleFactor: 1.0,),
                                 ),
                                 new Container(
                                   margin: EdgeInsets.only(
                                       left: 20.0, top: 5.0),
-                                  child: Text(capitalize(document['userDistance'])+'\t m',
+                                  child: Text(
+                                      capitalize(document['userDistance']) +
+                                          '\t m',
                                       style: TextStyle(
-                                        fontFamily: 'GoogleSansFamily',)
+                                          fontFamily: 'GoogleSansFamily',
+                                          fontWeight: FontWeight.w400,
+                                          color: hint_color_grey_light)
                                       , textScaleFactor: 1.0),
                                 )
                               ],
                             ));
                       } else {
-                        if(snapshot.data.documents.length == 1)
-                        return Container(
-                            margin: EdgeInsets.only(left: 20.0, top: 20.0),
-                            child: Center(
-                              child: Text(no_users),
-                            )
-                        );
+                        if (snapshot.data.documents.length == 1)
+                          return Container(
+                              margin: EdgeInsets.only(left: 20.0, top: 20.0),
+                              child: Center(
+                                child: Text(no_users),
+                              )
+                          );
                         else
                           return Container(
 
@@ -1102,19 +1117,20 @@ class ActiveUserListRadius extends StatelessWidget {
                     isFriend: true,
                     isAlreadyRequestSent: isAlreadyRequestSent,
                     peerName: documentSnapshot['name'],
+                    chatType: CHAT_TYPE_USER,
                   )));
     } else {
       print('USER lIST__________________________$isAlreadyRequestSent');
-   /*   await sendInvite(
+      /*   await sendInvite(
           documentSnapshot['name'], documentSnapshot['photoUrl'], friendId,
           documentSnapshot.data['user_token']).whenComplete(() =>
       {*/
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) =>
-            SendInviteToUser(
-                friendId, currentUserId, documentSnapshot['photoUrl'],
-                isAlreadyRequestSent,
-                isRequestSent, documentSnapshot['name'])));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) =>
+          SendInviteToUser(
+              friendId, currentUserId, documentSnapshot['photoUrl'],
+              isAlreadyRequestSent,
+              isRequestSent, documentSnapshot['name'])));
 //      });
 
       /*   Navigator.push(
@@ -1338,30 +1354,30 @@ class ActiveUserListRadius extends StatelessWidget {
 //    print('map_______________________________________ ${_userStatus}');
     isLoading = true;
 
-    if (map['userLocation'] != null &&
-        (_userStatus != '' && _userStatus == 'LOGIN')) {
+    if (map['userLocation'] != null /* &&
+        (_userStatus != '' && _userStatus == 'LOGIN')*/) {
       GeoPoint geopoint = map['userLocation'];
       // km = 423 // distance.as(LengthUnit.Kilometer,
       final double km = distance.distance(new LatLng(latitude, longtitude),
           new LatLng(geopoint.latitude, geopoint.longitude));
       print('USER DISTANCE $km');
       print('USER GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
-      if ((km == 0.0 || /*sliderData >= km*/ km < 1000) &&
-          userId != currentUserId) {
-        DocumentSnapshot userDocs = await Firestore.instance.collection('users')
+      if (/*(km != 0.0  */ /*sliderData >= km*/ /* */ /*km < 1000*/ /*) &&*/
+      userId != currentUserId) {
+        /* DocumentSnapshot userDocs = await Firestore.instance.collection('users')
             .document(userId).get();
         isLoading = false;
-        print('USER DETAILSSS ${userDocs.data.values} ____userId $userId');
+        print('USER DETAILSSS ${userDocs.data.values} ____userId $userId');*/
         Firestore.instance.collection('users').document(userId).updateData({
           'userDistanceISWITHINRADIUS':
           'YES',
-          'userDistance' : km.toInt().toString()
+          'userDistance': km.toInt().toString()
         });
       } else {
         Firestore.instance.collection('users').document(userId).updateData({
           'userDistanceISWITHINRADIUS':
           'NO',
-          'userDistance' : km.toInt().toString()
+          'userDistance': km.toInt().toString()
         });
       }
     }
@@ -1661,7 +1677,9 @@ class LoginUsersList extends StatelessWidget {
               fontFamily: 'GoogleSansFamily',)));
 //        var documents = snapshot.data.length;
         return Flexible(
-            child:  snapshot.data.documents.length == null || snapshot.data.documents.length == 0  || snapshot.data.documents.length == 1 ? Center(
+            child: snapshot.data.documents.length == null ||
+                snapshot.data.documents.length == 0 ||
+                snapshot.data.documents.length == 1 ? Center(
               child: Text(no_users),
             ) : new ListView(
                 scrollDirection: Axis.horizontal,
@@ -1958,19 +1976,20 @@ class LoginUsersList extends StatelessWidget {
                     isFriend: true,
                     isAlreadyRequestSent: isAlreadyRequestSent,
                     peerName: documentSnapshot['name'],
+                    chatType: CHAT_TYPE_USER,
                   )));
     } else {
       print('USER lIST__________________________$isAlreadyRequestSent');
-     /* await sendInvite(
+      /* await sendInvite(
           documentSnapshot['name'], documentSnapshot['photoUrl'], friendId,
           documentSnapshot.data['user_token']).whenComplete(() =>
       {*/
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) =>
-            SendInviteToUser(
-                friendId, currentUserId, documentSnapshot['photoUrl'],
-                isAlreadyRequestSent,
-                isRequestSent, documentSnapshot['name'])));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) =>
+          SendInviteToUser(
+              friendId, currentUserId, documentSnapshot['photoUrl'],
+              isAlreadyRequestSent,
+              isRequestSent, documentSnapshot['name'])));
 //      });
     }
   }
@@ -1982,6 +2001,11 @@ class BusinessListPage extends StatelessWidget {
   String mphotoUrl = '';
 
   SharedPreferences _preferences;
+  String _userStatus = '';
+
+
+  List<BusinessData> _mBusinessData = new List<BusinessData>();
+  final ScrollController listScrollController = new ScrollController();
 
 
   BusinessListPage(String currentUser, String photoUrl) {
@@ -1992,6 +2016,86 @@ class BusinessListPage extends StatelessWidget {
 
   void initialise() async {
     _preferences = await SharedPreferences.getInstance();
+    _userStatus = await _preferences.getString('USERSTATUS');
+
+    var query = await Firestore.instance.collection('business').getDocuments();
+
+    if (query.documents.length != 0) {
+      query.documents.forEach((doc) {
+        _mBusinessData.add(BusinessData(businessId: doc.data['businessId'],
+            businessName: doc.data['businessName'],
+            businessDistance: doc.data['businessDistance'],
+            businessPhotoUrl: doc.data['photoUrl'],
+            businessStatus: doc.data['status']));
+      });
+    } else {
+
+    }
+    if (currentUserId != '' && currentUserId != null)
+      getCurrentUserLocation(currentUserId);
+  }
+
+  final Distance distance = new Distance();
+
+  Future<DocumentSnapshot> getCurrentUserLocation(String userId) async {
+    DocumentSnapshot doc = await Firestore.instance.collection('users')
+        .document(userId).collection(
+        'userLocation').document(userId)
+        .get();
+    if (doc.data != null && doc.data.length != 0) {
+      DocumentSnapshot map = doc;
+      GeoPoint geopoint = map['userLocation'];
+      getDocumentNearBy(geopoint.latitude, geopoint.longitude);
+//      print('USERCURRENT  GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
+    }
+  }
+
+
+  Future getDocumentNearBy(double latitude, double longitude) async {
+    var query = await Firestore.instance.collection('business').getDocuments();
+    query.documents.forEach((doc) {
+      getUserLocation(latitude, longitude, doc.documentID);
+    });
+  }
+
+
+  Future<DocumentSnapshot> getUserLocation(double latitude, double longtitude,
+      String userId) async {
+    DocumentSnapshot doc = await Firestore.instance.collection('business')
+        .document(userId).collection(
+        'businessLocation').document(userId)
+        .get();
+    DocumentSnapshot map = doc;
+//    print('map_______________________________________ ${_userStatus}');
+//    isLoading = true;
+
+    if (map['businessLocation'] != null /*&&
+        (_userStatus != '' && _userStatus == 'LOGIN')*/) {
+      GeoPoint geopoint = map['businessLocation'];
+      // km = 423 // distance.as(LengthUnit.Kilometer,
+      final double km = distance.distance(new LatLng(latitude, longtitude),
+          new LatLng(geopoint.latitude, geopoint.longitude));
+      print('USER DISTANCE $km');
+      print('USER GEO ${geopoint.latitude} ___ ${geopoint.longitude}');
+      if (/*(km != 0.0  */ /*sliderData >= km*/ /* */ /*km < 1000*/ /*) &&*/
+      userId != currentUserId) {
+        /* DocumentSnapshot userDocs = await Firestore.instance.collection('users')
+            .document(userId).get();
+//        isLoading = false;
+        print('USER DETAILSSS ${userDocs.data.values} ____userId $userId');*/
+        Firestore.instance.collection('business').document(userId).updateData({
+          'businessDistanceISWITHINRADIUS':
+          'YES',
+          'businessDistance': km.toInt().toString()
+        });
+      } else {
+        Firestore.instance.collection('business').document(userId).updateData({
+          'businessDistanceISWITHINRADIUS':
+          'NO',
+          'businessDistance': km.toInt().toString()
+        });
+      }
+    }
   }
 
 
@@ -2000,7 +2104,10 @@ class BusinessListPage extends StatelessWidget {
     print('LoginUsersList _________________ ${new DateTime.now()}');
     return new StreamBuilder(
       stream: Firestore.instance.collection('business') /*.where(
-          'status', isEqualTo: 'ACTIVE')*/.snapshots(),
+          'businessDistanceISWITHINRADIUS', isEqualTo: 'YES')*/ /*.where(
+            'businessId', isEqualTo: '').*/ .where(
+          'status', isEqualTo: 'ACTIVE').orderBy('businessDistance',descending: true)
+          .snapshots(),
       builder:
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) return new Container(
@@ -2008,7 +2115,8 @@ class BusinessListPage extends StatelessWidget {
             child: new Text('Loading...', style: TextStyle(
               fontFamily: 'GoogleSansFamily',)));
         return Flexible(
-            child: snapshot.data.documents.length == null || snapshot.data.documents.length == 0 ? Center(
+            child: snapshot.data.documents.length == null ||
+                snapshot.data.documents.length == 0 ? Center(
               child: Text(noBusiness),
             ) : new ListView(
                 scrollDirection: Axis.horizontal,
@@ -2032,7 +2140,7 @@ class BusinessListPage extends StatelessWidget {
                                       document['photoUrl'] != ''
                                       ? new Container(
                                       margin: EdgeInsets.only(
-                                          left: 20.0, top: 10.0),
+                                          left: 20.0, top: 20.0),
                                       width: 60.0,
                                       height: 60.0,
                                       decoration: new BoxDecoration(
@@ -2059,7 +2167,7 @@ class BusinessListPage extends StatelessWidget {
                                         shape: BoxShape.circle,
                                       ))
                                       : Text(''),
-                                  document['status'] == 'ACTIVE' ? Container(
+                                  /*document['status'] == 'ACTIVE' ? Container(
                                       child: new SvgPicture.asset(
                                         'images/online_active.svg',
                                         height: 15.0,
@@ -2091,15 +2199,21 @@ class BusinessListPage extends StatelessWidget {
                                         bottom: 30.0,
                                         top: 10.0,
                                         right: 10.0),
-                                  )
+                                  )*/
                                 ]
                             ),
-                            new Container(
-                              margin: EdgeInsets.only(left: 20.0, top: 10.0),
-                              child: Text(capitalize(document['businessName']),
-                                  textScaleFactor: 1.0, style: TextStyle(
-                                    fontFamily: 'GoogleSansFamily',)),
-                            )
+                              new Container(
+                                margin: EdgeInsets.only(left: 20.0, top: 10.0),
+                                child: Text(capitalize(document['businessName']),
+                                    textScaleFactor: 1.0, style: TextStyle(
+                                      fontFamily: 'GoogleSansFamily',color: black_color,fontWeight: FontWeight.w400)),
+                              ),
+                              new Container(
+                                margin: EdgeInsets.only(left: 20.0, top: 10.0),
+                                child: Text(capitalize(document['businessDistance']) +"\t"+'m',
+                                    textScaleFactor: 1.0, style: TextStyle(
+                                      fontFamily: 'GoogleSansFamily',color: hint_color_grey_light,fontWeight: FontWeight.w400)),
+                              )
                           ],
                         ));
                     /* } else {
@@ -2129,11 +2243,130 @@ class BusinessListPage extends StatelessWidget {
   }
 
 
+  Widget buildListBusinesses(BuildContext context) {
+    return Container(
+        child:
+        (_mBusinessData != null && _mBusinessData.length != 0) ? ListView
+            .builder(
+          itemBuilder: (context, index) =>
+              buildBusiness(index, _mBusinessData, context),
+          itemCount: _mBusinessData.length,
+          scrollDirection: Axis.horizontal,
+          controller: listScrollController,
+        ) : Center(
+          child: Text('No recent chats'),
+        )
+    );
+  }
+
+  Widget buildBusiness(int index, List<BusinessData> mBusinessData,
+      BuildContext context,) {
+    if (mBusinessData.length == 0) {
+      return Center(
+          child: Text(no_business));
+    } else if (mBusinessData.length > 0 && mBusinessData.length != 0) {
+      return GestureDetector(
+          onTap: () {
+            print(
+                'ON TAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP currentUserId $currentUserId');
+            getFriendListNew(context, currentUserId, mBusinessData[index]);
+          },
+          child: new Column(
+            children: <Widget>[
+              Stack(
+                  children: <Widget>[
+                    mBusinessData[index].businessPhotoUrl != null &&
+                        mBusinessData[index].businessPhotoUrl != ''
+                        ? new Container(
+                        margin: EdgeInsets.only(
+                            left: 20.0, top: 15.0),
+                        width: 60.0,
+                        height: 60.0,
+                        decoration: new BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: new DecorationImage(
+                                fit: BoxFit.fill,
+                                image: new NetworkImage(
+                                    mBusinessData[index].businessPhotoUrl)
+                            )
+                        ))
+                        : mBusinessData[index].businessPhotoUrl == ''
+                        ? new Container(
+                        margin: EdgeInsets.only(
+                            left: 20.0, top: 10.0),
+                        width: 60.0,
+                        height: 60.0,
+                        child: new SvgPicture.asset(
+                          'images/user_unavailable.svg',
+                          height: 10.0,
+                          width: 10.0,
+//                                          color: primaryColor,
+                        ),
+                        decoration: new BoxDecoration(
+                          shape: BoxShape.circle,
+                        ))
+                        : Text(''),
+                    mBusinessData[index].businessStatus == 'ACTIVE' ? Container(
+                        child: new SvgPicture.asset(
+                          'images/online_active.svg',
+                          height: 15.0,
+                          width: 15.0,
+//                                          color: primaryColor,
+                        ),
+                        margin: EdgeInsets.only(left: 60.0,
+                            bottom: 30.0,
+                            top: 10.0,
+                            right: 10.0)) : mBusinessData[index]
+                        .businessStatus ==
+                        'LoggedOut' ? Container(
+                      child: new SvgPicture.asset(
+                        'images/online_inactive.svg',
+                        height: 15.0,
+                        width: 15.0,
+//                                        color: primaryColor,
+                      ),
+                      margin: EdgeInsets.only(left: 60.0,
+                          bottom: 30.0,
+                          top: 10.0,
+                          right: 10.0),
+                    ) : Container(
+                      child: new SvgPicture.asset(
+                        'images/online_idle.svg', height: 15.0,
+                        width: 15.0,
+//                                        color: primaryColor,
+                      ),
+                      margin: EdgeInsets.only(left: 60.0,
+                          bottom: 30.0,
+                          top: 10.0,
+                          right: 10.0),
+                    )
+                  ]
+              ),
+              new Container(
+                margin: EdgeInsets.only(left: 20.0, top: 10.0),
+                child: Text(capitalize(mBusinessData[index].businessName),
+                    textScaleFactor: 1.0, style: TextStyle(
+                      fontFamily: 'GoogleSansFamily',)),
+              )
+            ],
+          ));
+    }
+  }
+
   Future getFriendList(BuildContext context, String currentUserId,
       DocumentSnapshot documentSnapshot) async {
     var businessUserName = documentSnapshot['businessName'];
     Navigator.push(
         context, MaterialPageRoute(builder: (context) =>
         BusinessDetailPage(documentSnapshot['businessId'], businessUserName)));
+  }
+
+
+  Future getFriendListNew(BuildContext context, String currentUserId,
+      BusinessData businessData) async {
+    var businessUserName = businessData.businessName;
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) =>
+        BusinessDetailPage(businessData.businessId, businessUserName)));
   }
 }

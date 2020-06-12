@@ -37,8 +37,15 @@ class Chat extends StatelessWidget {
   bool isAlreadyRequestSent;
   String peerName;
 
+
+
+  String chatType = '';
+
+
+
   Chat(
-      {Key key, @required this.currentUserId, @required this.peerId, @required this.peerAvatar, @required this.isFriend, @required this.isAlreadyRequestSent, @required this.peerName})
+      {Key key, @required this.currentUserId, @required this.peerId, @required this.peerAvatar, @required this.isFriend,
+        @required this.isAlreadyRequestSent, @required this.peerName,@required this.chatType})
       : super(key: key) {
   }
 
@@ -135,6 +142,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   bool isPlaying = false;
   var mIndex = -1;
   final _controller = TextEditingController();
+  TextEditingController controllerName = new TextEditingController();
+  String name = '';
 
 
   @override
@@ -145,8 +154,6 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
   @override
   void initState() {
-    super.initState();
-
     focusNode.addListener(onFocusChange);
     groupChatId = '';
 
@@ -157,14 +164,18 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     readLocal();
 
 
-    _controller.addListener(() {
-      final text = _controller.text.toLowerCase();
-      _controller.value = _controller.value.copyWith(
+    setState(() {});
+
+    controllerName.addListener(() {
+      final text = controllerName.text;
+      controllerName.value = controllerName.value.copyWith(
         text: text,
-        selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+        selection: TextSelection(
+            baseOffset: text.length, extentOffset: text.length),
         composing: TextRange.empty,
       );
     });
+    super.initState();
   }
 
   String mDifference = '';
@@ -229,16 +240,19 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
   readLocal() async {
     prefs = await SharedPreferences.getInstance();
-    id = prefs.getString('userId') ?? '';
+//    id = prefs.getString('userId') ?? '';
+    id = currentUserId == '' ? prefs.getString('userId') : currentUserId;
     print('RECENT CHAT $id ___________peer $peerId');
+
     if (id.hashCode <= peerId.hashCode) {
       groupChatId = '$id-$peerId';
     } else {
       groupChatId = '$peerId-$id';
     }
+
     try {
       recorder.initializeExample(FlutterSound());
-    }on Exception catch (e){
+    } on Exception catch (e) {
       e.toString();
     }
     setState(() {
@@ -251,6 +265,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     currentUserName = await prefs.getString('name');
     mUsersList = await prefs.getStringList('CHAT_USERS');
     mUsersListName = await prefs.getStringList('CHAT_USERS_NAME');
+    controllerName = new TextEditingController(text: name);
     setState(() {});
   }
 
@@ -278,14 +293,15 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
         });
         Fluttertoast.showToast(msg: 'This file is not an image');
       });
-    }on Exception catch (e){
+    } on Exception catch (e) {
       Fluttertoast.showToast(msg: e.toString());
     }
   }
 
 
   Future getImage() async {
-    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery,imageQuality: 20);
+    imageFile =
+    await ImagePicker.pickImage(source: ImageSource.gallery, imageQuality: 20);
 
     if (imageFile != null) {
       setState(() {
@@ -297,7 +313,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
 
   Future getCamera() async {
-    imageFile = await ImagePicker.pickImage(source: ImageSource.camera,imageQuality: 20);
+    imageFile =
+    await ImagePicker.pickImage(source: ImageSource.camera, imageQuality: 20);
 
     if (imageFile != null) {
       setState(() {
@@ -337,26 +354,28 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
 
-  Future onSendMessage(String content, int type, String fileName) async{
+  Future onSendMessage(String content, int type, String fileName) async {
     // type: 0 = text, 1 = image, 2 = sticker
     String audioTime = '-1';
     if (type == 5) {
       if (fileName != '')
         audioTime = fileName;
     }
-    print('onSendMessage ${_controller.text}  ____ $imageUrl');
+    print('RECENT CHAT $id ___________peer $peerId');
+    print('onSendMessage ${controllerName
+        .text}  ____ $imageUrl ________________groupChatId $groupChatId');
 
-    if(_controller.text != ''){
-      content = _controller.text;
+    if (controllerName.text != '') {
+      content = controllerName.text;
       type = 0;
     }
-    if(imageUrl != ''){
+    if (imageUrl != '') {
       content = imageUrl;
       type = 1;
     }
 
     if (content.trim() != '') {
-      _controller.clear();
+      controllerName.clear();
       var currTime = DateTime
           .now()
           .millisecondsSinceEpoch
@@ -381,7 +400,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       } catch (e) {
         print('Registration' + e);
       }
-    /*  try {
+      /*  try {
         await Firestore.instance.runTransaction((
             transaction) async {
           await transaction.set(
@@ -417,7 +436,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           'type': type
         }
       );*/
-   /*   Firestore.instance.runTransaction((transaction) async {
+      /*   Firestore.instance.runTransaction((transaction) async {
         await transaction.set(
           documentReference,
           {
@@ -430,7 +449,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           },
         );
       });*/
-    /*  try {
+      /*  try {
         documentReference.setData(
             {
               'idFrom': id,
@@ -462,8 +481,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
         if (mUsersList[j] == peerId) {
           isExistUser = true;
         } else {
-          if(peerId != currentUserId)
-           mUsersList.add(peerId);
+          if (peerId != currentUserId)
+            mUsersList.add(peerId);
           else
             mUsersList.add(id);
           mUsersListName.add(peerName);
@@ -472,7 +491,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     } else {
       mUsersList = new List();
       mUsersListName = new List();
-      if(peerId != currentUserId)
+      if (peerId != currentUserId)
         mUsersList.add(peerId);
       else
         mUsersList.add(id);
@@ -492,7 +511,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
 
-  final String serverToken =SERVER_KEY;
+  final String serverToken = SERVER_KEY;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -568,6 +587,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       storeFile(document['content'], document['audioTime']);
     }
 
+    print('BUILD ITEM $id _____________ ${document['idFrom']}');
     if (document['idFrom'] == id) {
       // Right (my message)
       return new Row(
@@ -629,7 +649,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                             ),
                         errorWidget: (context, url, error) =>
                             Material(
-                              child:/* Image.asset(
+                              child: /* Image.asset(
                                 'images/img_not_available.jpeg',
                                 width: 200.0,
                                 height: 200.0,
@@ -699,9 +719,11 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                             mIndex = index;
                             isPlaying
                                 ? flutterStopPlayer(
-                                listMessage[index]['content'], document['audioTime'])
+                                listMessage[index]['content'],
+                                document['audioTime'])
                                 : flutterPlaySound(
-                                listMessage[index]['content'], document['audioTime']);
+                                listMessage[index]['content'],
+                                document['audioTime']);
                           },
                         ),
                         (index == mIndex) ? new Slider(
@@ -769,7 +791,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                     min: 0.0,
                     max: maxDuration,
                     divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt(),
-                    onChanged: (double value) {},) :  new Slider(
+                    onChanged: (double value) {},) : new Slider(
                     label: index.toString(),
                     value: 0.0,
                     min: 0.0,
@@ -787,231 +809,233 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
         mainAxisAlignment: MainAxisAlignment.end,
       );
     } else {
-    // Left (peer message)
+      // Left (peer message)
       var myVal = isFirstMessageLeft(index);
       print('MYVALU ${myVal.isSelected}');
-        return Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  true ? Container(
-                    margin: EdgeInsets.only(left: 10.0, right: 5.0),
-                    child: Material(
-                      child: CachedNetworkImage(
-                        placeholder: (context, url) =>
-                            Container(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 1.0,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    progress_color),
-                              ),
-                              width: 35.0,
-                              height: 35.0,
-                              padding: EdgeInsets.all(10.0),
+      return Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                true ? Container(
+                  margin: EdgeInsets.only(left: 10.0, right: 5.0),
+                  child: Material(
+                    child: CachedNetworkImage(
+                      placeholder: (context, url) =>
+                          Container(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.0,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  progress_color),
                             ),
-                        imageUrl: peerAvatar,
-                        width: 35.0,
-                        height: 35.0,
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18.0),
-                      ),
-                      clipBehavior: Clip.hardEdge,
+                            width: 35.0,
+                            height: 35.0,
+                            padding: EdgeInsets.all(10.0),
+                          ),
+                      imageUrl: peerAvatar,
+                      width: 35.0,
+                      height: 35.0,
+                      fit: BoxFit.cover,
                     ),
-                  )
-                      : Container(width: 35.0,
-                    margin: EdgeInsets.only(left: 10.0, right: 5.0),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(18.0),
+                    ),
+                    clipBehavior: Clip.hardEdge,
                   ),
-                  document['type'] == 0
-                      ?
-                  Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(top: 5.0),
-                          child: Text(
-                            document['content'],
-                            style: TextStyle(color: hint_color_grey_dark),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Text(
-                            DateFormat('kk:mm')
-                                .format(DateTime.fromMillisecondsSinceEpoch(
-                                int.parse(document['timestamp']))),
-                            style: TextStyle(color: hint_color_grey_light,
-                                fontSize: 12.0,
-                                fontStyle: FontStyle.italic),
-                          ),
-                        )
-                      ],
-                    ),
-                    padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                    width: 200.0,
-                    decoration: BoxDecoration(
-                        color: greyColor2, borderRadius: BorderRadius.circular(
-                        8.0)),
-                  )
-                      : document['type'] == 1
-                      ? Column(
+                )
+                    : Container(width: 35.0,
+                  margin: EdgeInsets.only(left: 10.0, right: 5.0),
+                ),
+                document['type'] == 0
+                    ?
+                Container(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[Container(
-                      child: FlatButton(
-                        child: Material(
-                          child: CachedNetworkImage(
-                            placeholder: (context, url) =>
-                                Container(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        progress_color),
-                                  ),
-                                  width: 200.0,
-                                  height: 200.0,
-                                  padding: EdgeInsets.all(70.0),
-                                  decoration: BoxDecoration(
-                                    color: greyColor2,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(8.0),
-                                    ),
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(top: 5.0),
+                        child: Text(
+                          document['content'],
+                          style: TextStyle(color: hint_color_grey_dark),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          DateFormat('kk:mm')
+                              .format(DateTime.fromMillisecondsSinceEpoch(
+                              int.parse(document['timestamp']))),
+                          style: TextStyle(color: hint_color_grey_light,
+                              fontSize: 12.0,
+                              fontStyle: FontStyle.italic),
+                        ),
+                      )
+                    ],
+                  ),
+                  padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                  width: 200.0,
+                  decoration: BoxDecoration(
+                      color: greyColor2, borderRadius: BorderRadius.circular(
+                      8.0)),
+                )
+                    : document['type'] == 1
+                    ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[Container(
+                    child: FlatButton(
+                      child: Material(
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) =>
+                              Container(
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      progress_color),
+                                ),
+                                width: 200.0,
+                                height: 200.0,
+                                padding: EdgeInsets.all(70.0),
+                                decoration: BoxDecoration(
+                                  color: greyColor2,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8.0),
                                   ),
                                 ),
-                            errorWidget: (context, url, error) =>
-                                Material(
-                                  child: /*Image.asset(
+                              ),
+                          errorWidget: (context, url, error) =>
+                              Material(
+                                child: /*Image.asset(
                                     'images/img_not_available.jpeg',
                                     width: 200.0,
                                     height: 200.0,
                                     fit: BoxFit.cover,
                                   ),*/
-                                  new SvgPicture.asset(
-                                    'images/user_unavailable.svg', height: 200.0,
-                                    width: 200.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(8.0),
-                                  ),
-                                  clipBehavior: Clip.hardEdge,
+                                new SvgPicture.asset(
+                                  'images/user_unavailable.svg', height: 200.0,
+                                  width: 200.0,
+                                  fit: BoxFit.cover,
                                 ),
-                            imageUrl: document['content'],
-                            width: 200.0,
-                            height: 200.0,
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                          clipBehavior: Clip.hardEdge,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8.0),
+                                ),
+                                clipBehavior: Clip.hardEdge,
+                              ),
+                          imageUrl: document['content'],
+                          width: 200.0,
+                          height: 200.0,
+                          fit: BoxFit.cover,
                         ),
-                        onPressed: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) =>
-                                  FullPhoto(url: document['content'])));
-                        },
-                        padding: EdgeInsets.all(0),
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                        clipBehavior: Clip.hardEdge,
                       ),
-                      margin: EdgeInsets.only(left: 5.0),
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) =>
+                                FullPhoto(url: document['content'])));
+                      },
+                      padding: EdgeInsets.all(0),
                     ),
-                      Container(
-                        margin: EdgeInsets.only(left: 5.0, top: 5.0),
-                        child: Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Text(
-                            DateFormat('kk:mm')
-                                .format(DateTime.fromMillisecondsSinceEpoch(
-                                int.parse(document['timestamp']))),
-                            style: TextStyle(color: hint_color_grey_light,
-                                fontSize: 12.0,
-                                fontStyle: FontStyle.italic),
+                    margin: EdgeInsets.only(left: 5.0),
+                  ),
+                    Container(
+                      margin: EdgeInsets.only(left: 5.0, top: 5.0),
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          DateFormat('kk:mm')
+                              .format(DateTime.fromMillisecondsSinceEpoch(
+                              int.parse(document['timestamp']))),
+                          style: TextStyle(color: hint_color_grey_light,
+                              fontSize: 12.0,
+                              fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                    )
+                  ],
+                ) : document['type'] == 5 ?
+                Container(
+                  child: Column(
+                      children: <Widget>[
+                        new Material(
+                          child: Container(
+                            height: 56.0,
+                            color: greyColor2,
+                            child: Row(
+                              children: <Widget>[
+                                IconButton(
+                                  icon: Icon(Icons.play_circle_filled),
+                                  onPressed: () {
+                                    isPlaying
+                                        ? flutterStopPlayer(
+                                        listMessage[index]['content'],
+                                        document['audioTime'])
+                                        : flutterPlaySound(
+                                        listMessage[index]['content'],
+                                        document['audioTime']);
+                                  },
+                                ),
+                                (index == mIndex) ? new Slider(
+                                  label: index.toString(),
+                                  value: sliderCurrentPosition,
+                                  min: 0.0,
+                                  max: maxDuration,
+                                  divisions: maxDuration == 0.0
+                                      ? 1
+                                      : maxDuration
+                                      .toInt(),
+                                  onChanged: (double value) {},) : new Slider(
+                                  label: index.toString(),
+                                  value: 0.0,
+                                  min: 0.0,
+                                  max: 0.0,
+                                  divisions: 0.0 == 0.0
+                                      ? 1
+                                      : 0.0
+                                      .toInt(),
+                                  onChanged: (double value) {},),
+                              ],
+                            ),
                           ),
                         ),
-                      )
-                    ],
-                  ) : document['type'] == 5 ?
-                  Container(
-                    child: Column(
-                        children: <Widget>[
-                          new Material(
-                            child: Container(
-                              height: 56.0,
-                              color: greyColor2,
-                              child: Row(
-                                children: <Widget>[
-                                  IconButton(
-                                    icon: Icon(Icons.play_circle_filled),
-                                    onPressed: () {
-                                      isPlaying
-                                          ? flutterStopPlayer(
-                                          listMessage[index]['content'], document['audioTime'])
-                                          : flutterPlaySound(
-                                          listMessage[index]['content'], document['audioTime']);
-                                    },
-                                  ),
-                                  (index == mIndex) ? new Slider(
-                                    label: index.toString(),
-                                    value: sliderCurrentPosition,
-                                    min: 0.0,
-                                    max: maxDuration,
-                                    divisions: maxDuration == 0.0
-                                        ? 1
-                                        : maxDuration
-                                        .toInt(),
-                                    onChanged: (double value) {},) : new Slider(
-                                    label: index.toString(),
-                                    value: 0.0,
-                                    min: 0.0,
-                                    max: 0.0,
-                                    divisions: 0.0 == 0.0
-                                        ? 1
-                                        : 0.0
-                                        .toInt(),
-                                    onChanged: (double value) {},) ,
-                                ],
-                              ),
+                        Container(
+                          margin: EdgeInsets.only(bottom: 5.0),
+                          child: Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Text(
+                              DateFormat('kk:mm')
+                                  .format(DateTime.fromMillisecondsSinceEpoch(
+                                  int.parse(document['timestamp']))),
+                              style: TextStyle(color: timestamp_color,
+                                  fontSize: 12.0,
+                                  fontStyle: FontStyle.italic),
                             ),
                           ),
-                          Container(
-                            margin: EdgeInsets.only(bottom: 5.0),
-                            child: Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Text(
-                                DateFormat('kk:mm')
-                                    .format(DateTime.fromMillisecondsSinceEpoch(
-                                    int.parse(document['timestamp']))),
-                                style: TextStyle(color: timestamp_color,
-                                    fontSize: 12.0,
-                                    fontStyle: FontStyle.italic),
-                              ),
-                            ),
-                          )
-                        ]
-                    ),
-                    padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                    width: 280.0,
-                    decoration: BoxDecoration(
-                        color: greyColor2,
-                        borderRadius: BorderRadius.circular(8.0)),
-                    margin: EdgeInsets.only(
-                        bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                        right: 10.0),
-                  )
-                      : Container(
-                    child: new Image.asset(
-                      'images/${document['content']}.gif',
-                      width: 100.0,
-                      height: 100.0,
-                      fit: BoxFit.cover,
-                    ),
-                    margin: EdgeInsets.only(
-                        bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                        right: 10.0),
+                        )
+                      ]
                   ),
-                ],
-              ),
-              /*    // Time
+                  padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                  width: 280.0,
+                  decoration: BoxDecoration(
+                      color: greyColor2,
+                      borderRadius: BorderRadius.circular(8.0)),
+                  margin: EdgeInsets.only(
+                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                      right: 10.0),
+                )
+                    : Container(
+                  child: new Image.asset(
+                    'images/${document['content']}.gif',
+                    width: 100.0,
+                    height: 100.0,
+                    fit: BoxFit.cover,
+                  ),
+                  margin: EdgeInsets.only(
+                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                      right: 10.0),
+                ),
+              ],
+            ),
+            /*    // Time
             isLastMessageLeft(index)
                 ? Align(
               alignment: Alignment.bottomLeft,
@@ -1028,10 +1052,10 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
               ),
             )
                 : Container()*/
-            ],
-          ),
-          margin: EdgeInsets.only(bottom: 10.0),
-        );
+          ],
+        ),
+        margin: EdgeInsets.only(bottom: 10.0),
+      );
     }
   }
 
@@ -1122,7 +1146,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
   bool isLastMessageLeft(int index) {
-    if ((index > 0 && listMessage != null && listMessage[index - 1]['idFrom'] == id) || index == 0) {
+    if ((index > 0 && listMessage != null &&
+        listMessage[index - 1]['idFrom'] == id) || index == 0) {
       return true;
     } else {
       return false;
@@ -1130,7 +1155,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   }
 
   bool isLastMessageRight(int index) {
-    if ((index > 0 && listMessage != null && listMessage[index - 1]['idFrom'] != id) || index == 0) {
+    if ((index > 0 && listMessage != null &&
+        listMessage[index - 1]['idFrom'] != id) || index == 0) {
       return true;
     } else {
       return false;
@@ -1150,38 +1176,39 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 
   selectedVal isFirstMessageLeft(int index) {
     currIndex = index;
-    datalen = datalen+1;
-    print('INDEX __$index _______prevIndex$prevIndex ________currIndex$currIndex  __len $len ___datalen $datalen');
-    if(prevIndex == -1){
+    datalen = datalen + 1;
+    print(
+        'INDEX __$index _______prevIndex$prevIndex ________currIndex$currIndex  __len $len ___datalen $datalen');
+    if (prevIndex == -1) {
       prevIndex = index;
     }
 
     print('MESSSAGE  prevIndex $prevIndex _________currIndex $currIndex');
 
-    if(prevIndex+1 == currIndex){
+    if (prevIndex + 1 == currIndex) {
       print('MESSSAGE');
       isTrue = true;
-      mVal= selectedVal(isSelected: true,index: currIndex);
+      mVal = selectedVal(isSelected: true, index: currIndex);
       count = count + 1;
       prevIndex = currIndex;
-    }else{
+    } else {
       prevIndex = currIndex;
       isTrue = false;
-      mVal= selectedVal(isSelected: false,index: currIndex);
-      count =0;
+      mVal = selectedVal(isSelected: false, index: currIndex);
+      count = 0;
     }
     mList.add(mVal);
     print('MYVALU isFirstMessageLeft ${mVal.isSelected}');
 
     return mVal;
 
-    if(count == 1){
+    if (count == 1) {
 //      if(datalen == len)
       isToSetImage = true;
-    }else if(count > 1){
+    } else if (count > 1) {
 //      if(datalen == len)
       isToSetImage = true;
-    }else{
+    } else {
 
     }
     /*if ((index >= 0 && listMessage != null) &&
@@ -1248,172 +1275,175 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
       );
     } else {
       return Stack(
-          children: <Widget>[
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Container(
+        children: <Widget>[
+          Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
 //                    color: white_color,
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width,
 //                    height: 150,
-                    child:
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment
-                          .center,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
-                          child: new IconButton(
+                  child:
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment
+                        .center,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
+                        child: new IconButton(
+                            icon: new SvgPicture.asset(
+                              'images/back_icon.svg',
+                              width: 20.0,
+                              height: 20.0,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            }),
+                      ),
+                      new Container(
+                        margin: EdgeInsets.only(
+                            top: 40.0, right: 10.0, bottom: 10.0),
+                        child: Material(
+                          child: CachedNetworkImage(
+                            placeholder: (context, url) =>
+                                Container(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 1.0,
+                                    valueColor: AlwaysStoppedAnimation<
+                                        Color>(progress_color),
+                                  ),
+                                  width: 35.0,
+                                  height: 35.0,
+                                  padding: EdgeInsets.all(10.0),
+                                ),
+                            imageUrl: peerAvatar,
+                            width: 35.0,
+                            height: 35.0,
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(18.0),
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                        ),
+                      ),
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            peerName != '' && peerName != null ? Container(
+                              margin: EdgeInsets.only(
+                                  top: 30.0, right: 10.0, bottom: 5.0),
+                              child: Text(
+                                peerName, style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: black_color,
+                                  fontFamily: 'GoogleSansFamily'),
+                              ),
+                            ) : Text(''),
+                            mDifference != 'Active Now' ? Container(
+                              child: Text(
+                                'Active \t ' + mDifference + '\t ago',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    color: hint_color_grey_dark,
+                                    fontFamily: 'GoogleSansFamily'),
+                              ),
+                            ) : Container(
+                              child: Text(
+                                mDifference, style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  color: hint_color_grey_dark,
+                                  fontFamily: 'GoogleSansFamily'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Spacer(),
+                      Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            margin: EdgeInsets.only(
+                                top: 40.0, right: 20.0, bottom: 5.0),
+                            child: IconButton(
                               icon: new SvgPicture.asset(
-                                'images/back_icon.svg',
-                                width: 20.0,
+                                'images/home.svg',
                                 height: 20.0,
+                                width: 20.0,
+                                color: black_color,
                               ),
                               onPressed: () {
-                                Navigator.pop(context);
-                              }),
-                        ),
-                        new Container(
-                          margin: EdgeInsets.only(
-                              top: 40.0, right: 10.0, bottom: 10.0),
-                          child: Material(
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) =>
-                                  Container(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1.0,
-                                      valueColor: AlwaysStoppedAnimation<
-                                          Color>(progress_color),
-                                    ),
-                                    width: 35.0,
-                                    height: 35.0,
-                                    padding: EdgeInsets.all(10.0),
-                                  ),
-                              imageUrl: peerAvatar,
-                              width: 35.0,
-                              height: 35.0,
-                              fit: BoxFit.cover,
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            UsersList(
+                                                '', currentUserId, '')));
+                              },
                             ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(18.0),
-                            ),
-                            clipBehavior: Clip.hardEdge,
-                          ),
-                        ),
-                        Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              peerName !='' && peerName != null ? Container(
-                                margin: EdgeInsets.only(
-                                    top: 30.0, right: 10.0, bottom: 5.0),
-                                child: Text(
-                                  peerName, style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: black_color,fontFamily: 'GoogleSansFamily'),
-                                ),
-                              ) : Text(''),
-                              mDifference != 'Active Now' ? Container(
-                                child: Text(
-                                  'Active \t ' + mDifference + '\t ago',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      color: hint_color_grey_dark,fontFamily: 'GoogleSansFamily'),
-                                ),
-                              ) : Container(
-                                child: Text(
-                                  mDifference, style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    color: hint_color_grey_dark,fontFamily: 'GoogleSansFamily'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Spacer(),
-                        Align(
-                            alignment: Alignment.topRight,
-                            child: Container(
-                              margin: EdgeInsets.only(
-                                  top: 40.0, right: 20.0, bottom: 5.0),
-                              child: IconButton(
-                                icon: new SvgPicture.asset(
-                                  'images/home.svg',
-                                  height: 20.0,
-                                  width: 20.0,
-                                  color: black_color,
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              UsersList(
-                                                  '', currentUserId, '')));
-                                },
-                              ),
-                            )
-                        )
-                      ],
-                    ),
-
+                          )
+                      )
+                    ],
                   ),
-                  Divider(color: divider_color,thickness: 1.0,),
-                  // List of messages
-                  buildListMessage(),
+
+                ),
+                Divider(color: divider_color, thickness: 1.0,),
+                // List of messages
+                buildListMessage(),
 /*
                     // Sticker
                     (isShowSticker ? buildSticker() : Container()),
 */
-                  imageUrl != '' ? FlatButton(
-                    child: Material(
-                      child: CachedNetworkImage(
-                        placeholder: (context, url) =>
-                            Container(
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    progress_color),
-                              ),
-                              width: 200.0,
-                              height: 200.0,
-                              padding: EdgeInsets.all(70.0),
-                              decoration: BoxDecoration(
-                                color: greyColor2,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(8.0),
-                                ),
+                imageUrl != '' ? FlatButton(
+                  child: Material(
+                    child: CachedNetworkImage(
+                      placeholder: (context, url) =>
+                          Container(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  progress_color),
+                            ),
+                            width: 200.0,
+                            height: 200.0,
+                            padding: EdgeInsets.all(70.0),
+                            decoration: BoxDecoration(
+                              color: greyColor2,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(8.0),
                               ),
                             ),
-                        imageUrl: imageUrl,
-                        width: 200.0,
-                        height: 200.0,
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                      clipBehavior: Clip.hardEdge,
+                          ),
+                      imageUrl: imageUrl,
+                      width: 200.0,
+                      height: 200.0,
+                      fit: BoxFit.cover,
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                          context, MaterialPageRoute(builder: (context) =>
-                          FullPhoto(url: imageUrl)));
-                    },
-                    padding: EdgeInsets.all(0),
-                  ) : Text(''),
-                  // Input content
-                  buildInput(),
-                ]
-            ),
-            /*Align(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    clipBehavior: Clip.hardEdge,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) =>
+                        FullPhoto(url: imageUrl)));
+                  },
+                  padding: EdgeInsets.all(0),
+                ) : Text(''),
+                // Input content
+                buildInput(),
+              ]
+          ),
+          /*Align(
               alignment: Alignment.bottomLeft,
               child: Container(
                 width: MediaQuery
                     .of(context)
                     .size
                     .width,
-               *//* height: MediaQuery
+               */ /* height: MediaQuery
                     .of(context)
                     .size
                     .height - 100,
@@ -1423,16 +1453,16 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                       topLeft: const Radius.circular(20.0),
                       topRight: const Radius.circular(20.0),
                     )
-                ),*//*
+                ),*/ /*
                 child: Column(
                   children: <Widget>[
 
                     // List of messages
                     buildListMessage(),
-*//*
+*/ /*
                     // Sticker
                     (isShowSticker ? buildSticker() : Container()),
-*//*
+*/ /*
                     imageUrl != '' ? FlatButton(
                       child: Material(
                         child: CachedNetworkImage(
@@ -1473,9 +1503,9 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 ),
               ),
             ),*/
-            // Loading
-            buildLoading()
-          ],
+          // Loading
+          buildLoading()
+        ],
       );
     }
   }
@@ -1631,7 +1661,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
               ),*/
               Material(
                 child: new Container(
-                  margin: EdgeInsets.only(left: 10.0,top: 10.0),
+                  margin: EdgeInsets.only(left: 10.0, top: 10.0),
 //                  margin: new EdgeInsets.symmetric(horizontal: 1.0),
                   child: new IconButton(
                     icon: new SvgPicture.asset(
@@ -1767,10 +1797,16 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                   margin: EdgeInsets.only(left: 20.0, bottom: 5.0),
                   child: TextField(
                     style: TextStyle(color: black_color, fontSize: 15.0),
-                    controller: _controller,
+                    controller: controllerName,
+                    onChanged: (value) {
+                      name = value;
+                    },
+                    textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                       hintText: chat_hint,
-                      hintStyle: TextStyle(color: hint_color_grey_dark,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),
+                      hintStyle: TextStyle(color: hint_color_grey_dark,
+                          fontFamily: 'GoogleSansFamily',
+                          fontWeight: FontWeight.w400),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                             color: focused_border_color,
@@ -1835,12 +1871,14 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             .collection('messages')
             .document(groupChatId)
             .collection(groupChatId)
+//        .where('chatType',isEqualTo : 'business')
             .orderBy('timestamp', descending: true)
             .limit(20)
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            print('chat ___buildListMessage _____________NOTTT______$groupChatId ___');
+            print(
+                'chat ___buildListMessage _____________NOTTT______$groupChatId ___');
 
             return Center(
                 child: CircularProgressIndicator(
@@ -1850,17 +1888,17 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
 //            len = snapshot.data.documents.length;
 //            mList = listMessage;
 //            len = mList.length;
-            for(int i=0;i< snapshot.data.documents.length ;i++) {
+            for (int i = 0; i < snapshot.data.documents.length; i++) {
               DocumentSnapshot documentSnapshot = snapshot.data.documents[i];
-              if (documentSnapshot['idFrom'] == id) {
-              } else {
-                len = len +1;
+              if (documentSnapshot['idFrom'] == id) {} else {
+                len = len + 1;
 //                isFirstMessageLeft(i);
               }
             }
 
-            for(int j=0;j<mList.length ; j++) {
-              print('MESSSAGELISTTTTT ${mList[j].isSelected} _____${mList[j].index}');
+            for (int j = 0; j < mList.length; j++) {
+              print('MESSSAGELISTTTTT ${mList[j].isSelected} _____${mList[j]
+                  .index}');
             }
             return ListView.builder(
 //              padding: EdgeInsets.all(10.0),
@@ -1870,7 +1908,6 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
               reverse: true,
               controller: listScrollController,
             );
-
           }
         },
       ),

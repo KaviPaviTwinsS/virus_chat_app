@@ -30,6 +30,7 @@ final text_color_grey = Color(0xFFBDBDBD);
 //walk through
 final background_white_color = Color(0xFFFFFFFF);
 final hint_color_grey_dark = Color(0xFF666666);
+final hint_color_grey_dark_time = Color(0xFF999999);
 final hint_color_grey_light= Color(0xFF8992A3);
 final text_color_blue = Color(0xFF4285F4);
 final button_fill_color =Color(0xFF4285F4);

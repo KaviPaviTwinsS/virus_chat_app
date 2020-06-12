@@ -484,7 +484,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                               borderSide: BorderSide(
                                                   color: greyColor, width: 0.5),
                                             ),
-                                            labelText: capitalize('LastName'),
+                                            labelText: capitalize('Last Name'),
                                             hintStyle: TextStyle(
                                                 fontSize: HINT_TEXT_SIZE,
                                                 fontFamily: 'GoogleSansFamily'),
@@ -561,7 +561,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     crossAxisAlignment: CrossAxisAlignment
                                         .start,
                                     children: <Widget>[
-                                      Container(
+                                     /* Container(
                                         margin: EdgeInsets.only(
                                             left: 20.0, right: 20.0, top: 25.0),
                                         child: Text(
@@ -572,8 +572,38 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             fontSize: 12.0,
                                             fontWeight: FontWeight.w400,),
                                         ),
-                                      ),
+                                      ),*/
+
+
                                       Container(
+                                        child: TextField(
+                                          decoration: new InputDecoration(
+                                            contentPadding: new EdgeInsets.all(
+                                                15.0),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: focused_border_color,
+                                                  width: 0.5),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: greyColor, width: 0.5),
+                                            ),
+                                            labelText: capitalize('Mobile number'),
+                                            hintStyle: TextStyle(
+                                                fontSize: HINT_TEXT_SIZE,
+                                                fontFamily: 'GoogleSansFamily'),
+                                          ),
+                                          controller: controllerMobileNumber,
+                                          textInputAction: TextInputAction.done,
+                                          onChanged: (value) {
+                                            mobileNumber = value;
+                                          },
+                                        ),
+                                        margin: EdgeInsets.only(
+                                            left: 20.0, right: 20.0, top: 30.0),
+                                      ),
+                                     /* Container(
                                         decoration: new BoxDecoration(
                                             shape: BoxShape.rectangle,
                                             color: unfocused_field_color
@@ -602,7 +632,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                         ),
                                         margin: EdgeInsets.only(
                                             left: 20.0, right: 20.0, top: 5.0),
-                                      ),
+                                      ),*/
                                     ]
                                 ) : Text(''),
 //                              Row(
@@ -667,13 +697,13 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                     });
                                                     Fluttertoast.showToast(
                                                         msg: enter_names);
-                                                  } else if (nickName == '') {
+                                                  }/* else if (nickName == '') {
                                                     setState(() {
                                                       isLoading = false;
                                                     });
                                                     Fluttertoast.showToast(
                                                         msg: enter_nickname);
-                                                  } else if (userEmail == '') {
+                                                  } */else if (userEmail == '') {
                                                     setState(() {
                                                       isLoading = false;
                                                     });
@@ -756,7 +786,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                         )
                                     )
                                 ),
-                                (businessId != '' && businessId != null)
+                                (businessId != '' && businessId != null  && _mBusinessType == BUSINESS_TYPE_OWNER )
                                     ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
@@ -773,7 +803,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                           fontFamily: 'GoogleSansFamily'),),
                                     ),
                                     businessImage != null && businessImage != ''
-                                        ? Center(
+    ? Center(
                                         child: Container(
                                           margin: EdgeInsets.only(bottom: 15.0,
                                               left: 20.0,
@@ -880,8 +910,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                       mainAxisAlignment: MainAxisAlignment
                                           .spaceBetween,
                                       children: <Widget>[
-                                        _noOfEmployees != null &&
-                                            _noOfEmployees != 0 ? Align(
+                                        _noOfEmployees != null  ? Align(
                                           child: Container(
                                             margin: EdgeInsets.only(
                                               left: 20.0,),
@@ -938,7 +967,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                 )
                                     : Text(''),
 
-                                businessId == '' || businessId == null ? Align(
+                                businessId == '' || businessId == null || (businessId != ''  && _mBusinessType == BUSINESS_TYPE_EMPLOYEE ) ? Align(
                                     alignment: Alignment.bottomRight,
                                     child: GestureDetector(
                                       onTap: () {
@@ -1087,11 +1116,13 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     'dialog');
                                 _updatestatus();
                                 clearLocalData();
-                                Navigator.pushReplacement(
+                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                                    PhoneNumberSelectionPage('phone')), (Route<dynamic> route) => false);
+                              /*  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                         builder: (
-                                            context) => new PhoneNumberSelectionPage('')));
+                                            context) => new PhoneNumberSelectionPage('phone')));*/
                                 /* Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
@@ -1542,12 +1573,14 @@ class ProfilePageState extends State<ProfilePageSetup> {
           setState(() {
             isLoading = false;
           });
+          isUploadInProgress = false;
           Fluttertoast.showToast(msg: 'This file is not an image');
         });
       } else {
         setState(() {
           isLoading = false;
         });
+        isUploadInProgress = false;
         Fluttertoast.showToast(msg: 'This file is not an image');
       }
     }, onError: (err) {

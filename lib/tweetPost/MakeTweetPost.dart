@@ -282,7 +282,7 @@ class MakeTweetPostState extends State<MakeTweetPost> {
                                 margin: EdgeInsets.only(left : 10.0,right: 15.0),
                                 child: Text(
                                     document['createdAt'],
-                                    style: TextStyle(color: hint_color_grey_dark,fontSize: 10.0,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400)
+                                    style: TextStyle(color: hint_color_grey_dark_time,fontSize: 10.0,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400)
                                 )
                             )) : Text(''),
 //                            Spacer(),

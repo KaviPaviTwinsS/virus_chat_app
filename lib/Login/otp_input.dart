@@ -538,7 +538,7 @@ class _PinPaint extends CustomPainter {
     errorTextStyle: decoration.errorTextStyle ??
         themeData.textTheme.caption.copyWith(color: themeData.errorColor),
     hintTextStyle: decoration.hintTextStyle ??
-        themeData.textTheme.headline.copyWith(color: themeData.hintColor),
+        themeData.textTheme.headline.copyWith(color: greyColor2),
   );
 
   @override

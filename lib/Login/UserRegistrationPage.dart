@@ -81,6 +81,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   TextEditingController userNameController = new TextEditingController();
   TextEditingController userNockNameController = new TextEditingController();
   TextEditingController userEmailController = new TextEditingController();
+  TextEditingController newUserNameController = new TextEditingController();
 
   String userPhoneNumberWithoutCountryCode = '';
   String photoUrl = '';
@@ -92,20 +93,39 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
   String userToken = '';
   String mCurrentLoginType = '';
 
+  String _userName = '';
+  String newUserName = '';
+
+  bool isUploadInProgress = false;
+  FocusNode focusNode = new FocusNode();
+
 
   UserRegistrationScreen(
       {Key key, @required this.userPhoneNumber, @required this.userPhoneNumberWithoutCountryCode, @required this.firebaseUser, @required this.mCurrentLoginType});
 
+
+
+  void onFocusChange() {
+    if (focusNode.hasFocus) {
+      // Hide sticker when keyboard appear
+      setState(() {
+//        isShowSticker = false;
+      });
+    }
+  }
+
+
   @override
   void initState() {
-    super.initState();
+
+    focusNode = new FocusNode();
+    focusNode.addListener(onFocusChange);
+
     isSignIn();
-    // Force refresh input
-    setState(() {});
 
 
     userNameController.addListener(() {
-      final text = userNameController.text.toLowerCase();
+      final text = userNameController.text;
       userNameController.value = userNameController.value.copyWith(
         text: text,
         selection: TextSelection(
@@ -116,7 +136,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
 
 
     userNockNameController.addListener(() {
-      final text = userNockNameController.text.toLowerCase();
+      final text = userNockNameController.text;
       userNockNameController.value = userNockNameController.value.copyWith(
         text: text,
         selection: TextSelection(
@@ -126,7 +146,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     });
 
     userEmailController.addListener(() {
-      final text = userEmailController.text.toLowerCase();
+      final text = userEmailController.text;
       userEmailController.value = userEmailController.value.copyWith(
         text: text,
         selection: TextSelection(
@@ -134,11 +154,19 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
         composing: TextRange.empty,
       );
     });
+
+    // Force refresh input
+    setState(() {});
+
+    super.initState();
+
   }
 
   void isSignIn() async {
     prefs = await SharedPreferences.getInstance();
     userToken = await prefs.getString('PUSH_TOKEN');
+//    userNameController = new TextEditingController(text: _userName);
+    newUserNameController = new TextEditingController(text: newUserName);
   }
 
 
@@ -263,13 +291,17 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                         width: double.infinity,
                         margin: EdgeInsets.all(20.0),
                       ),
-
                       Container(
                         margin: const EdgeInsets.only(
                             left: 20.0, top: 5.0, right: 20.0),
                         child: TextField(
                           obscureText: false,
                           controller: userNameController,
+//                          textInputAction: TextInputAction.next,
+                         /* onChanged: (value) {
+                            newUserName = value;
+                          },*/
+//                          focusNode: focusNode,
                           decoration: new InputDecoration(
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
@@ -349,14 +381,28 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                             height: 45, // specific value
                             child: RaisedButton(
                               onPressed: () {
+                                if (!isUploadInProgress) {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
                                 if (userNameController.text != '' &&
                                     userEmailController.text != '' &&
                                     photoUrl != '') {
                                   _AddNewUser(firebaseUser);
                                 } else {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
                                   print('NAN registrationValidation');
                                   registrationValidation();
                                 }
+                                } else {
+                                  setState(() {
+                                  isLoading = false;
+                                  });
+                                  Fluttertoast.showToast(
+                                  msg: 'Profile picture upload in progress');
+                                  }
                               },
                               color: button_fill_color,
                               textColor: text_color,
@@ -680,11 +726,13 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
     StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
     StorageTaskSnapshot storageTaskSnapshot;
+    isUploadInProgress = true;
     uploadTask.onComplete.then((value) {
       if (value.error == null) {
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           photoUrl = downloadUrl;
+          isUploadInProgress = false;
           Fluttertoast.showToast(msg: "Profile picture updated successfully");
           setState(() {
             isLoading = false;
@@ -693,18 +741,21 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
           setState(() {
             isLoading = false;
           });
+          isUploadInProgress = false;
           Fluttertoast.showToast(msg: 'This file is not an image');
         });
       } else {
         setState(() {
           isLoading = false;
         });
+        isUploadInProgress = false;
         Fluttertoast.showToast(msg: 'This file is not an image');
       }
     }, onError: (err) {
       setState(() {
         isLoading = false;
       });
+      isUploadInProgress = false;
       Fluttertoast.showToast(msg: err.toString());
     });
   }
@@ -739,8 +790,14 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                 .microsecondsSinceEpoch) / 1000).toInt()
           });
       print('NAN ADd user');
+      setState(() {
+        isLoading = false;
+      });
     } catch (e) {
       print('Registration' + e);
+      setState(() {
+        isLoading = false;
+      });
     }
     Firestore.instance.collection('users').document(firebaseUser.uid)
         .collection('userLocation').document(firebaseUser.uid)

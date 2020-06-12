@@ -194,7 +194,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                   clipBehavior: Clip.hardEdge,
                                 ),
                               ),
-                              photoUrl == '' ? IconButton(
+                              photoUrl == '' || photoUrl != '' ? IconButton(
                                 icon: new SvgPicture.asset(
                                   'images/camera.svg',
                                   height: 35.0,
@@ -205,7 +205,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                 padding: EdgeInsets.all(40.0),
                                 splashColor: Colors.transparent,
                                 highlightColor: greyColor,
-                                iconSize: 20.0,
+                                iconSize: 15.0,
                               ) : Text('')
                             ],
                           ),
@@ -363,7 +363,6 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                               onChanged: (value) {
                                 businessInfo = value;
                               },
-                              keyboardType: TextInputType.phone,
                             ),
                             margin: EdgeInsets.only(
                                 left: 20.0, right: 20.0, top: 30.0),
@@ -386,6 +385,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                               child: RaisedButton(
                                   color: white_color,
                                   textColor: button_fill_color,
+                                  highlightColor: button_fill_color,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: new BorderRadius
                                         .circular(

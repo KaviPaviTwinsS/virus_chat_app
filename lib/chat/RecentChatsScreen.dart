@@ -150,7 +150,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                             child: Text(recent_chats, style: TextStyle(
                                 color: black_color,
                                 fontSize: 20.0,
-                                fontWeight: FontWeight.bold),)
+                                fontWeight: FontWeight.w500,fontFamily: 'GoogleSansFamily'),)
                         ),
 
                       ],
@@ -287,7 +287,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                     children: <Widget>[
                       usersData != null &&
                           usersData.photoUrl != null ? new Container(
-                        margin: EdgeInsets.all(15.0),
+                        margin: EdgeInsets.all(10.0),
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Material(
@@ -304,20 +304,20 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                                     padding: EdgeInsets.all(10.0),
                                   ),
                               imageUrl: usersData.photoUrl,
-                              width: 35.0,
-                              height: 35.0,
+                              width: 50.0,
+                              height: 50.0,
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.all(
-                              Radius.circular(18.0),
+                              Radius.circular(30.0),
                             ),
                             clipBehavior: Clip.hardEdge,
                           ),
                         ),
                       ) : new Container(
                           margin: EdgeInsets.all(15.0),
-                          width: 35.0,
-                          height: 35.0,
+                          width: 50.0,
+                          height: 50.0,
                           child: new SvgPicture.asset(
                             'images/user_unavailable.svg',
                             width: 35.0,
@@ -335,7 +335,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                           margin: EdgeInsets.only(left: 45.0,
                               bottom: 40.0,
                               top: 15.0,
-                              right: 15.0)) : usersData != null &&
+                              right: 5.0)) : usersData != null &&
                           usersData.status == 'LoggedOut'
                           ? Container(
                         child: new SvgPicture.asset(
@@ -345,7 +345,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                         margin: EdgeInsets.only(left: 45.0,
                             bottom: 40.0,
                             top: 15.0,
-                            right: 15.0),
+                            right: 5.0),
                       )
                           : Container(
                         child: new SvgPicture.asset(
@@ -355,7 +355,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                         margin: EdgeInsets.only(left: 45.0,
                             bottom: 40.0,
                             top: 15.0,
-                            right: 15.0),
+                            right: 5.0),
                       )
                     ],
                   ),
@@ -369,7 +369,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                         margin: EdgeInsets.only(top: 5.0),
                         child: Text(
                           capitalize(usersData.name),
-                          style: TextStyle(fontWeight: FontWeight.bold),),
+                          style: TextStyle(fontWeight: FontWeight.w500,fontFamily: 'GoogleSansFamily',color: hint_color_grey_dark),),
                       ) : Text(''),
                      /* usersData != null && usersData.name != '' ? new Container(
                         child: Text(

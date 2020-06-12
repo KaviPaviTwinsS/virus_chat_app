@@ -42,16 +42,16 @@ class NewTweetPost extends StatefulWidget {
 
 class NewTweetPostState extends State<NewTweetPost> {
 
-  final FocusNode focusNode = new FocusNode();
+  FocusNode focusNode = new FocusNode();
   bool isShowSticker;
   String imageUrl;
   File imageFile;
   bool isLoading;
   String mCurrentPhotoUrl = '';
-  final _controller = TextEditingController();
   final ScrollController listScrollController = new ScrollController();
+  TextEditingController controllerName = new TextEditingController();
+  String name = '';
 
-  String mTweetMsg = '';
   SharedPreferences preferences;
   String currentUserId = ' ';
   String signInType = ' ';
@@ -59,6 +59,7 @@ class NewTweetPostState extends State<NewTweetPost> {
   String peerAvatar;
   String currentUserName = '';
 
+  String _tweetMsg = '';
   String tappedCategoryName = '';
   String tappedCategoryImage = '';
 
@@ -75,16 +76,17 @@ class NewTweetPostState extends State<NewTweetPost> {
     isShowSticker = false;
     imageUrl = '';
     isLoading = false;
+    focusNode = new FocusNode();
     focusNode.addListener(onFocusChange);
     initialise();
-    setState(() {
-    });
+    setState(() {});
 
-    _controller.addListener(() {
-      final text = _controller.text.toLowerCase();
-      _controller.value = _controller.value.copyWith(
+    controllerName.addListener(() {
+      final text = controllerName.text;
+      controllerName.value = controllerName.value.copyWith(
         text: text,
-        selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+        selection: TextSelection(
+            baseOffset: text.length, extentOffset: text.length),
         composing: TextRange.empty,
       );
     });
@@ -98,6 +100,8 @@ class NewTweetPostState extends State<NewTweetPost> {
     print('NEW TWEET signInType $signInType');
     peerAvatar = await preferences.getString('photoUrl');
     currentUserName = await preferences.getString('name');
+    controllerName = new TextEditingController(text: name);
+
   }
 
 
@@ -105,7 +109,7 @@ class NewTweetPostState extends State<NewTweetPost> {
     if (focusNode.hasFocus) {
       // Hide sticker when keyboard appear
       setState(() {
-        isShowSticker = false;
+//        isShowSticker = false;
       });
     }
   }
@@ -113,7 +117,7 @@ class NewTweetPostState extends State<NewTweetPost> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomPadding: true,
+//        resizeToAvoidBottomPadding: true,
         /*  appBar: AppBar(
           leading: new IconButton(
               icon: Icon(Icons.arrow_back_ios), onPressed: () {
@@ -123,13 +127,13 @@ class NewTweetPostState extends State<NewTweetPost> {
           }),
           title: Text('Post Message'),
         ),*/
-        body:Stack(
+        body: Stack(
           children: <Widget>[
             Stack(
               children: <Widget>[
                 Column(
                     children: <Widget>[
-                    /*  Container(
+                      /*  Container(
                         color: white_color,
                         width: MediaQuery
                             .of(context)
@@ -137,46 +141,50 @@ class NewTweetPostState extends State<NewTweetPost> {
                             .width,
                         height: 150,
                         child:*/
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment
-                              .center,
-                          children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
-                              child: new IconButton(
-                                  icon:new SvgPicture.asset(
-                                    'images/back_icon.svg',
-                                    width: 20.0,
-                                    height: 20.0,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  }),
-                            ),
-                            new Container(
-                                margin: EdgeInsets.only(
-                                    top: 40.0, right: 10.0, bottom: 10.0),
-                                child: Text('Post Message', style: TextStyle(
-                                    color: black_color,
-                                    fontSize: TOOL_BAR_TITLE_SIZE,
-                                    fontWeight: FontWeight.w500,fontFamily: 'GoogleSansFamily'),)
-                            ),
-                          ],
-                        ),
-                      Divider(color: divider_color,thickness: 1.0,),
-
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment
+                            .center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
+                            child: new IconButton(
+                                icon: new SvgPicture.asset(
+                                  'images/back_icon.svg',
+                                  width: 20.0,
+                                  height: 20.0,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                }),
+                          ),
+                          new Container(
+                              margin: EdgeInsets.only(
+                                  top: 40.0, right: 10.0, bottom: 10.0),
+                              child: Text('Post Message', style: TextStyle(
+                                  color: black_color,
+                                  fontSize: TOOL_BAR_TITLE_SIZE,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'GoogleSansFamily'),)
+                          ),
+                        ],
+                      ),
+                      Divider(color: divider_color, thickness: 1.0,),
+                      // List of messages
+                      buildTweetInput(),
+                      // Input content
+                      buildInput(),
 //                      ),
                     ]
                 ),
 
-                Align(
+        /*        Align(
                     alignment: Alignment.bottomLeft,
                     child: Container(
                         width: MediaQuery
                             .of(context)
                             .size
                             .width,
-                      /*  height: MediaQuery
+                        *//*  height: MediaQuery
                             .of(context)
                             .size
                             .height - 100,
@@ -186,7 +194,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                               topLeft: const Radius.circular(20.0),
                               topRight: const Radius.circular(20.0),
                             )
-                        ),*/
+                        ),*//*
                         child: Container(
                           child: Column(
                             children: <Widget>[
@@ -199,7 +207,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                           ),
                         )
                     )
-                )
+                )*/
               ],
             ),
             Positioned(
@@ -207,7 +215,8 @@ class NewTweetPostState extends State<NewTweetPost> {
                   ? Container(
                 child: Center(
                   child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(progress_color)),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          progress_color)),
                 ),
                 color: Colors.white.withOpacity(0.8),
               )
@@ -323,7 +332,9 @@ class NewTweetPostState extends State<NewTweetPost> {
                 child: Text(document['categoryName'], style: TextStyle(
                     color: mCategorySelect[index].isCategorySelected
                         ? button_fill_color
-                        : greyColor,fontSize: TWEET_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),),
+                        : greyColor,
+                    fontSize: TWEET_TEXT_SIZE,
+                    fontFamily: 'GoogleSansFamily'),),
               ),
             )
           ],
@@ -357,7 +368,7 @@ class NewTweetPostState extends State<NewTweetPost> {
     return Expanded(
       child: Container(
         padding: EdgeInsets.all(10.0),
-        margin: EdgeInsets.only(top: 110.0),
+//        margin: EdgeInsets.only(top: 110.0),
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
@@ -376,6 +387,33 @@ class NewTweetPostState extends State<NewTweetPost> {
                             width: 50.0,
                             height: 50.0,
                           ),
+                      errorWidget: (context, url,
+                          error) =>
+                          Material(
+                            child: /* Image.asset(
+                                                      'images/img_not_available.jpeg',
+                                                      width: MediaQuery
+                                                          .of(context)
+                                                          .size
+                                                          .width - 30,
+                                                      height: 200.0,
+                                                      fit: BoxFit.cover,
+                                                    ),*/
+                            new SvgPicture.asset(
+                              'images/user_unavailable.svg',
+                              height: 250.0,
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width - 30,
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius
+                                .all(
+                              Radius.circular(5.0),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                          ),
                       imageUrl: mCurrentPhotoUrl,
                       width: 50.0,
                       height: 50.0,
@@ -387,22 +425,25 @@ class NewTweetPostState extends State<NewTweetPost> {
                   Expanded(
                     child: Container(
                       padding: EdgeInsets.only(left: 10.0),
-                      child: TextField(
-                        style: TextStyle(color: primaryColor, fontSize: 15.0),
-                        controller: _controller,
-                       /* onChanged: (value) {
-                          mTweetMsg = value;
-                        },*/
+                      child: TextFormField(
+                        style: TextStyle(color: black_color, fontSize: 15.0),
+                        controller: controllerName,
+//                        textCapitalization: TextCapitalization.sentences,
+                        onChanged: (value) {
+                          name = value;
+                        },
+                        textInputAction: TextInputAction.next,
                         decoration: InputDecoration.collapsed(
                           hintText: 'What\'s happening?',
-                          hintStyle: TextStyle(color: hint_color_grey_dark,fontSize: TWEET_TEXT_SIZE,fontFamily: 'GoogleSansFamily'),
+                          hintStyle: TextStyle(color: hint_color_grey_dark,
+                              fontSize: TWEET_TEXT_SIZE,
+                              fontFamily: 'GoogleSansFamily'),
                         ),
                         focusNode: focusNode,
                         autofocus: true,
                       ),
                     ),
                   ),
-
                 ],
               ),
               imageUrl != '' ? Container(
@@ -413,7 +454,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                     child: CachedNetworkImage(
                       placeholder: (context, url) =>
                           Center(
-                            child:Container(
+                            child: Container(
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<
                                     Color>(
@@ -431,7 +472,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                           ),
                       errorWidget: (context, url, error) =>
                           Material(
-                            child:/* Image.asset(
+                            child: /* Image.asset(
                               'images/img_not_available.jpeg',
                               width: 250.0,
                               height: 250.0,
@@ -466,7 +507,7 @@ class NewTweetPostState extends State<NewTweetPost> {
             ],
           ),
         ),
-       /* width: double.infinity,
+        /* width: double.infinity,
         height: 300.0,
         decoration: new BoxDecoration(
             border: new Border(
@@ -475,7 +516,6 @@ class NewTweetPostState extends State<NewTweetPost> {
       ),
     );
   }
-
 
   Widget buildInput() {
     return Container(
@@ -564,13 +604,14 @@ class NewTweetPostState extends State<NewTweetPost> {
               width: 100,
               height: 100,
               child: IconButton(
-                color: button_fill_color,
+                  color: button_fill_color,
                   icon: new SvgPicture.asset(
                     'images/Send.svg', height: 500.0,
                     width: 500.0,
+                    allowDrawingOutsideViewBox: true,
                   ),
                   onPressed: () {
-                    onSendMessage(_controller.text, imageUrl);
+                    onSendMessage(controllerName.text, imageUrl);
                   }
               ),
             ),
@@ -588,7 +629,8 @@ class NewTweetPostState extends State<NewTweetPost> {
 
 
   Future getCamera() async {
-    imageFile = await ImagePicker.pickImage(source: ImageSource.camera,imageQuality: 20);
+    imageFile =
+    await ImagePicker.pickImage(source: ImageSource.camera, imageQuality: 20);
 
     if (imageFile != null) {
       setState(() {
@@ -599,7 +641,8 @@ class NewTweetPostState extends State<NewTweetPost> {
   }
 
   Future getImage() async {
-    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery,imageQuality: 20);
+    imageFile =
+    await ImagePicker.pickImage(source: ImageSource.gallery, imageQuality: 20);
 
     if (imageFile != null) {
       setState(() {
@@ -642,13 +685,13 @@ class NewTweetPostState extends State<NewTweetPost> {
 
   Future onSendMessage(String content, String tweetPostUrl) async {
     // type: 0 = text, 1 = image, 2 = sticker
-    if (tappedCategoryName.trim() != '') {
-      if (content.trim() != '' || tweetPostUrl.trim() != '') {
-        _controller.clear();
+//    if (tappedCategoryName.trim() != '') {
+    if (content.trim() != '' || tweetPostUrl.trim() != '') {
+      controllerName.clear();
 
-        var documentReference = Firestore.instance
-            .collection('tweetPosts')
-            .document();
+      var documentReference = Firestore.instance
+          .collection('tweetPosts')
+          .document();
 /*
 
       var documentReference = Firestore.instance
@@ -675,35 +718,35 @@ class NewTweetPostState extends State<NewTweetPost> {
           );
         });*/
 
-        documentReference.setData({
-          'idFrom': currentUserId,
-          'timestamp': DateTime
-              .now()
-              .millisecondsSinceEpoch
-              .toString(),
-          'content': content,
-          'tweetPostImage': tweetPostUrl,
-          'userPhoto': mCurrentPhotoUrl,
-          'userName': currentUserName,
-          'categoryName': tappedCategoryName,
-          'categoryImage': tappedCategoryImage,
-          'createdAt': DateFormat.yMd().add_jms().format(DateTime.now())
-        });
+      documentReference.setData({
+        'idFrom': currentUserId,
+        'timestamp': DateTime
+            .now()
+            .millisecondsSinceEpoch
+            .toString(),
+        'content': content,
+        'tweetPostImage': tweetPostUrl,
+        'userPhoto': mCurrentPhotoUrl,
+        'userName': currentUserName,
+        'categoryName': tappedCategoryName,
+        'categoryImage': tappedCategoryImage,
+        'createdAt': DateFormat.yMd().add_jms().format(DateTime.now())
+      });
 //      listScrollController.animateTo(
 //          0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
-       /* Navigator.pushReplacement(context, MaterialPageRoute(
+      /* Navigator.pushReplacement(context, MaterialPageRoute(
             builder: (context) =>
                 MakeTweetPost(currentUserId, mCurrentPhotoUrl)));*/
-       Navigator.pop(context);
-        imageUrl ='';
-        _controller.clear();
-        sendMsg();
-      } else {
-        Fluttertoast.showToast(msg: 'Nothing to send');
-      }
+      Navigator.pop(context);
+      imageUrl = '';
+      controllerName.clear();
+      sendMsg();
     } else {
-      Fluttertoast.showToast(msg: select_category);
+      Fluttertoast.showToast(msg: 'Nothing to send');
     }
+    /*  } else {
+      Fluttertoast.showToast(msg: select_category);
+    }*/
   }
 
   Future sendMsg() async {
@@ -719,7 +762,7 @@ class NewTweetPostState extends State<NewTweetPost> {
   }
 
 
-  final String serverToken =SERVER_KEY;
+  final String serverToken = SERVER_KEY;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;

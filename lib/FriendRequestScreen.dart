@@ -256,6 +256,33 @@ class friendlist extends StatelessWidget {
                                           height: 70.0,
                                           padding: EdgeInsets.all(20.0),
                                         ),
+                                    errorWidget: (context, url,
+                                        error) =>
+                                        Material(
+                                          child: /* Image.asset(
+                                                      'images/img_not_available.jpeg',
+                                                      width: MediaQuery
+                                                          .of(context)
+                                                          .size
+                                                          .width - 30,
+                                                      height: 200.0,
+                                                      fit: BoxFit.cover,
+                                                    ),*/
+                                          new SvgPicture.asset(
+                                            'images/user_unavailable.svg',
+                                            height: 250.0,
+                                            width: MediaQuery
+                                                .of(context)
+                                                .size
+                                                .width - 30,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          borderRadius: BorderRadius
+                                              .all(
+                                            Radius.circular(5.0),
+                                          ),
+                                          clipBehavior: Clip.hardEdge,
+                                        ),
                                     imageUrl: document['friendPhotoUrl'],
                                     width: 70.0,
                                     height: 70.0,

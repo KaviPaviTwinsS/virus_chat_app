@@ -106,6 +106,10 @@ class SendInviteToUserState extends State<SendInviteToUser> {
     flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
+    if (!isButtonPressed) {
+      print('_________________________isButtonPressed __$isButtonPressed');
+      sendInvite();
+    }
 //    flutterLocalNotificationsPlugin.initialize(initializationSettings,);
   }
 
@@ -176,10 +180,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
 
   @override
   Widget build(BuildContext context) {
-    if (!isButtonPressed) {
-      print('_________________________isButtonPressed __$isButtonPressed');
-      sendInvite();
-    }
+
     return WillPopScope(
       onWillPop: () {
         onBackPress();
@@ -272,6 +273,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                _mUserName, style: TextStyle(
                                  fontWeight: FontWeight.w500,
                                  color: black_color,
+                                 fontSize: 15.0,
                                  fontFamily: 'GoogleSansFamily'),
                              ),
                            ),
@@ -281,14 +283,16 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                style: TextStyle(
                                    fontWeight: FontWeight.w400,
                                    fontFamily: 'GoogleSansFamily',
-                                   color: black_color),
+                                   fontSize: 13.0,
+                                   color: hint_color_grey_light),
                              ),
                            ) : Container(
                              child: Text(
                                mDifference, style: TextStyle(
                                  fontWeight: FontWeight.w400,
                                  fontFamily: 'GoogleSansFamily',
-                                 color: black_color),
+                                 fontSize: 13.0,
+                                 color: hint_color_grey_light),
                              ),
                            ),
                          ],

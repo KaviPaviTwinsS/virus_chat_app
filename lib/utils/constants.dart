@@ -21,6 +21,11 @@ double TWEET_TEXT_SIZE = 14;
 String BUSINESS_TYPE_OWNER = 'owner';
 String BUSINESS_TYPE_EMPLOYEE = 'employee';
 
+
+
+String CHAT_TYPE_BUSINESS = 'business';
+String CHAT_TYPE_USER= 'user';
+
 double TOOLBAR_BACKGROUND_RADIUS = 20;
 
 int INACTIVE_TIME = 600000; //10minutes

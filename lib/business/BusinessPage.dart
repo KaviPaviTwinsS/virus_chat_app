@@ -77,7 +77,6 @@ class BusinessPageState extends State<BusinessPage> {
     );
   }
 
-
   Widget buildLoading() {
     return Positioned(
       child: isLoading
@@ -237,7 +236,7 @@ class BusinessPageState extends State<BusinessPage> {
                      margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0),
                      child: Text(capitalize(document['businessName']),
                        style: TextStyle(fontWeight: FontWeight.w500,
-                           fontSize: 18.0,
+                           fontSize: 16.0,
                            fontFamily: 'GoogleSansFamily'),)
                  )
                      : Text(''),
@@ -247,7 +246,7 @@ class BusinessPageState extends State<BusinessPage> {
                    child: Container(
                        width: MediaQuery.of(context).size.width - 120,
                        margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,right: 10.0),
-                       child: Text(/*capitalize(document['businessDescription'],)*/'TESssssssssssssssssssssssssssssssssssssssssss',
+                       child: Text(capitalize(document['businessDescription'],),
                          overflow: TextOverflow.ellipsis,
                          style: TextStyle(fontWeight: FontWeight.w400,
                              fontSize: 12.0,

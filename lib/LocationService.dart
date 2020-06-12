@@ -185,7 +185,7 @@ class LocationService {
             .microsecondsSinceEpoch) / 1000).toInt(),
       });
 
-      if(businessType != '' || businessType == BUSINESS_TYPE_OWNER){
+    /*  if(businessType != '' || businessType == BUSINESS_TYPE_OWNER){
         databaseReference.collection('business').document(currentUserId).collection(
             'businessLocation').document(currentUserId).updateData({
           'businessLocation':
@@ -194,7 +194,7 @@ class LocationService {
               .toUtc()
               .microsecondsSinceEpoch) / 1000).toInt(),
         });
-      }
+      }*/
 //    });
 
 //    Timer(Duration(seconds: 5), () {

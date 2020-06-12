@@ -4,12 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/Login/OtpScreenPage.dart';
 import 'package:virus_chat_app/Login/otpPage.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:virus_chat_app/utils/constants.dart';
+
 
 class PhoneNumberSelectionPage extends StatelessWidget {
 
@@ -76,18 +78,32 @@ class PhoneNumberSelectionState extends State<PhoneNumberSelection> {
   String smsOTP;
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 String _mCurrentLoginType = 'phone';
+  SharedPreferences prefs;
+
+
   PhoneNumberSelectionState(String mCurrentLoginType){
     _mCurrentLoginType = mCurrentLoginType;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialise();
+
+  }
+
+
+  void initialise() async {
+    prefs = await SharedPreferences.getInstance();
+    await prefs.setString(WALK_THROUGH, 'YES');
   }
 
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        body: WillPopScope(
-            onWillPop: (){
-              onBackPress();
-            },
+        body:  WillPopScope(
+            onWillPop: () async => false,
             child: new GestureDetector(
             onTap: () {
             FocusScope.of(context).requestFocus(new FocusNode());
@@ -317,6 +333,6 @@ String _mCurrentLoginType = 'phone';
         context,
         MaterialPageRoute(
             builder: (context) => new LoginSelection()));*/
-    return Future.value(true);
+    return Future.value(false);
   }
 }
