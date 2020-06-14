@@ -22,14 +22,14 @@ import 'package:path_provider/path_provider.dart'
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/UsersList.dart';
-import 'package:virus_chat_app/audiop/MyAudioRecorder.dart';
+import 'package:virus_chat_app/business/MyAudioRecorderBusiness.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 
 
-class Chat extends StatelessWidget {
+class BusinessChat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
   final String currentUserId;
@@ -40,12 +40,13 @@ class Chat extends StatelessWidget {
 
 
   String chatType = '';
+  String businessId ='';
 
 
 
-  Chat(
+  BusinessChat(
       {Key key, @required this.currentUserId, @required this.peerId, @required this.peerAvatar, @required this.isFriend,
-        @required this.isAlreadyRequestSent, @required this.peerName,@required this.chatType})
+        @required this.isAlreadyRequestSent, @required this.peerName,@required this.chatType,this.businessId})
       : super(key: key) {
   }
 
@@ -65,20 +66,21 @@ class Chat extends StatelessWidget {
         ),
         centerTitle: true,
       ),*/
-      body: new ChatScreen(
-          currentUserId: currentUserId,
-          peerId: peerId,
-          peerAvatar: peerAvatar,
-          isFriend: isFriend,
-          isAlreadyRequestSent: isAlreadyRequestSent,
-          peerName: peerName,
+      body: new BusinessChatScreen(
+        currentUserId: currentUserId,
+        peerId: peerId,
+        peerAvatar: peerAvatar,
+        isFriend: isFriend,
+        isAlreadyRequestSent: isAlreadyRequestSent,
+        peerName: peerName,
         chatType: chatType,
+          businessId : businessId
       ),
     );
   }
 }
 
-class ChatScreen extends StatefulWidget {
+class BusinessChatScreen extends StatefulWidget {
   final String peerId;
   final String peerAvatar;
   final String currentUserId;
@@ -86,29 +88,32 @@ class ChatScreen extends StatefulWidget {
   bool isAlreadyRequestSent;
   String peerName;
   String chatType;
+  String businessId;
 
-  ChatScreen({Key key, @required this.currentUserId, @required this.peerId,
-    @required this.peerAvatar, @required this.isFriend, @required this.isAlreadyRequestSent, @required this.peerName,@required this.chatType})
+  BusinessChatScreen({Key key, @required this.currentUserId, @required this.peerId,
+    @required this.peerAvatar, @required this.isFriend, @required this.isAlreadyRequestSent, @required this.peerName,@required this.chatType
+  ,@required this.businessId})
       : super(key: key);
 
   @override
   State createState() =>
-      new ChatScreenState(currentUserId: currentUserId,
+      new BusinessChatScreenState(currentUserId: currentUserId,
           peerId: peerId,
           peerAvatar: peerAvatar,
           isFriend: isFriend,
           isAlreadyRequestSent: isAlreadyRequestSent,
-          peerName: peerName,chatType:chatType);
+          peerName: peerName,chatType:chatType,businessId:businessId);
 }
 
 abstract class audioListener {
   void audioListenerPath(String mAudioPath);
 }
 
-class ChatScreenState extends State<ChatScreen> implements audioListener {
-  ChatScreenState(
+class BusinessChatScreenState extends State<BusinessChatScreen> implements audioListener {
+  BusinessChatScreenState(
       {Key key, @required this.currentUserId, @required this.peerId, @required this.peerAvatar,
-        @required this.isFriend, @required this.isAlreadyRequestSent, @required this.peerName,@required this.chatType});
+        @required this.isFriend, @required this.isAlreadyRequestSent, @required this.peerName,@required this.chatType
+      ,@required this.businessId});
 
   String peerId;
   String peerAvatar;
@@ -118,6 +123,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   bool isAlreadyRequestSent;
   String id;
   String peerName;
+  String businessId;
 
   var listMessage;
   String groupChatId;
@@ -131,7 +137,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   final ScrollController listScrollController = new ScrollController();
   final FocusNode focusNode = new FocusNode();
 
-  MyAudioRecorder recorder;
+  MyAudioRecorderBusiness recorder;
   String mAudioPath = '';
   String _friendToken = '';
   String currentUserName = '';
@@ -163,7 +169,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
-    recorder = new MyAudioRecorder(this);
+    recorder = new MyAudioRecorderBusiness(this);
     readLocal();
 
 
@@ -245,12 +251,34 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
     prefs = await SharedPreferences.getInstance();
 //    id = prefs.getString('userId') ?? '';
     id = currentUserId == '' ? prefs.getString('userId') : currentUserId;
+//    id =currentUserId;
     print('RECENT CHAT $id ___________peer $peerId');
 
     if (id.hashCode <= peerId.hashCode) {
       groupChatId = '$id-$peerId';
     } else {
       groupChatId = '$peerId-$id';
+    }
+
+
+    if(businessId != '' && id != '' && peerId != '') {
+      QuerySnapshot mDocuments = await Firestore.instance.collection('chatRooms')
+          .where('storeId', isEqualTo: businessId)
+          .where('userId', isEqualTo: id)
+          .where('employeeId', isEqualTo: peerId)
+          .where('isCreated', isEqualTo: true).getDocuments();
+      final List<DocumentSnapshot> documents = mDocuments.documents;
+
+      if (documents.length != 0){
+        var mReferenceId = documents[0].documentID;
+        print('Business chat documentId ${documents[0].documentID}');
+        Firestore.instance.collection('chatRooms')
+            .document(mReferenceId).updateData({
+          'isCreated':false
+        });
+      }else{
+        print('Business chat documentId Empty');
+      }
     }
 
     try {
@@ -384,7 +412,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           .millisecondsSinceEpoch
           .toString();
       var documentReference = Firestore.instance
-          .collection('messages')
+          .collection('BusinessMessages')
           .document(groupChatId)
           .collection(groupChatId)
           .document(currTime);
@@ -1285,7 +1313,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Container(
-//                    color: white_color,
+                    color: white_color,
                     width: MediaQuery
                         .of(context)
                         .size
@@ -1869,53 +1897,56 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
   Widget buildListMessage() {
     print('chatType_$chatType');
 //    groupChatId = '$peerId-$id';
-    return Flexible(
-      child: groupChatId == ''
-          ? Center(child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(progress_color)))
-          : StreamBuilder(
-        stream: Firestore.instance
-            .collection('messages')
-            .document(groupChatId)
-            .collection(groupChatId)
-            .orderBy('timestamp', descending: true)
-            .limit(20)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            print(
-                'chat ___buildListMessage _____________NOTTT______$groupChatId ___');
+    return Expanded(
+        child:Container(
+          color: white_color,
+          child:  groupChatId == ''
+            ? Center(child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(progress_color)))
+            : StreamBuilder(
+          stream: Firestore.instance
+              .collection('BusinessMessages')
+              .document(groupChatId)
+              .collection(groupChatId)
+              .orderBy('timestamp', descending: true)
+              .limit(20)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              print(
+                  'chat ___buildListMessage _____________NOTTT______$groupChatId ___');
 
-            return Center(
-                child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
-          } else {
-            listMessage = snapshot.data.documents;
+              return Center(
+                  child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
+            } else {
+              listMessage = snapshot.data.documents;
 //            len = snapshot.data.documents.length;
 //            mList = listMessage;
 //            len = mList.length;
-            for (int i = 0; i < snapshot.data.documents.length; i++) {
-              DocumentSnapshot documentSnapshot = snapshot.data.documents[i];
-              if (documentSnapshot['idFrom'] == id) {} else {
-                len = len + 1;
+              for (int i = 0; i < snapshot.data.documents.length; i++) {
+                DocumentSnapshot documentSnapshot = snapshot.data.documents[i];
+                if (documentSnapshot['idFrom'] == id) {} else {
+                  len = len + 1;
 //                isFirstMessageLeft(i);
+                }
               }
-            }
 
-            for (int j = 0; j < mList.length; j++) {
-              print('MESSSAGELISTTTTT ${mList[j].isSelected} _____${mList[j]
-                  .index}');
-            }
-            return ListView.builder(
+              for (int j = 0; j < mList.length; j++) {
+                print('MESSSAGELISTTTTT ${mList[j].isSelected} _____${mList[j]
+                    .index}');
+              }
+              return ListView.builder(
 //              padding: EdgeInsets.all(10.0),
-              itemBuilder: (context, index) =>
-                  buildItem(index, listMessage[index]),
-              itemCount: listMessage.length,
-              reverse: true,
-              controller: listScrollController,
-            );
-          }
-        },
+                itemBuilder: (context, index) =>
+                    buildItem(index, listMessage[index]),
+                itemCount: listMessage.length,
+                reverse: true,
+                controller: listScrollController,
+              );
+            }
+          },
+        ),
       ),
     );
   }

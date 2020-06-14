@@ -92,6 +92,8 @@ class UsersListState extends State<UsersList>
   bool sliderChanged = true;
   double _msliderData = 100.0;
 
+  String _currentUserBusinessId = '';
+
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
 
   UsersListState(String currentUserId, String signInType, String mphotoUrl) {
@@ -113,6 +115,7 @@ class UsersListState extends State<UsersList>
     currentUserName = await prefs.getString('name');
     currentUser = await prefs.getString('userId');
     currentUserPhotoUrl = await prefs.getString('photoUrl');
+    _currentUserBusinessId = await prefs.getString('BUSINESS_ID');
     if (userSignInType == '') {
       userSignInType = await prefs.getString('signInType');
     }
@@ -180,8 +183,13 @@ class UsersListState extends State<UsersList>
 //    } on PlatformException {
 //      print('Failed to get platform version');
 //    }
-    firebaseMessaging.requestNotificationPermissions(
-        const IosNotificationSettings(sound: true, badge: true, alert: true));
+    var initializationSettingsAndroid =
+    new AndroidInitializationSettings('app_icon');
+    new AndroidInitializationSettings('app_icon');
+    var initializationSettingsIOS = new IOSInitializationSettings();
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
     firebaseMessaging.onIosSettingsRegistered
         .listen((IosNotificationSettings settings) {
       print("Settings registered: $settings");
@@ -193,7 +201,28 @@ class UsersListState extends State<UsersList>
       print(token);
     });
   }
+/*
 
+
+  Future onSelectNotification(String payload) async {
+    if(notifyId == '1000'*//* && !isOpened*//*) {
+      print('________1000');
+//      isOpened = true;
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  BusinessChat(
+                    currentUserId: businessId,
+                    peerId: userId,
+                    peerAvatar: photoUrl,
+                    isFriend: true,
+                    isAlreadyRequestSent: true,
+                    peerName: name,
+                    chatType: CHAT_TYPE_BUSINESS,
+                  )));
+    }
+  }*/
 /*
   void initializeNotify() async{
     var initializationSettingsAndroid =
@@ -648,8 +677,9 @@ class UsersListState extends State<UsersList>
                                     fontWeight: FontWeight.w500),)
                             ),
                           ),
-                          new BusinessListPage(
-                              currentUser, currentUserPhotoUrl),
+                          currentUser != '' && currentUser != null
+                              ?new BusinessListPage(
+                              currentUser, currentUserPhotoUrl,_currentUserBusinessId) : Container(),
                           /*
                           Align(
                             alignment: Alignment.bottomLeft,
@@ -2002,35 +2032,43 @@ class BusinessListPage extends StatelessWidget {
 
   SharedPreferences _preferences;
   String _userStatus = '';
-
+  String _currentUserBusinessType = '';
+  String _currentUserBusinessId= '';
 
   List<BusinessData> _mBusinessData = new List<BusinessData>();
   final ScrollController listScrollController = new ScrollController();
 
 
-  BusinessListPage(String currentUser, String photoUrl) {
+  BusinessListPage(String currentUser, String photoUrl,String currentUserBusinessId) {
     currentUserId = currentUser;
     mphotoUrl = photoUrl;
+    _currentUserBusinessId = currentUserBusinessId;
     initialise();
   }
 
   void initialise() async {
     _preferences = await SharedPreferences.getInstance();
     _userStatus = await _preferences.getString('USERSTATUS');
+    _currentUserBusinessType = await _preferences.getString('BUSINESS_TYPE');
 
-    var query = await Firestore.instance.collection('business').getDocuments();
+
+  /*  var query = await Firestore.instance.collection('business').getDocuments();
 
     if (query.documents.length != 0) {
       query.documents.forEach((doc) {
-        _mBusinessData.add(BusinessData(businessId: doc.data['businessId'],
-            businessName: doc.data['businessName'],
-            businessDistance: doc.data['businessDistance'],
-            businessPhotoUrl: doc.data['photoUrl'],
-            businessStatus: doc.data['status']));
+        if( doc.data['businessId'] ==_currentUserBusinessId && (_currentUserBusinessType == BUSINESS_TYPE_OWNER || _currentUserBusinessType == BUSINESS_TYPE_EMPLOYEE)){
+
+        }else {
+          _mBusinessData.add(BusinessData(businessId: doc.data['businessId'],
+              businessName: doc.data['businessName'],
+              businessDistance: doc.data['businessDistance'],
+              businessPhotoUrl: doc.data['photoUrl'],
+              businessStatus: doc.data['status']));
+        }
       });
     } else {
 
-    }
+    }*/
     if (currentUserId != '' && currentUserId != null)
       getCurrentUserLocation(currentUserId);
   }
@@ -2101,7 +2139,7 @@ class BusinessListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('LoginUsersList _________________ ${new DateTime.now()}');
+    print('LoginUsersList _________________BUSINEDS ${new DateTime.now()}');
     return new StreamBuilder(
       stream: Firestore.instance.collection('business') /*.where(
           'businessDistanceISWITHINRADIUS', isEqualTo: 'YES')*/ /*.where(
@@ -2121,8 +2159,8 @@ class BusinessListPage extends StatelessWidget {
             ) : new ListView(
                 scrollDirection: Axis.horizontal,
                 children: snapshot.data.documents.map((document) {
-//                  print('Document idddd ${document.documentID}');
-                  if (document.documentID != currentUserId) {
+                  print('Document idddd ${_currentUserBusinessId}');
+                  if (document['businessId'] != _currentUserBusinessId) {
 //                    updateUserStatus();
 //                    if (document['businessType'] == BUSINESS_TYPE_OWNER ||
 //                        document['businessType'] == '') {
@@ -2226,15 +2264,12 @@ class BusinessListPage extends StatelessWidget {
                     }*/
                   } else {
                     return Container(
-                        margin: EdgeInsets.only(left: 20.0, top: 20.0),
-                        child: Center(
-                          child: Text(noBusiness),
-                        )
+//                        margin: EdgeInsets.only(left: 20.0, top: 20.0),
+//                        child: Center(
+//                          child: Text(''),
+//                        )
                     );
                   }
-                  return new ListTile(
-                      title: new Text(document['name']),
-                      subtitle: new Text(document['status']));
                 }).toList()
             )
         );

@@ -577,6 +577,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
 
                                       Container(
                                         child: TextField(
+                                          readOnly: true,
                                           decoration: new InputDecoration(
                                             contentPadding: new EdgeInsets.all(
                                                 15.0),
@@ -967,7 +968,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                 )
                                     : Text(''),
 
-                                businessId == '' || businessId == null || (businessId != ''  && _mBusinessType == BUSINESS_TYPE_EMPLOYEE ) ? Align(
+                                businessId == '' || businessId == null/* || (businessId != ''  && _mBusinessType == BUSINESS_TYPE_EMPLOYEE )*/ ? Align(
                                     alignment: Alignment.bottomRight,
                                     child: GestureDetector(
                                       onTap: () {

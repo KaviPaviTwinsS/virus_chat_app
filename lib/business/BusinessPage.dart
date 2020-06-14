@@ -197,8 +197,8 @@ class BusinessPageState extends State<BusinessPage> {
                               width: 15.0,
 //                                          color: primaryColor,
                             ),
-                            margin: EdgeInsets.only(left: 60.0,
-                                bottom: 30.0,
+                            margin: EdgeInsets.only(left: 55.0,
+                                bottom: 40.0,
                                 top: 15.0,
                                 right: 15.0)) : document['status'] ==
                             'LoggedOut' ? Container(
@@ -208,8 +208,8 @@ class BusinessPageState extends State<BusinessPage> {
                             width: 15.0,
 //                                        color: primaryColor,
                           ),
-                          margin: EdgeInsets.only(left: 60.0,
-                              bottom: 30.0,
+                          margin: EdgeInsets.only(left: 55.0,
+                              bottom: 40.0,
                               top: 15.0,
                               right: 15.0),
                         ) : Container(
@@ -218,8 +218,8 @@ class BusinessPageState extends State<BusinessPage> {
                             width: 15.0,
 //                                        color: primaryColor,
                           ),
-                          margin: EdgeInsets.only(left: 60.0,
-                              bottom: 30.0,
+                          margin: EdgeInsets.only(left: 55.0,
+                              bottom: 40.0,
                               top: 15.0,
                               right: 15.0),
                         )

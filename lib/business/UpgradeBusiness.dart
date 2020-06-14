@@ -480,7 +480,8 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
           'businessId': reference.documentID,
           'businessDescription': businessInfo,
           'ownerName': _ownerName,
-          'createdAt': currTime
+          'createdAt': currTime,
+          'businessChatPeriority': 0,
         }).whenComplete(() =>
         {
           Firestore.instance.collection('users').document(userId).updateData({

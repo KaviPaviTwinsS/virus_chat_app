@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'package:intl/intl.dart';
+
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,7 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/business/BusinessChatData.dart';
-import 'package:virus_chat_app/chat/chat.dart';
+import 'package:virus_chat_app/business/BusinessChat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -15,6 +19,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:virus_chat_app/utils/constants.dart';
+import 'package:virus_chat_app/business/BusinessRecentChats.dart';
 
 
 class BusinessDetailPage extends StatefulWidget {
@@ -48,9 +53,12 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
   SharedPreferences preferences;
 
   String _currentUserId = '';
+  String _currentUserName ='';
   List<DocumentSnapshot> documents = new List<DocumentSnapshot>();
 
   bool isLoading = false;
+
+  bool isCurrentUserCanChat = false;
 
   BusinessDetailPageState(String businessId, String businessName) {
     _businessId = businessId;
@@ -63,12 +71,43 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
     super.initState();
   }
 
+  Future onSelectNotification(String payload) async {
+    print('BUsiness detail nottify $_businessChatData ____ $notifyId');
+    if(notifyId == '1000'/* && !isOpened*/) {
+      print('________1000');
+//      isOpened = true;
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  BusinessChat(
+                    currentUserId: businessId,
+                    peerId: userId,
+                    peerAvatar: photoUrl,
+                    isFriend: true,
+                    isAlreadyRequestSent: true,
+                    peerName: name,
+                    chatType: CHAT_TYPE_BUSINESS,
+                  )));
+    }
+  }
 
   void initialise() async {
     preferences = await SharedPreferences.getInstance();
     _currentUserId = await preferences.getString('userId');
+    _currentUserName =await preferences.getString('name');
     _currentUserBusinessType = await preferences.getString('BUSINESS_TYPE');
     _currentUserBusinessId = await preferences.getString('BUSINESS_ID');
+
+    if(_currentUserBusinessId != ''){
+      if(_currentUserBusinessId == _businessId) {
+        isCurrentUserCanChat = false;
+      }else{
+        isCurrentUserCanChat = true;
+      }
+    }else{
+      isCurrentUserCanChat = true;
+    }
     setState(() {
       isLoading = true;
     });
@@ -180,6 +219,29 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                               fontSize: 20.0,
                               fontWeight: FontWeight.w500),)
                       ),
+                      Spacer(),
+                      (_currentUserBusinessType == BUSINESS_TYPE_EMPLOYEE  || _currentUserBusinessType == BUSINESS_TYPE_OWNER)&& _businessId == _currentUserBusinessId? Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            margin: EdgeInsets.only(
+                                top: 40.0, right: 10.0, bottom: 5.0,left: 10.0),
+                            child: IconButton(
+                              icon: new SvgPicture.asset(
+                                'images/business_conversation.svg',
+                                height: 20.0,
+                                width: 20.0,
+                                color: black_color,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            BusinessRecentChats(_currentUserId,_businessImage,_businessId)));
+                              },
+                            ),
+                          )
+                      ) : Container()
                     ],
                   ),
                   Divider(color: divider_color, thickness: 1.0,),
@@ -190,17 +252,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                   alignment: Alignment.bottomLeft,
                   child: Stack(
                     children: <Widget>[
-                      Positioned(
-                          child: isLoading
-                              ? Container(
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      progress_color)),
-                            ),
-                            color: Colors.white.withOpacity(0.8),
-                          ) : Container()
-                      ),
+
                       Stack(
                         children: <Widget>[
                           Column(
@@ -370,27 +422,39 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                               )
                             ],
                           ),
-                          Align(
+                          isCurrentUserCanChat ?  Align(
                             alignment: Alignment.bottomRight,
                             child: Container(
                               width: 100,
                               height: 100,
                               child: IconButton(
                                 icon: new SvgPicture.asset(
-                                  'images/business_chat.svg', height: 500.0,
+                                  'images/business_chat.svg',
+                                  height: 500.0,
                                   width: 500.0,
                                 ),
                                 onPressed: () {
-                                  getBusinessUsers();
+                                  StartBusinessChat();
                                 },
                               ),
                             ),
-                          )
+                          ) : Container()
                         ],
                       ),
                     ],
                   )
-              )
+              ),
+              Positioned(
+                  child: isLoading
+                      ? Container(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              progress_color)),
+                    ),
+                    color: Colors.white.withOpacity(0.8),
+                  ) : Container()
+              ),
             ],
           ),
         )
@@ -503,12 +567,12 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
               if (!isChatOpened) {
                 isChatOpened = true;
                 sendAndRetrieveMessage(mIsChatOneListData.userToken,
-                    mIsChatOneListData.businessName);
+                    mIsChatOneListData.businessName,mIsChatOneListData);
                 Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            Chat(
+                            BusinessChat(
                               currentUserId: _businessId,
                               peerId: mIsChatOneListData.userId,
                               peerAvatar: mIsChatOneListData.photoUrl,
@@ -533,7 +597,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Chat(
+                                  BusinessChat(
                                     currentUserId: _businessId,
                                     peerId: documentReference.data['id'],
                                     peerAvatar: documentReference
@@ -575,12 +639,12 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
               if (!isChatOpened) {
                 isChatOpened = true;
                 sendAndRetrieveMessage(mIsChatTwoListData.userToken,
-                    mIsChatTwoListData.businessName);
+                    mIsChatTwoListData.businessName,mIsChatTwoListData);
                 Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            Chat(
+                            BusinessChat(
                               currentUserId: _businessId,
                               peerId: mIsChatTwoListData.userId,
                               peerAvatar: mIsChatTwoListData.photoUrl,
@@ -605,7 +669,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Chat(
+                                  BusinessChat(
                                     currentUserId: _businessId,
                                     peerId: documentReference.data['id'],
                                     peerAvatar: documentReference
@@ -647,12 +711,12 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
               if (!isChatOpened) {
                 isChatOpened = true;
                 sendAndRetrieveMessage(mIsChatThreeListData.userToken,
-                    mIsChatThreeListData.businessName);
+                    mIsChatThreeListData.businessName,mIsChatThreeListData);
                 Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            Chat(
+                            BusinessChat(
                               currentUserId: _businessId,
                               peerId: mIsChatThreeListData.userId,
                               peerAvatar: mIsChatThreeListData.photoUrl,
@@ -677,7 +741,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Chat(
+                                  BusinessChat(
                                     currentUserId: _businessId,
                                     peerId: documentReference.data['id'],
                                     peerAvatar: documentReference
@@ -723,12 +787,12 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
               if (!isChatOpened) {
                 isChatOpened = true;
                 sendAndRetrieveMessage(mIsChatFourListData.userToken,
-                    mIsChatFourListData.businessName);
+                    mIsChatFourListData.businessName,mIsChatFourListData);
                 Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            Chat(
+                            BusinessChat(
                               currentUserId: _businessId,
                               peerId: mIsChatFourListData.userId,
                               peerAvatar: mIsChatFourListData.photoUrl,
@@ -753,7 +817,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Chat(
+                                  BusinessChat(
                                     currentUserId: _businessId,
                                     peerId: documentReference.data['id'],
                                     peerAvatar: documentReference
@@ -805,25 +869,395 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
           .where('status', isEqualTo: 'ACTIVE')
           .getDocuments().then((result) {
         List<BusinessChatData> mChatList = List<BusinessChatData>();
-        for (var number in result.documents) {
-          var index = result.documents.indexOf(number);
-          var reference = result.documents
-              .elementAt(index)
-              .data;
-          var _businessChatPeriority = 0;
-          if (reference.containsKey('businessChatPeriority')) {
-            _businessChatPeriority = reference['businessChatPeriority'];
-          } else {
-            _businessChatPeriority = 0;
+        var userListData = result.documents;
+        if (userListData.length != 0) {
+          for (var number in result.documents) {
+            var index = result.documents.indexOf(number);
+            var reference = result.documents
+                .elementAt(index)
+                .data;
+            var _businessChatPeriority = 0;
+            if (reference.containsKey('businessChatPeriority')) {
+              _businessChatPeriority = reference['businessChatPeriority'];
+            } else {
+              _businessChatPeriority = 0;
+            }
+            mChatList.add(BusinessChatData(businessId: reference['businessId'],
+                businessChatPriority: reference['businessChatPeriority'],
+                userId: reference['id'],
+                name: reference['name'],
+                photoUrl: reference['photoUrl'],
+                userToken: reference['user_token'],
+                businessName: reference['businessName'],
+                businessType: reference['businessType'],
+                userStatus: reference['status']));
           }
-          mChatList.add(BusinessChatData(businessId: reference['businessId'],
-              businessChatPriority: reference['businessChatPeriority'],
-              userId: reference['id'],
-              name: reference['name'],
-              photoUrl: reference['photoUrl'],
-              userToken: reference['user_token'],
-              businessName: reference['businessName'],
-              businessChatWith: reference['businessChatWith']));
+
+          var isPriorityOne = false; //is priority 0
+          var isPriorityTwo = false; //is priority 1
+          var isPriorityThree = false; //is priority 2
+          var isPriorityFour = false; //is priority 3
+
+          var employeeOneData = BusinessChatData(); //priority 0 data
+          var employeeTwoData = BusinessChatData(); //priority 1 data
+          var employeeThreeData = BusinessChatData(); //priority 2 data
+          var employeeFourData = BusinessChatData(); //priority 3 data
+
+
+          var isChatOpened = false;
+
+          var employeeCount = 0;
+          var ownerCount = 0;
+          var ownerId = '';
+
+          /**
+           * To find the owner and employee count
+           */
+          for (var mValue in mChatList) {
+            var index = mChatList.indexOf(mValue); // through an index
+            var businessType = mChatList
+                .elementAt(index)
+                .businessType;
+            if (businessType == BUSINESS_TYPE_EMPLOYEE)
+              employeeCount = employeeCount + 1;
+            else if (businessType == BUSINESS_TYPE_OWNER) {
+              ownerCount = ownerCount + 1;
+              ownerId = mChatList
+                  .elementAt(index)
+                  .userId;
+            }
+          }
+
+          var ownerAvailable = false;
+          var employeeAvailable = false;
+
+          if (employeeCount == 0) {
+            if (ownerCount == 0) {
+              Fluttertoast.showToast(
+                  msg: 'Business Owner not available');
+            } else {
+              /**
+               * To assign owner as a contact person for the user if employees not available
+               */
+              for (var mValue in mChatList) {
+                var index = mChatList.indexOf(mValue); // through an index
+                var myCurrentChatPriority = mChatList
+                    .elementAt(index)
+                    .businessChatPriority;
+                var businessType = mChatList
+                    .elementAt(index)
+                    .businessType;
+                var businessOwnerId = mChatList
+                    .elementAt(index)
+                    .userId;
+                if (myCurrentChatPriority == 0) {
+                  isPriorityOne = true;
+                  if (businessType == BUSINESS_TYPE_OWNER &&
+                      businessOwnerId != _currentUserId) {
+                    employeeOneData = mChatList.elementAt(index);
+                    ownerAvailable = true;
+                  }
+                } else if (myCurrentChatPriority == 1) {
+                  isPriorityTwo = true;
+                  if (businessType == BUSINESS_TYPE_OWNER &&
+                      businessOwnerId != _currentUserId) {
+                    employeeTwoData = mChatList.elementAt(index);
+                    ownerAvailable = true;
+                  }
+                } else if (myCurrentChatPriority == 2) {
+                  isPriorityThree = true;
+                  if (businessType == BUSINESS_TYPE_OWNER &&
+                      businessOwnerId != _currentUserId) {
+                    employeeThreeData = mChatList.elementAt(index);
+                    ownerAvailable = true;
+                  }
+                } else {
+                  isPriorityFour = true;
+                  Firestore.instance.collection('users')
+                      .document(employeeFourData.userId)
+                      .updateData({
+                    'businessChatPeriority': 0,
+                  });
+                  if (businessType == BUSINESS_TYPE_OWNER &&
+                      businessOwnerId != _currentUserId) {
+                    ownerAvailable = true;
+                    employeeFourData = mChatList.elementAt(index);
+                  }
+                }
+              }
+            }
+          } else {
+            for (var mValue in mChatList) {
+              var index = mChatList.indexOf(mValue); // through an index
+              var myCurrentChatPriority = mChatList
+                  .elementAt(index)
+                  .businessChatPriority;
+              var businessType = mChatList
+                  .elementAt(index)
+                  .businessType;
+              var businessEmployeeId = mChatList
+                  .elementAt(index)
+                  .userId;
+              print(
+                  '______________________INDEX________$index __________myCurrentChatPriority __$myCurrentChatPriority');
+
+              if (myCurrentChatPriority == 0) {
+                isPriorityOne = true;
+                if (businessType == BUSINESS_TYPE_EMPLOYEE &&
+                    businessEmployeeId != _currentUserId) {
+                  employeeOneData = mChatList.elementAt(index);
+                  employeeAvailable = true;
+                }
+              } else if (myCurrentChatPriority == 1) {
+                isPriorityTwo = true;
+                if (businessType == BUSINESS_TYPE_EMPLOYEE &&
+                    businessEmployeeId != _currentUserId) {
+                  employeeTwoData = mChatList.elementAt(index);
+                  employeeAvailable = true;
+                }
+              } else if (myCurrentChatPriority == 2) {
+                isPriorityThree = true;
+                if (businessType == BUSINESS_TYPE_EMPLOYEE &&
+                    businessEmployeeId != _currentUserId) {
+                  employeeThreeData = mChatList.elementAt(index);
+                  employeeAvailable = true;
+                }
+              } else {
+                isPriorityFour = true;
+                Firestore.instance.collection('users')
+                    .document(employeeFourData.userId)
+                    .updateData({
+                  'businessChatPeriority': 0,
+                });
+                if (businessType == BUSINESS_TYPE_EMPLOYEE &&
+                    businessEmployeeId != _currentUserId) {
+                  employeeFourData = mChatList.elementAt(index);
+                  employeeAvailable = true;
+                }
+              }
+            }
+          }
+
+          if (employeeAvailable || ownerAvailable) {
+            if (isPriorityOne) {
+              Firestore.instance.collection('users')
+                  .document(employeeOneData.userId)
+                  .updateData({
+                'businessChatPeriority': 1,
+              }).whenComplete(() {
+                Firestore.instance.collection('chatRooms').add({
+                  'createDate': DateFormat.yMd().add_jms().format(
+                      DateTime.now()),
+                  'employeeId': employeeOneData.userId,
+                  'isCreated': true,
+                  'storeId': _businessId,
+                  'userId': _currentUserId,
+                  'employeeName' : employeeOneData.name,
+                  'userName':_currentUserName,
+                  'employeePhotoUrl':employeeOneData.photoUrl,
+                  'employeeStatus': employeeOneData.userStatus
+                }).whenComplete(() {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  if (!isChatOpened) {
+                    isChatOpened = true;
+                    sendAndRetrieveMessage(employeeOneData.userToken,
+                        employeeOneData.businessName,employeeOneData);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                BusinessChat(
+                                  currentUserId: _currentUserId,
+                                  peerId: employeeOneData.userId,
+                                  peerAvatar: employeeOneData.photoUrl,
+                                  isFriend: true,
+                                  isAlreadyRequestSent: true,
+                                  peerName: employeeOneData.name,
+                                  chatType: CHAT_TYPE_BUSINESS,
+                                )));
+                  } else {
+//                Fluttertoast.showToast(
+//                    msg: 'Business user 0 ');
+                  }
+                });
+              });
+            } else if (isPriorityTwo) {
+              Firestore.instance.collection('users')
+                  .document(employeeTwoData.userId)
+                  .updateData({
+                'businessChatPeriority': 2,
+              }).whenComplete(() {
+               /* Firestore.instance.collection('chatRooms').document(
+                    _currentUserId).setData({
+                  'createDate': DateFormat.yMd().add_jms().format(
+                      DateTime.now()),
+                  'employeeId': employeeTwoData.userId,
+                  'isCreated': true,
+                  'storeId': _businessId,
+                  'userId': _currentUserId
+                }).*/
+                Firestore.instance.collection('chatRooms').add({
+                  'createDate': DateFormat.yMd().add_jms().format(
+                      DateTime.now()),
+                  'employeeId': employeeTwoData.userId,
+                  'isCreated': true,
+                  'storeId': _businessId,
+                  'userId': _currentUserId,
+                  'employeeName' : employeeTwoData.name,
+                  'userName':_currentUserName,
+                  'employeePhotoUrl':employeeTwoData.photoUrl,
+                  'employeeStatus': employeeTwoData.userStatus
+                }).whenComplete(() {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  if (!isChatOpened) {
+                    isChatOpened = true;
+                    sendAndRetrieveMessage(employeeTwoData.userToken,
+                        employeeTwoData.businessName,employeeTwoData);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                BusinessChat(
+                                  currentUserId: _currentUserId,
+                                  peerId: employeeTwoData.userId,
+                                  peerAvatar: employeeTwoData.photoUrl,
+                                  isFriend: true,
+                                  isAlreadyRequestSent: true,
+                                  peerName: employeeTwoData.name,
+                                  chatType: CHAT_TYPE_BUSINESS,
+                                )));
+                  } else {
+//                Fluttertoast.showToast(
+//                    msg: 'Business user 0 ');
+                  }
+                });
+              });
+            } else if (isPriorityThree) {
+              Firestore.instance.collection('users')
+                  .document(employeeThreeData.userId)
+                  .updateData({
+                'businessChatPeriority': 3,
+              }).whenComplete(() {
+                Firestore.instance.collection('chatRooms').add({
+                  'createDate': DateFormat.yMd().add_jms().format(
+                      DateTime.now()),
+                  'employeeId': employeeThreeData.userId,
+                  'isCreated': true,
+                  'storeId': _businessId,
+                  'userId': _currentUserId,
+                  'employeeName' : employeeThreeData.name,
+                  'userName':_currentUserName,
+                  'employeePhotoUrl':employeeThreeData.photoUrl,
+                  'employeeStatus': employeeThreeData.userStatus
+                })/*;
+                Firestore.instance.collection('chatRooms').document(
+                    _currentUserId).setData({
+                  'createDate': DateFormat.yMd().add_jms().format(
+                      DateTime.now()),
+                  'employeeId': employeeThreeData.userId,
+                  'isCreated': true,
+                  'storeId': _businessId,
+                  'userId': _currentUserId
+                })*/.whenComplete(() {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  if (!isChatOpened) {
+                    isChatOpened = true;
+                    sendAndRetrieveMessage(employeeThreeData.userToken,
+                        employeeThreeData.businessName,employeeThreeData);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                BusinessChat(
+                                  currentUserId: _currentUserId,
+                                  peerId: employeeThreeData.userId,
+                                  peerAvatar: employeeThreeData.photoUrl,
+                                  isFriend: true,
+                                  isAlreadyRequestSent: true,
+                                  peerName: employeeThreeData.name,
+                                  chatType: CHAT_TYPE_BUSINESS,
+                                )));
+                  } else {
+//                Fluttertoast.showToast(
+//                    msg: 'Business user 0 ');
+                  }
+                });
+              });
+            } else if (isPriorityFour) {
+              Firestore.instance.collection('users')
+                  .document(employeeFourData.userId)
+                  .updateData({
+                'businessChatPeriority': 0,
+              }).whenComplete(() {
+                Firestore.instance.collection('chatRooms').add({
+                  'createDate': DateFormat.yMd().add_jms().format(
+                      DateTime.now()),
+                  'employeeId': employeeFourData.userId,
+                  'isCreated': true,
+                  'storeId': _businessId,
+                  'userId': _currentUserId,
+                  'employeeName' : employeeFourData.name,
+                  'userName':_currentUserName,
+                  'employeePhotoUrl':employeeFourData.photoUrl,
+                  'employeeStatus': employeeFourData.userStatus
+                }).
+               /* Firestore.instance.collection('chatRooms').document(
+                    _currentUserId).setData({
+                  'createDate': DateFormat.yMd().add_jms().format(
+                      DateTime.now()),
+                  'employeeId': employeeFourData.userId,
+                  'isCreated': true,
+                  'storeId': _businessId,
+                  'userId': _currentUserId
+                }).*/whenComplete(() {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  if (!isChatOpened) {
+                    isChatOpened = true;
+                    sendAndRetrieveMessage(employeeFourData.userToken,
+                        employeeFourData.businessName,employeeFourData);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                BusinessChat(
+                                  currentUserId: _currentUserId,
+                                  peerId: employeeFourData.userId,
+                                  peerAvatar: employeeFourData.photoUrl,
+                                  isFriend: true,
+                                  isAlreadyRequestSent: true,
+                                  peerName: employeeFourData.name,
+                                  chatType: CHAT_TYPE_BUSINESS,
+                                )));
+                  } else {
+//              Fluttertoast.showToast(
+//                  msg: 'Business user 0 ');
+                  }
+                });
+              }
+              );
+            }
+          } else {
+            if (!ownerAvailable) {
+              Fluttertoast.showToast(
+                  msg: 'Business ownerUnavailable');
+            }
+
+            if (!employeeAvailable) {
+              Fluttertoast.showToast(
+                  msg: 'Business employeeUnavailable');
+            }
+          }
+        } else {
+          Fluttertoast.showToast(
+              msg: 'Owner and Employees unavailable');
         }
       }).catchError((error) {
         Fluttertoast.showToast(msg: '${error.toString()}');
@@ -833,15 +1267,24 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
     }
   }
 
+
   final String serverToken = SERVER_KEY;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   String _message = '';
+  BusinessChatData _businessChatData;
+  String notifyId;
+  String userId ='';
+  String name ='';
+  String photoUrl ='';
+  String businessId ='';
+  bool isOpened = false;
+
 
   Future<Map<String, dynamic>> sendAndRetrieveMessage(String token,
-      String businessName) async {
+      String businessName, BusinessChatData mIsChatListData) async {
     print('Business detail sendAndRetrieveMessage');
     await firebaseMessaging.requestNotificationPermissions(
       const IosNotificationSettings(sound: true, badge: true, alert: true),
@@ -862,8 +1305,12 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
           'priority': 'high',
           'data': <String, dynamic>{
             'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-            'id': '1',
-            'status': 'done'
+            'id': '1000',
+            'status': 'done',
+            'userId':mIsChatListData.userId,
+            'name':mIsChatListData.name,
+            'photoUrl':mIsChatListData.photoUrl,
+            'businessId':_currentUserId,
           },
           'to': token,
         },
@@ -883,29 +1330,57 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
     var platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    var initializationSettingsAndroid =
+    new AndroidInitializationSettings('app_icon');
+    var initializationSettingsIOS = new IOSInitializationSettings();
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
     await flutterLocalNotificationsPlugin.show(
-      0,
+      1000,
       message["notification"]["title"],
       message["notification"]["body"],
       platformChannelSpecifics,
       payload: 'Default_Sound',
     );
+    _businessChatData = message["data"]["data"];
+    notifyId = message["data"]["id"];
+    userId = message["data"]["userId"];
+    name =message["data"]["name"];
+    photoUrl = message["data"]["photoUrl"];
+    businessId = message["data"]["businessId"];
+//    onSelectNotification('');
   }
 
 
   void getMessage() {
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
-          print('on message $message');
+          print('on message $message ___ ${ message["data"]["id"]} ______ ${message["data"]["data"] }');
           _showNotificationWithDefaultSound(message);
-          setState(() => _message = message["notification"]["title"]);
+          setState(() {
+            _message = message["notification"]["title"];
+            _businessChatData = message["data"]["data"];
+            notifyId = message["data"]["id"];
+          });
         }, onResume: (Map<String, dynamic> message) async {
-      print('on resume $message');
+      print('on resume $message ___ ${ message["data"]["id"]} ______ ${message["data"]["data"] }');
       _showNotificationWithDefaultSound(message);
-      setState(() => _message = message["notification"]["title"]);
+      setState(() {
+        _message = message["notification"]["title"];
+        _businessChatData = message["data"]["data"];
+        notifyId = message["data"]["id"];
+      });
     }, onLaunch: (Map<String, dynamic> message) async {
-      print('on launch $message');
-      setState(() => _message = message["notification"]["title"]);
+      print('on onLaunch $message ___ ${ message["data"]["id"]} ______ ${message["data"]["data"] }');
+      _showNotificationWithDefaultSound(message);
+      setState(() {
+        _message = message["notification"]["title"];
+        _businessChatData = message["data"]["data"];
+        notifyId = message["data"]["id"];
+      });
     });
   }
 }

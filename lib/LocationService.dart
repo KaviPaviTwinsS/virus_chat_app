@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 //import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:location/location.dart';
 import 'package:virus_chat_app/utils/constants.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class LocationService {
   UserLocation _currentLocation = null;
@@ -129,6 +131,8 @@ class LocationService {
 //          print('LocationService  ___NOTgranted__ $location');
           }
         } else {
+          Fluttertoast.showToast(
+              msg: 'Please enable location service');
 //        print('LocationService  ___NOTgranted__ $currentUser');
           /* Firestore.instance_currentLocation
               .collection('users')
@@ -174,6 +178,11 @@ class LocationService {
 
     await Future.delayed(Duration(milliseconds: 30000));
 //    await Future.delayed(Duration(seconds: 30));
+    requestContactsPermission(
+        onPermissionDenied: () {
+          Fluttertoast.showToast(
+              msg: 'Please enable location service');
+        });
     print('______________________________________Delay ${new DateTime.now()}');
 //    Timer(Duration(seconds: 10),(){
       databaseReference.collection('users').document(currentUserId).collection(
@@ -225,8 +234,25 @@ class LocationService {
       print("Timer_________$currentUserId _____Now __${new DateTime.now()}");
     });*/
   }
+  final PermissionHandler _permissionHandler = PermissionHandler();
 
+  /// Requests the users permission to read their contacts.
+  Future<bool> requestContactsPermission({Function onPermissionDenied}) async {
+    var granted = await _requestPermission(PermissionGroup.contacts);
+    if (!granted) {
+      onPermissionDenied();
+    }
+    return granted;
+  }
 
+  Future<bool> _requestPermission(PermissionGroup permission) async {
+    var result = await _permissionHandler.requestPermissions([permission]);
+    if (result[permission] == PermissionStatus.granted) {
+      return true;
+    }
+
+    return false;
+  }
   void updateLocationOfNewUser(String UserId) async {
     if (_currentLocation == null) {
       print('NAN updateLocationOfNewUser ______________$_mCurrentLocation');

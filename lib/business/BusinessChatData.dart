@@ -8,7 +8,8 @@ class BusinessChatData {
   String businessName ='';
   String businessChatWith;
   String businessType = '';
+  String userStatus ='';
   BusinessChatData(
-      {this.businessId, this.businessChatPriority,this.userId,this.name,this.photoUrl,this.userToken,this.businessName,this.businessChatWith,this.businessType});
+      {this.businessId, this.businessChatPriority,this.userId,this.name,this.photoUrl,this.userToken,this.businessName,this.businessChatWith,this.businessType,this.userStatus});
 
 }
