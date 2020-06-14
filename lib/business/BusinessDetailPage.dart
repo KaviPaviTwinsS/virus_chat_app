@@ -59,6 +59,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
   bool isLoading = false;
 
   bool isCurrentUserCanChat = false;
+  String currentUserPhoto ='';
 
   BusinessDetailPageState(String businessId, String businessName) {
     _businessId = businessId;
@@ -98,7 +99,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
     _currentUserName =await preferences.getString('name');
     _currentUserBusinessType = await preferences.getString('BUSINESS_TYPE');
     _currentUserBusinessId = await preferences.getString('BUSINESS_ID');
-
+    currentUserPhoto = await preferences.getString('photoUrl');
     if(_currentUserBusinessId != ''){
       if(_currentUserBusinessId == _businessId) {
         isCurrentUserCanChat = false;
@@ -237,7 +238,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            BusinessRecentChats(_currentUserId,_businessImage,_businessId)));
+                                            BusinessRecentChats(_currentUserId,_businessImage,_businessId,currentUserPhoto)));
                               },
                             ),
                           )
@@ -882,6 +883,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
             } else {
               _businessChatPeriority = 0;
             }
+            print('________________________Status ${reference['status']}');
             mChatList.add(BusinessChatData(businessId: reference['businessId'],
                 businessChatPriority: reference['businessChatPeriority'],
                 userId: reference['id'],
@@ -1055,7 +1057,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                   'employeeName' : employeeOneData.name,
                   'userName':_currentUserName,
                   'employeePhotoUrl':employeeOneData.photoUrl,
-                  'employeeStatus': employeeOneData.userStatus
+                  'employeeStatus': 'ACTIVE'
                 }).whenComplete(() {
                   setState(() {
                     isLoading = false;
@@ -1108,7 +1110,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                   'employeeName' : employeeTwoData.name,
                   'userName':_currentUserName,
                   'employeePhotoUrl':employeeTwoData.photoUrl,
-                  'employeeStatus': employeeTwoData.userStatus
+                  'employeeStatus': 'ACTIVE'
                 }).whenComplete(() {
                   setState(() {
                     isLoading = false;
@@ -1152,7 +1154,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                   'employeeName' : employeeThreeData.name,
                   'userName':_currentUserName,
                   'employeePhotoUrl':employeeThreeData.photoUrl,
-                  'employeeStatus': employeeThreeData.userStatus
+                  'employeeStatus': 'ACTIVE'
                 })/*;
                 Firestore.instance.collection('chatRooms').document(
                     _currentUserId).setData({
@@ -1205,7 +1207,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                   'employeeName' : employeeFourData.name,
                   'userName':_currentUserName,
                   'employeePhotoUrl':employeeFourData.photoUrl,
-                  'employeeStatus': employeeFourData.userStatus
+                  'employeeStatus': 'ACTIVE'
                 }).
                /* Firestore.instance.collection('chatRooms').document(
                     _currentUserId).setData({
@@ -1245,6 +1247,9 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
               );
             }
           } else {
+            setState(() {
+              isLoading = false;
+            });
             if (!ownerAvailable) {
               Fluttertoast.showToast(
                   msg: 'Business ownerUnavailable');
@@ -1256,13 +1261,22 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
             }
           }
         } else {
+          setState(() {
+            isLoading = false;
+          });
           Fluttertoast.showToast(
               msg: 'Owner and Employees unavailable');
         }
       }).catchError((error) {
+        setState(() {
+          isLoading = false;
+        });
         Fluttertoast.showToast(msg: '${error.toString()}');
       });
     } on Exception catch (e) {
+      setState(() {
+        isLoading = false;
+      });
       Fluttertoast.showToast(msg: '${e.toString()}');
     }
   }
@@ -1285,7 +1299,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
 
   Future<Map<String, dynamic>> sendAndRetrieveMessage(String token,
       String businessName, BusinessChatData mIsChatListData) async {
-    print('Business detail sendAndRetrieveMessage');
+    print('Business detail sendAndRetrieveMessage ___token $token');
     await firebaseMessaging.requestNotificationPermissions(
       const IosNotificationSettings(sound: true, badge: true, alert: true),
     );

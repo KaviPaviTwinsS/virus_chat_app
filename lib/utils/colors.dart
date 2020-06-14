@@ -33,6 +33,7 @@ final hint_color_grey_dark = Color(0xFF666666);
 final hint_color_grey_dark_time = Color(0xFF999999);
 final hint_color_grey_light= Color(0xFF8992A3);
 final chat_bg_color= Color(0xFFF4F5F8);
+final chat_border_color = Color(0xFFE6E8EE);
 final text_color_blue = Color(0xFF4285F4);
 final button_fill_color =Color(0xFF4285F4);
 final divider_color= Color(0xFFE4E9F2);

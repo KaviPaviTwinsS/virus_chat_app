@@ -363,6 +363,8 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                               onChanged: (value) {
                                 businessInfo = value;
                               },
+                              keyboardType: TextInputType.multiline,
+                              maxLines: null,
                             ),
                             margin: EdgeInsets.only(
                                 left: 20.0, right: 20.0, top: 30.0),
@@ -497,7 +499,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
         isLoading = false;
         print('Could not get Add businesss: ${e.toString()}');
       }
-    /*reference.setData({
+      /*reference.setData({
         'businessName': businessName,
         'photoUrl': photoUrl,
         'businessNumber': businessNumber,
@@ -505,41 +507,44 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
         'businessId': reference.documentID,
         'createdAt':currTime
       });*/
-    UserLocation currentLocation = await LocationService(reference.documentID,BUSINESS_TYPE_OWNER,reference.documentID)
-        .getLocation();
-    Firestore.instance.collection('business').document(reference.documentID)
-        .collection('businessLocation').document(reference.documentID)
-        .setData({
-    'businessLocation': new GeoPoint(
-    currentLocation.latitude, currentLocation.longitude),
-    });
-    await preferences.setString('BUSINESS_ID', reference.documentID);
-    await preferences.setString('BUSINESS_NAME', businessName);
-    await preferences.setString('BUSINESS_ADDRESS', businessAddress);
-    await preferences.setString(
-    'BUSINESS_NUMBER', COUNTRY_CODE + businessNumber);
-    await preferences.setString(
-    'BUSINESS_INFO', businessInfo);
-    await preferences.setString('BUSINESS_IMAGE', photoUrl);
-    await preferences.setString('BUSINESS_TYPE', BUSINESS_TYPE_OWNER);
-    await preferences.setInt('BUSINESS_EMPLOYEES_COUNT', 0);
-    await preferences.setString('BUSINESS_CREATED_AT', currTime.toString());
+      UserLocation currentLocation = await LocationService(
+          reference.documentID, BUSINESS_TYPE_OWNER, reference.documentID)
+          .getLocation();
+      Firestore.instance.collection('business').document(reference.documentID)
+          .collection('businessLocation').document(reference.documentID)
+          .setData({
+        'businessLocation': new GeoPoint(
+            currentLocation.latitude, currentLocation.longitude),
+      });
+      await preferences.setString('BUSINESS_ID', reference.documentID);
+      await preferences.setString('BUSINESS_NAME', businessName);
+      await preferences.setString('BUSINESS_ADDRESS', businessAddress);
+      await preferences.setString(
+          'BUSINESS_NUMBER', COUNTRY_CODE + businessNumber);
+      await preferences.setString(
+          'BUSINESS_INFO', businessInfo);
+      await preferences.setString('BUSINESS_IMAGE', photoUrl);
+      await preferences.setString('BUSINESS_TYPE', BUSINESS_TYPE_OWNER);
+      await preferences.setInt('BUSINESS_EMPLOYEES_COUNT', 0);
+      await preferences.setString('BUSINESS_CREATED_AT', currTime.toString());
 
-    if (_mCurrentLoginType == 'business') {
-    Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-    builder: (context) =>
-    UsersList(_signInType,
-    userId, photoUrl)));
-    } else {
-    Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-    builder: (context) =>
-    ProfilePageSetup(_signInType, currentUserId: userId,)));
+      if (_mCurrentLoginType == 'business') {
+        LocationService(userId, '', '');
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    UsersList(_signInType,
+                        userId, photoUrl)));
+      } else {
+        LocationService(userId, '', '');
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    ProfilePageSetup(_signInType, currentUserId: userId,)));
+      }
     }
-  }
   }
 
   Future businessValidation() async {
@@ -552,9 +557,9 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
     } else if (businessInfo == '') {
       Fluttertoast.showToast(msg: 'Enter business description');
     }
-    /*else if(businessNumber == ''){
+    else if (businessNumber == '') {
       Fluttertoast.showToast(msg: 'Enter business number');
-    }*/ else {
+    } else {
       await addBusiness();
     }
   }

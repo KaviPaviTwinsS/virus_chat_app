@@ -921,20 +921,12 @@ class AddEmployeeState extends State<AddEmployee> {
   }
 
 
-  void _sendSMS(String message, List<String> recipents) async {
-    print('SEND SMSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS');
-    String _result = await FlutterSms
-        .sendSMS(message: message, recipients: recipents)
-        .catchError((onError) {
+  _sendSMS(String message, List<String> recipents) async {
+    List<String> recipients =recipents;
+    String _result = await FlutterSms.sendSMS(message: "message", recipients: recipients).catchError((onError) {
       print(onError);
+      Fluttertoast.showToast(msg: 'Send sms error');
     });
     print(_result);
- /*   String _result = await sendSMS(message: message, recipients: recipents)
-        .catchError((onError) {
-      print(onError);
-      Fluttertoast.showToast(msg: 'onError $onError');
-    });
-    print(_result);
-    Fluttertoast.showToast(msg: '_result $_result');*/
   }
 }

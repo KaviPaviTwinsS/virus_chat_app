@@ -272,7 +272,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                   clipBehavior: Clip.hardEdge,
                                 ),
                               ),
-                              photoUrl == '' ? IconButton(
+                              photoUrl == '' || photoUrl != ''? IconButton(
                                 icon: new SvgPicture.asset(
                                   'images/camera.svg',
                                   height: 35.0,
@@ -280,10 +280,10 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                   fit: BoxFit.cover,
                                 ),
                                 onPressed: getImage,
-                                padding: EdgeInsets.all(40.0),
+                                padding: EdgeInsets.all(30.0),
                                 splashColor: Colors.transparent,
                                 highlightColor: greyColor,
-                                iconSize: 20.0,
+                                iconSize: 15.0,
                               ) : Text(''),
                             ],
                           ),
@@ -788,23 +788,26 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
             ((new DateTime.now()
                 .toUtc()
                 .microsecondsSinceEpoch) / 1000).toInt()
-          });
-      print('NAN ADd user');
-      setState(() {
-        isLoading = false;
+          }).whenComplete((){
+        Firestore.instance.collection('users').document(firebaseUser.uid)
+            .collection('userLocation').document(firebaseUser.uid)
+            .setData({
+          'userLocation': new GeoPoint(
+              currentLocation.latitude, currentLocation.longitude),
+        });
+        print('NAN ADd user');
+        setState(() {
+          isLoading = false;
+        });
       });
+
     } catch (e) {
       print('Registration' + e);
       setState(() {
         isLoading = false;
       });
     }
-    Firestore.instance.collection('users').document(firebaseUser.uid)
-        .collection('userLocation').document(firebaseUser.uid)
-        .setData({
-      'userLocation': new GeoPoint(
-          currentLocation.latitude, currentLocation.longitude),
-    });
+
   }
 
 
@@ -859,7 +862,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     } else
     if (userNameController.text == '' || userNameController.text == null) {
       Fluttertoast.showToast(
-          msg: enter_name);
+          msg: enter_first_name);
     } else
     if (userEmailController.text == '' || userEmailController.text == null) {
       Fluttertoast.showToast(
@@ -867,7 +870,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
     } else {
       emailValid = RegExp(
           r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-          .hasMatch(userEmailController.text.toString());
+          .hasMatch(userEmailController.text);
       if (!emailValid) {
         Fluttertoast.showToast(
             msg: enter_valid_email);

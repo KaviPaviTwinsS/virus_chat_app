@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/Login/UserRegistrationPage.dart';
 import 'package:virus_chat_app/profile/ProfilePage.dart';
@@ -420,6 +421,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
 
     if(_mCurrentLoginType == 'phone') {
+      LocationService(uid,'','');
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -435,6 +437,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 builder: (context) =>
                     UpgradeBusiness(uid, _mCurrentLoginType)));
       }else{
+        LocationService(uid,'','');
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(

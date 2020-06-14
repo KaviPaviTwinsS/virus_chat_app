@@ -9,19 +9,30 @@ import 'package:virus_chat_app/utils/strings.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 
 
-class BusinessPage extends StatefulWidget {
+class ViewEmployeesPage extends StatefulWidget {
+
+  String _mBusinessId = '';
+
+  ViewEmployeesPage(String businessId){
+    _mBusinessId = businessId;
+  }
   @override
   State<StatefulWidget> createState() {
-    return BusinessPageState();
+    return ViewEmployeesPageState(_mBusinessId);
   }
 
 }
 
-class BusinessPageState extends State<BusinessPage> {
+class ViewEmployeesPageState extends State<ViewEmployeesPage> {
 
   final ScrollController listScrollController = new ScrollController();
   var listMessage;
   bool isLoading = false;
+
+  String _mBusinessId ='';
+  ViewEmployeesPageState(String mBusinessId){
+    _mBusinessId = mBusinessId;
+  }
 
 
   @override
@@ -59,7 +70,7 @@ class BusinessPageState extends State<BusinessPage> {
                   new Container(
                       margin: EdgeInsets.only(
                           top: 40.0, bottom: 10.0),
-                      child: Text(business_header, style: TextStyle(
+                      child: Text(view_employees, style: TextStyle(
                           color: black_color,
                           fontSize: TOOL_BAR_TITLE_SIZE,
                           fontWeight: FontWeight.w500,
@@ -94,34 +105,34 @@ class BusinessPageState extends State<BusinessPage> {
   Widget buildListBusinesses() {
     return Expanded(
         child: StreamBuilder(
-    stream: Firestore.instance.collection('business') /*.where(
-          'status', isEqualTo: 'ACTIVE')*/.snapshots(),
-      builder: (context, snapshot) {
-        print(
-            'snapshot ____________${snapshot.hasData} ___isLoading $isLoading');
-        if (snapshot.data == null || !snapshot.hasData) {
-          isLoading = false;
-          /* return Center(
+          stream: Firestore.instance.collection('users') .where(
+          'businessId', isEqualTo: _mBusinessId).where('businessType',isEqualTo: BUSINESS_TYPE_EMPLOYEE).snapshots(),
+          builder: (context, snapshot) {
+            print(
+                'snapshot ____________${snapshot.hasData} ___isLoading $isLoading');
+            if (snapshot.data == null || !snapshot.hasData) {
+              isLoading = false;
+              /* return Center(
               child: Text('sssssssssssss'));*/
-          return Center(
-              child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
-        } else {
-          isLoading = false;
-          listMessage = snapshot.data.documents;
-          print('snapshot ____________${listMessage
-              .length}___isLoading $isLoading');
-          return (listMessage.length == 0) ? Center(
-            child: Text(no_business),
-          ) : ListView.builder(
-            itemBuilder: (context, index) =>
-                buildItem(index, snapshot.data.documents[index]),
-            itemCount: snapshot.data.documents.length,
+              return Center(
+                  child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
+            } else {
+              isLoading = false;
+              listMessage = snapshot.data.docUpuments;
+              print('snapshot ____________${listMessage
+                  .length}___isLoading $isLoading');
+              return (listMessage.length == 0) ? Center(
+                child: Text(no_business_employees),
+              ) : ListView.builder(
+                itemBuilder: (context, index) =>
+                    buildItem(index, snapshot.data.documents[index]),
+                itemCount: snapshot.data.documents.length,
 //              reverse: true,
-            controller: listScrollController,
-          );
-        }
-      },
+                controller: listScrollController,
+              );
+            }
+          },
         )
     );
   }
@@ -133,10 +144,7 @@ class BusinessPageState extends State<BusinessPage> {
         children: <Widget>[
           GestureDetector(
             onTap: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) =>
-                  BusinessDetailPage(
-                      document['businessId'], document['businessName'])));
+
             },
             child: Row(
               children: <Widget>[
@@ -190,7 +198,7 @@ class BusinessPageState extends State<BusinessPage> {
                               shape: BoxShape.circle,
                             ))
                             : Text(''),
-                        document['status'] == 'ACTIVE' ? Container(
+                        document['status'] == 'ACTIVE'  && document['status']  != ''? Container(
                             child: new SvgPicture.asset(
                               'images/online_active.svg',
                               height: 15.0,
@@ -201,7 +209,7 @@ class BusinessPageState extends State<BusinessPage> {
                                 bottom: 40.0,
                                 top: 10.0,
                                 right: 15.0)) : document['status'] ==
-                            'LoggedOut' ? Container(
+                            'LoggedOut' && document['status'] !='' ? Container(
                           child: new SvgPicture.asset(
                             'images/online_inactive.svg',
                             height: 15.0,
@@ -212,7 +220,8 @@ class BusinessPageState extends State<BusinessPage> {
                               bottom: 40.0,
                               top: 10.0,
                               right: 15.0),
-                        ) : Container(
+                        ) :  document['status'] ==
+                            'INACTIVE' && document['status'] !=''  ? Container(
                           child: new SvgPicture.asset(
                             'images/online_idle.svg', height: 15.0,
                             width: 15.0,
@@ -222,41 +231,41 @@ class BusinessPageState extends State<BusinessPage> {
                               bottom: 40.0,
                               top: 10.0,
                               right: 15.0),
-                        )
+                        ): Container()
                       ]
                   ),
                 )
                     : Text(''),
-             Column(
-               crossAxisAlignment: CrossAxisAlignment.start,
-               mainAxisAlignment: MainAxisAlignment.start,
-               children: <Widget>[
-                 document['businessName'] != ''
-                     ? Container(
-                     margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,top: 15.0),
-                     child: Text(capitalize(document['businessName']),
-                       style: TextStyle(fontWeight: FontWeight.w500,
-                           fontSize: 16.0,
-                           fontFamily: 'GoogleSansFamily',color: black_color),)
-                 )
-                     : Text(''),
-                 document['businessDescription'] != ''
-                     ? Align(
-                   alignment: Alignment.bottomLeft,
-                   child: Container(
-                       width: MediaQuery.of(context).size.width - 120,
-                       margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,right: 10.0),
-                       child: Text(capitalize(document['businessDescription'],),
-                         overflow: TextOverflow.ellipsis,
-                         style: TextStyle(fontWeight: FontWeight.w400,
-                             fontSize: 12.0,
-                             fontFamily: 'GoogleSansFamily',color:hint_color_grey_dark ),
-                       )
-                   ),
-                 )
-                     : Text('')
-               ],
-             )
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    document['name'] != ''
+                        ? Container(
+                        margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,top: 15.0),
+                        child: Text(capitalize(document['name']),
+                          style: TextStyle(fontWeight: FontWeight.w500,
+                              fontSize: 16.0,
+                              fontFamily: 'GoogleSansFamily',color: black_color),)
+                    )
+                        : Text(''),
+                    document['phoneNo'] != ''
+                        ? Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(
+                          width: MediaQuery.of(context).size.width - 120,
+                          margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,right: 10.0),
+                          child: Text(capitalize(document['phoneNo'],),
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontWeight: FontWeight.w400,
+                                fontSize: 12.0,
+                                fontFamily: 'GoogleSansFamily',color:hint_color_grey_dark ),
+                          )
+                      ),
+                    )
+                        : Text('')
+                  ],
+                )
               ],
             ),),
 //          Divider()

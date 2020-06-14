@@ -621,9 +621,12 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
             width: 200.0,
             decoration: BoxDecoration(
-                color: white_color, borderRadius: BorderRadius.circular(8.0)),
+                color: white_color, borderRadius: BorderRadius.circular(
+                15.0),
+                border: Border.all(color: chat_border_color)
+            ),
             margin: EdgeInsets.only(
-                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 15.0),
           )
               : document['type'] == 1
           // Image
@@ -703,7 +706,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
               ),
             ),
             margin: EdgeInsets.only(
-                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 15.0),
           )
           // Sticker
               : document['type'] == 5 ?
@@ -713,7 +716,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 new Material(
                   child: Container(
                     height: 56.0,
-                    color: greyColor2,
+                    color: white_color,
                     child: Row(
                       children: <Widget>[
                         IconButton(
@@ -768,14 +771,23 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
             padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
             width: 280.0,
             decoration: BoxDecoration(
-                color: greyColor2, borderRadius: BorderRadius.circular(8.0)),
+                color: white_color,
+                borderRadius: BorderRadius.circular(15.0),
+                border: Border.all(color: chat_border_color)
+            ),
             margin: EdgeInsets.only(
-                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 15.0),
           )
               :
           new Material(
             child: Container(
               height: 56.0,
+              margin: EdgeInsets.only(left: 15.0),
+              decoration: BoxDecoration(
+                  color: chat_bg_color,
+                  borderRadius: BorderRadius.circular(15.0),
+                  border: Border.all(color: chat_border_color)
+              ),
               child: Row(
                 children: <Widget>[
                   IconButton(
@@ -821,7 +833,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           children: <Widget>[
             Row(
               children: <Widget>[
-                true ? Container(
+                /*true ? Container(
                   margin: EdgeInsets.only(left: 10.0, right: 5.0),
                   child: Material(
                     child: CachedNetworkImage(
@@ -849,7 +861,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 )
                     : Container(width: 35.0,
                   margin: EdgeInsets.only(left: 10.0, right: 5.0),
-                ),
+                ),*/
                 document['type'] == 0
                     ?
                 Container(
@@ -878,9 +890,11 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                   ),
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                   width: 200.0,
+                  margin: EdgeInsets.only(left: 15.0),
                   decoration: BoxDecoration(
                       color: chat_bg_color, borderRadius: BorderRadius.circular(
-                      8.0)),
+                      15.0),border: Border.all(color: chat_border_color)
+                  ),
                 )
                     : document['type'] == 1
                     ? Column(
@@ -962,7 +976,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                         new Material(
                           child: Container(
                             height: 56.0,
-                            color: greyColor2,
+                           color: chat_bg_color,
                             child: Row(
                               children: <Widget>[
                                 IconButton(
@@ -1019,11 +1033,13 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                   width: 280.0,
                   decoration: BoxDecoration(
-                      color: greyColor2,
-                      borderRadius: BorderRadius.circular(8.0)),
+                      color: chat_bg_color,
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(color: chat_border_color)
+                  ),
                   margin: EdgeInsets.only(
                       bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                      right: 10.0),
+                      right: 0.0,left: 15.0),
                 )
                     : Container(
                   child: new Image.asset(
@@ -1362,6 +1378,7 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                                   mDifference, style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     color: hint_color_grey_dark,
+
                                     fontFamily: 'GoogleSansFamily'),
                                 ),
                               ),
@@ -1802,6 +1819,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                 child: Container(
                   margin: EdgeInsets.only(left: 20.0, bottom: 5.0),
                   child: TextField(
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
                     style: TextStyle(color: black_color, fontSize: 15.0),
                     controller: controllerName,
                     onChanged: (value) {

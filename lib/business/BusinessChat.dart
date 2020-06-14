@@ -192,7 +192,7 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
   Future getUserActiveTime() async {
     print('CHATTTTTTTTTTTTTTTTTTTTT getUserActiveTime $peerId');
     var document = await Firestore.instance.collection('users').document(
-        peerId).collection('userLocation').document(peerId).get();
+        id).collection('userLocation').document(id).get();
     var chatData = document.data;
     var date = new DateTime.fromMillisecondsSinceEpoch(
         chatData['UpdateTime']);
@@ -612,7 +612,6 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
       setState(() => _message = message["notification"]["title"]);
     });
   }
-
   Widget buildItem(int index, DocumentSnapshot document) {
     if (document['type'] == 5) {
       storeFile(document['content'], document['audioTime']);
@@ -649,9 +648,12 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
             padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
             width: 200.0,
             decoration: BoxDecoration(
-                color: white_color, borderRadius: BorderRadius.circular(8.0)),
+                color: white_color, borderRadius: BorderRadius.circular(
+                15.0),
+                border: Border.all(color: chat_border_color)
+            ),
             margin: EdgeInsets.only(
-                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 15.0),
           )
               : document['type'] == 1
           // Image
@@ -731,7 +733,7 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
               ),
             ),
             margin: EdgeInsets.only(
-                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 15.0),
           )
           // Sticker
               : document['type'] == 5 ?
@@ -741,7 +743,7 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
                 new Material(
                   child: Container(
                     height: 56.0,
-                    color: greyColor2,
+                    color: white_color,
                     child: Row(
                       children: <Widget>[
                         IconButton(
@@ -796,14 +798,23 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
             padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
             width: 280.0,
             decoration: BoxDecoration(
-                color: greyColor2, borderRadius: BorderRadius.circular(8.0)),
+                color: white_color,
+                borderRadius: BorderRadius.circular(15.0),
+                border: Border.all(color: chat_border_color)
+            ),
             margin: EdgeInsets.only(
-                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 15.0),
           )
               :
           new Material(
             child: Container(
               height: 56.0,
+              margin: EdgeInsets.only(left: 15.0),
+              decoration: BoxDecoration(
+                  color: chat_bg_color,
+                  borderRadius: BorderRadius.circular(15.0),
+                  border: Border.all(color: chat_border_color)
+              ),
               child: Row(
                 children: <Widget>[
                   IconButton(
@@ -849,7 +860,7 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
           children: <Widget>[
             Row(
               children: <Widget>[
-                true ? Container(
+                /*true ? Container(
                   margin: EdgeInsets.only(left: 10.0, right: 5.0),
                   child: Material(
                     child: CachedNetworkImage(
@@ -877,7 +888,7 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
                 )
                     : Container(width: 35.0,
                   margin: EdgeInsets.only(left: 10.0, right: 5.0),
-                ),
+                ),*/
                 document['type'] == 0
                     ?
                 Container(
@@ -906,9 +917,11 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
                   ),
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                   width: 200.0,
+                  margin: EdgeInsets.only(left: 15.0),
                   decoration: BoxDecoration(
                       color: chat_bg_color, borderRadius: BorderRadius.circular(
-                      8.0)),
+                      15.0),border: Border.all(color: chat_border_color)
+                  ),
                 )
                     : document['type'] == 1
                     ? Column(
@@ -990,7 +1003,7 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
                         new Material(
                           child: Container(
                             height: 56.0,
-                            color: greyColor2,
+                            color: chat_bg_color,
                             child: Row(
                               children: <Widget>[
                                 IconButton(
@@ -1047,11 +1060,13 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                   width: 280.0,
                   decoration: BoxDecoration(
-                      color: greyColor2,
-                      borderRadius: BorderRadius.circular(8.0)),
+                      color: chat_bg_color,
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(color: chat_border_color)
+                  ),
                   margin: EdgeInsets.only(
                       bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                      right: 10.0),
+                      right: 0.0,left: 15.0),
                 )
                     : Container(
                   child: new Image.asset(

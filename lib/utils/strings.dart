@@ -77,3 +77,8 @@ String login = 'Login';
 String sign_up = 'Sign Up';
 //user registration
 String update_profile= 'Update Profile';
+String enter_first_name='Enter first name';
+
+//view employees page
+String view_employees = 'Employees';
+String no_business_employees ='No business employees';

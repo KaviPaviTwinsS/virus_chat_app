@@ -160,7 +160,7 @@ class NewTweetPostState extends State<NewTweetPost> {
                           new Container(
                               margin: EdgeInsets.only(
                                   top: 40.0, right: 10.0, bottom: 10.0),
-                              child: Text('Post Message', style: TextStyle(
+                              child: Text('Post Tweet', style: TextStyle(
                                   color: black_color,
                                   fontSize: TOOL_BAR_TITLE_SIZE,
                                   fontWeight: FontWeight.w500,
@@ -428,6 +428,8 @@ class NewTweetPostState extends State<NewTweetPost> {
                       child: TextFormField(
                         style: TextStyle(color: black_color, fontSize: 15.0),
                         controller: controllerName,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
 //                        textCapitalization: TextCapitalization.sentences,
                         onChanged: (value) {
                           name = value;

@@ -5,16 +5,17 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
-import 'package:draggable_floating_button/draggable_floating_button.dart';
+//import 'package:draggable_floating_button/draggable_floating_button.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+//import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FriendRequestScreen.dart';
+import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/SendInviteScreen.dart';
 import 'package:virus_chat_app/business/BusinessData.dart';
 import 'package:virus_chat_app/business/BusinessDetailPage.dart';
@@ -148,7 +149,6 @@ class UsersListState extends State<UsersList>
             .updateData({'status': 'ACTIVE'});
       }
     }*/
-//    LocationService(currentUser);
       /*for(int i=5;i<250;i+5){
       spinnerItems.add('$i m');
     }*/
@@ -425,71 +425,81 @@ class UsersListState extends State<UsersList>
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                        new ProfilePageSetup(
-                                          userSignInType,
-                                          currentUserId: currentUser,)));
-                              },
-                              child: new Container(
+                             new Container(
                                 margin: EdgeInsets.only(
-                                    left: 15.0, top: 30.0, right: 10.0),
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Material(
-                                    child: CachedNetworkImage(
-                                      placeholder: (context, url) =>
-                                          Container(
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.0,
-                                              valueColor: AlwaysStoppedAnimation<
-                                                  Color>(progress_color),
-                                            ),
-                                            width: 35.0,
-                                            height: 35.0,
-                                            padding: EdgeInsets.all(20.0),
-                                          ),
-                                      errorWidget: (context, url, error) =>
-                                          Material(
-                                            child: new SvgPicture.asset(
-                                              'images/user_unavailable.svg',
-                                              height: 35.0,
+                                    left: 15.0, top: 20.0, right: 10.0),
+                                child:GestureDetector(
+                                  onTap: (){
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                            new ProfilePageSetup(
+                                              userSignInType,
+                                              currentUserId: currentUser,)));
+                                  },
+                                  child:  Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                      new Container(
+                                      margin: EdgeInsets.only(
+                                          left: 5.0, top: 20.0, right: 10.0),
+                                    child: Material(
+                                            child: CachedNetworkImage(
+                                              placeholder: (context, url) =>
+                                                  Container(
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2.0,
+                                                      valueColor: AlwaysStoppedAnimation<
+                                                          Color>(progress_color),
+                                                    ),
+                                                    width: 35.0,
+                                                    height: 35.0,
+                                                    padding: EdgeInsets.all(20.0),
+                                                  ),
+                                              errorWidget: (context, url, error) =>
+                                                  Material(
+                                                    child: new SvgPicture.asset(
+                                                      'images/user_unavailable.svg',
+                                                      height: 35.0,
+                                                      width: 35.0,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                    borderRadius: BorderRadius.all(
+                                                      Radius.circular(5.0),
+                                                    ),
+                                                    clipBehavior: Clip.hardEdge,
+                                                  ),
+                                              imageUrl: currentUserPhotoUrl,
                                               width: 35.0,
+                                              height: 35.0,
                                               fit: BoxFit.cover,
                                             ),
                                             borderRadius: BorderRadius.all(
-                                              Radius.circular(5.0),
+                                              Radius.circular(18.0),
                                             ),
                                             clipBehavior: Clip.hardEdge,
                                           ),
-                                      imageUrl: currentUserPhotoUrl,
-                                      width: 35.0,
-                                      height: 35.0,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(18.0),
-                                    ),
-                                    clipBehavior: Clip.hardEdge,
+                                      ),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                top: 30.0, right: 10.0),
+                                            child: Text(
+                                              currentUserName, style: TextStyle(
+                                                color: text_color,
+                                                fontFamily: 'GoogleSansFamily',
+                                                fontWeight: FontWeight.w500),
+                                            ),
+                                          ),
+                                        ],
+                                      )
                                   ),
-                                ),
                               ),
                             ),
 
-                            Container(
-                              margin: EdgeInsets.only(
-                                  top: 30.0, right: 10.0),
-                              child: Text(
-                                currentUserName, style: TextStyle(
-                                  color: text_color,
-                                  fontFamily: 'GoogleSansFamily',
-                                  fontWeight: FontWeight.w500),
-                              ),
-                            ),
+
                             Spacer(),
 
                             Container(

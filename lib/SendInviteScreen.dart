@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:virus_chat_app/FriendRequestScreen.dart';
@@ -15,6 +16,7 @@ import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/constants.dart';
+import 'package:virus_chat_app/utils/strings.dart';
 
 
 class SendInviteToUser extends StatefulWidget {
@@ -372,7 +374,7 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                 margin: EdgeInsets.only(
                                     left: 20.0, right: 20.0),
                                 child: Text(
-                                  'You\'ll be able to chat with VALENTINE once your invitation has been accepted.',
+                                  'You\'ll be able to chat with $_mUserName once your invitation has been accepted.',
                                   style: TextStyle(fontWeight: FontWeight.w400,
                                       fontFamily: 'GoogleSansFamily',
                                       color: hint_color_grey_dark,),textAlign: TextAlign.center,
@@ -382,6 +384,10 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                           ),
                         )
                     )
+                ),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: buildInput(),
                 )
 
               ])
@@ -389,6 +395,166 @@ class SendInviteToUserState extends State<SendInviteToUser> {
     );
   }
 
+
+  Widget buildInput() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              /* Material(
+                child: new Container(
+                  margin: EdgeInsets.only(left: 10.0),
+                  child: new IconButton(
+                    icon: new SvgPicture.asset(
+                      'images/smile.svg', height: 20.0,
+                      width: 20.0,
+                    ),
+                    onPressed: getImage,
+                    color: primaryColor,
+                  ),
+                ),
+                color: Colors.white,
+              ),*/
+              Material(
+                child: new Container(
+                  margin: EdgeInsets.only(left: 10.0, top: 10.0),
+//                  margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                  child: new IconButton(
+                    icon: new SvgPicture.asset(
+                      'images/camera.svg', height: 20.0,
+                      width: 20.0,
+                    ),
+                    color: primaryColor,
+                  ),
+                ),
+                color: Colors.white,
+              ),
+              // Button send image
+              Material(
+                child: new Container(
+                  margin: EdgeInsets.only(top: 10.0),
+                  child: new IconButton(
+                    icon: new SvgPicture.asset(
+                      'images/pic.svg', height: 20.0,
+                      width: 20.0,
+                    ),
+                    color: primaryColor,
+                  ),
+                ),
+                color: Colors.white,
+              ),
+              Material(
+                child: Listener(
+                    onPointerDown: (details) {
+                      print('onPointerDown');
+//                audioClicked = true;
+                    },
+                    onPointerUp: (details) {
+                      print('onPointerUp');
+                    },
+                    child: GestureDetector(
+                      onTap: () {
+                      },
+                      child: Stack(
+                        children: <Widget>[
+                          Center(child: new Container(
+                            margin: EdgeInsets.only(top: 10.0),
+                            child: new IconButton(
+                              icon: new SvgPicture.asset(
+                                'images/voice.svg', height: 20.0,
+                                width: 20.0,
+                              ),
+                              onPressed: () {
+                              },
+                            ),
+                          ),
+                          ),
+                Center(child: new Container(
+                            margin: EdgeInsets.only(top: 10.0),
+//                            margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                            child:  new IconButton(
+                              icon: new SvgPicture.asset(
+                                'images/voice.svg', height: 20.0,
+                                width: 20.0,
+                              ),
+                              onPressed: () {
+                              },
+                            ),
+                          ),
+                          )
+                        ],
+                      ),
+                    )
+                ),
+                color: Colors.white,
+              ),
+              // Edit text
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(left: 20.0, bottom: 5.0),
+                  child: TextField(
+                    style: TextStyle(color: black_color, fontSize: 15.0),
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(
+                      hintText: chat_hint,
+                      hintStyle: TextStyle(color: hint_color_grey_dark,
+                          fontFamily: 'GoogleSansFamily',
+                          fontWeight: FontWeight.w400),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: focused_border_color,
+                            width: 0.5),
+                        borderRadius: const BorderRadius.all(
+                          const Radius.circular(30.0),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: greyColor, width: 0.5),
+                        borderRadius: const BorderRadius.all(
+                          const Radius.circular(30.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Button send message
+              Material(
+                child: Container(
+                    width: 90,
+                    height: 90,
+                    child: new IconButton(
+                      icon: new SvgPicture.asset(
+                        'images/Send.svg', height: 90.0,
+                        width: 90.0,
+                        allowDrawingOutsideViewBox: true,
+                      ),
+                      onPressed: () =>
+                          Fluttertoast.showToast(msg: 'Waiting for friend request'),
+                      color: primaryColor,
+                    )
+                ),
+                color: Colors.white,
+              ),
+
+            ],
+          )
+        ],
+      ),
+      width: double.infinity,
+      height: 150.0,
+      decoration: new BoxDecoration(
+          border: new Border(
+              top: new BorderSide(color: greyColor2, width: 0.5)),
+          color: Colors.white),
+    );
+  }
 
   Future sendInvite() async {
     print('sendInvite____________');

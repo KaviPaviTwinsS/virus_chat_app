@@ -44,7 +44,8 @@ class PhoneNumberSelectionPage extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+//        primarySwatch: Colors.blue,
+        fontFamily: 'GoogleSansFamily'
       ),
       home: PhoneNumberSelection(_mCurrentLoginType),
     );
@@ -138,18 +139,30 @@ String _mCurrentLoginType = 'phone';
                               top: _mCurrentLoginType == 'business' ? 10.0 : 70.0,left: 20.0, right: 20.0),
                           child: Text( _mCurrentLoginType== 'phone' ? phone_no : phone_number_business,
                             style: TextStyle(
-                                fontSize: 27,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w500),
+                                fontSize: 27,fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w500,color: black_color),
                           ),
                         ),
                       ),
                       Align(
                         alignment: Alignment.topLeft,
                         child: Container(
-                          margin: const EdgeInsets.only(
-                              left: 20.0, top: 30.0, right: 20.0),
-                          child: Text(phone_no_sub,
-                            style: TextStyle(fontSize: 15,fontFamily: 'GoogleSansFamily',color : hint_color_grey_dark,fontWeight: FontWeight.w400),
-                          ),
+                          margin: EdgeInsets.only(
+                              left: 20.0, top: 30.0, right: 0.0),
+                          child:Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment
+                                .start,
+                            children: <Widget>[
+                            Text('Tap \"Get started\" to get an SMS confirmation to',
+                              style: TextStyle(fontSize: 15,fontFamily: 'GoogleSansFamily',color : hint_color_grey_dark,fontWeight: FontWeight.w400,),
+                            ),
+                            Text('help you use Chat.We would like your phone',
+                              style: TextStyle(fontSize: 15,fontFamily: 'GoogleSansFamily',color : hint_color_grey_dark,fontWeight: FontWeight.w400,),
+                            ),
+                            Text('number.',
+                              style: TextStyle(fontSize: 15,fontFamily: 'GoogleSansFamily',color : hint_color_grey_dark,fontWeight: FontWeight.w400,),
+                            ),
+                          ],)
                         ),
                       ),
                     ],

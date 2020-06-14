@@ -1,6 +1,6 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,6 +20,7 @@ import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/UsersList.dart';
 import 'package:virus_chat_app/business/AddEmployee.dart';
 import 'package:virus_chat_app/business/UpgradeBusiness.dart';
+import 'package:virus_chat_app/business/flutter_sms.dart';
 import 'package:virus_chat_app/tweetPost/MakeTweetPost.dart';
 import 'package:virus_chat_app/tweetPost/NewTweetPost.dart';
 import 'package:virus_chat_app/utils/colors.dart';
@@ -27,6 +28,7 @@ import 'package:virus_chat_app/utils/strings.dart';
 import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import '../utils/constants.dart';
 import 'package:virus_chat_app/version2/settingsPage/SettingsPage.dart';
+import 'package:virus_chat_app/business/ViewEmployees.dart';
 
 /*
 class ProfilePageSetup extends StatelessWidget {
@@ -282,6 +284,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                       color: black_color,
                                     ),
                                     onPressed: () {
+//                                      _sendSMS();
                                       /* Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
@@ -294,7 +297,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                               )
                             ],
                           ),
-                          Divider(color: divider_color,thickness: 1.0,),
+                          Divider(color: divider_color, thickness: 1.0,),
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
@@ -359,7 +362,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                   45.0)),
                                           clipBehavior: Clip.hardEdge,
                                         ),
-                                        photoUrl == '' ? IconButton(
+                                        photoUrl == '' || photoUrl != ''
+                                            ? IconButton(
                                           icon: Container(
                                             child: new SvgPicture.asset(
                                               'images/camera.svg',
@@ -369,11 +373,12 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             ),
                                           ),
                                           onPressed: getImage,
-                                          padding: EdgeInsets.all(40.0),
+                                          padding: EdgeInsets.all(30.0),
                                           splashColor: Colors.transparent,
                                           highlightColor: greyColor,
-                                          iconSize: 20.0,
-                                        ) : ((photoUrl != '' &&
+                                          iconSize: 15.0,
+                                        )
+                                            : ((photoUrl != '' &&
                                             mNewPhotoUrl != '') &&
                                             photoUrl != mNewPhotoUrl)
                                             ? GestureDetector(
@@ -561,7 +566,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     crossAxisAlignment: CrossAxisAlignment
                                         .start,
                                     children: <Widget>[
-                                     /* Container(
+                                      /* Container(
                                         margin: EdgeInsets.only(
                                             left: 20.0, right: 20.0, top: 25.0),
                                         child: Text(
@@ -590,7 +595,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                               borderSide: BorderSide(
                                                   color: greyColor, width: 0.5),
                                             ),
-                                            labelText: capitalize('Mobile number'),
+                                            labelText: capitalize(
+                                                'Mobile number'),
                                             hintStyle: TextStyle(
                                                 fontSize: HINT_TEXT_SIZE,
                                                 fontFamily: 'GoogleSansFamily'),
@@ -604,7 +610,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                         margin: EdgeInsets.only(
                                             left: 20.0, right: 20.0, top: 30.0),
                                       ),
-                                     /* Container(
+                                      /* Container(
                                         decoration: new BoxDecoration(
                                             shape: BoxShape.rectangle,
                                             color: unfocused_field_color
@@ -698,13 +704,15 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                     });
                                                     Fluttertoast.showToast(
                                                         msg: enter_names);
-                                                  }/* else if (nickName == '') {
+                                                  }
+                                                  /* else if (nickName == '') {
                                                     setState(() {
                                                       isLoading = false;
                                                     });
                                                     Fluttertoast.showToast(
                                                         msg: enter_nickname);
-                                                  } */else if (userEmail == '') {
+                                                  } */ else
+                                                  if (userEmail == '') {
                                                     setState(() {
                                                       isLoading = false;
                                                     });
@@ -787,7 +795,10 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                         )
                                     )
                                 ),
-                                (businessId != '' && businessId != null  && _mBusinessType == BUSINESS_TYPE_OWNER )
+                                (businessId != '' && businessId != null &&
+                                    (_mBusinessType == BUSINESS_TYPE_OWNER ||
+                                        _mBusinessType ==
+                                            BUSINESS_TYPE_EMPLOYEE))
                                     ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
@@ -804,7 +815,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                           fontFamily: 'GoogleSansFamily'),),
                                     ),
                                     businessImage != null && businessImage != ''
-    ? Center(
+                                        ? Center(
                                         child: Container(
                                           margin: EdgeInsets.only(bottom: 15.0,
                                               left: 20.0,
@@ -873,7 +884,9 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     businessName != null && businessName != ''
                                         ? Container(
                                       margin: EdgeInsets.only(
-                                          left: 20.0, bottom: 10.0),
+                                          left: 20.0,
+                                          bottom: 10.0,
+                                          right: 20.0),
                                       child: Text(capitalize(businessName),
                                         style: TextStyle(
                                             fontWeight: FontWeight.w500,
@@ -883,7 +896,9 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     businessAddress != null &&
                                         businessAddress != '' ? Container(
                                       margin: EdgeInsets.only(
-                                          left: 20.0, bottom: 15.0),
+                                          left: 20.0,
+                                          bottom: 15.0,
+                                          right: 20.0),
                                       child: Text(businessAddress,
                                         style: TextStyle(
                                             fontWeight: FontWeight.w400,
@@ -905,23 +920,35 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             fontFamily: 'GoogleSansFamily',
                                             color: hint_color_grey_light),),
                                     ) : Text(''),
-                                    Row(
+                                    _mBusinessType == BUSINESS_TYPE_OWNER ? Row(
                                       crossAxisAlignment: CrossAxisAlignment
                                           .start,
                                       mainAxisAlignment: MainAxisAlignment
                                           .spaceBetween,
                                       children: <Widget>[
-                                        _noOfEmployees != null  ? Align(
-                                          child: Container(
-                                            margin: EdgeInsets.only(
-                                              left: 20.0,),
-                                            child: Text(
-                                              _noOfEmployees.toString() +
-                                                  '\t' + employees,
-                                              style: TextStyle(
-                                                  fontFamily: 'GoogleSansFamily'),),
-                                          ),
-                                        ) : Text(''),
+                                        _noOfEmployees != null
+                                            ? GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ViewEmployeesPage(
+                                                              businessId)));
+                                            },
+                                            child: Align(
+                                              child: Container(
+                                                margin: EdgeInsets.only(
+                                                  left: 20.0,),
+                                                child: Text(
+                                                  _noOfEmployees.toString() +
+                                                      '\t' + employees,
+                                                  style: TextStyle(
+                                                      fontFamily: 'GoogleSansFamily'),),
+                                              ),
+                                            )
+                                        )
+                                            : Text(''),
                                         GestureDetector(
                                           onTap: () {
                                             Navigator.push(
@@ -962,13 +989,15 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                           ),
                                         )
                                       ],
-                                    )
+                                    ) : Container()
 //                                ],
                                   ],
                                 )
                                     : Text(''),
 
-                                businessId == '' || businessId == null/* || (businessId != ''  && _mBusinessType == BUSINESS_TYPE_EMPLOYEE )*/ ? Align(
+                                businessId == '' || businessId ==
+                                    null /* || (businessId != ''  && _mBusinessType == BUSINESS_TYPE_EMPLOYEE )*/
+                                    ? Align(
                                     alignment: Alignment.bottomRight,
                                     child: GestureDetector(
                                       onTap: () {
@@ -1024,7 +1053,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                         ],
                                       ),
                                     )
-                                ) : Text(''),
+                                )
+                                    : Text(''),
                               ]
                           ),
                           // Loading
@@ -1047,6 +1077,32 @@ class ProfilePageState extends State<ProfilePageSetup> {
             )
         )
     );
+  }
+
+  static const platform = const MethodChannel('sendSms');
+
+  Future<Null> sendSMS() async {
+    print("SendSMS");
+    try {
+      final String result = await platform.invokeMethod('send',
+          <String, dynamic>{
+            "phone": "+919952820806",
+            "msg": "Hello! I'm sent programatically."
+          }); //Replace a 'X' with 10 digit phone number
+      print(result);
+    } on PlatformException catch (e) {
+      print(e.toString());
+    }
+  }
+
+  _sendSMS() async {
+    List<String> recipients = ["9952820806"];
+    String _result = await FlutterSms.sendSMS(
+        message: "You added in the $businessName as a employee.Please login.",
+        recipients: recipients).catchError((onError) {
+      print(onError);
+    });
+    print(_result);
   }
 
   void uploadProfile() async {
@@ -1117,9 +1173,11 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                     'dialog');
                                 _updatestatus();
                                 clearLocalData();
-                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-                                    PhoneNumberSelectionPage('phone')), (Route<dynamic> route) => false);
-                              /*  Navigator.pushReplacement(
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(builder: (context) =>
+                                        PhoneNumberSelectionPage('phone')), (
+                                    Route<dynamic> route) => false);
+                                /*  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                         builder: (

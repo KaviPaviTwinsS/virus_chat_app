@@ -178,11 +178,12 @@ class LocationService {
 
     await Future.delayed(Duration(milliseconds: 30000));
 //    await Future.delayed(Duration(seconds: 30));
-    requestContactsPermission(
+
+    /*requestContactsPermission(
         onPermissionDenied: () {
           Fluttertoast.showToast(
               msg: 'Please enable location service');
-        });
+        });*/
     print('______________________________________Delay ${new DateTime.now()}');
 //    Timer(Duration(seconds: 10),(){
       databaseReference.collection('users').document(currentUserId).collection(
@@ -234,7 +235,7 @@ class LocationService {
       print("Timer_________$currentUserId _____Now __${new DateTime.now()}");
     });*/
   }
-  final PermissionHandler _permissionHandler = PermissionHandler();
+ /* final PermissionHandler _permissionHandler = PermissionHandler();
 
   /// Requests the users permission to read their contacts.
   Future<bool> requestContactsPermission({Function onPermissionDenied}) async {
@@ -252,7 +253,7 @@ class LocationService {
     }
 
     return false;
-  }
+  }*/
   void updateLocationOfNewUser(String UserId) async {
     if (_currentLocation == null) {
       print('NAN updateLocationOfNewUser ______________$_mCurrentLocation');

@@ -18,17 +18,19 @@ class BusinessRecentChats extends StatefulWidget {
   String _userId = '';
   String _userPhoto = '';
   String _clickedBusinessId = '';
+  String _currentUserPhoto ='';
 
   BusinessRecentChats(String currentUser, String currentUserPhotoUrl,
-      String clickedBusinessId) {
+      String clickedBusinessId, String currentUserPhoto) {
     _userId = currentUser;
     _userPhoto = currentUserPhotoUrl;
     _clickedBusinessId = clickedBusinessId;
+    _currentUserPhoto = currentUserPhoto;
   }
 
   @override
   State<StatefulWidget> createState() {
-    return BusinessRecentChatsState(_userId, _userPhoto, _clickedBusinessId);
+    return BusinessRecentChatsState(_userId, _userPhoto, _clickedBusinessId,_currentUserPhoto);
   }
 
 }
@@ -61,12 +63,14 @@ class BusinessRecentChatsState extends State<BusinessRecentChats> {
   String _mEmployeeId = '';
   String _mUserId = '';
   String _mStoreId = '';
+  String _mcurrentUserPhoto ='';
 
   BusinessRecentChatsState(String userId, String userPhoto,
-      String clickedBusinessId) {
+      String clickedBusinessId,String mcurrentUserPhoto) {
     _muserId = userId;
     _muserPhoto = userPhoto;
     _clickedBusinessId = clickedBusinessId;
+    _mcurrentUserPhoto = mcurrentUserPhoto;
   }
 
   @override
@@ -85,6 +89,7 @@ class BusinessRecentChatsState extends State<BusinessRecentChats> {
     _userSignInType = await prefs.getString('signInType');
     _currentUserBusinessType = await prefs.getString('BUSINESS_TYPE');
     _currentUserBusinessId = await prefs.getString('BUSINESS_ID');
+
 
 
     if (_currentUserBusinessType == BUSINESS_TYPE_OWNER) {
@@ -300,6 +305,57 @@ class BusinessRecentChatsState extends State<BusinessRecentChats> {
                               Navigator.pop(context);
                             }),
                       ),
+
+                      new Container(
+                        margin: EdgeInsets.only(
+                            top: 40.0, right: 10.0, bottom: 10.0),
+                        child: Material(
+                          child: CachedNetworkImage(
+                            placeholder: (context, url) =>
+                                Container(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 1.0,
+                                    valueColor: AlwaysStoppedAnimation<
+                                        Color>(progress_color),
+                                  ),
+                                  width: 35.0,
+                                  height: 35.0,
+                                  padding: EdgeInsets.all(10.0),
+                                ),
+                            errorWidget: (context, url,
+                                error) =>
+                                Material(
+                                  child: /* Image.asset(
+                                                      'images/img_not_available.jpeg',
+                                                      width: MediaQuery
+                                                          .of(context)
+                                                          .size
+                                                          .width - 30,
+                                                      height: 200.0,
+                                                      fit: BoxFit.cover,
+                                                    ),*/
+                                  new SvgPicture.asset(
+                                    'images/user_unavailable.svg',
+                                    width: 35.0,
+                                    height: 35.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(18.0),
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
+                            imageUrl: _mcurrentUserPhoto,
+                            width: 35.0,
+                            height: 35.0,
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(18.0),
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                        ),
+                      ),
                       new Container(
                           margin: EdgeInsets.only(
                               top: 40.0, right: 10.0, bottom: 10.0),
@@ -419,8 +475,8 @@ class BusinessRecentChatsState extends State<BusinessRecentChats> {
                 MaterialPageRoute(
                     builder: (context) =>
                         BusinessChat(
-                          currentUserId: usersData.userId,
-                          peerId: usersData.employeeId,
+                          currentUserId: _muserId,
+                          peerId: usersData.userId,
                           peerAvatar: usersData.employeePhotoUrl,
                           isFriend: true,
                           isAlreadyRequestSent: true,
