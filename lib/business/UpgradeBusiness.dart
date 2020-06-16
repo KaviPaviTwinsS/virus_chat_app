@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -14,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/UserLocation.dart';
 import 'package:virus_chat_app/profile/ProfilePage.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -133,33 +134,39 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                               (avatarImageFile == null)
                                   ? (photoUrl != null &&
                                   photoUrl != ''
-                                  ? GestureDetector(
-                                onTap: () {
-                                  print('getImage');
-                                },
-                                child: Material(
-                                  child: CachedNetworkImage(
-                                    placeholder: (context, url) =>
-                                        Container(
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                            valueColor: AlwaysStoppedAnimation<
-                                                Color>(
-                                                progress_color),
+                                  ? Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        45.0),border: Border.all(color: profile_image_border_color)
+                                ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    print('getImage');
+                                  },
+                                  child: Material(
+                                    child: CachedNetworkImage(
+                                      placeholder: (context, url) =>
+                                          Container(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                              valueColor: AlwaysStoppedAnimation<
+                                                  Color>(
+                                                  progress_color),
+                                            ),
+                                            width: 70.0,
+                                            height: 70.0,
+                                            padding: EdgeInsets.all(
+                                                20.0),
                                           ),
-                                          width: 70.0,
-                                          height: 70.0,
-                                          padding: EdgeInsets.all(
-                                              20.0),
-                                        ),
-                                    imageUrl: photoUrl,
-                                    width: 70.0,
-                                    height: 70.0,
-                                    fit: BoxFit.cover,
+                                      imageUrl: photoUrl,
+                                      width: 70.0,
+                                      height: 70.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(45.0)),
+                                    clipBehavior: Clip.hardEdge,
                                   ),
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(45.0)),
-                                  clipBehavior: Clip.hardEdge,
                                 ),
                               )
                                   : Container(
@@ -202,7 +209,7 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                   fit: BoxFit.cover,
                                 ),
                                 onPressed: getImage,
-                                padding: EdgeInsets.all(40.0),
+                                padding: EdgeInsets.all(photoUrl == '' ?40.0 : 30.0),
                                 splashColor: Colors.transparent,
                                 highlightColor: greyColor,
                                 iconSize: 15.0,
@@ -378,13 +385,35 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                           mainAxisAlignment: MainAxisAlignment
                               .spaceEvenly,
                           children: <Widget>[
-                            SizedBox(
-                              height: 45.0,
-                              width: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width / 2 - 20,
-                              child: RaisedButton(
+                          GestureDetector(
+                                onTap: (){
+                                  Navigator.of(context).pop();
+                                },
+                                child:Container(
+//                                  color: white_color,
+                                  height: 45.0,
+                                  width: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width / 2 - 20,
+                                  decoration: BoxDecoration(
+                                      color: white_color, borderRadius: BorderRadius.circular(
+                                      30.0),border: Border.all(color: button_fill_color)
+                                  ),
+                                  child:
+                                  Container(
+                                    margin: EdgeInsets.only(top: 13.0),
+                                    child: Text(business_cancel,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400,color: button_fill_color),),
+                                    ), /* Text(business_cancel,
+                                    style: TextStyle(
+                                        fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),),*/
+                                )
+                              ),
+
+                              /*RaisedButton(
                                   color: white_color,
                                   textColor: button_fill_color,
                                   highlightColor: button_fill_color,
@@ -399,9 +428,8 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   }
-                              ),
-                            ),
-                            SizedBox(
+                              ),*/
+                         /*   SizedBox(
                                 height: 45.0,
                                 width: MediaQuery
                                     .of(context)
@@ -422,7 +450,34 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
                                       businessValidation();
                                     }
                                 )
-                            )
+                            )*/
+                            GestureDetector(
+                                onTap: (){
+                                  businessValidation();
+                                },
+                                child:Container(
+//                                  color: white_color,
+                                  height: 45.0,
+                                  width: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width / 2 - 20,
+                                  decoration: BoxDecoration(
+                                      color: button_fill_color, borderRadius: BorderRadius.circular(
+                                      30.0),border: Border.all(color: button_fill_color)
+                                  ),
+                                  child:
+                                  Container(
+                                    margin: EdgeInsets.only(top: 13.0),
+                                    child: Text(business_upgrade,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400,color: white_color),),
+                                  ), /* Text(business_cancel,
+                                    style: TextStyle(
+                                        fontFamily: 'GoogleSansFamily',fontWeight: FontWeight.w400),),*/
+                                )
+                            ),
                           ],
                         ),
                       )
@@ -484,11 +539,15 @@ class UpgradeBusinessState extends State<UpgradeBusiness> {
           'ownerName': _ownerName,
           'createdAt': currTime,
           'businessChatPeriority': 0,
+          'employeeCount': 0,
+          'businessDistance' :'0',
+          'status':'ACTIVE'
         }).whenComplete(() =>
         {
           Firestore.instance.collection('users').document(userId).updateData({
             'businessId': reference.documentID,
-            'businessType': BUSINESS_TYPE_OWNER
+            'businessType': BUSINESS_TYPE_OWNER,
+            'businessName':businessName
           })
         }).whenComplete(() =>
         {

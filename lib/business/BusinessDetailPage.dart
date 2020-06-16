@@ -161,9 +161,13 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                             }),
                       ),
 
-                      new Container(
+                   /*   new Container(
                         margin: EdgeInsets.only(
                             top: 40.0, right: 10.0, bottom: 10.0),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                30.0),border: Border.all(color: profile_image_border_color)
+                        ),
                         child: Material(
                           child: CachedNetworkImage(
                             placeholder: (context, url) =>
@@ -180,7 +184,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                             errorWidget: (context, url,
                                 error) =>
                                 Material(
-                                  child: /* Image.asset(
+                                  child: *//* Image.asset(
                                                       'images/img_not_available.jpeg',
                                                       width: MediaQuery
                                                           .of(context)
@@ -188,7 +192,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                                           .width - 30,
                                                       height: 200.0,
                                                       fit: BoxFit.cover,
-                                                    ),*/
+                                                    ),*//*
                                   new SvgPicture.asset(
                                     'images/user_unavailable.svg',
                                     width: 35.0,
@@ -210,7 +214,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                           ),
                           clipBehavior: Clip.hardEdge,
                         ),
-                      ),
+                      ),*/
                       new Container(
                           margin: EdgeInsets.only(
                               left: 0.0, bottom: 10.0, top: 40.0),
@@ -1073,10 +1077,10 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                 BusinessChat(
                                   currentUserId: _currentUserId,
                                   peerId: employeeOneData.userId,
-                                  peerAvatar: employeeOneData.photoUrl,
+                                  peerAvatar: _businessImage,
                                   isFriend: true,
                                   isAlreadyRequestSent: true,
-                                  peerName: employeeOneData.name,
+                                  peerName: _businessName,
                                   chatType: CHAT_TYPE_BUSINESS,
                                 )));
                   } else {
@@ -1126,10 +1130,10 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                 BusinessChat(
                                   currentUserId: _currentUserId,
                                   peerId: employeeTwoData.userId,
-                                  peerAvatar: employeeTwoData.photoUrl,
+                                  peerAvatar: _businessImage,
                                   isFriend: true,
                                   isAlreadyRequestSent: true,
-                                  peerName: employeeTwoData.name,
+                                  peerName: _businessName,
                                   chatType: CHAT_TYPE_BUSINESS,
                                 )));
                   } else {
@@ -1179,10 +1183,10 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                 BusinessChat(
                                   currentUserId: _currentUserId,
                                   peerId: employeeThreeData.userId,
-                                  peerAvatar: employeeThreeData.photoUrl,
+                                  peerAvatar: _businessImage,
                                   isFriend: true,
                                   isAlreadyRequestSent: true,
-                                  peerName: employeeThreeData.name,
+                                  peerName: _businessName,
                                   chatType: CHAT_TYPE_BUSINESS,
                                 )));
                   } else {
@@ -1232,10 +1236,10 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
                                 BusinessChat(
                                   currentUserId: _currentUserId,
                                   peerId: employeeFourData.userId,
-                                  peerAvatar: employeeFourData.photoUrl,
+                                  peerAvatar: _businessImage,
                                   isFriend: true,
                                   isAlreadyRequestSent: true,
-                                  peerName: employeeFourData.name,
+                                  peerName: _businessName,
                                   chatType: CHAT_TYPE_BUSINESS,
                                 )));
                   } else {
@@ -1313,7 +1317,7 @@ class BusinessDetailPageState extends State<BusinessDetailPage> {
       body: jsonEncode(
         <String, dynamic>{
           'notification': <String, dynamic>{
-            'body': 'Business Chat from $businessName.Kindly go to business chat.',
+            'body': 'Business Chat from user ${mIsChatListData.name} in $businessName.Kindly go to business chat.',
             'title': 'Business Chat'
           },
           'priority': 'high',

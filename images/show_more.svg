@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="78" height="78" viewBox="0 0 78 78">
+  <defs>
+    <filter id="Oval" x="0" y="0" width="78" height="78" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Oval-2" x="0" y="0" width="78" height="78" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur-2"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur-2"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <clipPath id="clip-path">
+      <g transform="matrix(1, 0, 0, 1, 0, 0)" filter="url(#Oval)">
+        <circle id="Oval-3" data-name="Oval" cx="30" cy="30" r="30" fill="none"/>
+      </g>
+    </clipPath>
+  </defs>
+  <g id="show_more" transform="translate(9 8)">
+    <g transform="matrix(1, 0, 0, 1, -9, -8)" filter="url(#Oval-2)">
+      <path id="Oval-4" data-name="Oval" d="M30,0A30,30,0,1,1,0,30,30,30,0,0,1,30,0Z" transform="translate(9 8)" fill="#fff"/>
+    </g>
+    <path id="_Icon_Color" data-name="🎨 Icon Color" d="M4.139,10.5,11.5,18.013a1.776,1.776,0,0,1,0,2.475,1.69,1.69,0,0,1-2.424,0L.5,11.737a1.776,1.776,0,0,1,0-2.475L9.074.513a1.69,1.69,0,0,1,2.424,0,1.776,1.776,0,0,1,0,2.475Z" transform="translate(36 40.5) rotate(180)" fill="#969696"/>
+  </g>
+</svg>

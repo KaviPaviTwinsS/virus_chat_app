@@ -12,11 +12,15 @@ class UsersData {
   String status;
   String userDistanceISWITHINRADIUS;
   String user_token;
+  String lastMessage;
+
+  String userDistance;
 
   UsersData(
       {this.businessId, this.businessName, this.businessType, this.createdAt, this.email, this.id, this.name, this.nickName,
         this.phoneNo,this.photoUrl,
         this.status, this.userDistanceISWITHINRADIUS,
-        this.user_token});
+        this.userDistance,
+        this.user_token,this.lastMessage});
 
 }

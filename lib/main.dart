@@ -30,7 +30,7 @@ void main() {
       // Notice that the counter didn't reset back to zero; the application
       // is not restarted.
 //        primarySwatch: Colors.blue,
-        fontFamily: 'GoogleSansFamily'
+        fontFamily: 'GoogleSansFamily',
     ),
     home: new SplashScreenPage(),
     routes: <String, WidgetBuilder>{

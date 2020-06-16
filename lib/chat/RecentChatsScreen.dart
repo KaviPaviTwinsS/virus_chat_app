@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/business/UsersData.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
@@ -68,32 +68,49 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                       .collection('users')
                       .document(_chatIds[i]).get().then((
                       DocumentSnapshot snapshot) {
-                    setState(() {
-                      isLoading = false;
-                    });
-                    _usersData.add(
-                        UsersData(businessId: snapshot.data['businessId'],
-                            businessName: snapshot.data['businessName'],
-                            businessType: snapshot.data['businessType'],
-                            createdAt: snapshot.data['createdAt'],
-                            email: snapshot.data['email'],
-                            id: snapshot.data['id'],
-                            name: snapshot.data['name'],
-                            nickName: snapshot.data['nickName'],
-                            phoneNo: snapshot.data['phoneNo'],
-                            photoUrl: snapshot.data['photoUrl'],
-                            status: snapshot.data['status'],
-                            userDistanceISWITHINRADIUS: snapshot
-                                .data['userDistanceISWITHINRADIUS'],
-                            user_token: snapshot.data['user_token']));
-                    if (i + 1 == _chatIds.length) {
-                      print(
-                          'Recent Chats ___________chatting_${i}VALUEEEEEEEEE _______');
-                      setState(() {
-                        this._mChatIds = _chatIds;
-                        this._mUsersData = _usersData;
-                      });
+                        String groupChatId ='';
+                    if (_muserId.hashCode <= snapshot.data['id'].hashCode) {
+                      groupChatId = '$_muserId-${snapshot.data['id']}';
+                    } else {
+                      groupChatId = '${snapshot.data['id']}-$_muserId';
                     }
+                    Firestore.instance
+                        .collection('messages')
+                        .document(groupChatId)
+                        .collection(groupChatId)
+                        .orderBy('timestamp', descending: true)
+                        .limit(20)
+                        .getDocuments().then((value){
+                          List<DocumentSnapshot> mDocument = value.documents;
+                      print('VALUE ______________________Last message ${mDocument[0].data['content']}');
+                      setState(() {
+                        isLoading = false;
+                      });
+                      _usersData.add(
+                          UsersData(businessId: snapshot.data['businessId'],
+                              businessName: snapshot.data['businessName'],
+                              businessType: snapshot.data['businessType'],
+                              createdAt: snapshot.data['createdAt'],
+                              email: snapshot.data['email'],
+                              id: snapshot.data['id'],
+                              name: snapshot.data['name'],
+                              nickName: snapshot.data['nickName'],
+                              phoneNo: snapshot.data['phoneNo'],
+                              photoUrl: snapshot.data['photoUrl'],
+                              status: snapshot.data['status'],
+                              userDistanceISWITHINRADIUS: snapshot
+                                  .data['userDistanceISWITHINRADIUS'],
+                              user_token: snapshot.data['user_token'],lastMessage: mDocument[0].data['content']));
+                      if (i + 1 == _chatIds.length) {
+                        print(
+                            'Recent Chats ___________chatting_${i}VALUEEEEEEEEE _______');
+                        setState(() {
+                          this._mChatIds = _chatIds;
+                          this._mUsersData = _usersData;
+                        });
+                      }
+                    });
+
                   });
                 }
               }else{
@@ -219,7 +236,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-            new UsersList(_userSignInType, _muserId, _muserPhoto)));
+            new UsersList( _muserId,_userSignInType, _muserPhoto)));
   }
 
 
@@ -288,6 +305,10 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                       usersData != null &&
                           usersData.photoUrl != null ? new Container(
                         margin: EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                30.0),border: Border.all(color: profile_image_border_color)
+                        ),
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Material(
@@ -325,6 +346,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                           ),
                           decoration: new BoxDecoration(
                             shape: BoxShape.circle,
+                            border: Border.all(color: profile_image_border_color),
                           )),
                       usersData != null &&
                           usersData.status == 'ACTIVE' ? Container(
@@ -334,7 +356,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                           ),
                           margin: EdgeInsets.only(left: 45.0,
                               bottom: 40.0,
-                              top: 15.0,
+                              top: 12.0,
                               right: 5.0)) : usersData != null &&
                           usersData.status == 'LoggedOut'
                           ? Container(
@@ -344,7 +366,7 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                         ),
                         margin: EdgeInsets.only(left: 45.0,
                             bottom: 40.0,
-                            top: 15.0,
+                            top: 12.0,
                             right: 5.0),
                       )
                           : Container(
@@ -354,14 +376,14 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                         ),
                         margin: EdgeInsets.only(left: 45.0,
                             bottom: 40.0,
-                            top: 15.0,
+                            top: 12.0,
                             right: 5.0),
                       )
                     ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment
-                        .center,
+                        .start,
                     mainAxisAlignment: MainAxisAlignment
                         .start,
                     children: <Widget>[
@@ -371,10 +393,14 @@ class RecentChatsScreenState extends State<RecentChatsScreen> {
                           capitalize(usersData.name),
                           style: TextStyle(fontWeight: FontWeight.w500,fontFamily: 'GoogleSansFamily',color: hint_color_grey_dark),),
                       ) : Text(''),
-                     /* usersData != null && usersData.name != '' ? new Container(
+                      usersData != null && usersData.lastMessage != '' ? new Container(
+                        width: MediaQuery.of(context).size.width - 120,
+                        margin: EdgeInsets.only(top: 5.0,right: 5.0),
                         child: Text(
-                          capitalize(usersData.name),),
-                      ) : Text(''),*/
+                          usersData.lastMessage,
+                          overflow: TextOverflow.ellipsis,
+                          style:  TextStyle(fontWeight: FontWeight.w500,fontFamily: 'GoogleSansFamily',color: hint_color_grey_light,fontSize: 12.0,),),
+                      ) : Text(''),
                     ],
                   )
                 ],

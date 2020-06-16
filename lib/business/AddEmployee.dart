@@ -46,6 +46,7 @@ class AddEmployeeState extends State<AddEmployee> {
   Uint8List avatar;
 //  List<String> userList = new List<String>();
   List<DocumentSnapshot> documents;
+  PermissionStatus permissionStatus;
   SharedPreferences prefs;
   final ScrollController listScrollController = new ScrollController();
   bool isLoading = false;
@@ -117,6 +118,7 @@ class AddEmployeeState extends State<AddEmployee> {
     _mBusinessName = await prefs.getString('BUSINESS_NAME');
     _noOfEmployee = await prefs.getInt('BUSINESS_EMPLOYEES_COUNT');
     documents = await loadUsers();
+    permissionStatus = await _getContactPermission();
     Timer(Duration(seconds: 2), ()  {
       _mSearchContact = 'a';
       refreshContacts('a');
@@ -202,9 +204,14 @@ class AddEmployeeState extends State<AddEmployee> {
                         children: <Widget>[
                           Card(
                             elevation: 20,
-                            margin: EdgeInsets.all(20.0),
+                            margin: EdgeInsets.only(left: 20.0,right: 20.0,bottom: 20.0,top: 10.0),
                             child: Container(
-                              color: white_color,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(3.0),
+                                ),
+                              ),
+//                              color: white_color,
                               child: TextField(
                                 decoration: InputDecoration(
                                   contentPadding: new EdgeInsets.all(15.0),
@@ -219,6 +226,7 @@ class AddEmployeeState extends State<AddEmployee> {
                                     },
                                   ),
                                   hintText: search,
+                                  hintStyle:TextStyle(color: text_color_grey)
                                 ),
                                 controller: searchController,
                                 onChanged: (value) {
@@ -290,7 +298,6 @@ class AddEmployeeState extends State<AddEmployee> {
 
   Future refreshContacts(String searchKey) async {
     print('NANDHU AddEmployeeState refreshContacts key ___${searchKey} ___text ${searchController.text}');
-    PermissionStatus permissionStatus = await _getContactPermission();
     if (permissionStatus == PermissionStatus.granted) {
       if (!isLoading) {
         setState(() {
@@ -794,10 +801,14 @@ class AddEmployeeState extends State<AddEmployee> {
               prefs.setInt('BUSINESS_EMPLOYEES_COUNT', _noOfEmployee);
               Navigator.pop(context);
 
-              String message = "You are added in the " + "business";
+              String message = "You are added in the $_mBusinessName" + "business"+'Please login';
               print('NAndhini Ndot addemployee ${COUNTRY_CODE + "\t" +
                   _mContactPhone} _______');
-              List<String> recipents = [COUNTRY_CODE + "\t" + _mContactPhone,];
+            /*  if(_mContactPhone.contains('+91')){
+                _mContactPhone.replaceAll('+91', '');
+              }*/
+//              List<String> recipents = [COUNTRY_CODE + "\t" + _mContactPhone,];
+                            List<String> recipents = [_mContactPhone,];
               _sendSMS(message, recipents);
 
 
@@ -923,7 +934,7 @@ class AddEmployeeState extends State<AddEmployee> {
 
   _sendSMS(String message, List<String> recipents) async {
     List<String> recipients =recipents;
-    String _result = await FlutterSms.sendSMS(message: "message", recipients: recipients).catchError((onError) {
+    String _result = await FlutterSms.sendSMS(message: message, recipients: recipients).catchError((onError) {
       print(onError);
       Fluttertoast.showToast(msg: 'Send sms error');
     });

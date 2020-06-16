@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
 import 'package:virus_chat_app/UserLocation.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:virus_chat_app/utils/constants.dart';
@@ -227,13 +227,13 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                               valueColor: AlwaysStoppedAnimation<
                                                   Color>(progress_color),
                                             ),
-                                            width: 90.0,
-                                            height: 90.0,
+                                            width: 70.0,
+                                            height: 70.0,
                                             padding: EdgeInsets.all(20.0),
                                           ),
                                       imageUrl: photoUrl,
-                                      width: 90.0,
-                                      height: 90.0,
+                                      width: 70.0,
+                                      height: 70.0,
                                       fit: BoxFit.cover,
                                     ),
                                     borderRadius: BorderRadius.all(
@@ -263,8 +263,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                 child: Material(
                                   child: Image.file(
                                     avatarImageFile,
-                                    width: 90.0,
-                                    height: 90.0,
+                                    width: 70.0,
+                                    height: 70.0,
                                     fit: BoxFit.cover,
                                   ),
                                   borderRadius: BorderRadius.all(
@@ -280,7 +280,7 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
                                   fit: BoxFit.cover,
                                 ),
                                 onPressed: getImage,
-                                padding: EdgeInsets.all(30.0),
+                                padding: EdgeInsets.all(photoUrl == '' ?40.0 : 30.0),
                                 splashColor: Colors.transparent,
                                 highlightColor: greyColor,
                                 iconSize: 15.0,
@@ -840,8 +840,8 @@ class UserRegistrationScreen extends State<UserRegistrationState> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  UsersList(signInType,
-                      firebaseUser.uid, photoUrl)));
+                  UsersList(firebaseUser.uid,signInType,
+                       photoUrl)));
     }
     /*  Navigator.push(
         context,

@@ -21,7 +21,7 @@ import 'package:path_provider/path_provider.dart'
     show getExternalStorageDirectory, getTemporaryDirectory;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/UserLocation.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/business/MyAudioRecorderBusiness.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
 import 'package:virus_chat_app/utils/colors.dart';
@@ -1354,6 +1354,10 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
                         new Container(
                           margin: EdgeInsets.only(
                               top: 40.0, right: 10.0, bottom: 10.0),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                  30.0),border: Border.all(color: profile_image_border_color)
+                          ),
                           child: Material(
                             child: CachedNetworkImage(
                               placeholder: (context, url) =>
@@ -1389,6 +1393,7 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
                                   peerName, style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     color: black_color,
+                                    fontSize: 12.0,
                                     fontFamily: 'GoogleSansFamily'),
                                 ),
                               ) : Text(''),
@@ -1398,6 +1403,7 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       color: hint_color_grey_dark,
+                                      fontSize: 12.0,
                                       fontFamily: 'GoogleSansFamily'),
                                 ),
                               ) : Container(
@@ -1405,6 +1411,7 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
                                   mDifference, style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     color: hint_color_grey_dark,
+                                    fontSize: 12.0,
                                     fontFamily: 'GoogleSansFamily'),
                                 ),
                               ),
@@ -1429,8 +1436,8 @@ class BusinessChatScreenState extends State<BusinessChatScreen> implements audio
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              UsersList(
-                                                  '', currentUserId, '')));
+                                              UsersList(currentUserId,
+                                                  '', '')));
                                 },
                               ),
                             )

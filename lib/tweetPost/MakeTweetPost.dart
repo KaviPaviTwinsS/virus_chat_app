@@ -238,6 +238,10 @@ class MakeTweetPostState extends State<MakeTweetPost> {
               Stack(
                 children: <Widget>[
                   document['userPhoto'] != '' ? Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                              30.0),border: Border.all(color: profile_image_border_color)
+                      ),
                       margin: EdgeInsets.only(left : 10.0,bottom: document['tweetPostImage'] != '' ? 170.0 : 100.0,top: 10.0),
                       child: Material(
                         child: CachedNetworkImage(

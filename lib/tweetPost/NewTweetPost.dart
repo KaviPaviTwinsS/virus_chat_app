@@ -374,23 +374,28 @@ class NewTweetPostState extends State<NewTweetPost> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Material(
-                    child: CachedNetworkImage(
-                      placeholder: (context, url) =>
-                          Container(
-                            alignment: Alignment.topLeft,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.0,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  progress_color),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                            30.0),border: Border.all(color: profile_image_border_color)
+                    ),
+                    child: Material(
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) =>
+                            Container(
+                              alignment: Alignment.topLeft,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.0,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    progress_color),
+                              ),
+                              width: 50.0,
+                              height: 50.0,
                             ),
-                            width: 50.0,
-                            height: 50.0,
-                          ),
-                      errorWidget: (context, url,
-                          error) =>
-                          Material(
-                            child: /* Image.asset(
+                        errorWidget: (context, url,
+                            error) =>
+                            Material(
+                              child: /* Image.asset(
                                                       'images/img_not_available.jpeg',
                                                       width: MediaQuery
                                                           .of(context)
@@ -399,29 +404,30 @@ class NewTweetPostState extends State<NewTweetPost> {
                                                       height: 200.0,
                                                       fit: BoxFit.cover,
                                                     ),*/
-                            new SvgPicture.asset(
-                              'images/user_unavailable.svg',
-                              height: 250.0,
-                              width: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width - 30,
-                              fit: BoxFit.cover,
+                              new SvgPicture.asset(
+                                'images/user_unavailable.svg',
+                                height: 250.0,
+                                width: MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width - 30,
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius
+                                  .all(
+                                Radius.circular(5.0),
+                              ),
+                              clipBehavior: Clip.hardEdge,
                             ),
-                            borderRadius: BorderRadius
-                                .all(
-                              Radius.circular(5.0),
-                            ),
-                            clipBehavior: Clip.hardEdge,
-                          ),
-                      imageUrl: mCurrentPhotoUrl,
-                      width: 50.0,
-                      height: 50.0,
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.all(Radius.circular(45.0)),
-                    clipBehavior: Clip.hardEdge,
-                  ), // Edit text
+                        imageUrl: mCurrentPhotoUrl,
+                        width: 50.0,
+                        height: 50.0,
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(45.0)),
+                      clipBehavior: Clip.hardEdge,
+                    ), // Edit text,
+                  ),
                   Expanded(
                     child: Container(
                       padding: EdgeInsets.only(left: 10.0),

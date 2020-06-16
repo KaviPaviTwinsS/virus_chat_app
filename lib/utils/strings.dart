@@ -57,7 +57,7 @@ String business_cancel ='Cancel';
 String business_upgrade ='Upgrade';
 String add_employee = 'Add Employee';
 String created_at = 'Created at';
-String search = 'Search';
+String search = 'Search by number';
 String employees = 'Employees';
 
 

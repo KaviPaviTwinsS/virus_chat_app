@@ -8,7 +8,7 @@ import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:virus_chat_app/Login/UserRegistrationPage.dart';
 import 'package:virus_chat_app/profile/ProfilePage.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/utils/CustomTextSpan.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -201,7 +201,11 @@ class _OTPScreenState extends State<OTPScreen> {
                           });
                           _onFormSubmitted();
                         } else {
-                          showToast("Invalid OTP", Colors.red);
+                          if(_pinEditingController.text.length == 0)
+                          showToast("Please enter OTP", Colors.red);
+                          else
+                            showToast("Please enter 6digits OTP", Colors.red);
+
                         }
                       },
                       color: button_fill_color,
@@ -426,8 +430,8 @@ class _OTPScreenState extends State<OTPScreen> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  UsersList('MobileNumber',
-                      uid, documents[0]['photoUrl'])));
+                  UsersList(
+                      uid,'MobileNumber', documents[0]['photoUrl'])));
       print('updateLocalListData NANDHU');
     }else{
       if((documents[0]['businessId'] != null && documents[0]['businessId'] == '') || (documents[0]['businessType'] != null && documents[0]['businessType'] != BUSINESS_TYPE_OWNER)) {
@@ -442,8 +446,8 @@ class _OTPScreenState extends State<OTPScreen> {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    UsersList('MobileNumber',
-                        uid, documents[0]['photoUrl'])));
+                    UsersList(
+                        uid,'MobileNumber', documents[0]['photoUrl'])));
       }
     }
 

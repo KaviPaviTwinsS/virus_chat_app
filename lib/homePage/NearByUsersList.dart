@@ -3,35 +3,34 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:virus_chat_app/business/BusinessDetailPage.dart';
+import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 
 
-class ViewEmployeesPage extends StatefulWidget {
+class NearByUsersList extends StatefulWidget {
 
-  String _mBusinessId = '';
-
-  ViewEmployeesPage(String businessId){
-    _mBusinessId = businessId;
+  String _currentUserId ='';
+  NearByUsersList(String currentUserId){
+    _currentUserId = currentUserId;
   }
   @override
   State<StatefulWidget> createState() {
-    return ViewEmployeesPageState(_mBusinessId);
+    return NearByUsersListState(_currentUserId);
   }
 
 }
 
-class ViewEmployeesPageState extends State<ViewEmployeesPage> {
+class NearByUsersListState extends State<NearByUsersList> {
 
   final ScrollController listScrollController = new ScrollController();
   var listMessage;
   bool isLoading = false;
 
-  String _mBusinessId ='';
-  ViewEmployeesPageState(String mBusinessId){
-    _mBusinessId = mBusinessId;
+  String _currentUserId;
+  NearByUsersListState(String currentUserId){
+    _currentUserId = currentUserId;
   }
 
 
@@ -70,7 +69,7 @@ class ViewEmployeesPageState extends State<ViewEmployeesPage> {
                   new Container(
                       margin: EdgeInsets.only(
                           top: 40.0, bottom: 10.0),
-                      child: Text(view_employees, style: TextStyle(
+                      child: Text(business_header, style: TextStyle(
                           color: black_color,
                           fontSize: TOOL_BAR_TITLE_SIZE,
                           fontWeight: FontWeight.w500,
@@ -103,10 +102,10 @@ class ViewEmployeesPageState extends State<ViewEmployeesPage> {
   }
 
   Widget buildListBusinesses() {
-    return Flexible(
+    return Expanded(
         child: StreamBuilder(
           stream: Firestore.instance.collection('users') .where(
-          'businessId', isEqualTo: _mBusinessId).where('businessType',isEqualTo: BUSINESS_TYPE_EMPLOYEE).snapshots(),
+          'status', isEqualTo: 'ACTIVE').snapshots(),
           builder: (context, snapshot) {
             print(
                 'snapshot ____________${snapshot.hasData} ___isLoading $isLoading');
@@ -123,7 +122,7 @@ class ViewEmployeesPageState extends State<ViewEmployeesPage> {
               print('snapshot ____________${listMessage
                   .length}___isLoading $isLoading');
               return (listMessage.length == 0) ? Center(
-                child: Text(no_business_employees),
+                child: Text(no_business),
               ) : ListView.builder(
                 itemBuilder: (context, index) =>
                     buildItem(index, snapshot.data.documents[index]),
@@ -144,17 +143,26 @@ class ViewEmployeesPageState extends State<ViewEmployeesPage> {
         children: <Widget>[
           GestureDetector(
             onTap: () {
-
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Chat(
+                            currentUserId: _currentUserId,
+                            peerId: document['id'],
+                            peerAvatar: document['photoUrl'],
+                            isFriend: true,
+                            isAlreadyRequestSent: true,
+                            peerName: document['name'],
+                          )));
             },
             child: Row(
               children: <Widget>[
-               /* document['photoUrl'] != '' ? */Container(
+                document['photoUrl'] != '' ? Container(
                   margin: EdgeInsets.only(bottom: index == 0 ? 10.0 : 10.0,top: index == 0 ? 0.0 : 15.0),
-                  child: Stack(
-                      children: <Widget>[
-                       /* document['photoUrl'] != null &&
+                  child: document['photoUrl'] != null &&
                             document['photoUrl'] != ''
-                            ? */new Container(
+                            ? new Container(
                           margin: EdgeInsets.all(10.0),
                           child: Align(
                             alignment: Alignment.topLeft,
@@ -175,30 +183,6 @@ class ViewEmployeesPageState extends State<ViewEmployeesPage> {
                                 width: 60.0,
                                 height: 60.0,
                                 fit: BoxFit.cover,
-                                errorWidget: (context, url,
-                                    error) =>
-                                    Material(
-                                      child: /* Image.asset(
-                                                      'images/img_not_available.jpeg',
-                                                      width: MediaQuery
-                                                          .of(context)
-                                                          .size
-                                                          .width - 30,
-                                                      height: 200.0,
-                                                      fit: BoxFit.cover,
-                                                    ),*/
-                                      new SvgPicture.asset(
-                                        'images/user_unavailable.svg',
-                                        height: 60.0,
-                                        width: 60.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: BorderRadius
-                                          .all(
-                                        Radius.circular(5.0),
-                                      ),
-                                      clipBehavior: Clip.hardEdge,
-                                    ),
                               ),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(30.0),
@@ -206,8 +190,13 @@ class ViewEmployeesPageState extends State<ViewEmployeesPage> {
                               clipBehavior: Clip.hardEdge,
                             ),
                           ),
-                        ),
-                        /*    : new Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                  30.0),border: Border.all(color: profile_image_border_color)
+                          ),
+                        )
+                            : document['photoUrl'] == ''
+                            ? new Container(
                             margin: EdgeInsets.all(10.0),
                             width: 60.0,
                             height: 60.0,
@@ -219,65 +208,30 @@ class ViewEmployeesPageState extends State<ViewEmployeesPage> {
                             ),
                             decoration: new BoxDecoration(
                               shape: BoxShape.circle,
-                            )),*/
-                        document['status'] == 'ACTIVE'  && document['status']  != ''? Container(
-                            child: new SvgPicture.asset(
-                              'images/online_active.svg',
-                              height: 15.0,
-                              width: 15.0,
-//                                          color: primaryColor,
-                            ),
-                            margin: EdgeInsets.only(left: 53.0,
-                                bottom: 40.0,
-                                top: 10.0,
-                                right: 15.0)) : document['status'] ==
-                            'LoggedOut' && document['status'] !='' ? Container(
-                          child: new SvgPicture.asset(
-                            'images/online_inactive.svg',
-                            height: 15.0,
-                            width: 15.0,
-//                                        color: primaryColor,
-                          ),
-                          margin: EdgeInsets.only(left: 53.0,
-                              bottom: 40.0,
-                              top: 10.0,
-                              right: 15.0),
-                        ) :  document['status'] ==
-                            'INACTIVE' && document['status'] !=''  ? Container(
-                          child: new SvgPicture.asset(
-                            'images/online_idle.svg', height: 15.0,
-                            width: 15.0,
-//                                        color: primaryColor,
-                          ),
-                          margin: EdgeInsets.only(left: 53.0,
-                              bottom: 40.0,
-                              top: 10.0,
-                              right: 15.0),
-                        ): Container()
-                      ]
-                  ),
-                ),
-                   /* : Text(''),*/
+                            ))
+                            : Text(''),
+                )
+                    : Text(''),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     document['name'] != ''
                         ? Container(
-                        margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,top: 10.0),
+                        margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,top: index == 0? 10.0 :15.0),
                         child: Text(capitalize(document['name']),
                           style: TextStyle(fontWeight: FontWeight.w500,
                               fontSize: 16.0,
                               fontFamily: 'GoogleSansFamily',color: black_color),)
                     )
                         : Text(''),
-                    document['phoneNo'] != ''
+                   /* document['userDistance'] != ''
                         ? Align(
                       alignment: Alignment.bottomLeft,
                       child: Container(
                           width: MediaQuery.of(context).size.width - 120,
                           margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,right: 10.0),
-                          child: Text(capitalize(document['phoneNo'],),
+                          child: Text(capitalize(document['userDistance'],),
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontWeight: FontWeight.w400,
                                 fontSize: 12.0,
@@ -285,7 +239,7 @@ class ViewEmployeesPageState extends State<ViewEmployeesPage> {
                           )
                       ),
                     )
-                        : Text('')
+                        : Text('')*/
                   ],
                 )
               ],

@@ -21,7 +21,7 @@ import 'package:path_provider/path_provider.dart'
     show getExternalStorageDirectory, getTemporaryDirectory;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/UserLocation.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/audiop/MyAudioRecorder.dart';
 import 'package:virus_chat_app/chat/fullPhoto.dart';
 import 'package:virus_chat_app/utils/colors.dart';
@@ -1327,6 +1327,10 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                         new Container(
                           margin: EdgeInsets.only(
                               top: 40.0, right: 10.0, bottom: 10.0),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                  30.0),border: Border.all(color: profile_image_border_color)
+                          ),
                           child: Material(
                             child: CachedNetworkImage(
                               placeholder: (context, url) =>
@@ -1362,23 +1366,25 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                                   peerName, style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     color: black_color,
+                                    fontSize: 12.0,
                                     fontFamily: 'GoogleSansFamily'),
                                 ),
                               ) : Text(''),
                               mDifference != 'Active Now' ? Container(
                                 child: Text(
-                                  'Active \t ' + mDifference + '\t ago',
+                                  'Active\t ' + mDifference + '\t ago',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       color: hint_color_grey_dark,
+                                      fontSize: 12.0,
                                       fontFamily: 'GoogleSansFamily'),
                                 ),
                               ) : Container(
                                 child: Text(
                                   mDifference, style: TextStyle(
                                     fontWeight: FontWeight.w400,
+                                    fontSize: 12.0,
                                     color: hint_color_grey_dark,
-
                                     fontFamily: 'GoogleSansFamily'),
                                 ),
                               ),
@@ -1403,8 +1409,8 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              UsersList(
-                                                  '', currentUserId, '')));
+                                              UsersList(currentUserId,
+                                                  '',  '')));
                                 },
                               ),
                             )
@@ -1815,12 +1821,12 @@ class ChatScreenState extends State<ChatScreen> implements audioListener {
           ),
           Row(
             children: <Widget>[
-              Expanded(
+              Flexible(
                 child: Container(
                   margin: EdgeInsets.only(left: 20.0, bottom: 5.0),
                   child: TextField(
-                    maxLines: null,
-                    keyboardType: TextInputType.multiline,
+//                    maxLines: null,
+//                    keyboardType: TextInputType.multiline,
                     style: TextStyle(color: black_color, fontSize: 15.0),
                     controller: controllerName,
                     onChanged: (value) {

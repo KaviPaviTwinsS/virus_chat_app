@@ -10,7 +10,7 @@ import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/PhoneNumberSelection.dart';
 import 'package:http/http.dart' as http;
 import 'package:virus_chat_app/UserLocation.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/splash/WalkThroughOne.dart';
 import 'package:virus_chat_app/splash/WalkThroughThree.dart';
 import 'package:virus_chat_app/splash/WalkThroughTwo.dart';
@@ -258,7 +258,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => UsersList(signinType,user,userUrl)));
+            builder: (context) => UsersList(user,signinType,userUrl)));
 
      }
 

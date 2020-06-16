@@ -17,7 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:virus_chat_app/FacebookSignup.dart';
 import 'package:virus_chat_app/LocationService.dart';
 import 'package:virus_chat_app/Login/LoginSelection.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/business/AddEmployee.dart';
 import 'package:virus_chat_app/business/UpgradeBusiness.dart';
 import 'package:virus_chat_app/business/flutter_sms.dart';
@@ -100,6 +100,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
   String businessName = '';
   String businessNumber = '';
   String businessAddress = '';
+  String businessInfo ='';
   String businessImage = '';
   String _mBusinessType = '';
   String businessCreatedTime = '';
@@ -152,6 +153,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
     userEmail = prefs.getString('email');
     photoUrl = prefs.getString('photoUrl');
     mNewPhotoUrl = prefs.getString('photoUrl');
+    name = prefs.getString('name');
+    nickName = prefs.getString('nickname');
     businessId = prefs.getString('BUSINESS_ID');
     print('businessId $businessId');
     mobileNumber = prefs.getString('phoneNo');
@@ -182,6 +185,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
           this.businessId = businessDetails['businessId'];
           this.businessName = businessDetails['businessName'];
           this.businessAddress = businessDetails['businessAddress'];
+          this.businessInfo =businessDetails['businessDescription'];
           this.businessNumber = businessDetails['businessNumber'];
           this.businessImage = businessDetails['photoUrl'];
           this.businessCreatedTime = businessDetails['createdAt'].toString();
@@ -191,6 +195,8 @@ class ProfilePageState extends State<ProfilePageSetup> {
         await prefs.setString('BUSINESS_NAME', businessName);
         await prefs.setString('BUSINESS_ADDRESS', businessAddress);
         await prefs.setString('BUSINESS_NUMBER', businessNumber);
+        await prefs.setString(
+            'BUSINESS_INFO', businessInfo);
         await prefs.setString('BUSINESS_IMAGE', businessImage);
         await prefs.setString('BUSINESS_CREATED_AT', businessCreatedTime);
         await prefs.setInt('BUSINESS_EMPLOYEES_COUNT', _noOfEmployees);
@@ -201,6 +207,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
         businessId = prefs.getString('BUSINESS_ID');
         businessName = prefs.getString('BUSINESS_NAME');
         businessAddress = prefs.getString('BUSINESS_ADDRESS');
+        businessInfo = prefs.getString('BUSINESS_INFO');
         businessNumber = prefs.getString('BUSINESS_NUMBER');
         businessImage = prefs.getString('BUSINESS_IMAGE');
         businessCreatedTime = prefs.getString('BUSINESS_CREATED_AT');
@@ -309,31 +316,37 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             ? ((photoUrl != null &&
                                             photoUrl != '') ||
                                             photoUrl != mNewPhotoUrl
-                                            ? GestureDetector(
-                                          onTap: getImage,
-                                          child: Material(
-                                            child: CachedNetworkImage(
-                                              placeholder: (context, url) =>
-                                                  Container(
-                                                    child: CircularProgressIndicator(
-                                                      strokeWidth: 2.0,
-                                                      valueColor: AlwaysStoppedAnimation<
-                                                          Color>(
-                                                          progress_color),
+                                            ? Container(
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(
+                                                  45.0),border: Border.all(color: profile_image_border_color)
+                                          ),
+                                          child: GestureDetector(
+                                            onTap: getImage,
+                                            child: Material(
+                                              child: CachedNetworkImage(
+                                                placeholder: (context, url) =>
+                                                    Container(
+                                                      child: CircularProgressIndicator(
+                                                        strokeWidth: 2.0,
+                                                        valueColor: AlwaysStoppedAnimation<
+                                                            Color>(
+                                                            progress_color),
+                                                      ),
+                                                      width: 70.0,
+                                                      height: 70.0,
+                                                      padding: EdgeInsets.all(
+                                                          20.0),
                                                     ),
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    padding: EdgeInsets.all(
-                                                        20.0),
-                                                  ),
-                                              imageUrl: photoUrl,
-                                              width: 70.0,
-                                              height: 70.0,
-                                              fit: BoxFit.cover,
+                                                imageUrl: photoUrl,
+                                                width: 70.0,
+                                                height: 70.0,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(45.0)),
+                                              clipBehavior: Clip.hardEdge,
                                             ),
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(45.0)),
-                                            clipBehavior: Clip.hardEdge,
                                           ),
                                         )
                                             : Container(
@@ -373,7 +386,7 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             ),
                                           ),
                                           onPressed: getImage,
-                                          padding: EdgeInsets.all(30.0),
+                                          padding: EdgeInsets.all(photoUrl == '' ?40.0 : 30.0),
                                           splashColor: Colors.transparent,
                                           highlightColor: greyColor,
                                           iconSize: 15.0,
@@ -381,31 +394,37 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             : ((photoUrl != '' &&
                                             mNewPhotoUrl != '') &&
                                             photoUrl != mNewPhotoUrl)
-                                            ? GestureDetector(
-                                          onTap: getImage,
-                                          child: Material(
-                                            child: CachedNetworkImage(
-                                              placeholder: (context, url) =>
-                                                  Container(
-                                                    child: CircularProgressIndicator(
-                                                      strokeWidth: 2.0,
-                                                      valueColor: AlwaysStoppedAnimation<
-                                                          Color>(
-                                                          progress_color),
+                                            ? Container(
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(
+                                                  30.0),border: Border.all(color: profile_image_border_color)
+                                          ),
+                                          child: GestureDetector(
+                                            onTap: getImage,
+                                            child: Material(
+                                              child: CachedNetworkImage(
+                                                placeholder: (context, url) =>
+                                                    Container(
+                                                      child: CircularProgressIndicator(
+                                                        strokeWidth: 2.0,
+                                                        valueColor: AlwaysStoppedAnimation<
+                                                            Color>(
+                                                            progress_color),
+                                                      ),
+                                                      width: 70.0,
+                                                      height: 70.0,
+                                                      padding: EdgeInsets.all(
+                                                          20.0),
                                                     ),
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    padding: EdgeInsets.all(
-                                                        20.0),
-                                                  ),
-                                              imageUrl: mNewPhotoUrl,
-                                              width: 70.0,
-                                              height: 70.0,
-                                              fit: BoxFit.cover,
+                                                imageUrl: mNewPhotoUrl,
+                                                width: 70.0,
+                                                height: 70.0,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(45.0)),
+                                              clipBehavior: Clip.hardEdge,
                                             ),
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(45.0)),
-                                            clipBehavior: Clip.hardEdge,
                                           ),
                                         )
                                             : Text('')
@@ -588,16 +607,17 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                                 15.0),
                                             focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: focused_border_color,
+                                                  color: mobile_number_profile,
                                                   width: 0.5),
                                             ),
                                             enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: greyColor, width: 0.5),
+                                                  color: mobile_number_profile, width: 0.5),
                                             ),
                                             labelText: capitalize(
                                                 'Mobile number'),
                                             hintStyle: TextStyle(
+                                              color: mobile_number_profile,
                                                 fontSize: HINT_TEXT_SIZE,
                                                 fontFamily: 'GoogleSansFamily'),
                                           ),
@@ -920,6 +940,18 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                             fontFamily: 'GoogleSansFamily',
                                             color: hint_color_grey_light),),
                                     ) : Text(''),
+                                    businessInfo != null &&
+                                        businessInfo != '' ? Container(
+                                      margin: EdgeInsets.only(
+                                          left: 20.0,
+                                          bottom: 15.0,
+                                          right: 20.0),
+                                      child: Text(businessInfo,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontFamily: 'GoogleSansFamily',
+                                            color: hint_color_grey_dark),),
+                                    ) : Text(''),
                                     _mBusinessType == BUSINESS_TYPE_OWNER ? Row(
                                       crossAxisAlignment: CrossAxisAlignment
                                           .start,
@@ -929,12 +961,14 @@ class ProfilePageState extends State<ProfilePageSetup> {
                                         _noOfEmployees != null
                                             ? GestureDetector(
                                             onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ViewEmployeesPage(
-                                                              businessId)));
+                                                if(_noOfEmployees != 0) {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ViewEmployeesPage(
+                                                                  businessId)));
+                                                }
                                             },
                                             child: Align(
                                               child: Container(
@@ -1655,11 +1689,11 @@ class ProfilePageState extends State<ProfilePageSetup> {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => new UsersList(signinType, userId, photoUrl)));
+            builder: (context) => new UsersList(userId,signinType,  photoUrl)));
   }
 
   Future fetchAllUsersData() async {
-    name = controllerName.text;
+//    name = controllerName.text;
     if (prefs.containsKey('userId') && prefs.getString('userId') != null) {
       if (prefs.getString('userId') == '' ||
           prefs.getString('BUSINESS_ID') == '') {
@@ -1689,23 +1723,24 @@ class ProfilePageState extends State<ProfilePageSetup> {
       } else {
         print('NANDHU FETCH USER_________________________');
         setState(() {
-          this.name = prefs.getString('name');
-          this.photoUrl = prefs.getString('photoUrl');
-          this.userEmail = prefs.getString('email');
-          this.nickName = prefs.getString('nickname');
-          this.userPassword = prefs.getString('password');
+//          this.name = prefs.getString('name');
+//          this.photoUrl = prefs.getString('photoUrl');
+//          this.userEmail = prefs.getString('email');
+//          this.nickName = prefs.getString('nickname');
+//          this.userPassword = prefs.getString('password');
           this.businessId = prefs.getString('BUSINESS_ID');
           this.businessCreatedTime = prefs.getString('BUSINESS_CREATED_AT');
           this.businessName = prefs.getString('BUSINESS_NAME');
           this.businessAddress = prefs.getString('BUSINESS_ADDRESS');
+          this.businessInfo = prefs.getString('BUSINESS_INFO');
           this.businessImage = prefs.getString('BUSINESS_IMAGE');
           this._mBusinessType = prefs.getString('BUSINESS_TYPE');
-          if (prefs.getString('phoneNo') != null &&
-              signinType == 'MobileNumber')
-            this.mobileNumber = prefs.getString('phoneNo');
-          this.controllerName = new TextEditingController(text: name);
-          this.controllerNickName = new TextEditingController(text: nickName);
-          this.controllerEmail = new TextEditingController(text: userEmail);
+//          if (prefs.getString('phoneNo') != null &&
+//              signinType == 'MobileNumber')
+//            this.mobileNumber = prefs.getString('phoneNo');
+//          this.controllerName = new TextEditingController(text: name);
+//          this.controllerNickName = new TextEditingController(text: nickName);
+//          this.controllerEmail = new TextEditingController(text: userEmail);
         });
       }
     } else {

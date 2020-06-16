@@ -38,6 +38,8 @@ final text_color_blue = Color(0xFF4285F4);
 final button_fill_color =Color(0xFF4285F4);
 final divider_color= Color(0xFFE4E9F2);
 final unfocused_field_color = Color(0xFFC8CDDC);
+final profile_image_border_color = Color(0xFFE4E9F2);
+final mobile_number_profile = Color(0xFFE4E9F2);
 /*
 100% - FF
 95% - F2

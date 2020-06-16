@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -12,12 +11,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:virus_chat_app/FriendRequestScreen.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/constants.dart';
 import 'package:virus_chat_app/utils/strings.dart';
-
 
 class SendInviteToUser extends StatefulWidget {
   String _mPeerId, _mCurrentUserId;
@@ -45,6 +43,7 @@ class SendInviteToUser extends StatefulWidget {
 
 }
 
+
 class SendInviteToUserState extends State<SendInviteToUser> {
   String _mPeerId, _mCurrentUserId;
   String _mPhotoUrl;
@@ -53,12 +52,10 @@ class SendInviteToUserState extends State<SendInviteToUser> {
   bool _misRequestSent;
   bool isFriend;
   SharedPreferences prefs;
-
   String _userName, _userPhotoUrl;
   String _friendToken = '';
   String currentUserName = '';
   String userSignInType = '';
-
   String _mUserName = '';
 
   SendInviteToUserState(String peerId, String currentUserId,
@@ -158,21 +155,21 @@ class SendInviteToUserState extends State<SendInviteToUser> {
           if (differenceSecs == 0) {
             mDifference = 'Active Now';
           } else {
-            mDifference = differenceSecs.toString() + '\t secs';
+            mDifference = differenceSecs.toString() + 'secs';
           }
         } else {
-          mDifference = differenceMins.toString() + '\t mins';
+          mDifference = differenceMins.toString() + 'mins';
         }
       } else {
-        mDifference = differenceHours.toString() + '\t hours';
+        mDifference = differenceHours.toString() + 'hours';
       }
     } else {
       if (differenceDays == 1) {
-        mDifference = differenceDays.toString() + '\t day';
+        mDifference = differenceDays.toString() + 'day';
       } else if (differenceDays == 30) {
         differenceDays = 1;
       } else {
-        mDifference = differenceDays.toString() + '\t days';
+        mDifference = differenceDays.toString() + 'days';
       }
     }
     setState(() {
@@ -182,7 +179,6 @@ class SendInviteToUserState extends State<SendInviteToUser> {
 
   @override
   Widget build(BuildContext context) {
-
     return WillPopScope(
       onWillPop: () {
         onBackPress();
@@ -217,6 +213,10 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                         new Container(
                           margin: EdgeInsets.only(
                               top: 40.0, right: 10.0, bottom: 10.0),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                  30.0),border: Border.all(color: profile_image_border_color)
+                          ),
                           child: Material(
                             child: CachedNetworkImage(
                               placeholder: (context, url) =>
@@ -374,10 +374,10 @@ class SendInviteToUserState extends State<SendInviteToUser> {
                                 margin: EdgeInsets.only(
                                     left: 20.0, right: 20.0),
                                 child: Text(
-                                  'You\'ll be able to chat with $_mUserName once your invitation has been accepted.',
+                                  'You\'ll be able to chat with ${_mUserName.toUpperCase()} once your invitation has been accepted.',
                                   style: TextStyle(fontWeight: FontWeight.w400,
                                       fontFamily: 'GoogleSansFamily',
-                                      color: hint_color_grey_dark,),textAlign: TextAlign.center,
+                                      color: hint_color_grey_light,),textAlign: TextAlign.center,
                                 ),
                               )
                             ],

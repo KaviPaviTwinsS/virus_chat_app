@@ -174,6 +174,10 @@ class BusinessPageState extends State<BusinessPage> {
                               clipBehavior: Clip.hardEdge,
                             ),
                           ),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                  30.0),border: Border.all(color: profile_image_border_color)
+                          ),
                         )
                             : document['photoUrl'] == ''
                             ? new Container(
@@ -233,7 +237,7 @@ class BusinessPageState extends State<BusinessPage> {
                children: <Widget>[
                  document['businessName'] != ''
                      ? Container(
-                     margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,top: 15.0),
+                     margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,top: index == 0? 10.0 :15.0),
                      child: Text(capitalize(document['businessName']),
                        style: TextStyle(fontWeight: FontWeight.w500,
                            fontSize: 16.0,

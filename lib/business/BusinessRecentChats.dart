@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/business/UsersData.dart';
 import 'package:virus_chat_app/business/BusinessChat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
@@ -309,6 +309,10 @@ class BusinessRecentChatsState extends State<BusinessRecentChats> {
                       new Container(
                         margin: EdgeInsets.only(
                             top: 40.0, right: 10.0, bottom: 10.0),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                30.0),border: Border.all(color: profile_image_border_color)
+                        ),
                         child: Material(
                           child: CachedNetworkImage(
                             placeholder: (context, url) =>
@@ -433,7 +437,7 @@ class BusinessRecentChatsState extends State<BusinessRecentChats> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-            new UsersList(_userSignInType, _muserId, _muserPhoto)));
+            new UsersList(_muserId,_userSignInType,  _muserPhoto)));
   }
 
 
@@ -500,6 +504,10 @@ class BusinessRecentChatsState extends State<BusinessRecentChats> {
                   children: <Widget>[
                     usersData!= null && usersData.employeePhotoUrl != null ? new Container(
                       margin: EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                              30.0),border: Border.all(color: profile_image_border_color)
+                      ),
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Material(
@@ -591,6 +599,7 @@ class BusinessRecentChatsState extends State<BusinessRecentChats> {
                         'Chatted with'+'\t'+capitalize(usersData.userName),
                         style: TextStyle(fontWeight: FontWeight.w500,
                             fontFamily: 'GoogleSansFamily',
+                            fontSize: 12.0,
                             color: hint_color_grey_light),),
                     ) : Text(''),
                     /* usersData != null && usersData.name != '' ? new Container(

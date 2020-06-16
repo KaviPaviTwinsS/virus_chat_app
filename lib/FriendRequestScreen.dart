@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:virus_chat_app/UsersList.dart';
+import 'file:///C:/Users/Nandhini%20S/Documents/virus_chat_app/lib/homePage/UsersList.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
 import 'package:intl/intl.dart';
@@ -37,6 +37,7 @@ class FriendRequestScreen extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+        fontFamily: 'GoogleSansFamily',
       ),
       home: FriendRequestScreenState(
           _mcurrentUserId, photoUrl
@@ -239,6 +240,10 @@ class friendlist extends StatelessWidget {
                               .spaceBetween,
                           children: <Widget>[
                             new Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                      30.0),border: Border.all(color: profile_image_border_color)
+                              ),
                               margin: EdgeInsets.only(top : 20.0,left: 10.0),
                               child: Align(
                                 alignment: Alignment.topLeft,
