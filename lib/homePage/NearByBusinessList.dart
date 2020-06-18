@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:virus_chat_app/business/BusinessData.dart';
 import 'package:virus_chat_app/business/BusinessDetailPage.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -10,9 +11,16 @@ import 'package:virus_chat_app/utils/constants.dart';
 
 
 class NearByBusinessList extends StatefulWidget {
+  String _mCurrentUserId = '';
+  List<BusinessData> _mBusinessData;
+  NearByBusinessList(String currentUserId, List<BusinessData> mBusinessData){
+    _mCurrentUserId = currentUserId;
+    _mBusinessData = mBusinessData;
+  }
+
   @override
   State<StatefulWidget> createState() {
-    return NearByBusinessListState();
+    return NearByBusinessListState(_mCurrentUserId,_mBusinessData);
   }
 
 }
@@ -22,6 +30,14 @@ class NearByBusinessListState extends State<NearByBusinessList> {
   final ScrollController listScrollController = new ScrollController();
   var listMessage;
   bool isLoading = false;
+
+
+  String _mCurrentUserId = '';
+  List<BusinessData> _mBusinessData;
+  NearByBusinessListState(String mCurrentUserId, List<BusinessData> mBusinessData){
+    _mCurrentUserId = mCurrentUserId;
+    _mBusinessData = mBusinessData;
+  }
 
 
   @override
@@ -92,58 +108,47 @@ class NearByBusinessListState extends State<NearByBusinessList> {
   }
 
   Widget buildListBusinesses() {
-    return Expanded(
-        child: StreamBuilder(
-          stream: Firestore.instance.collection('business').where(
-          'status', isEqualTo: 'ACTIVE').snapshots(),
-          builder: (context, snapshot) {
-            print(
-                'snapshot ____________${snapshot.hasData} ___isLoading $isLoading');
-            if (snapshot.data == null || !snapshot.hasData) {
-              isLoading = false;
-              /* return Center(
-              child: Text('sssssssssssss'));*/
-              return Center(
-                  child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
-            } else {
-              isLoading = false;
-              listMessage = snapshot.data.documents;
-              print('snapshot ____________${listMessage
-                  .length}___isLoading $isLoading');
-              return (listMessage.length == 0) ? Center(
-                child: Text(no_business),
-              ) : ListView.builder(
-                itemBuilder: (context, index) =>
-                    buildItem(index, snapshot.data.documents[index]),
-                itemCount: snapshot.data.documents.length,
-//              reverse: true,
-                controller: listScrollController,
-              );
-            }
-          },
-        )
+    return Flexible(
+      child: Container(
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
+          child:
+          (_mBusinessData != null && _mBusinessData.length != 0)? ListView.builder(
+            itemBuilder: (context, index) =>
+                buildItem(index, _mBusinessData),
+            itemCount: _mBusinessData.length,
+            controller: listScrollController,
+          ) : Center(
+            child: Text('No recent chats'),
+          )
+      ),
     );
   }
 
-  Widget buildItem(int index, DocumentSnapshot document) {
+  Widget buildItem(int index, List<BusinessData> mNearbyBusinessData) {
     print('Buisness __________index__$index');
-    return SingleChildScrollView(
-      child:  Column(
+    BusinessData businessData = mNearbyBusinessData[index];
+    return Column(
         children: <Widget>[
           GestureDetector(
             onTap: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) =>
                   BusinessDetailPage(
-                      document['businessId'], document['businessName'])));
+                      businessData.businessId, businessData.businessName)));
             },
             child: Row(
               children: <Widget>[
-                document['photoUrl'] != '' ? Container(
+                businessData.businessPhotoUrl != '' ? Container(
                   margin: EdgeInsets.only(bottom: index == 0 ? 10.0 : 10.0,top: index == 0 ? 0.0 : 15.0),
-                  child: document['photoUrl'] != null &&
-                            document['photoUrl'] != ''
+                  child: businessData.businessPhotoUrl!= null &&
+                      businessData.businessPhotoUrl!= ''
                             ? new Container(
                           margin: EdgeInsets.all(10.0),
                           child: Align(
@@ -161,7 +166,7 @@ class NearByBusinessListState extends State<NearByBusinessList> {
                                       height: 30.0,
                                       padding: EdgeInsets.all(10.0),
                                     ),
-                                imageUrl: document['photoUrl'],
+                                imageUrl: businessData.businessPhotoUrl,
                                 width: 60.0,
                                 height: 60.0,
                                 fit: BoxFit.cover,
@@ -177,7 +182,7 @@ class NearByBusinessListState extends State<NearByBusinessList> {
                                   30.0),border: Border.all(color: profile_image_border_color)
                           ),
                         )
-                            : document['photoUrl'] == ''
+                            : businessData.businessPhotoUrl == ''
                             ? new Container(
                             margin: EdgeInsets.all(10.0),
                             width: 60.0,
@@ -198,22 +203,22 @@ class NearByBusinessListState extends State<NearByBusinessList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    document['businessName'] != ''
+                    businessData.businessName != ''
                         ? Container(
                         margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,top: index == 0? 10.0 :15.0),
-                        child: Text(capitalize(document['businessName']),
+                        child: Text(capitalize( businessData.businessName),
                           style: TextStyle(fontWeight: FontWeight.w500,
                               fontSize: 16.0,
                               fontFamily: 'GoogleSansFamily',color: black_color),)
                     )
                         : Text(''),
-                  /*  document['businessDistance'] != ''
+                    businessData.businessDistance!= ''
                         ? Align(
                       alignment: Alignment.bottomLeft,
                       child: Container(
                           width: MediaQuery.of(context).size.width - 120,
                           margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,right: 10.0),
-                          child: Text(capitalize(document['businessDistance'],),
+                          child: Text(capitalize(  businessData.businessDistance.toString())+'\t'+businessData.distanceMetric,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontWeight: FontWeight.w400,
                                 fontSize: 12.0,
@@ -221,14 +226,13 @@ class NearByBusinessListState extends State<NearByBusinessList> {
                           )
                       ),
                     )
-                        : Text('')*/
+                        : Text('')
                   ],
                 )
               ],
             ),),
 //          Divider()
         ],
-      ),
     );
   }
 

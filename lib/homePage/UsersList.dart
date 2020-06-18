@@ -10,6 +10,7 @@ import 'package:device_info/device_info.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:virus_chat_app/homePage/NearByBusinessList.dart';
 
 import 'package:virus_chat_app/homePage/NearByUsersList.dart';
 //import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -1375,26 +1376,74 @@ class LoginUsersListState extends State<LoginUsersList> {
     }
   }
 
+
+  var mTempNearByUserListkm = new List<UsersData>();
+  var mTempNearByUserListm = new List<UsersData>();
+
   Future findNearByUsersForCurrentUser(double currentUserLat,
       double currentUserLng) async {
     _mNearByUsersData.clear();
-    var mTempNearByUsersList = new List<UsersData>();
     var query = await Firestore.instance.collection('users').where(
         'status', isEqualTo: 'ACTIVE').getDocuments();
-    query.documents.forEach((doc) async {
+    query.documents.forEach((doc){
       if (doc.documentID != currentUserId) {
-        DocumentSnapshot docs = await Firestore.instance.collection('users')
+       Firestore.instance.collection('users')
             .document(doc.documentID).collection(
             'userLocation').document(doc.documentID)
-            .get();
-        DocumentSnapshot map = docs;
-        if (map != null && map['userLocation'] != null) {
-          GeoPoint geopoint = map['userLocation'];
-          print('NearBY Users ______${geopoint} ______${doc.data['name']}');
-          double km = distance.distance(
-              new LatLng(currentUserLat, currentUserLng),
-              new LatLng(geopoint.latitude, geopoint.longitude));
-          mTempNearByUsersList.add(
+            .get().then((DocumentSnapshot documentSnapshot) {
+         findNearbyUsersList(
+              documentSnapshot, currentUserLat, currentUserLng, doc);
+        }).whenComplete(() {
+         print('findNearbyUsersList whenComplete _mNearByUsersData________${mTempNearByUserListm.length} _____${mTempNearByUserListkm.length}');
+
+         _mNearByUsersData.clear();
+         print('findNearbyUsersList whenComplete clear___________${mTempNearByUserListm.length} _____${mTempNearByUserListkm.length}');
+
+         mTempNearByUserListm.sort((a, b) {
+           print('METRICUSER_________________M ${a.userDistance} __${b
+               .userDistance}');
+           return a.userDistance.compareTo(b.userDistance);
+         });
+         mTempNearByUserListkm.sort((a, b) {
+           print('METRICUSER________________KM${a.userDistance} __${b
+               .userDistance}');
+           return a.userDistance.compareTo(b.userDistance);
+         });
+         _mNearByUsersData.addAll(mTempNearByUserListm);
+         _mNearByUsersData.addAll(mTempNearByUserListkm);
+         setState(() {
+           print('findNearbyUsersList whenComplete setState___________${_mNearByUsersData.length}');
+           this._mNearByUsersData = _mNearByUsersData;
+         });
+         Future.delayed(Duration(milliseconds: 20000));
+         setState(() {
+
+         });
+        });
+      }
+    });
+  }
+
+
+
+  void findNearbyUsersList(DocumentSnapshot businessLocation, double currentUserLat,double currentUserLng, DocumentSnapshot businessDetail)  {
+    print(
+        'BusinessListPage____________map_findNearByBusinessForCurrentUserdocs_________${businessDetail.data['id']}');
+    DocumentSnapshot map = businessLocation;
+    var doc = businessDetail;
+    if (map != null && map['userLocation'] != null) {
+      GeoPoint geopoint = map['userLocation'];
+      var myDistance;
+      double km = distance.distance(
+          new LatLng(currentUserLat, currentUserLng),
+          new LatLng(geopoint.latitude, geopoint.longitude));
+      var mkm = km.toInt();
+//          print('METRIC________NearBY Business _____METRIC_${mkm} _____');
+      if (mkm != 0) {
+        if (mkm == 1000) {
+          print('METRIC_________________KM__________NN1');
+          myDistance = (mkm / 1000).toInt();
+          mTempNearByUserListkm.add(
               UsersData(businessId: doc.data['businessId'],
                   businessName: doc.data['businessName'],
                   businessType: doc.data['businessType'],
@@ -1406,21 +1455,69 @@ class LoginUsersListState extends State<LoginUsersList> {
                   phoneNo: doc.data['phoneNo'],
                   photoUrl: doc.data['photoUrl'],
                   status: doc.data['status'],
-                  userDistance: km.toString(),
+                  userDistance:myDistance,
+                  distanceMetric: 'km',
                   user_token: doc.data['user_token']));
-          setState(() {
-            print('USRE LISTT length ${_mNearByUsersData
-                .length} _________${mTempNearByUsersList.length}');
-            this._mNearByUsersData = mTempNearByUsersList;
-          });
+        } else if (mkm < 1000) {
+          print('METRIC_________________M__________NN1');
+          myDistance = (mkm).toInt();
+          mTempNearByUserListm.add(
+              UsersData(businessId: doc.data['businessId'],
+                  businessName: doc.data['businessName'],
+                  businessType: doc.data['businessType'],
+                  createdAt: doc.data['createdAt'],
+                  email: doc.data['email'],
+                  id: doc.data['id'],
+                  name: doc.data['name'],
+                  nickName: doc.data['nickName'],
+                  phoneNo: doc.data['phoneNo'],
+                  photoUrl: doc.data['photoUrl'],
+                  status: doc.data['status'],
+                  userDistance:myDistance,
+                  distanceMetric: 'm',
+                  user_token: doc.data['user_token']));
+        } else {
+          print('METRIC_________________KM__________NN0');
+          myDistance = (mkm / 1000).toInt();
+          mTempNearByUserListkm.add(
+              UsersData(businessId: doc.data['businessId'],
+                  businessName: doc.data['businessName'],
+                  businessType: doc.data['businessType'],
+                  createdAt: doc.data['createdAt'],
+                  email: doc.data['email'],
+                  id: doc.data['id'],
+                  name: doc.data['name'],
+                  nickName: doc.data['nickName'],
+                  phoneNo: doc.data['phoneNo'],
+                  photoUrl: doc.data['photoUrl'],
+                  status: doc.data['status'],
+                  userDistance:myDistance,
+                  distanceMetric: 'km',
+                  user_token: doc.data['user_token']));
         }
+      } else {
+        print('METRIC_________________M__________NN0');
+        myDistance = (mkm).toInt();
+        mTempNearByUserListm.add(
+            UsersData(businessId: doc.data['businessId'],
+                businessName: doc.data['businessName'],
+                businessType: doc.data['businessType'],
+                createdAt: doc.data['createdAt'],
+                email: doc.data['email'],
+                id: doc.data['id'],
+                name: doc.data['name'],
+                nickName: doc.data['nickName'],
+                phoneNo: doc.data['phoneNo'],
+                photoUrl: doc.data['photoUrl'],
+                status: doc.data['status'],
+                userDistance:myDistance,
+                distanceMetric: 'm',
+                user_token: doc.data['user_token']));
       }
-    });
-
-//    await Future.delayed(Duration(milliseconds: 10000));
-
-
+    }
   }
+
+
 
 
   @override
@@ -1435,7 +1532,7 @@ class LoginUsersListState extends State<LoginUsersList> {
               .of(context)
               .size
               .height - 200) / 2,
-          margin: EdgeInsets.only(top: 20.0),
+//          margin: EdgeInsets.only(top: 10.0),
           child:
           (_mNearByUsersData != null && _mNearByUsersData.length != 0) &&
               (_mNearByUsersData != null && _mNearByUsersData.length != 0) ?
@@ -1444,10 +1541,11 @@ class LoginUsersListState extends State<LoginUsersList> {
                 buildUsersList(index, _mNearByUsersData),
             itemCount:8,
             shrinkWrap: true,
+            primary: true,
             gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,crossAxisSpacing: 2,childAspectRatio:1.2,
+              crossAxisCount: 4,childAspectRatio:0.6,
             ),
-            scrollDirection: Axis.horizontal,
+//            scrollDirection: Axis.vertical,
           ) : Center(
             child: Text('No users'),
           )
@@ -1470,7 +1568,7 @@ class LoginUsersListState extends State<LoginUsersList> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          NearByUsersList(currentUserId)));
+                          NearByUsersList(currentUserId,_mNearByUsersData)));
             },
             child:Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1512,6 +1610,8 @@ class LoginUsersListState extends State<LoginUsersList> {
                             )));
               },
               child: Container(
+                width: 100.0,
+                height: 100.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment
                       .start,
@@ -1567,7 +1667,7 @@ class LoginUsersListState extends State<LoginUsersList> {
                       width: 70,
                       margin: EdgeInsets.only(left: 15.0, top: 0.0,bottom: 0.0),
                       child: Text(
-                        usersData.userDistance,
+                        usersData.userDistance.toString() +'\t'+usersData.distanceMetric,
                         textAlign: TextAlign.center,
                         style: TextStyle(fontWeight: FontWeight.w500,
                           fontFamily: 'GoogleSansFamily',
@@ -1673,6 +1773,7 @@ class BusinessListPageState extends State<BusinessListPage> {
   final Distance distance = new Distance();
 
 
+
   BusinessListPageState(String currentUser, String photoUrl,
       String currentUserBusinessId) {
     currentUserId = currentUser;
@@ -1711,44 +1812,108 @@ class BusinessListPageState extends State<BusinessListPage> {
 
     }
   }
+  var mTempNearByBusinessListkm = new List<BusinessData>();
+  var mTempNearByBusinessListm = new List<BusinessData>();
 
   Future findNearByBusinessForCurrentUser(double currentUserLat,
       double currentUserLng) async {
     _mBusinessData.clear();
-    var mTempNearByBusinessList = new List<BusinessData>();
+
     var query = await Firestore.instance.collection('business').where(
         'status', isEqualTo: 'ACTIVE').getDocuments();
-    query.documents.forEach((doc) async {
+    query.documents.forEach((doc) {
       if (doc.documentID != _currentUserBusinessId) {
-
-        DocumentSnapshot docs = await Firestore.instance.collection('business')
+       Firestore.instance.collection('business')
             .document(doc.documentID).collection(
             'businessLocation').document(doc.documentID)
-            .get();
-        print('BusinessListPage____________map_findNearByBusinessForCurrentUserdocs');
-        DocumentSnapshot map = docs;
-        if (map != null && map['businessLocation'] != null) {
-          GeoPoint geopoint = map['businessLocation'];
-          print('NearBY Business ______${geopoint} ______${doc.data['name']}');
-          double km = distance.distance(
-              new LatLng(currentUserLat, currentUserLng),
-              new LatLng(geopoint.latitude, geopoint.longitude));
-          mTempNearByBusinessList.add(
-              BusinessData(businessId: doc.data['businessId'],
-                  businessName: doc.data['businessName'],
-                  businessPhotoUrl: doc.data['photoUrl'],
-              businessStatus: doc.data['status'],
-              businessDistance: km.toString()));
-          setState(() {
-            this._mBusinessData = mTempNearByBusinessList;
-          });
-        }
+            .get().then((DocumentSnapshot documentSnapshot){
+         findNearbyBusinessList(documentSnapshot,currentUserLat,currentUserLng,doc);
+       }).whenComplete((){
+         _mBusinessData.clear();
+         mTempNearByBusinessListm.sort((a, b) {
+           print('METRIC_________________M ${a.businessDistance} __${b.businessDistance}');
+           return a.businessDistance.compareTo(b.businessDistance);
+         });
+         mTempNearByBusinessListkm.sort((a, b) {
+           print('METRIC________________KM${a.businessDistance} __${b.businessDistance}');
+           return a.businessDistance.compareTo(b.businessDistance);
+         });
+         print('METRIC________________KM  BEFORE${_mBusinessData.length} _______m ${mTempNearByBusinessListm.length}_______km ${mTempNearByBusinessListkm.length}');
+         _mBusinessData.addAll(mTempNearByBusinessListm);
+         print('METRIC________________KM AFTERRRR${_mBusinessData.length}');
+         _mBusinessData.addAll(mTempNearByBusinessListkm);
+         setState(() {
+           this._mBusinessData = _mBusinessData;
+         });
+         Future.delayed(Duration(milliseconds: 20000));
+         setState(() {
+
+         });
+       });
       }
     });
 
-//    await Future.delayed(Duration(milliseconds: 10000));
+  }
 
 
+  Future findNearbyBusinessList(DocumentSnapshot businessLocation, double currentUserLat,double currentUserLng, DocumentSnapshot businessDetail) async {
+    print(
+        'BusinessListPage____________map_findNearByBusinessForCurrentUserdocs');
+    DocumentSnapshot map = businessLocation;
+    var doc = businessDetail;
+    if (map != null && map['businessLocation'] != null) {
+      GeoPoint geopoint = map['businessLocation'];
+      var myDistance;
+      double km = distance.distance(
+          new LatLng(currentUserLat, currentUserLng),
+          new LatLng(geopoint.latitude, geopoint.longitude));
+      var mkm = km.toInt();
+//          print('METRIC________NearBY Business _____METRIC_${mkm} _____');
+      if (mkm != 0) {
+        if (mkm == 1000) {
+          print('METRIC_________________KM__________NN1');
+
+          myDistance = (mkm / 1000).toInt();
+          mTempNearByBusinessListkm.add(
+              BusinessData(businessId: doc.data['businessId'],
+                  businessName: doc.data['businessName'],
+                  businessPhotoUrl: doc.data['photoUrl'],
+                  businessStatus: doc.data['status'],
+                  businessDistance: myDistance,
+                  distanceMetric: 'km'));
+        } else if (mkm < 1000) {
+          print('METRIC_________________M__________NN1');
+          myDistance = (mkm).toInt();
+          mTempNearByBusinessListm.add(
+              BusinessData(businessId: doc.data['businessId'],
+                  businessName: doc.data['businessName'],
+                  businessPhotoUrl: doc.data['photoUrl'],
+                  businessStatus: doc.data['status'],
+                  businessDistance: myDistance,
+                  distanceMetric: 'm'));
+        } else {
+          print('METRIC_________________KM__________NN0');
+          myDistance = (mkm / 1000).toInt();
+          mTempNearByBusinessListkm.add(
+              BusinessData(businessId: doc.data['businessId'],
+                  businessName: doc.data['businessName'],
+                  businessPhotoUrl: doc.data['photoUrl'],
+                  businessStatus: doc.data['status'],
+                  businessDistance: myDistance,
+                  distanceMetric: 'km'));
+        }
+      } else {
+        print('METRIC_________________M__________NN0');
+        myDistance = (mkm).toInt();
+        mTempNearByBusinessListm.add(
+            BusinessData(businessId: doc.data['businessId'],
+                businessName: doc.data['businessName'],
+                businessPhotoUrl: doc.data['photoUrl'],
+                businessStatus: doc.data['status'],
+                businessDistance: myDistance,
+                distanceMetric: 'm'));
+      }
+    }
   }
 
 
@@ -1764,7 +1929,7 @@ class BusinessListPageState extends State<BusinessListPage> {
             .of(context)
             .size
             .height - 200) / 2,
-        margin: EdgeInsets.only(top: 20.0),
+        margin: EdgeInsets.only(top: 10.0),
         child:
         (_mBusinessData != null && _mBusinessData.length != 0) &&
             (_mBusinessData != null && _mBusinessData.length != 0) ?
@@ -1774,9 +1939,9 @@ class BusinessListPageState extends State<BusinessListPage> {
           itemCount:8,
           shrinkWrap: true,
           gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,crossAxisSpacing: 2,childAspectRatio:1.2,
+            crossAxisCount: 4,crossAxisSpacing: 2,childAspectRatio:0.6,
           ),
-          scrollDirection: Axis.horizontal,
+          scrollDirection: Axis.vertical,
         ) : Center(
           child: Text('No Business'),
         )
@@ -1793,111 +1958,116 @@ class BusinessListPageState extends State<BusinessListPage> {
     } else if (_mBusinessData.length > 0 && _mBusinessData.length != 0 && _mBusinessData.length > index) {
       BusinessData businessData = _mBusinessData[index];
       return businessData != null ? index+1 == 8 &&  _mBusinessData.length >8? GestureDetector(
-              onTap: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            BusinessPage()));
-              },
-              child:Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  new Container(
-                    margin: EdgeInsets.only(
-                        left: 10.0, top: 0.0,bottom: 0.0),
-                    width: 70.0,
-                    height: 70.0,
-                    child: new SvgPicture.asset(
-                      'images/show_more.svg',
-                    ),
+            onTap: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          NearByBusinessList(currentUserId,_mBusinessData)));
+            },
+            child: Container(
+                height: 100.0,
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                new Container(
+                  margin: EdgeInsets.only(
+                      left: 10.0, top: 0.0,bottom: 0.0),
+                  width: 70.0,
+                  height: 70.0,
+                  child: new SvgPicture.asset(
+                    'images/show_more.svg',
                   ),
-                  new Container(
+                ),
+                new Container(
+                  margin: EdgeInsets.only(left: 15.0, top: 0.0,bottom: 0.0),
+                  child: Text('Show more',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.w500,
+                      fontFamily: 'GoogleSansFamily',
+                      color: black_color,
+                      fontSize: 12.0,),),
+                )
+              ],
+            )
+            )
+      ):GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) =>
+                  BusinessDetailPage(businessData.businessId, businessData.businessName)));
+            },
+            child: Container(
+              height: 100.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment
+                    .start,
+                mainAxisAlignment: MainAxisAlignment
+                    .start,
+                children: <Widget>[
+                  businessData.businessPhotoUrl != null &&
+                      businessData.businessPhotoUrl != ''
+                      ? new Container(
+                      margin: EdgeInsets.only(
+                          left: 20.0, top: 0.0,bottom: 0.0),
+                      width: 60.0,
+                      height: 60.0,
+                      decoration: new BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: profile_image_border_color),
+                          image: new DecorationImage(
+                            fit: BoxFit.fill,
+                            image: new NetworkImage(
+                                businessData.businessPhotoUrl),
+                          )
+                      )
+                  )
+                      : businessData.businessPhotoUrl == ''
+                      ? new Container(
+                      margin: EdgeInsets.only(
+                          left: 20.0, top: 10.0),
+                      width: 60.0,
+                      height: 60.0,
+                      child: new SvgPicture.asset(
+                        'images/user_unavailable.svg',
+                        height: 10.0,
+                        width: 10.0,
+//                                          color: primaryColor,
+                      ),
+                      decoration: new BoxDecoration(
+                        shape: BoxShape.circle,
+                      ))
+                      : Text(''),
+                  businessData != null && businessData.businessName != '' ? new Container(
+                    width: 70,
                     margin: EdgeInsets.only(left: 15.0, top: 0.0,bottom: 0.0),
-                    child: Text('Show more',
+                    child: Text(capitalize(businessData.businessName),
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        textScaleFactor: 1.0, style: TextStyle(
+                            fontFamily: 'GoogleSansFamily',
+                            color: black_color,
+                            fontWeight: FontWeight.w400)),
+                  ) : Text(''),
+                  businessData != null && businessData.businessDistance != ''
+                      ? new Container(
+                    width: 70,
+                    margin: EdgeInsets.only(left: 15.0, top: 0.0,bottom: 0.0),
+                    child: Text(
+                      businessData.businessDistance.toString() + '\t'+businessData.distanceMetric,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.w500,
                         fontFamily: 'GoogleSansFamily',
-                        color: black_color,
+                        color: hint_color_grey_light,
                         fontSize: 12.0,),),
                   )
+                      : Text(''),
                 ],
-      )
-          ): GestureDetector(
-              onTap: () {
-                Navigator.push(
-        context, MaterialPageRoute(builder: (context) =>
-        BusinessDetailPage(businessData.businessId, businessData.businessName)));
-              },
-              child: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment
-                      .start,
-                  mainAxisAlignment: MainAxisAlignment
-                      .start,
-                  children: <Widget>[
-                    businessData.businessPhotoUrl != null &&
-                        businessData.businessPhotoUrl != ''
-                        ? new Container(
-                        margin: EdgeInsets.only(
-                            left: 20.0, top: 0.0,bottom: 10.0),
-                        width: 60.0,
-                        height: 60.0,
-                        decoration: new BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: profile_image_border_color),
-                            image: new DecorationImage(
-                              fit: BoxFit.fill,
-                              image: new NetworkImage(
-                                  businessData.businessPhotoUrl),
-                            )
-                        )
-                    )
-                        : businessData.businessPhotoUrl == ''
-                        ? new Container(
-                        margin: EdgeInsets.only(
-                            left: 20.0, top: 10.0),
-                        width: 60.0,
-                        height: 60.0,
-                        child: new SvgPicture.asset(
-                          'images/user_unavailable.svg',
-                          height: 10.0,
-                          width: 10.0,
-//                                          color: primaryColor,
-                        ),
-                        decoration: new BoxDecoration(
-                          shape: BoxShape.circle,
-                        ))
-                        : Text(''),
-                    businessData != null && businessData.businessName != '' ? new Container(
-                      width: 70,
-                      margin: EdgeInsets.only(left: 15.0, top: 0.0,bottom: 0.0),
-                      child: Text(capitalize(businessData.businessName),
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          textScaleFactor: 1.0, style: TextStyle(
-                              fontFamily: 'GoogleSansFamily',
-                              color: black_color,
-                              fontWeight: FontWeight.w400)),
-                    ) : Text(''),
-                    businessData != null && businessData.businessDistance != ''
-                        ? new Container(
-                      width: 70,
-                      margin: EdgeInsets.only(left: 15.0, top: 0.0,bottom: 0.0),
-                      child: Text(
-                        businessData.businessDistance,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontWeight: FontWeight.w500,
-                          fontFamily: 'GoogleSansFamily',
-                          color: hint_color_grey_light,
-                          fontSize: 12.0,),),
-                    )
-                        : Text(''),
-                  ],
-                ),
-              )
-      ) : Center(child: Text('No Business'),);
+              ),
+            )
+      ): Center(child: Text('No Business'),
+      );
     }else{
       return Container();
     }

@@ -2,9 +2,10 @@ class BusinessData {
   String businessId;
   String businessName;
   String businessPhotoUrl;
-  String businessDistance;
+  int businessDistance;
   String businessStatus;
+  String distanceMetric;
   BusinessData(
-      {this.businessId, this.businessName, this.businessPhotoUrl, this.businessDistance,this.businessStatus});
+      {this.businessId, this.businessName, this.businessPhotoUrl, this.businessDistance,this.businessStatus,this.distanceMetric});
 
 }

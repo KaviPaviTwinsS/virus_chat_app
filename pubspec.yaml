@@ -239,4 +239,4 @@ fonts:
   # For details regarding fonts from package dependencies,IACTIV
   # see https://flutter.dev/custom-fonts/#from-packages
 module:
-  androidX: true // Add this line.
+  androidX: true

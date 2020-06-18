@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:virus_chat_app/business/UsersData.dart';
 import 'package:virus_chat_app/chat/chat.dart';
 import 'package:virus_chat_app/utils/colors.dart';
 import 'package:virus_chat_app/utils/strings.dart';
@@ -12,12 +13,14 @@ import 'package:virus_chat_app/utils/constants.dart';
 class NearByUsersList extends StatefulWidget {
 
   String _currentUserId ='';
-  NearByUsersList(String currentUserId){
+  List<UsersData> _mNearByUsersData;
+  NearByUsersList(String currentUserId, List<UsersData> mNearByUsersData){
     _currentUserId = currentUserId;
+    _mNearByUsersData = mNearByUsersData;
   }
   @override
   State<StatefulWidget> createState() {
-    return NearByUsersListState(_currentUserId);
+    return NearByUsersListState(_currentUserId,_mNearByUsersData);
   }
 
 }
@@ -27,10 +30,12 @@ class NearByUsersListState extends State<NearByUsersList> {
   final ScrollController listScrollController = new ScrollController();
   var listMessage;
   bool isLoading = false;
+  List<UsersData> _mNearByUsersData;
 
   String _currentUserId;
-  NearByUsersListState(String currentUserId){
+  NearByUsersListState(String currentUserId, List<UsersData> mNearByUsersData){
     _currentUserId = currentUserId;
+    _mNearByUsersData = mNearByUsersData;
   }
 
 
@@ -78,7 +83,7 @@ class NearByUsersListState extends State<NearByUsersList> {
                 ],
               ),
               Divider(color: divider_color, thickness: 1.0,),
-              buildListBusinesses(),
+              buildListUsers(),
             ],
           ),
           buildLoading()
@@ -101,45 +106,34 @@ class NearByUsersListState extends State<NearByUsersList> {
     );
   }
 
-  Widget buildListBusinesses() {
-    return Expanded(
-        child: StreamBuilder(
-          stream: Firestore.instance.collection('users') .where(
-          'status', isEqualTo: 'ACTIVE').snapshots(),
-          builder: (context, snapshot) {
-            print(
-                'snapshot ____________${snapshot.hasData} ___isLoading $isLoading');
-            if (snapshot.data == null || !snapshot.hasData) {
-              isLoading = false;
-              /* return Center(
-              child: Text('sssssssssssss'));*/
-              return Center(
-                  child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(progress_color)));
-            } else {
-              isLoading = false;
-              listMessage = snapshot.data.documents;
-              print('snapshot ____________${listMessage
-                  .length}___isLoading $isLoading');
-              return (listMessage.length == 0) ? Center(
-                child: Text(no_business),
-              ) : ListView.builder(
-                itemBuilder: (context, index) =>
-                    buildItem(index, snapshot.data.documents[index]),
-                itemCount: snapshot.data.documents.length,
-//              reverse: true,
-                controller: listScrollController,
-              );
-            }
-          },
-        )
-    );
+  Widget buildListUsers() {
+     return Flexible(
+       child: Container(
+           width: MediaQuery
+               .of(context)
+               .size
+               .width,
+           height: MediaQuery
+               .of(context)
+               .size
+               .height,
+           child:
+           (_mNearByUsersData != null && _mNearByUsersData.length != 0)? ListView.builder(
+             itemBuilder: (context, index) =>
+                 buildItem(index, _mNearByUsersData),
+             itemCount: _mNearByUsersData.length,
+             controller: listScrollController,
+           ) : Center(
+             child: Text('No recent chats'),
+           )
+       ),
+     );
   }
 
-  Widget buildItem(int index, DocumentSnapshot document) {
+  Widget buildItem(int index, List<UsersData> mNearbyUsersData) {
     print('Buisness __________index__$index');
-    return SingleChildScrollView(
-      child:  Column(
+    UsersData usersData = mNearbyUsersData[index];
+    return Column(
         children: <Widget>[
           GestureDetector(
             onTap: () {
@@ -149,19 +143,19 @@ class NearByUsersListState extends State<NearByUsersList> {
                       builder: (context) =>
                           Chat(
                             currentUserId: _currentUserId,
-                            peerId: document['id'],
-                            peerAvatar: document['photoUrl'],
+                            peerId: usersData.id,
+                            peerAvatar: usersData.photoUrl,
                             isFriend: true,
                             isAlreadyRequestSent: true,
-                            peerName: document['name'],
+                            peerName: usersData.name,
                           )));
             },
             child: Row(
               children: <Widget>[
-                document['photoUrl'] != '' ? Container(
+                usersData.photoUrl != '' ? Container(
                   margin: EdgeInsets.only(bottom: index == 0 ? 10.0 : 10.0,top: index == 0 ? 0.0 : 15.0),
-                  child: document['photoUrl'] != null &&
-                            document['photoUrl'] != ''
+                  child:  usersData.photoUrl != null &&
+                      usersData.photoUrl!= ''
                             ? new Container(
                           margin: EdgeInsets.all(10.0),
                           child: Align(
@@ -179,7 +173,7 @@ class NearByUsersListState extends State<NearByUsersList> {
                                       height: 30.0,
                                       padding: EdgeInsets.all(10.0),
                                     ),
-                                imageUrl: document['photoUrl'],
+                                imageUrl:  usersData.photoUrl,
                                 width: 60.0,
                                 height: 60.0,
                                 fit: BoxFit.cover,
@@ -195,7 +189,7 @@ class NearByUsersListState extends State<NearByUsersList> {
                                   30.0),border: Border.all(color: profile_image_border_color)
                           ),
                         )
-                            : document['photoUrl'] == ''
+                            :  usersData.photoUrl == ''
                             ? new Container(
                             margin: EdgeInsets.all(10.0),
                             width: 60.0,
@@ -216,22 +210,22 @@ class NearByUsersListState extends State<NearByUsersList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    document['name'] != ''
+                    usersData.name != ''
                         ? Container(
                         margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,top: index == 0? 10.0 :15.0),
-                        child: Text(capitalize(document['name']),
+                        child: Text(capitalize( usersData.name),
                           style: TextStyle(fontWeight: FontWeight.w500,
                               fontSize: 16.0,
                               fontFamily: 'GoogleSansFamily',color: black_color),)
                     )
                         : Text(''),
-                   /* document['userDistance'] != ''
+                    usersData.userDistance != ''
                         ? Align(
                       alignment: Alignment.bottomLeft,
                       child: Container(
                           width: MediaQuery.of(context).size.width - 120,
                           margin: EdgeInsets.only(left: 0.0, bottom: index == 10 ? 0.0 : 10.0,right: 10.0),
-                          child: Text(capitalize(document['userDistance'],),
+                          child: Text(usersData.userDistance.toString()+'\t'+usersData.distanceMetric,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontWeight: FontWeight.w400,
                                 fontSize: 12.0,
@@ -239,14 +233,13 @@ class NearByUsersListState extends State<NearByUsersList> {
                           )
                       ),
                     )
-                        : Text('')*/
+                        : Text('')
                   ],
                 )
               ],
             ),),
 //          Divider()
         ],
-      ),
     );
   }
 
